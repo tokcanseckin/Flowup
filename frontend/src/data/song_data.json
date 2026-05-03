@@ -1,0 +1,571 @@
+{
+  "spotify_uri": "spotify:track:4uLU6hMCjMI75M1A2tKUQC",
+  "title": "Группа Крови — Кино",
+  "lines": [
+    {
+      "start_time_ms": 14800,
+      "end_time_ms": 19200,
+      "original_line": "Тёплое место, но улицы ждут",
+      "stressed_line": "Тёплое ме́сто, но у́лицы ждут",
+      "translation": "A warm place, but the streets are waiting",
+      "words": [
+        {
+          "key": 1,
+          "inflected_stressed": "Тёплое",
+          "lemma_stressed": "тёплый",
+          "grammar": "Adjective, Nominative, Singular, Neuter",
+          "dictionary_definition": "warm, cozy, comforting"
+        },
+        {
+          "key": 2,
+          "inflected_stressed": "ме́сто,",
+          "lemma_stressed": "ме́сто",
+          "grammar": "Noun, Nominative, Singular, Neuter",
+          "dictionary_definition": "place, spot, seat, location"
+        },
+        {
+          "key": 3,
+          "inflected_stressed": "но",
+          "lemma_stressed": "но",
+          "grammar": "Conjunction",
+          "dictionary_definition": "but, however, yet"
+        },
+        {
+          "key": 4,
+          "inflected_stressed": "у́лицы",
+          "lemma_stressed": "у́лица",
+          "grammar": "Noun, Nominative, Plural, Feminine",
+          "dictionary_definition": "street, road (pl: streets)"
+        },
+        {
+          "key": 5,
+          "inflected_stressed": "ждут",
+          "lemma_stressed": "жда́ть",
+          "grammar": "Verb, Present, 3rd Person, Plural",
+          "dictionary_definition": "to wait, to await, to expect"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 19200,
+      "end_time_ms": 23600,
+      "original_line": "Отправляться в дорогу зовут",
+      "stressed_line": "Отправля́ться в доро́гу зову́т",
+      "translation": "They call us to set out on the road",
+      "words": [
+        {
+          "key": 1,
+          "inflected_stressed": "Отправля́ться",
+          "lemma_stressed": "отправля́ться",
+          "grammar": "Verb (infinitive), Imperfective",
+          "dictionary_definition": "to set off, to depart, to head out"
+        },
+        {
+          "key": 2,
+          "inflected_stressed": "в",
+          "lemma_stressed": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, into, to (direction)"
+        },
+        {
+          "key": 3,
+          "inflected_stressed": "доро́гу",
+          "lemma_stressed": "доро́га",
+          "grammar": "Noun, Accusative, Singular, Feminine",
+          "dictionary_definition": "road, path, way, journey"
+        },
+        {
+          "key": 4,
+          "inflected_stressed": "зову́т",
+          "lemma_stressed": "зва́ть",
+          "grammar": "Verb, Present, 3rd Person, Plural",
+          "dictionary_definition": "to call, to invite, to summon"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 23600,
+      "end_time_ms": 28100,
+      "original_line": "Снова ты видишь вперёд",
+      "stressed_line": "Сно́ва ты ви́дишь вперёд",
+      "translation": "Once again you look ahead",
+      "words": [
+        {
+          "key": 1,
+          "inflected_stressed": "Сно́ва",
+          "lemma_stressed": "сно́ва",
+          "grammar": "Adverb",
+          "dictionary_definition": "again, once more, anew"
+        },
+        {
+          "key": 2,
+          "inflected_stressed": "ты",
+          "lemma_stressed": "ты",
+          "grammar": "Pronoun, Nominative, 2nd Person, Singular",
+          "dictionary_definition": "you (informal singular)"
+        },
+        {
+          "key": 3,
+          "inflected_stressed": "ви́дишь",
+          "lemma_stressed": "ви́деть",
+          "grammar": "Verb, Present, 2nd Person, Singular",
+          "dictionary_definition": "to see, to perceive, to observe"
+        },
+        {
+          "key": 4,
+          "inflected_stressed": "вперёд",
+          "lemma_stressed": "вперёд",
+          "grammar": "Adverb",
+          "dictionary_definition": "forward, ahead, onwards"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 28100,
+      "end_time_ms": 32600,
+      "original_line": "Группа крови на рукаве",
+      "stressed_line": "Гру́ппа кро́ви на рукаве́",
+      "translation": "Blood type on the sleeve",
+      "words": [
+        {
+          "key": 1,
+          "inflected_stressed": "Гру́ппа",
+          "lemma_stressed": "гру́ппа",
+          "grammar": "Noun, Nominative, Singular, Feminine",
+          "dictionary_definition": "group, team, band, cluster"
+        },
+        {
+          "key": 2,
+          "inflected_stressed": "кро́ви",
+          "lemma_stressed": "кровь",
+          "grammar": "Noun, Genitive, Singular, Feminine",
+          "dictionary_definition": "blood (gen: of blood)"
+        },
+        {
+          "key": 3,
+          "inflected_stressed": "на",
+          "lemma_stressed": "на",
+          "grammar": "Preposition",
+          "dictionary_definition": "on, upon, at (surface)"
+        },
+        {
+          "key": 4,
+          "inflected_stressed": "рукаве́",
+          "lemma_stressed": "рукав",
+          "grammar": "Noun, Locative, Singular, Masculine",
+          "dictionary_definition": "sleeve (of a garment)"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 32600,
+      "end_time_ms": 37200,
+      "original_line": "Мой порядковый номер на рукаве",
+      "stressed_line": "Мой поря́дковый но́мер на рукаве́",
+      "translation": "My serial number on the sleeve",
+      "words": [
+        {
+          "key": 1,
+          "inflected_stressed": "Мой",
+          "lemma_stressed": "мой",
+          "grammar": "Pronoun, Nominative, Singular, Masculine",
+          "dictionary_definition": "my, mine (masculine)"
+        },
+        {
+          "key": 2,
+          "inflected_stressed": "поря́дковый",
+          "lemma_stressed": "поря́дковый",
+          "grammar": "Adjective, Nominative, Singular, Masculine",
+          "dictionary_definition": "ordinal, serial, sequential"
+        },
+        {
+          "key": 3,
+          "inflected_stressed": "но́мер",
+          "lemma_stressed": "но́мер",
+          "grammar": "Noun, Nominative, Singular, Masculine",
+          "dictionary_definition": "number, issue, size, room"
+        },
+        {
+          "key": 4,
+          "inflected_stressed": "на",
+          "lemma_stressed": "на",
+          "grammar": "Preposition",
+          "dictionary_definition": "on, upon, at (surface)"
+        },
+        {
+          "key": 5,
+          "inflected_stressed": "рукаве́",
+          "lemma_stressed": "рукав",
+          "grammar": "Noun, Locative, Singular, Masculine",
+          "dictionary_definition": "sleeve (of a garment)"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 37200,
+      "end_time_ms": 42000,
+      "original_line": "Пожелай мне удачи в бою",
+      "stressed_line": "Пожела́й мне уда́чи в бою́",
+      "translation": "Wish me luck in battle",
+      "words": [
+        {
+          "key": 1,
+          "inflected_stressed": "Пожела́й",
+          "lemma_stressed": "пожела́ть",
+          "grammar": "Verb, Imperative, 2nd Person, Singular, Perfective",
+          "dictionary_definition": "to wish (someone something); wish me!"
+        },
+        {
+          "key": 2,
+          "inflected_stressed": "мне",
+          "lemma_stressed": "я",
+          "grammar": "Pronoun, Dative, 1st Person, Singular",
+          "dictionary_definition": "me, to me (dative of я)"
+        },
+        {
+          "key": 3,
+          "inflected_stressed": "уда́чи",
+          "lemma_stressed": "уда́ча",
+          "grammar": "Noun, Genitive, Singular, Feminine",
+          "dictionary_definition": "luck, fortune, success"
+        },
+        {
+          "key": 4,
+          "inflected_stressed": "в",
+          "lemma_stressed": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, during (location/time)"
+        },
+        {
+          "key": 5,
+          "inflected_stressed": "бою́",
+          "lemma_stressed": "бой",
+          "grammar": "Noun, Locative, Singular, Masculine",
+          "dictionary_definition": "battle, fight, combat"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 42000,
+      "end_time_ms": 46800,
+      "original_line": "Пожелай мне не остаться в ней",
+      "stressed_line": "Пожела́й мне не оста́ться в ней",
+      "translation": "Wish me not to remain in it",
+      "words": [
+        {
+          "key": 1,
+          "inflected_stressed": "Пожела́й",
+          "lemma_stressed": "пожела́ть",
+          "grammar": "Verb, Imperative, 2nd Person, Singular, Perfective",
+          "dictionary_definition": "to wish (someone something)"
+        },
+        {
+          "key": 2,
+          "inflected_stressed": "мне",
+          "lemma_stressed": "я",
+          "grammar": "Pronoun, Dative, 1st Person, Singular",
+          "dictionary_definition": "me, to me"
+        },
+        {
+          "key": 3,
+          "inflected_stressed": "не",
+          "lemma_stressed": "не",
+          "grammar": "Particle",
+          "dictionary_definition": "not (negation particle)"
+        },
+        {
+          "key": 4,
+          "inflected_stressed": "оста́ться",
+          "lemma_stressed": "оста́ться",
+          "grammar": "Verb (infinitive), Perfective",
+          "dictionary_definition": "to remain, to stay, to be left"
+        },
+        {
+          "key": 5,
+          "inflected_stressed": "в",
+          "lemma_stressed": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, inside"
+        },
+        {
+          "key": 6,
+          "inflected_stressed": "ней",
+          "lemma_stressed": "она́",
+          "grammar": "Pronoun, Locative, 3rd Person, Singular, Feminine",
+          "dictionary_definition": "in her/it (prepositional of она)"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 46800,
+      "end_time_ms": 51500,
+      "original_line": "Пожелай мне удачи в бою",
+      "stressed_line": "Пожела́й мне уда́чи в бою́",
+      "translation": "Wish me luck in battle",
+      "words": [
+        {
+          "key": 1,
+          "inflected_stressed": "Пожела́й",
+          "lemma_stressed": "пожела́ть",
+          "grammar": "Verb, Imperative, 2nd Person, Singular, Perfective",
+          "dictionary_definition": "to wish (someone something)"
+        },
+        {
+          "key": 2,
+          "inflected_stressed": "мне",
+          "lemma_stressed": "я",
+          "grammar": "Pronoun, Dative, 1st Person, Singular",
+          "dictionary_definition": "me, to me"
+        },
+        {
+          "key": 3,
+          "inflected_stressed": "уда́чи",
+          "lemma_stressed": "уда́ча",
+          "grammar": "Noun, Genitive, Singular, Feminine",
+          "dictionary_definition": "luck, fortune, success"
+        },
+        {
+          "key": 4,
+          "inflected_stressed": "в",
+          "lemma_stressed": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, during"
+        },
+        {
+          "key": 5,
+          "inflected_stressed": "бою́",
+          "lemma_stressed": "бой",
+          "grammar": "Noun, Locative, Singular, Masculine",
+          "dictionary_definition": "battle, fight, combat"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 51500,
+      "end_time_ms": 57000,
+      "original_line": "Я хочу быть с тобой",
+      "stressed_line": "Я хочу́ быть с тобо́й",
+      "translation": "I want to be with you",
+      "words": [
+        {
+          "key": 1,
+          "inflected_stressed": "Я",
+          "lemma_stressed": "я",
+          "grammar": "Pronoun, Nominative, 1st Person, Singular",
+          "dictionary_definition": "I (first person singular)"
+        },
+        {
+          "key": 2,
+          "inflected_stressed": "хочу́",
+          "lemma_stressed": "хоте́ть",
+          "grammar": "Verb, Present, 1st Person, Singular",
+          "dictionary_definition": "to want, to wish, to desire"
+        },
+        {
+          "key": 3,
+          "inflected_stressed": "быть",
+          "lemma_stressed": "быть",
+          "grammar": "Verb (infinitive), Imperfective",
+          "dictionary_definition": "to be, to exist"
+        },
+        {
+          "key": 4,
+          "inflected_stressed": "с",
+          "lemma_stressed": "с",
+          "grammar": "Preposition",
+          "dictionary_definition": "with, together with"
+        },
+        {
+          "key": 5,
+          "inflected_stressed": "тобо́й",
+          "lemma_stressed": "ты",
+          "grammar": "Pronoun, Ablative, 2nd Person, Singular",
+          "dictionary_definition": "you (instrumental: with you)"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 57000,
+      "end_time_ms": 62500,
+      "original_line": "Я хочу быть с тобой",
+      "stressed_line": "Я хочу́ быть с тобо́й",
+      "translation": "I want to be with you",
+      "words": [
+        {
+          "key": 1,
+          "inflected_stressed": "Я",
+          "lemma_stressed": "я",
+          "grammar": "Pronoun, Nominative, 1st Person, Singular",
+          "dictionary_definition": "I (first person singular)"
+        },
+        {
+          "key": 2,
+          "inflected_stressed": "хочу́",
+          "lemma_stressed": "хоте́ть",
+          "grammar": "Verb, Present, 1st Person, Singular",
+          "dictionary_definition": "to want, to wish, to desire"
+        },
+        {
+          "key": 3,
+          "inflected_stressed": "быть",
+          "lemma_stressed": "быть",
+          "grammar": "Verb (infinitive), Imperfective",
+          "dictionary_definition": "to be, to exist"
+        },
+        {
+          "key": 4,
+          "inflected_stressed": "с",
+          "lemma_stressed": "с",
+          "grammar": "Preposition",
+          "dictionary_definition": "with, together with"
+        },
+        {
+          "key": 5,
+          "inflected_stressed": "тобо́й",
+          "lemma_stressed": "ты",
+          "grammar": "Pronoun, Ablative, 2nd Person, Singular",
+          "dictionary_definition": "you (instrumental: with you)"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 62500,
+      "end_time_ms": 68000,
+      "original_line": "И я хочу быть с тобой",
+      "stressed_line": "И я хочу́ быть с тобо́й",
+      "translation": "And I want to be with you",
+      "words": [
+        {
+          "key": 1,
+          "inflected_stressed": "И",
+          "lemma_stressed": "и",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and, also, even"
+        },
+        {
+          "key": 2,
+          "inflected_stressed": "я",
+          "lemma_stressed": "я",
+          "grammar": "Pronoun, Nominative, 1st Person, Singular",
+          "dictionary_definition": "I (first person singular)"
+        },
+        {
+          "key": 3,
+          "inflected_stressed": "хочу́",
+          "lemma_stressed": "хоте́ть",
+          "grammar": "Verb, Present, 1st Person, Singular",
+          "dictionary_definition": "to want, to wish, to desire"
+        },
+        {
+          "key": 4,
+          "inflected_stressed": "быть",
+          "lemma_stressed": "быть",
+          "grammar": "Verb (infinitive), Imperfective",
+          "dictionary_definition": "to be, to exist"
+        },
+        {
+          "key": 5,
+          "inflected_stressed": "с",
+          "lemma_stressed": "с",
+          "grammar": "Preposition",
+          "dictionary_definition": "with, together with"
+        },
+        {
+          "key": 6,
+          "inflected_stressed": "тобо́й",
+          "lemma_stressed": "ты",
+          "grammar": "Pronoun, Ablative, 2nd Person, Singular",
+          "dictionary_definition": "you (instrumental: with you)"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 68000,
+      "end_time_ms": 73500,
+      "original_line": "Наши сердца требуют смены декораций",
+      "stressed_line": "На́ши сердца́ тре́буют сме́ны декора́ций",
+      "translation": "Our hearts demand a change of scenery",
+      "words": [
+        {
+          "key": 1,
+          "inflected_stressed": "На́ши",
+          "lemma_stressed": "наш",
+          "grammar": "Pronoun, Nominative, Plural",
+          "dictionary_definition": "our, ours (plural)"
+        },
+        {
+          "key": 2,
+          "inflected_stressed": "сердца́",
+          "lemma_stressed": "се́рдце",
+          "grammar": "Noun, Nominative, Plural, Neuter",
+          "dictionary_definition": "hearts (pl. of сердце)"
+        },
+        {
+          "key": 3,
+          "inflected_stressed": "тре́буют",
+          "lemma_stressed": "тре́бовать",
+          "grammar": "Verb, Present, 3rd Person, Plural",
+          "dictionary_definition": "to demand, to require, to need"
+        },
+        {
+          "key": 4,
+          "inflected_stressed": "сме́ны",
+          "lemma_stressed": "сме́на",
+          "grammar": "Noun, Genitive, Singular, Feminine",
+          "dictionary_definition": "change, shift, replacement"
+        },
+        {
+          "key": 5,
+          "inflected_stressed": "декора́ций",
+          "lemma_stressed": "декора́ция",
+          "grammar": "Noun, Genitive, Plural, Feminine",
+          "dictionary_definition": "scenery, décor, set decoration"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 73500,
+      "end_time_ms": 79000,
+      "original_line": "Это не больше, чем жест",
+      "stressed_line": "Э́то не бо́льше, чем жест",
+      "translation": "This is no more than a gesture",
+      "words": [
+        {
+          "key": 1,
+          "inflected_stressed": "Э́то",
+          "lemma_stressed": "э́то",
+          "grammar": "Pronoun, Nominative, Singular, Neuter",
+          "dictionary_definition": "this, that, it (demonstrative)"
+        },
+        {
+          "key": 2,
+          "inflected_stressed": "не",
+          "lemma_stressed": "не",
+          "grammar": "Particle",
+          "dictionary_definition": "not (negation)"
+        },
+        {
+          "key": 3,
+          "inflected_stressed": "бо́льше,",
+          "lemma_stressed": "бо́льше",
+          "grammar": "Adverb, Comparative",
+          "dictionary_definition": "more, greater (comparative)"
+        },
+        {
+          "key": 4,
+          "inflected_stressed": "чем",
+          "lemma_stressed": "чем",
+          "grammar": "Conjunction",
+          "dictionary_definition": "than (comparison)"
+        },
+        {
+          "key": 5,
+          "inflected_stressed": "жест",
+          "lemma_stressed": "жест",
+          "grammar": "Noun, Nominative, Singular, Masculine",
+          "dictionary_definition": "gesture, motion, sign"
+        }
+      ]
+    }
+  ]
+}
