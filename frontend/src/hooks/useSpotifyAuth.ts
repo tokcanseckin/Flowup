@@ -15,8 +15,37 @@ import { useState, useEffect, useCallback } from 'react'
 
 // ── Config ────────────────────────────────────────────────────────────────────
 
-const CLIENT_ID   = import.meta.env.VITE_SPOTIFY_CLIENT_ID as string
-const REDIRECT_URI = window.location.origin  // e.g. http://localhost:5173
+const CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID as string
+const REDIRECT_URI = (
+  (import.meta.env.VITE_SPOTIFY_REDIRECT_URI as string | undefined)?.trim() ||
+  window.location.origin
+)
+
+function isValidSpotifyClientId(value: string | undefined | null): value is string {
+  if (!value) return false
+  const v = value.trim()
+  if (!v) return false
+  if (v === 'your_spotify_client_id_here') return false
+  // Spotify client IDs are 32-char hex strings.
+  return /^[a-f0-9]{32}$/i.test(v)
+}
+
+function isValidRedirectUri(value: string | undefined | null): value is string {
+  if (!value) return false
+  try {
+    const url = new URL(value)
+    if (url.protocol === 'https:') {
+      return true
+    }
+    // Spotify allows HTTP only for explicit loopback addresses.
+    return (
+      url.protocol === 'http:' &&
+      (url.hostname === '127.0.0.1' || url.hostname === '::1')
+    )
+  } catch {
+    return false
+  }
+}
 
 const SCOPES = [
   'streaming',
@@ -172,6 +201,17 @@ export function useSpotifyAuth(): SpotifyAuthState & SpotifyAuthActions {
   // ── Initialization: handle callback or restore session ─────────────────────
   useEffect(() => {
     const init = async () => {
+      if (!isValidSpotifyClientId(CLIENT_ID)) {
+        setError('Spotify is not configured: set VITE_SPOTIFY_CLIENT_ID in frontend/.env and restart Vite.')
+        setIsLoading(false)
+        return
+      }
+      if (!isValidRedirectUri(REDIRECT_URI)) {
+        setError('Invalid Spotify redirect URI. Use HTTPS, or HTTP with loopback (e.g. http://127.0.0.1:5173). localhost is not allowed.')
+        setIsLoading(false)
+        return
+      }
+
       const params         = new URLSearchParams(window.location.search)
       const code           = params.get('code')
       const returnedState  = params.get('state')
@@ -236,6 +276,15 @@ export function useSpotifyAuth(): SpotifyAuthState & SpotifyAuthActions {
 
   // ── login ──────────────────────────────────────────────────────────────────
   const login = useCallback(async () => {
+    if (!isValidSpotifyClientId(CLIENT_ID)) {
+      setError('Invalid Spotify client_id. Update VITE_SPOTIFY_CLIENT_ID in frontend/.env and restart Vite.')
+      return
+    }
+    if (!isValidRedirectUri(REDIRECT_URI)) {
+      setError('Invalid Spotify redirect URI. Use HTTPS, or HTTP with loopback (e.g. http://127.0.0.1:5173). localhost is not allowed.')
+      return
+    }
+
     const verifier  = generateRandomString(64)
     const challenge = await sha256Base64Url(verifier)
     const state     = generateRandomString(16)
