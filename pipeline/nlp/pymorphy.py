@@ -12,6 +12,14 @@ import re
 
 from .base import NLPBackend, WordAnalysis
 
+
+_VOWELS = "АЕЁИОУЫЭЮЯаеёиоуыэюя"
+
+
+def _normalize_stress_marks(text: str) -> str:
+    """Convert ruaccent's plus-before-vowel markers into combining acute accents."""
+    return re.sub(rf"\+([{_VOWELS}])", lambda m: m.group(1) + "\u0301", text)
+
 # ── Grammar tag maps (pymorphy3 internal codes → human labels) ────────────────
 
 _POS = {
@@ -81,13 +89,13 @@ class PyMorphyBackend(NLPBackend):
 
         # Newer ruaccent builds expose process_all(), older ones process_text().
         if hasattr(self._accent, "process_text"):
-            return self._accent.process_text(text)
+            return _normalize_stress_marks(self._accent.process_text(text))
 
         if hasattr(self._accent, "process_all"):
             out = self._accent.process_all(text)
             if isinstance(out, list):
-                return out[0] if out else text
-            return out
+                return _normalize_stress_marks(out[0] if out else text)
+            return _normalize_stress_marks(out)
 
         return text
 
