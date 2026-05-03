@@ -1,0 +1,4 @@
+requests>=2.31.0
+pymorphy3>=2.0.2
+ruaccent>=0.0.10
+onnxruntime>=1.17.0

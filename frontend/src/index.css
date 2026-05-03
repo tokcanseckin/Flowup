@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    background-color: #0d0d14;
+    color-scheme: dark;
+  }
+
+  /* Smooth scrollbar in webkit */
+  ::-webkit-scrollbar        { width: 6px; }
+  ::-webkit-scrollbar-track  { background: transparent; }
+  ::-webkit-scrollbar-thumb  { background: #2d2d4a; border-radius: 3px; }
+
+  /* Russian text needs slightly more line-height for readability */
+  .lyrics-text {
+    font-feature-settings: "kern" 1, "liga" 1;
+    line-height: 1.4;
+  }
+}
+
+@layer utilities {
+  /* Stress-mark accent (U+0301) renders sharply */
+  .stressed {
+    font-variant-ligatures: none;
+  }
+
+  /* Invisible scrollbar but still scrollable */
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  /* Glass card */
+  .glass {
+    background: rgba(18, 18, 31, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+}
