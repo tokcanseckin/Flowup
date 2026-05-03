@@ -2,9 +2,11 @@
 Russian dictionary lookup with multiple fallbacks.
 
 Strategies:
-1. Try to download OpenRussian CSV files from GitHub (cached locally)
-2. Fall back to Wiktionary API for live definitions
-3. Last resort: return None (caller uses lemma as placeholder)
+1. Try TogetherDB OpenRussian public export (words/translations)
+2. Try to download OpenRussian CSV files from GitHub mirrors
+3. Try Archive.org snapshots for historical CSV copies
+4. Fall back to Wiktionary API for live definitions
+5. Last resort: return None (caller uses lemma as placeholder)
 """
 
 from __future__ import annotations
@@ -36,6 +38,72 @@ _lookup: dict[str, str] | None = None
 _wiktionary_cache: dict[str, Optional[str]] = {}
 
 _WIKTIONARY_API = "https://en.wiktionary.org/api/rest_v1/page/definition"
+
+_TOGETHERDB_WORKER = "https://worker.togetherdb.com"
+_TOGETHERDB_CONNECTION_ID = "fwoedz5fvtwvq03v"
+_TOGETHERDB_DATABASE_NAME = "openrussian_public"
+
+
+def _download_togetherdb_table(table_name: str, dest: Path) -> None:
+    """Download a TogetherDB table as CSV into dest."""
+    export_endpoint = (
+        f"{_TOGETHERDB_WORKER}/connections/{_TOGETHERDB_CONNECTION_ID}"
+        f"/databases/{_TOGETHERDB_DATABASE_NAME}/tables/{table_name}"
+        "/export?expand=false&filter=&separator=%2C"
+    )
+    resp = requests.post(export_endpoint, timeout=30)
+    resp.raise_for_status()
+    data = resp.json()
+    export_key = (data.get("result") or {}).get("exportKey")
+    if not export_key:
+        raise ValueError(f"Missing exportKey for table '{table_name}'")
+
+    csv_url = f"{_TOGETHERDB_WORKER}/exports/{export_key}"
+    csv_resp = requests.get(csv_url, timeout=120)
+    csv_resp.raise_for_status()
+
+    tmp_dest = dest.with_suffix(dest.suffix + ".tmp")
+    tmp_dest.write_bytes(csv_resp.content)
+    tmp_dest.replace(dest)
+
+
+def _download_from_togetherdb() -> bool:
+    """Try fetching OpenRussian CSV tables from TogetherDB worker export API."""
+    try:
+        structure_url = (
+            f"{_TOGETHERDB_WORKER}/connections/{_TOGETHERDB_CONNECTION_ID}"
+            f"/databases/{_TOGETHERDB_DATABASE_NAME}/structure"
+        )
+        print("[Dictionary] Checking TogetherDB OpenRussian structure...")
+        structure_resp = requests.get(structure_url, timeout=30)
+        structure_resp.raise_for_status()
+        structure = structure_resp.json()
+
+        table_names = {
+            (t.get("name") or "").strip().lower()
+            for t in (structure.get("result") or {}).get("tables", [])
+            if isinstance(t, dict)
+        }
+        if "words" not in table_names or "translations" not in table_names:
+            print(
+                "[Dictionary] TogetherDB structure missing words/translations tables; "
+                "continuing with other sources"
+            )
+            return False
+
+        print("[Dictionary] Downloading words/translations from TogetherDB...")
+        _download_togetherdb_table("words", _WORDS_FILE)
+        _download_togetherdb_table("translations", _TRANSLATIONS_FILE)
+        words_kb = _WORDS_FILE.stat().st_size // 1024
+        trans_kb = _TRANSLATIONS_FILE.stat().st_size // 1024
+        print(
+            f"[Dictionary] Saved TogetherDB CSV cache: "
+            f"words={words_kb:,} KB, translations={trans_kb:,} KB"
+        )
+        return True
+    except Exception as exc:
+        print(f"[Dictionary] TogetherDB export failed: {exc}")
+        return False
 
 
 def _download_first(urls: list[str], dest: Path) -> None:
@@ -209,7 +277,7 @@ def _build_lookup(already_tried_download: bool = False) -> dict[str, str]:
         try:
             # Build word_id -> bare lemma map
             id_to_bare: dict[str, str] = {}
-            with _WORDS_FILE.open(encoding="utf-8") as fh:
+            with _WORDS_FILE.open(encoding="utf-8-sig") as fh:
                 reader = csv.DictReader(fh)
                 for row in reader:
                     bare = (row.get("bare") or "").strip()
@@ -219,13 +287,14 @@ def _build_lookup(already_tried_download: bool = False) -> dict[str, str]:
 
             # Build word_id -> English definitions map
             id_to_defs: dict[str, list[str]] = {}
-            with _TRANSLATIONS_FILE.open(encoding="utf-8") as fh:
+            with _TRANSLATIONS_FILE.open(encoding="utf-8-sig") as fh:
                 reader = csv.DictReader(fh)
                 for row in reader:
                     if (row.get("lang") or "").lower() != "en":
                         continue
                     wid = (row.get("word_id") or "").strip()
-                    word = (row.get("word") or "").strip()
+                    # TogetherDB/OpenRussian exports use `tl` for translated text.
+                    word = (row.get("word") or row.get("tl") or "").strip()
                     if wid and word:
                         id_to_defs.setdefault(wid, []).append(word)
 
@@ -243,6 +312,10 @@ def _build_lookup(already_tried_download: bool = False) -> dict[str, str]:
     
     # Try to download fresh copies on first call (not on recursive call)
     if not already_tried_download:
+        # First try TogetherDB worker export (currently most reliable OpenRussian source)
+        if _download_from_togetherdb():
+            return _build_lookup(already_tried_download=True)
+
         # First try GitHub mirrors
         try:
             _download_first(_WORDS_URLS, _WORDS_FILE)
@@ -277,9 +350,10 @@ def lookup(lemma: str) -> Optional[str]:
     """Return English definition(s) for lemma.
     
     Strategy:
-    1. Check local in-memory cache (loaded from CSV)
-    2. Try Wiktionary API for live lookup
-    3. Return None if all fail (caller uses lemma as placeholder)
+    1. Check local in-memory cache (loaded from TogetherDB/GitHub/Archive CSV)
+    2. Try Russian Wiktionary API for live lookup
+    3. Fall back to English Wiktionary API
+    4. Return None if all fail (caller uses lemma as placeholder)
     """
     if _lookup is None:
         return None
