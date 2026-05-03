@@ -1,8 +1,8 @@
-import { useState, useCallback, useEffect, useRef } from 'react'
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react'
 import { useSpotifyAuth }   from './hooks/useSpotifyAuth'
 import { useSpotifyPlayer } from './hooks/useSpotifyPlayer'
 import LyricsPlayer         from './components/LyricsPlayer'
-import { api, SongDetail, SongSummary } from './api/client'
+import { api, PlaylistDetail, PlaylistSummary, SongDetail, SongSummary } from './api/client'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -95,12 +95,15 @@ const LANG_BADGE_MAP: Record<string, string> = {
 }
 
 function SongBrowser({
-  songs, loading, error, onSelect, onLogout, user,
+  songs, playlists, activePlaylistId, loading, error, onSelect, onSelectPlaylist, onLogout, user,
 }: {
   songs: SongSummary[]
+  playlists: PlaylistSummary[]
+  activePlaylistId: number | null
   loading: boolean
   error: string | null
   onSelect: (id: number) => void
+  onSelectPlaylist: (id: number | null) => void
   onLogout: () => void
   user: { display_name: string | null } | null
 }) {
@@ -127,7 +130,25 @@ function SongBrowser({
         </div>
       </div>
 
-      <h2 className="text-white font-semibold text-lg mb-4">Choose a song</h2>
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <h2 className="text-white font-semibold text-lg">Choose a song</h2>
+        <div className="flex items-center gap-2">
+          <label className="text-xs text-gray-500" htmlFor="playlist-select">Playlist</label>
+          <select
+            id="playlist-select"
+            value={activePlaylistId ?? ''}
+            onChange={e => onSelectPlaylist(e.target.value ? Number(e.target.value) : null)}
+            className="rounded-lg border border-gray-700 bg-gray-900/80 px-2 py-1.5 text-xs text-gray-200 focus:outline-none focus:border-indigo-500"
+          >
+            <option value="">All songs</option>
+            {playlists.map(pl => (
+              <option key={pl.id} value={pl.id}>
+                {pl.name} ({pl.song_count})
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
 
       {error && (
         <div className="mb-4 rounded-xl border border-amber-900/50 bg-amber-950/20 px-4 py-3 text-sm text-amber-400">
@@ -213,12 +234,16 @@ function ProgressBar({ posMs, durMs, onSeek }: { posMs: number; durMs: number; o
 // ── Player view ───────────────────────────────────────────────────────────────
 
 function PlayerView({
-  song, user, onBack, onLogout,
+  song, user, onBack, onLogout, onPrev, onNext, canPrev, canNext,
 }: {
   song: SongDetail
   user: { display_name: string | null; images: { url: string }[] } | null
   onBack: () => void
   onLogout: () => void
+  onPrev: () => void
+  onNext: () => void
+  canPrev: boolean
+  canNext: boolean
 }) {
   const [trackUri, setTrackUri] = useState(song.spotify_uri)
   const [loading,  setLoading]  = useState(false)
@@ -231,6 +256,26 @@ function PlayerView({
     await player.loadAndPlayTrack(trackUri)
     setLoading(false)
   }, [player, trackUri])
+
+  useEffect(() => {
+    setTrackUri(song.spotify_uri)
+  }, [song.spotify_uri])
+
+  useEffect(() => {
+    if (!player.isReady) return
+
+    let cancelled = false
+    setLoading(true)
+
+    void player.loadAndPlayTrack(song.spotify_uri)
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [player, player.isReady, song.spotify_uri])
 
   useEffect(() => {
     if (infoVisible) {
@@ -331,7 +376,17 @@ function PlayerView({
             </div>
           </div>
           <ProgressBar posMs={player.currentPositionMs} durMs={player.durationMs} onSeek={player.seekTo} />
-          <div className="flex items-center justify-center mt-5">
+          <div className="flex items-center justify-center gap-3 mt-5">
+            <button
+              onClick={onPrev}
+              disabled={!canPrev}
+              aria-label="Previous song"
+              className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-800 hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed text-gray-200 transition-all"
+            >
+              <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">
+                <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
+              </svg>
+            </button>
             <button
               onClick={player.togglePlay}
               disabled={!player.isReady}
@@ -353,6 +408,16 @@ function PlayerView({
                   <path d="M8 5.14v14l11-7-11-7z"/>
                 </svg>
               )}
+            </button>
+            <button
+              onClick={onNext}
+              disabled={!canNext}
+              aria-label="Next song"
+              className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-800 hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed text-gray-200 transition-all"
+            >
+              <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">
+                <path d="M16 6h2v12h-2zM6 6v12l8.5-6z"/>
+              </svg>
             </button>
           </div>
         </section>
@@ -399,21 +464,44 @@ export default function App() {
   const auth = useSpotifyAuth()
 
   const [songs,        setSongs]        = useState<SongSummary[]>([])
+  const [playlists,    setPlaylists]    = useState<PlaylistSummary[]>([])
+  const [activePlaylistId, setActivePlaylistId] = useState<number | null>(null)
+  const [activePlaylist, setActivePlaylist] = useState<PlaylistDetail | null>(null)
   const [songsLoading, setSongsLoading] = useState(false)
+  const [playlistsLoading, setPlaylistsLoading] = useState(false)
   const [songsError,   setSongsError]   = useState<string | null>(null)
   const [activeSong,   setActiveSong]   = useState<SongDetail | null>(null)
   const [songLoading,  setSongLoading]  = useState(false)
 
-  // Fetch song list once authenticated
+  // Fetch song and playlist lists once authenticated
   useEffect(() => {
     if (!auth.isAuthenticated) return
     setSongsLoading(true)
+    setPlaylistsLoading(true)
     setSongsError(null)
     api.listSongs()
       .then(setSongs)
       .catch(e => setSongsError(e instanceof Error ? e.message : 'Failed to load songs'))
       .finally(() => setSongsLoading(false))
+
+    api.listPlaylists()
+      .then((pls) => {
+        setPlaylists(pls)
+        if (pls.length > 0) setActivePlaylistId(pls[0].id)
+      })
+      .catch(e => setSongsError(e instanceof Error ? e.message : 'Failed to load playlists'))
+      .finally(() => setPlaylistsLoading(false))
   }, [auth.isAuthenticated])
+
+  useEffect(() => {
+    if (!activePlaylistId) {
+      setActivePlaylist(null)
+      return
+    }
+    api.getPlaylist(activePlaylistId)
+      .then(setActivePlaylist)
+      .catch(() => setActivePlaylist(null))
+  }, [activePlaylistId])
 
   // Sync user to backend (non-fatal if backend is down)
   useEffect(() => {
@@ -443,6 +531,38 @@ export default function App() {
     }
   }, [])
 
+  const displayedSongs = useMemo(() => {
+    if (!activePlaylist) return songs
+    const byId = new Map(songs.map(s => [s.id, s]))
+    return activePlaylist.songs.map((entry) => {
+      const full = byId.get(entry.song_id)
+      if (full) return full
+      return {
+        id: entry.song_id,
+        spotify_uri: entry.spotify_uri,
+        title: entry.title,
+        artist: entry.artist,
+        language_code: activePlaylist.language_code ?? 'ru',
+        language_name: (activePlaylist.language_code ?? 'ru').toUpperCase(),
+      }
+    })
+  }, [activePlaylist, songs])
+
+  const activeSongIndex = useMemo(() => {
+    if (!activeSong) return -1
+    return displayedSongs.findIndex(s => s.id === activeSong.id)
+  }, [activeSong, displayedSongs])
+
+  const handlePrevSong = useCallback(() => {
+    if (activeSongIndex <= 0) return
+    void handleSelectSong(displayedSongs[activeSongIndex - 1].id)
+  }, [activeSongIndex, displayedSongs, handleSelectSong])
+
+  const handleNextSong = useCallback(() => {
+    if (activeSongIndex < 0 || activeSongIndex >= displayedSongs.length - 1) return
+    void handleSelectSong(displayedSongs[activeSongIndex + 1].id)
+  }, [activeSongIndex, displayedSongs, handleSelectSong])
+
   if (auth.isLoading)  return <LoadingScreen message="Restoring session..." />
   if (!auth.isAuthenticated) return <LoginScreen onLogin={auth.login} error={auth.error} />
   if (songLoading)     return <LoadingScreen message="Loading song..." />
@@ -454,16 +574,23 @@ export default function App() {
         user={auth.user}
         onBack={() => setActiveSong(null)}
         onLogout={auth.logout}
+        onPrev={handlePrevSong}
+        onNext={handleNextSong}
+        canPrev={activeSongIndex > 0}
+        canNext={activeSongIndex >= 0 && activeSongIndex < displayedSongs.length - 1}
       />
     )
   }
 
   return (
     <SongBrowser
-      songs={songs}
-      loading={songsLoading}
+      songs={displayedSongs}
+      playlists={playlists}
+      activePlaylistId={activePlaylistId}
+      loading={songsLoading || playlistsLoading}
       error={songsError}
       onSelect={handleSelectSong}
+      onSelectPlaylist={setActivePlaylistId}
       onLogout={auth.logout}
       user={auth.user}
     />

@@ -21,6 +21,7 @@ export interface PlayerControls {
 }
 
 const SPOTIFY_SDK_ID = 'spotify-web-playback-sdk'
+const PLAYER_NAME = 'FlowUp - Russian Music Learner'
 
 /**
  * Injects the Spotify Web Playback SDK, initialises a Player instance with the
@@ -67,7 +68,7 @@ export function useSpotifyPlayer(token: string | null): PlayerState & PlayerCont
 
     const initPlayer = () => {
       const player = new window.Spotify.Player({
-        name: 'FlowUp — Russian Music Learner',
+        name: PLAYER_NAME,
         getOAuthToken: cb => cb(token),
         volume: 0.6,
       })
@@ -168,15 +169,68 @@ export function useSpotifyPlayer(token: string | null): PlayerState & PlayerCont
    * Requires token scopes: streaming, user-modify-playback-state
    */
   const loadAndPlayTrack = useCallback(async (trackUri: string) => {
-    const deviceId = deviceIdRef.current
-    if (!deviceId || !token) return
+    if (!token) return
 
-    // Transfer playback to this device
-    const transferRes = await fetch('https://api.spotify.com/v1/me/player', {
-      method: 'PUT',
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ device_ids: [deviceId], play: false }),
-    })
+    const player = playerRef.current
+    // Best effort: satisfy browser autoplay requirements before transfer.
+    const activatable = player as (Spotify.Player & { activateElement?: () => Promise<void> | void }) | null
+    await activatable?.activateElement?.()
+    await player?.connect()
+
+    const getDevices = async (): Promise<Array<{ id: string; name?: string }>> => {
+      const r = await fetch('https://api.spotify.com/v1/me/player/devices', {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      if (!r.ok) return []
+      const data = await r.json() as { devices?: Array<{ id: string; name?: string }> }
+      return data.devices ?? []
+    }
+
+    const knownDeviceId = deviceIdRef.current
+    let devices = await getDevices()
+
+    let targetDeviceId =
+      (knownDeviceId && devices.find(d => d.id === knownDeviceId)?.id) ||
+      devices.find(d => d.name === PLAYER_NAME)?.id ||
+      devices[0]?.id ||
+      null
+
+    if (!targetDeviceId) {
+      // One short retry window for SDK registration in Spotify devices list.
+      await new Promise(resolve => setTimeout(resolve, 700))
+      devices = await getDevices()
+      targetDeviceId =
+        (knownDeviceId && devices.find(d => d.id === knownDeviceId)?.id) ||
+        devices.find(d => d.name === PLAYER_NAME)?.id ||
+        devices[0]?.id ||
+        null
+    }
+
+    if (!targetDeviceId) {
+      setState(prev => ({
+        ...prev,
+        error: 'No Spotify playback device available. Open Spotify on this browser/device and try again.',
+      }))
+      return
+    }
+
+    const transfer = async (deviceId: string) =>
+      fetch('https://api.spotify.com/v1/me/player', {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ device_ids: [deviceId], play: false }),
+      })
+
+    let transferRes = await transfer(targetDeviceId)
+    if (!transferRes.ok && transferRes.status !== 204 && transferRes.status === 404) {
+      devices = await getDevices()
+      const fallbackId = devices[0]?.id
+      if (fallbackId) {
+        targetDeviceId = fallbackId
+        transferRes = await transfer(targetDeviceId)
+      }
+    }
+
     if (!transferRes.ok && transferRes.status !== 204) {
       const body = await transferRes.json().catch(() => ({})) as { error?: { message?: string } }
       setState(prev => ({
@@ -186,12 +240,30 @@ export function useSpotifyPlayer(token: string | null): PlayerState & PlayerCont
       return
     }
 
-    // Start the track
-    const playRes = await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
+    deviceIdRef.current = targetDeviceId
+    setState(prev => ({ ...prev, deviceId: targetDeviceId, error: null }))
+
+    const playRes = await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${targetDeviceId}`, {
       method: 'PUT',
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ uris: [trackUri], position_ms: 0 }),
     })
+    if (!playRes.ok && playRes.status === 404) {
+      // Sometimes transfer succeeds but immediate play races; retry once.
+      await transfer(targetDeviceId)
+      const retry = await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${targetDeviceId}`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ uris: [trackUri], position_ms: 0 }),
+      })
+      if (retry.ok) return
+      const body = await retry.json().catch(() => ({})) as { error?: { message?: string } }
+      setState(prev => ({
+        ...prev,
+        error: `Play request failed (${retry.status}): ${body.error?.message ?? retry.statusText}`,
+      }))
+      return
+    }
     if (!playRes.ok) {
       const body = await playRes.json().catch(() => ({})) as { error?: { message?: string } }
       setState(prev => ({
