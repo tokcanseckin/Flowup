@@ -39,7 +39,7 @@ _POS = {
 }
 _CASE = {
     "nomn": "Nominative", "gent": "Genitive",  "datv": "Dative",
-    "accs": "Accusative", "ablt": "Instrumental", "loct": "Locative",
+    "accs": "Accusative", "ablt": "Instrumental", "loct": "Prepositional",
     "voct": "Vocative",   "gen2": "Genitive 2", "loc2": "Prepositional",
 }
 _GEND = {"masc": "Masculine", "femn": "Feminine",  "neut": "Neuter"}

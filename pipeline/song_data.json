@@ -1,1095 +1,2084 @@
 {
-  "spotify_uri": "spotify:track:7fss5WF5vuXRHvMsYRQXQH",
-  "title": "Темная ночь",
-  "artist": "Mark Bernes",
+  "spotify_uri": "spotify:track:3vLykknydhbDIVnaTvt1yJ",
+  "title": "Marea",
+  "artist": "Madame",
   "language": {
-    "code": "ru",
-    "name": "Russian",
-    "script": "Cyrillic",
+    "code": "it",
+    "name": "Italian",
+    "script": "Latin",
     "direction": "ltr"
   },
   "lines": [
     {
-      "start_time_ms": 13310,
-      "end_time_ms": 20460,
-      "original_line": "Тёмная ночь, только пули свистят по степи",
-      "phonetic_line": "Тёмная но́чь, то́лько пу́ли свистя́т по степи́",
-      "translation": "Dark night, only bullets whistling down the steppe",
+      "start_time_ms": 7000,
+      "end_time_ms": 12060,
+      "original_line": "Sarà, sarà l'oasi in mezzo al Sahara",
+      "phonetic_line": null,
+      "translation": "It will be the oasis in the middle of the Sahara",
       "words": [
         {
           "key": 1,
-          "display_form": "Тёмная",
-          "lemma": "тёмный",
-          "grammar": "Adjective, Singular, Feminine, Nominative",
-          "dictionary_definition": "dark"
+          "display_form": "Sarà,",
+          "lemma": "essere",
+          "grammar": "Auxiliary Verb, Singular, Future, Indicative, 3rd Person",
+          "dictionary_definition": "give certain properties to something"
         },
         {
           "key": 2,
-          "display_form": "но́чь,",
-          "lemma": "но́чь",
-          "grammar": "Noun, Singular, Feminine, Accusative / Noun, Singular, Feminine, Nominative",
-          "dictionary_definition": "night"
+          "display_form": "sarà",
+          "lemma": "essere",
+          "grammar": "Auxiliary Verb, Singular, Future, Indicative, 3rd Person",
+          "dictionary_definition": "give certain properties to something"
         },
         {
           "key": 3,
-          "display_form": "то́лько",
-          "lemma": "то́лько",
-          "grammar": "Adverb / Particle / Conjunction",
-          "dictionary_definition": "only; just, simply"
+          "display_form": "l'oasi",
+          "lemma": "loasi",
+          "grammar": "Proper Noun",
+          "dictionary_definition": "[loasi]"
         },
         {
           "key": 4,
-          "display_form": "пу́ли",
-          "lemma": "пу́ля",
-          "grammar": "Noun, Plural, Feminine, Accusative / Noun, Singular, Feminine, Genitive / Noun, Plural, Feminine, Nominative",
-          "dictionary_definition": "bullet, projectile"
-        },
-        {
-          "key": 5,
-          "display_form": "свистя́т",
-          "lemma": "свисте́ть",
-          "grammar": "Verb, Present, 3rd Person, Plural",
-          "dictionary_definition": "to whistle"
-        },
-        {
-          "key": 6,
-          "display_form": "по",
-          "lemma": "по́",
-          "grammar": "Preposition / Noun, Singular, Neuter, Nominative / Noun, Singular, Neuter, Genitive / Noun, Singular, Neuter, Dative / Noun, Singular, Neuter, Accusative / Noun, Singular, Neuter, Instrumental / Noun, Singular, Neuter, Locative / Noun, Singular, Nominative / Noun, Singular, Genitive / Noun, Singular, Dative / Noun, Singular, Accusative / Noun, Singular, Instrumental / Noun, Singular, Locative / Noun, Plural, Nominative / Noun, Plural, Genitive / Noun, Plural, Dative / Noun, Plural, Accusative / Noun, Plural, Instrumental / Noun, Plural, Locative",
-          "dictionary_definition": "along, down, through, across, around; about, under, for, on; by the means of (por medio de), on; hit or punch somewhere"
-        },
-        {
-          "key": 7,
-          "display_form": "степи́",
-          "lemma": "сте́пь",
-          "grammar": "Noun, Singular, Feminine, Dative / Noun, Plural, Feminine, Nominative / Noun, Singular, Feminine, Genitive / Noun, Plural, Feminine, Accusative / Noun, Singular, Feminine, Locative / Noun, Singular, Feminine, Prepositional",
-          "dictionary_definition": "steppe / veld"
-        }
-      ]
-    },
-    {
-      "start_time_ms": 20460,
-      "end_time_ms": 30980,
-      "original_line": "Только ветер гудит в проводах, тускло звёзды мерцают",
-      "phonetic_line": "То́лько ве́тер гуди́т в провода́х, ту́скло звёзды мерца́ют",
-      "translation": "Only the wind hums in the wires, dim stars twinkle",
-      "words": [
-        {
-          "key": 1,
-          "display_form": "То́лько",
-          "lemma": "то́лько",
-          "grammar": "Adverb / Particle / Conjunction",
-          "dictionary_definition": "only; just, simply"
-        },
-        {
-          "key": 2,
-          "display_form": "ве́тер",
-          "lemma": "ве́тер",
-          "grammar": "Noun, Singular, Masculine, Nominative / Noun, Singular, Masculine, Accusative",
-          "dictionary_definition": "wind, breeze"
-        },
-        {
-          "key": 3,
-          "display_form": "гуди́т",
-          "lemma": "гуде́ть",
-          "grammar": "Verb, Present, 3rd Person, Singular",
-          "dictionary_definition": "buzz, drone, hoot, honk"
-        },
-        {
-          "key": 4,
-          "display_form": "в",
-          "lemma": "в",
-          "grammar": "Preposition / Noun, Singular, Masculine, Genitive / Noun, Singular, Masculine, Locative / Noun, Singular, Masculine, Nominative / Noun, Singular, Masculine, Dative / Noun, Singular, Masculine, Accusative / Noun, Singular, Masculine, Instrumental / Noun, Plural, Masculine, Nominative / Noun, Plural, Masculine, Genitive / Noun, Plural, Masculine, Dative / Noun, Plural, Masculine, Accusative / Noun, Plural, Masculine, Instrumental / Noun, Plural, Masculine, Locative",
-          "dictionary_definition": "in, at, on, within; to, into, for"
-        },
-        {
-          "key": 5,
-          "display_form": "провода́х,",
-          "lemma": "про́воды",
-          "grammar": "Noun, Plural, Locative / Noun, Plural, Masculine, Locative",
-          "dictionary_definition": "seeing-off, send-off, farewell"
-        },
-        {
-          "key": 6,
-          "display_form": "ту́скло",
-          "lemma": "ту́скло",
-          "grammar": "Adverb / Verb, Past, Singular, Neuter / Adj (short), Singular, Neuter",
-          "dictionary_definition": "dimly, wanly"
-        },
-        {
-          "key": 7,
-          "display_form": "звёзды",
-          "lemma": "звезда́",
-          "grammar": "Noun, Plural, Feminine, Nominative / Noun, Plural, Feminine, Accusative",
-          "dictionary_definition": "star; famous person; name of service module on the International Space Station"
-        },
-        {
-          "key": 8,
-          "display_form": "мерца́ют",
-          "lemma": "мерца́ть",
-          "grammar": "Verb, Present, 3rd Person, Plural",
-          "dictionary_definition": "to twinkle/to shimmer, glimmer, flicker"
-        }
-      ]
-    },
-    {
-      "start_time_ms": 30980,
-      "end_time_ms": 38240,
-      "original_line": "В тёмную ночь ты любимая знаю не спишь",
-      "phonetic_line": "В тёмную но́чь ты люби́мая зна́ю не спи́шь",
-      "translation": "On a dark night, you know you don't sleep.",
-      "words": [
-        {
-          "key": 1,
-          "display_form": "В",
-          "lemma": "в",
-          "grammar": "Preposition / Noun, Singular, Masculine, Genitive / Noun, Singular, Masculine, Locative / Noun, Singular, Masculine, Nominative / Noun, Singular, Masculine, Dative / Noun, Singular, Masculine, Accusative / Noun, Singular, Masculine, Instrumental / Noun, Plural, Masculine, Nominative / Noun, Plural, Masculine, Genitive / Noun, Plural, Masculine, Dative / Noun, Plural, Masculine, Accusative / Noun, Plural, Masculine, Instrumental / Noun, Plural, Masculine, Locative / Noun, Singular, Feminine, Nominative / Noun, Singular, Feminine, Genitive / Noun, Singular, Feminine, Dative / Noun, Singular, Feminine, Accusative / Noun, Singular, Feminine, Instrumental / Noun, Singular, Feminine, Locative",
-          "dictionary_definition": "in, at, on, within; to, into, for"
-        },
-        {
-          "key": 2,
-          "display_form": "тёмную",
-          "lemma": "тёмный",
-          "grammar": "Adjective, Singular, Feminine, Accusative",
-          "dictionary_definition": "dark"
-        },
-        {
-          "key": 3,
-          "display_form": "но́чь",
-          "lemma": "но́чь",
-          "grammar": "Noun, Singular, Feminine, Accusative / Noun, Singular, Feminine, Nominative",
-          "dictionary_definition": "night"
-        },
-        {
-          "key": 4,
-          "display_form": "ты",
-          "lemma": "ты́",
-          "grammar": "Pronoun, 2nd Person, Singular, Nominative",
-          "dictionary_definition": "you"
-        },
-        {
-          "key": 5,
-          "display_form": "люби́мая",
-          "lemma": "люби́мый",
-          "grammar": "Adjective, Singular, Feminine, Nominative / Participle, Present, Singular, Feminine, Nominative",
-          "dictionary_definition": "favorite, favourite, beloved, loved, adored"
-        },
-        {
-          "key": 6,
-          "display_form": "зна́ю",
-          "lemma": "зна́ть",
-          "grammar": "Verb, Present, 1st Person, Singular",
-          "dictionary_definition": "nobility, noble people"
-        },
-        {
-          "key": 7,
-          "display_form": "не",
-          "lemma": "не́",
-          "grammar": "Particle",
-          "dictionary_definition": "not"
-        },
-        {
-          "key": 8,
-          "display_form": "спи́шь",
-          "lemma": "спа́ть",
-          "grammar": "Verb, Present, 2nd Person, Singular",
-          "dictionary_definition": "to sleep"
-        }
-      ]
-    },
-    {
-      "start_time_ms": 38240,
-      "end_time_ms": 48590,
-      "original_line": "И у детской кроватки тайком ты слезу утираешь",
-      "phonetic_line": "И у де́тской крова́тки тайко́м ты слезу́ утира́ешь",
-      "translation": "And at the crib, you secretly wipe away a tear.",
-      "words": [
-        {
-          "key": 1,
-          "display_form": "И",
-          "lemma": "и",
-          "grammar": "Conjunction / Particle / Interjection / Noun, Singular, Masculine, Nominative / Noun, Singular, Masculine, Genitive / Noun, Singular, Masculine, Dative / Noun, Singular, Masculine, Accusative / Noun, Singular, Masculine, Instrumental / Noun, Singular, Masculine, Locative / Noun, Plural, Masculine, Nominative / Noun, Plural, Masculine, Genitive / Noun, Plural, Masculine, Dative / Noun, Plural, Masculine, Accusative / Noun, Plural, Masculine, Instrumental / Noun, Plural, Masculine, Locative / Noun, Singular, Feminine, Nominative / Noun, Singular, Feminine, Genitive / Noun, Singular, Feminine, Dative / Noun, Singular, Feminine, Accusative / Noun, Singular, Feminine, Instrumental / Noun, Singular, Feminine, Locative",
-          "dictionary_definition": "and; also, too"
-        },
-        {
-          "key": 2,
-          "display_form": "у",
-          "lemma": "у",
-          "grammar": "Preposition / Interjection",
-          "dictionary_definition": "(possession); by, at (place); with; from (take, borrow)"
-        },
-        {
-          "key": 3,
-          "display_form": "де́тской",
-          "lemma": "де́тский",
-          "grammar": "Adjective, Singular, Feminine, Genitive / Adjective, Singular, Feminine, Locative / Adjective, Singular, Feminine, Instrumental / Noun, Singular, Feminine, Genitive / Adjective, Singular, Feminine, Dative / Noun, Singular, Feminine, Dative / Noun, Singular, Feminine, Instrumental / Noun, Singular, Feminine, Locative",
-          "dictionary_definition": "children's, childish, infantile, puerile, childlike, child; baby"
-        },
-        {
-          "key": 4,
-          "display_form": "крова́тки",
-          "lemma": "крова́тка",
-          "grammar": "Noun, Singular, Feminine, Genitive / Noun, Plural, Feminine, Nominative / Noun, Plural, Feminine, Accusative",
-          "dictionary_definition": "crib"
-        },
-        {
-          "key": 5,
-          "display_form": "тайко́м",
-          "lemma": "тайко́м",
-          "grammar": "Adverb",
-          "dictionary_definition": "secretly, in secret, surreptitiously, by stealth, on the quiet, on the sly"
-        },
-        {
-          "key": 6,
-          "display_form": "ты",
-          "lemma": "ты́",
-          "grammar": "Pronoun, 2nd Person, Singular, Nominative",
-          "dictionary_definition": "you"
-        },
-        {
-          "key": 7,
-          "display_form": "слезу́",
-          "lemma": "слеза́",
-          "grammar": "Noun, Singular, Feminine, Accusative / Verb, Future, 1st Person, Singular",
-          "dictionary_definition": "tear"
-        },
-        {
-          "key": 8,
-          "display_form": "утира́ешь",
-          "lemma": "утира́ть",
-          "grammar": "Verb, Present, 2nd Person, Singular",
-          "dictionary_definition": "wipe, dry"
-        }
-      ]
-    },
-    {
-      "start_time_ms": 48590,
-      "end_time_ms": 56960,
-      "original_line": "Как я люблю глубину твоих ласковых глаз",
-      "phonetic_line": "Как я люблю́ глубину́ твои́х ла́сковых гла́з",
-      "translation": "How I love the depth of your gentle eyes",
-      "words": [
-        {
-          "key": 1,
-          "display_form": "Как",
-          "lemma": "ка́к",
-          "grammar": "Conjunction / Adverb / Particle",
-          "dictionary_definition": "how; what; like, as; because"
-        },
-        {
-          "key": 2,
-          "display_form": "я",
-          "lemma": "я",
-          "grammar": "Pronoun, 1st Person, Singular, Nominative",
-          "dictionary_definition": "I, me, myself"
-        },
-        {
-          "key": 3,
-          "display_form": "люблю́",
-          "lemma": "люби́ть",
-          "grammar": "Verb, Present, 1st Person, Singular",
-          "dictionary_definition": "love"
-        },
-        {
-          "key": 4,
-          "display_form": "глубину́",
-          "lemma": "глубина́",
-          "grammar": "Noun, Singular, Feminine, Accusative",
-          "dictionary_definition": "depth, intensity, profundity, heart; interior, back"
-        },
-        {
-          "key": 5,
-          "display_form": "твои́х",
-          "lemma": "тво́й",
-          "grammar": "Adjective, Plural, Genitive / Adjective, Plural, Locative / Adjective, Plural, Accusative",
-          "dictionary_definition": "your, yours"
-        },
-        {
-          "key": 6,
-          "display_form": "ла́сковых",
-          "lemma": "ла́сковый",
-          "grammar": "Adjective, Plural, Genitive / Adjective, Plural, Accusative / Adjective, Plural, Locative",
-          "dictionary_definition": "affectionate, caressing; tender, gentle, sweet"
-        },
-        {
-          "key": 7,
-          "display_form": "гла́з",
-          "lemma": "гла́з",
-          "grammar": "Noun, Plural, Masculine, Genitive / Noun, Singular, Masculine, Accusative / Noun, Singular, Masculine, Nominative",
-          "dictionary_definition": "eye"
-        }
-      ]
-    },
-    {
-      "start_time_ms": 56960,
-      "end_time_ms": 65270,
-      "original_line": "Как я хочу к ним прижаться теперь губами",
-      "phonetic_line": "Как я хочу́ к ним прижа́ться тепе́рь губа́ми",
-      "translation": "How I want to snuggle my lips now",
-      "words": [
-        {
-          "key": 1,
-          "display_form": "Как",
-          "lemma": "ка́к",
-          "grammar": "Conjunction / Adverb / Particle",
-          "dictionary_definition": "how; what; like, as; because"
-        },
-        {
-          "key": 2,
-          "display_form": "я",
-          "lemma": "я",
-          "grammar": "Pronoun, 1st Person, Singular, Nominative",
-          "dictionary_definition": "I, me, myself"
-        },
-        {
-          "key": 3,
-          "display_form": "хочу́",
-          "lemma": "хоте́ть",
-          "grammar": "Verb, Present, 1st Person, Singular",
-          "dictionary_definition": "to want; to feel like; to mean"
-        },
-        {
-          "key": 4,
-          "display_form": "к",
-          "lemma": "к",
-          "grammar": "Preposition / Conjunction / Noun, Singular, Masculine, Nominative / Noun, Singular, Masculine, Genitive / Noun, Singular, Masculine, Dative / Noun, Singular, Masculine, Accusative / Noun, Singular, Masculine, Instrumental / Noun, Singular, Masculine, Locative / Noun, Plural, Masculine, Nominative / Noun, Plural, Masculine, Genitive / Noun, Plural, Masculine, Dative / Noun, Plural, Masculine, Accusative / Noun, Plural, Masculine, Instrumental / Noun, Plural, Masculine, Locative",
-          "dictionary_definition": "towards; to; by (time); for the purpose of"
-        },
-        {
-          "key": 5,
-          "display_form": "ним",
-          "lemma": "они́",
-          "grammar": "Pronoun, 3rd Person, Plural, Dative / Pronoun, 3rd Person, Singular, Masculine, Instrumental / Pronoun, 3rd Person, Singular, Neuter, Instrumental",
-          "dictionary_definition": "they"
-        },
-        {
-          "key": 6,
-          "display_form": "прижа́ться",
-          "lemma": "прижа́ться",
-          "grammar": "Verb (infinitive)",
-          "dictionary_definition": "to press up against something"
-        },
-        {
-          "key": 7,
-          "display_form": "тепе́рь",
-          "lemma": "тепе́рь",
-          "grammar": "Adverb",
-          "dictionary_definition": "now, nowadays, today"
-        },
-        {
-          "key": 8,
-          "display_form": "губа́ми",
-          "lemma": "губа́",
-          "grammar": "Noun, Plural, Feminine, Instrumental",
-          "dictionary_definition": "lip, inlet, bay, firth, tree-fungus"
-        }
-      ]
-    },
-    {
-      "start_time_ms": 65270,
-      "end_time_ms": 72020,
-      "original_line": "Тёмная ночь разделяет, любимая, нас",
-      "phonetic_line": "Тёмная но́чь разделя́ет, люби́мая, на́с",
-      "translation": "The dark night divides us, love.",
-      "words": [
-        {
-          "key": 1,
-          "display_form": "Тёмная",
-          "lemma": "тёмный",
-          "grammar": "Adjective, Singular, Feminine, Nominative",
-          "dictionary_definition": "dark"
-        },
-        {
-          "key": 2,
-          "display_form": "но́чь",
-          "lemma": "но́чь",
-          "grammar": "Noun, Singular, Feminine, Accusative / Noun, Singular, Feminine, Nominative",
-          "dictionary_definition": "night"
-        },
-        {
-          "key": 3,
-          "display_form": "разделя́ет,",
-          "lemma": "разделя́ть",
-          "grammar": "Verb, Present, 3rd Person, Singular",
-          "dictionary_definition": "divide, separate, part, split; share"
-        },
-        {
-          "key": 4,
-          "display_form": "люби́мая,",
-          "lemma": "люби́мый",
-          "grammar": "Adjective, Singular, Feminine, Nominative / Participle, Present, Singular, Feminine, Nominative",
-          "dictionary_definition": "favorite, favourite, beloved, loved, adored"
-        },
-        {
-          "key": 5,
-          "display_form": "на́с",
-          "lemma": "мы́",
-          "grammar": "Pronoun, 1st Person, Plural, Genitive / Pronoun, 1st Person, Plural, Accusative / Pronoun, 1st Person, Plural, Locative",
-          "dictionary_definition": "we"
-        }
-      ]
-    },
-    {
-      "start_time_ms": 72020,
-      "end_time_ms": 81990,
-      "original_line": "И тревожная чёрная степь пролегла между нами",
-      "phonetic_line": "И трево́жная чёрная сте́пь пролегла́ ме́жду на́ми",
-      "translation": "And a disturbing black steppe lay between us.",
-      "words": [
-        {
-          "key": 1,
-          "display_form": "И",
-          "lemma": "и",
-          "grammar": "Conjunction / Particle / Interjection / Noun, Singular, Masculine, Nominative / Noun, Singular, Masculine, Genitive / Noun, Singular, Masculine, Dative / Noun, Singular, Masculine, Accusative / Noun, Singular, Masculine, Instrumental / Noun, Singular, Masculine, Locative / Noun, Plural, Masculine, Nominative / Noun, Plural, Masculine, Genitive / Noun, Plural, Masculine, Dative / Noun, Plural, Masculine, Accusative / Noun, Plural, Masculine, Instrumental / Noun, Plural, Masculine, Locative / Noun, Singular, Feminine, Nominative / Noun, Singular, Feminine, Genitive / Noun, Singular, Feminine, Dative / Noun, Singular, Feminine, Accusative / Noun, Singular, Feminine, Instrumental / Noun, Singular, Feminine, Locative",
-          "dictionary_definition": "and; also, too"
-        },
-        {
-          "key": 2,
-          "display_form": "трево́жная",
-          "lemma": "трево́жный",
-          "grammar": "Adjective, Singular, Feminine, Nominative",
-          "dictionary_definition": "alarming, disturbing; anxious; unsettling, worrisome"
-        },
-        {
-          "key": 3,
-          "display_form": "чёрная",
-          "lemma": "чёрный",
-          "grammar": "Adjective, Singular, Feminine, Nominative",
-          "dictionary_definition": "black; ferrous metal"
-        },
-        {
-          "key": 4,
-          "display_form": "сте́пь",
-          "lemma": "сте́пь",
-          "grammar": "Noun, Singular, Feminine, Accusative / Noun, Singular, Feminine, Nominative",
-          "dictionary_definition": "steppe / veld"
-        },
-        {
-          "key": 5,
-          "display_form": "пролегла́",
-          "lemma": "проле́чь",
-          "grammar": "Verb, Past, Singular, Feminine",
-          "dictionary_definition": "to lie through, run through"
-        },
-        {
-          "key": 6,
-          "display_form": "ме́жду",
-          "lemma": "ме́жду",
+          "display_form": "in",
+          "lemma": "in",
           "grammar": "Preposition",
-          "dictionary_definition": "between; among; inter-"
-        },
-        {
-          "key": 7,
-          "display_form": "на́ми",
-          "lemma": "мы́",
-          "grammar": "Pronoun, 1st Person, Plural, Instrumental",
-          "dictionary_definition": "we"
-        }
-      ]
-    },
-    {
-      "start_time_ms": 81990,
-      "end_time_ms": 88770,
-      "original_line": "Верю в тебя, в дорогую подругу мою",
-      "phonetic_line": "Ве́рю в тебя́, в дорогу́ю подру́гу мою́",
-      "translation": "I believe in you, my dear friend.",
-      "words": [
-        {
-          "key": 1,
-          "display_form": "Ве́рю",
-          "lemma": "ве́рить",
-          "grammar": "Verb, Present, 1st Person, Singular",
-          "dictionary_definition": "to believe, trust; to believe in, have faith in"
-        },
-        {
-          "key": 2,
-          "display_form": "в",
-          "lemma": "в",
-          "grammar": "Preposition / Noun, Singular, Masculine, Genitive / Noun, Singular, Masculine, Locative / Noun, Singular, Masculine, Nominative / Noun, Singular, Masculine, Dative / Noun, Singular, Masculine, Accusative / Noun, Singular, Masculine, Instrumental / Noun, Plural, Masculine, Nominative / Noun, Plural, Masculine, Genitive / Noun, Plural, Masculine, Dative / Noun, Plural, Masculine, Accusative / Noun, Plural, Masculine, Instrumental / Noun, Plural, Masculine, Locative",
-          "dictionary_definition": "in, at, on, within; to, into, for"
-        },
-        {
-          "key": 3,
-          "display_form": "тебя́,",
-          "lemma": "ты́",
-          "grammar": "Pronoun, 2nd Person, Singular, Accusative / Pronoun, 2nd Person, Singular, Genitive",
-          "dictionary_definition": "you"
-        },
-        {
-          "key": 4,
-          "display_form": "в",
-          "lemma": "в",
-          "grammar": "Preposition / Noun, Singular, Masculine, Genitive / Noun, Singular, Masculine, Locative / Noun, Singular, Masculine, Nominative / Noun, Singular, Masculine, Dative / Noun, Singular, Masculine, Accusative / Noun, Singular, Masculine, Instrumental / Noun, Plural, Masculine, Nominative / Noun, Plural, Masculine, Genitive / Noun, Plural, Masculine, Dative / Noun, Plural, Masculine, Accusative / Noun, Plural, Masculine, Instrumental / Noun, Plural, Masculine, Locative",
-          "dictionary_definition": "in, at, on, within; to, into, for"
+          "dictionary_definition": "[in]"
         },
         {
           "key": 5,
-          "display_form": "дорогу́ю",
-          "lemma": "дорого́й",
-          "grammar": "Adjective, Singular, Feminine, Accusative",
-          "dictionary_definition": "expensive, costly, precious; dear, darling; important"
+          "display_form": "mezzo",
+          "lemma": "mezzo",
+          "grammar": "Noun, Singular, Masculine",
+          "dictionary_definition": "how a result is obtained or an end is achieved"
         },
         {
           "key": 6,
-          "display_form": "подру́гу",
-          "lemma": "подру́га",
-          "grammar": "Noun, Singular, Feminine, Accusative",
-          "dictionary_definition": "friend (female); girlfriend"
+          "display_form": "al",
+          "lemma": "a il",
+          "grammar": "Preposition, Singular, Masculine, Definite",
+          "dictionary_definition": "[ail]"
         },
         {
           "key": 7,
-          "display_form": "мою́",
-          "lemma": "мо́й",
-          "grammar": "Adjective, Singular, Feminine, Accusative / Verb, Present, 1st Person, Singular",
-          "dictionary_definition": "my, mine, my people"
+          "display_form": "Sahara",
+          "lemma": "sahara",
+          "grammar": "Adjective, Singular, Feminine",
+          "dictionary_definition": "the world's largest desert (3,500,000 square miles) in northern Africa"
         }
       ]
     },
     {
-      "start_time_ms": 88770,
-      "end_time_ms": 99090,
-      "original_line": "Эта вера от пули меня тёмной ночью хранила",
-      "phonetic_line": "Э́та ве́ра от пу́ли меня́ тёмной но́чью храни́ла",
-      "translation": "That belief from a bullet kept me safe for a dark night.",
+      "start_time_ms": 12060,
+      "end_time_ms": 15860,
+      "original_line": "Sarà pioggia e nubi dal mare",
+      "phonetic_line": null,
+      "translation": "It will be rain and clouds from the sea",
       "words": [
         {
           "key": 1,
-          "display_form": "Э́та",
-          "lemma": "э́тот",
-          "grammar": "Adjective, Singular, Feminine, Nominative",
-          "dictionary_definition": "this"
+          "display_form": "Sarà",
+          "lemma": "essere",
+          "grammar": "Auxiliary Verb, Singular, Future, Indicative, 3rd Person",
+          "dictionary_definition": "give certain properties to something"
         },
         {
           "key": 2,
-          "display_form": "ве́ра",
-          "lemma": "ве́ра",
-          "grammar": "Noun, Singular, Feminine, Nominative",
-          "dictionary_definition": "faith, belief, trust"
+          "display_form": "pioggia",
+          "lemma": "pioggia",
+          "grammar": "Noun, Singular, Feminine",
+          "dictionary_definition": "anything happening rapidly or in quick successive"
         },
         {
           "key": 3,
-          "display_form": "от",
-          "lemma": "о́т",
+          "display_form": "e",
+          "lemma": "e",
+          "grammar": "Conjunction",
+          "dictionary_definition": "the cardinal compass point that is at 90 degrees"
+        },
+        {
+          "key": 4,
+          "display_form": "nubi",
+          "lemma": "nubi",
+          "grammar": "Adjective, Singular",
+          "dictionary_definition": "[nubi]"
+        },
+        {
+          "key": 5,
+          "display_form": "dal",
+          "lemma": "da il",
+          "grammar": "Preposition, Singular, Masculine, Definite",
+          "dictionary_definition": "[dail]"
+        },
+        {
+          "key": 6,
+          "display_form": "mare",
+          "lemma": "mare",
+          "grammar": "Noun, Singular, Masculine",
+          "dictionary_definition": "a wide and open space or area as of surface or land or sky"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 15860,
+      "end_time_ms": 21030,
+      "original_line": "Sarà un corso d'acqua in salita, salita",
+      "phonetic_line": null,
+      "translation": "It will be a water course uphill, ascent",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Sarà",
+          "lemma": "essere",
+          "grammar": "Auxiliary Verb, Singular, Future, Indicative, 3rd Person",
+          "dictionary_definition": "give certain properties to something"
+        },
+        {
+          "key": 2,
+          "display_form": "un",
+          "lemma": "uno",
+          "grammar": "Determiner, Singular, Masculine, Indefinite",
+          "dictionary_definition": "the smallest whole number or a numeral representing this number"
+        },
+        {
+          "key": 3,
+          "display_form": "corso",
+          "lemma": "corso",
+          "grammar": "Noun, Singular, Masculine",
+          "dictionary_definition": "education imparted in a series of lessons or meetings"
+        },
+        {
+          "key": 4,
+          "display_form": "d'acqua",
+          "lemma": "dacqua",
+          "grammar": "Noun",
+          "dictionary_definition": "[dacqua]"
+        },
+        {
+          "key": 5,
+          "display_form": "in",
+          "lemma": "in",
           "grammar": "Preposition",
-          "dictionary_definition": "from (away); from (part of a whole); from (cause); from (distance)"
-        },
-        {
-          "key": 4,
-          "display_form": "пу́ли",
-          "lemma": "пу́ля",
-          "grammar": "Noun, Plural, Feminine, Accusative / Noun, Singular, Feminine, Genitive / Noun, Plural, Feminine, Nominative",
-          "dictionary_definition": "bullet, projectile"
-        },
-        {
-          "key": 5,
-          "display_form": "меня́",
-          "lemma": "я",
-          "grammar": "Pronoun, 1st Person, Singular, Accusative / Pronoun, 1st Person, Singular, Genitive",
-          "dictionary_definition": "I, me, myself"
+          "dictionary_definition": "[in]"
         },
         {
           "key": 6,
-          "display_form": "тёмной",
-          "lemma": "тёмный",
-          "grammar": "Adjective, Singular, Feminine, Genitive / Adjective, Singular, Feminine, Instrumental / Adjective, Singular, Feminine, Locative / Adjective, Singular, Feminine, Dative",
-          "dictionary_definition": "dark"
+          "display_form": "salita,",
+          "lemma": "salita",
+          "grammar": "Noun, Singular, Feminine",
+          "dictionary_definition": "the act of changing location in an upward direction"
         },
         {
           "key": 7,
-          "display_form": "но́чью",
-          "lemma": "но́чью",
-          "grammar": "Adverb / Noun, Singular, Feminine, Instrumental",
-          "dictionary_definition": "at night, by night"
-        },
-        {
-          "key": 8,
-          "display_form": "храни́ла",
-          "lemma": "храни́ть",
-          "grammar": "Verb, Past, Singular, Feminine",
-          "dictionary_definition": "to keep, to protect, to guard, to store"
+          "display_form": "salita",
+          "lemma": "salita",
+          "grammar": "Noun, Singular, Feminine",
+          "dictionary_definition": "the act of changing location in an upward direction"
         }
       ]
     },
     {
-      "start_time_ms": 99090,
-      "end_time_ms": 105610,
-      "original_line": "Радостно мне, я спокоен в смертельном бою",
-      "phonetic_line": "Ра́достно мне́, я споко́ен в смерте́льном бою́",
-      "translation": "I am happy, I am calm in a deadly battle.",
+      "start_time_ms": 21030,
+      "end_time_ms": 24350,
+      "original_line": "Samba, coi tuoi occhi samba",
+      "phonetic_line": null,
+      "translation": "Samba, with your eyes samba",
       "words": [
         {
           "key": 1,
-          "display_form": "Ра́достно",
-          "lemma": "ра́достно",
-          "grammar": "Adverb / Adj (short), Singular, Neuter",
-          "dictionary_definition": "With joy, happily"
+          "display_form": "Samba,",
+          "lemma": "samba",
+          "grammar": "Noun, Singular, Feminine",
+          "dictionary_definition": "[samba]"
         },
         {
           "key": 2,
-          "display_form": "мне́,",
-          "lemma": "я",
-          "grammar": "Pronoun, 1st Person, Singular, Dative / Pronoun, 1st Person, Singular, Locative",
-          "dictionary_definition": "I, me, myself"
+          "display_form": "coi",
+          "lemma": "con il",
+          "grammar": "Preposition, Plural, Masculine, Definite",
+          "dictionary_definition": "[conil]"
         },
         {
           "key": 3,
-          "display_form": "я",
-          "lemma": "я",
-          "grammar": "Pronoun, 1st Person, Singular, Nominative",
-          "dictionary_definition": "I, me, myself"
+          "display_form": "tuoi",
+          "lemma": "tuo",
+          "grammar": "Pronoun, Plural, Masculine",
+          "dictionary_definition": "[tuo]"
         },
         {
           "key": 4,
-          "display_form": "споко́ен",
-          "lemma": "споко́йный",
-          "grammar": "Adj (short), Singular, Masculine",
-          "dictionary_definition": "quiet, calm, tranquil, placid, serene, easy-tempered, composed, easy; reassure"
+          "display_form": "occhi",
+          "lemma": "occhio",
+          "grammar": "Noun, Plural, Masculine",
+          "dictionary_definition": "the organ of sight"
         },
         {
           "key": 5,
-          "display_form": "в",
-          "lemma": "в",
-          "grammar": "Preposition / Noun, Singular, Masculine, Genitive / Noun, Singular, Masculine, Locative / Noun, Singular, Masculine, Nominative / Noun, Singular, Masculine, Dative / Noun, Singular, Masculine, Accusative / Noun, Singular, Masculine, Instrumental / Noun, Plural, Masculine, Nominative / Noun, Plural, Masculine, Genitive / Noun, Plural, Masculine, Dative / Noun, Plural, Masculine, Accusative / Noun, Plural, Masculine, Instrumental / Noun, Plural, Masculine, Locative",
-          "dictionary_definition": "in, at, on, within; to, into, for"
-        },
-        {
-          "key": 6,
-          "display_form": "смерте́льном",
-          "lemma": "смерте́льный",
-          "grammar": "Adjective, Singular, Masculine, Locative / Adjective, Singular, Neuter, Locative",
-          "dictionary_definition": "lethal, fatal, mortal, deadly"
-        },
-        {
-          "key": 7,
-          "display_form": "бою́",
-          "lemma": "бо́й",
-          "grammar": "Noun, Singular, Masculine, Prepositional / Noun, Singular, Masculine, Dative",
-          "dictionary_definition": "fight; battle, combat"
+          "display_form": "samba",
+          "lemma": "sambo",
+          "grammar": "Noun, Singular, Feminine",
+          "dictionary_definition": "[sambo]"
         }
       ]
     },
     {
-      "start_time_ms": 105610,
-      "end_time_ms": 115300,
-      "original_line": "Знаю, встретишь с любовью меня, что б со мной ни случилось",
-      "phonetic_line": "Зна́ю, встре́тишь с любо́вью меня́, что б со мно́й ни случи́лось",
-      "translation": "I know you'll meet me with love, whatever happens to me.",
+      "start_time_ms": 24350,
+      "end_time_ms": 27860,
+      "original_line": "Labbra nella carne, fiori nella sabbia",
+      "phonetic_line": null,
+      "translation": "Lip in meat, flowers in sand",
       "words": [
         {
           "key": 1,
-          "display_form": "Зна́ю,",
-          "lemma": "зна́ть",
-          "grammar": "Verb, Present, 1st Person, Singular",
-          "dictionary_definition": "nobility, noble people"
+          "display_form": "Labbra",
+          "lemma": "Labbra",
+          "grammar": "Proper Noun",
+          "dictionary_definition": "either of two fleshy folds of tissue that surround the mouth and play a role in speaking"
         },
         {
           "key": 2,
-          "display_form": "встре́тишь",
-          "lemma": "встре́тить",
-          "grammar": "Verb, Future, 2nd Person, Singular",
-          "dictionary_definition": "meet"
+          "display_form": "nella",
+          "lemma": "in il",
+          "grammar": "Preposition, Singular, Feminine, Definite",
+          "dictionary_definition": "[inil]"
         },
         {
           "key": 3,
-          "display_form": "с",
-          "lemma": "с",
-          "grammar": "Preposition / Noun, Plural, Feminine, Nominative / Particle / Noun, Singular, Feminine, Nominative / Noun, Singular, Feminine, Genitive / Noun, Singular, Feminine, Dative / Noun, Singular, Feminine, Accusative / Noun, Singular, Feminine, Instrumental / Noun, Singular, Feminine, Locative / Noun, Plural, Feminine, Genitive / Noun, Plural, Feminine, Dative / Noun, Plural, Feminine, Accusative / Noun, Plural, Feminine, Instrumental / Noun, Plural, Feminine, Locative / Noun, Singular, Neuter, Nominative / Noun, Singular, Neuter, Genitive / Noun, Singular, Neuter, Dative / Noun, Singular, Neuter, Accusative / Noun, Singular, Neuter, Instrumental / Noun, Singular, Neuter, Locative / Noun, Plural, Neuter, Nominative / Noun, Plural, Neuter, Genitive / Noun, Plural, Neuter, Dative / Noun, Plural, Neuter, Accusative / Noun, Plural, Neuter, Instrumental / Noun, Plural, Neuter, Locative",
-          "dictionary_definition": "with; from, in the course of; since; off, remove from"
+          "display_form": "carne,",
+          "lemma": "carne",
+          "grammar": "Noun, Singular, Feminine",
+          "dictionary_definition": "alternative names for the body of a human being"
         },
         {
           "key": 4,
-          "display_form": "любо́вью",
-          "lemma": "любо́вь",
-          "grammar": "Noun, Singular, Feminine, Instrumental",
-          "dictionary_definition": "love"
+          "display_form": "fiori",
+          "lemma": "fiore",
+          "grammar": "Noun, Plural, Masculine",
+          "dictionary_definition": "a collection of selected literary passages"
         },
         {
           "key": 5,
-          "display_form": "меня́,",
-          "lemma": "я",
-          "grammar": "Pronoun, 1st Person, Singular, Accusative / Pronoun, 1st Person, Singular, Genitive",
-          "dictionary_definition": "I, me, myself"
+          "display_form": "nella",
+          "lemma": "in il",
+          "grammar": "Preposition, Singular, Feminine, Definite",
+          "dictionary_definition": "[inil]"
         },
         {
           "key": 6,
-          "display_form": "что",
-          "lemma": "что́",
-          "grammar": "Conjunction / Particle / Pronoun, Singular, Neuter, Accusative / Pronoun, Singular, Neuter, Nominative / Adverb",
-          "dictionary_definition": "what; that"
-        },
-        {
-          "key": 7,
-          "display_form": "б",
-          "lemma": "б",
-          "grammar": "Particle / Noun, Singular, Masculine, Nominative / Noun, Singular, Masculine, Genitive / Noun, Singular, Masculine, Dative / Noun, Singular, Masculine, Accusative / Noun, Singular, Masculine, Instrumental / Noun, Singular, Masculine, Locative / Noun, Plural, Masculine, Nominative / Noun, Plural, Masculine, Genitive / Noun, Plural, Masculine, Dative / Noun, Plural, Masculine, Accusative / Noun, Plural, Masculine, Instrumental / Noun, Plural, Masculine, Locative",
-          "dictionary_definition": "The second letter of the Russian alphabet, called бэ (bɛ) and written in the Cyrillic script.; alternative form of бы (by)"
-        },
-        {
-          "key": 8,
-          "display_form": "со",
-          "lemma": "с",
-          "grammar": "Preposition / Noun, Singular, Feminine, Nominative / Noun, Singular, Feminine, Genitive / Noun, Singular, Feminine, Dative / Noun, Singular, Feminine, Accusative / Noun, Singular, Feminine, Instrumental / Noun, Singular, Feminine, Locative / Noun, Plural, Feminine, Nominative / Noun, Plural, Feminine, Genitive / Noun, Plural, Feminine, Dative / Noun, Plural, Feminine, Accusative / Noun, Plural, Feminine, Instrumental / Noun, Plural, Feminine, Locative",
-          "dictionary_definition": "with; from, in the course of; since; off, remove from"
-        },
-        {
-          "key": 9,
-          "display_form": "мно́й",
-          "lemma": "я",
-          "grammar": "Pronoun, 1st Person, Singular, Instrumental",
-          "dictionary_definition": "I, me, myself"
-        },
-        {
-          "key": 10,
-          "display_form": "ни",
-          "lemma": "ни́",
-          "grammar": "Particle / Conjunction",
-          "dictionary_definition": "neither; no"
-        },
-        {
-          "key": 11,
-          "display_form": "случи́лось",
-          "lemma": "случи́ться",
-          "grammar": "Verb, Past, Singular, Neuter",
-          "dictionary_definition": "to happen, occur; to come about (с + instrumental)"
+          "display_form": "sabbia",
+          "lemma": "sabbia",
+          "grammar": "Noun, Singular, Feminine",
+          "dictionary_definition": "a loose material consisting of grains of rock or coral"
         }
       ]
     },
     {
-      "start_time_ms": 115300,
-      "end_time_ms": 123930,
-      "original_line": "Смерть нестрашна, с ней встречались не раз мы в степи",
-      "phonetic_line": "Сме́рть нестрашна́, с ней встреча́лись не ра́з мы в степи́",
-      "translation": "Death is not fearful, we have met her more than once in the steppe.",
+      "start_time_ms": 27860,
+      "end_time_ms": 31590,
+      "original_line": "Eh, eh, santa, nei tuoi occhi santa",
+      "phonetic_line": null,
+      "translation": "Oh, my God.",
       "words": [
         {
           "key": 1,
-          "display_form": "Сме́рть",
-          "lemma": "сме́рть",
-          "grammar": "Noun, Singular, Feminine, Nominative / Noun, Singular, Feminine, Accusative",
-          "dictionary_definition": "death; (emphatic with как) dying for; desperately"
+          "display_form": "Eh,",
+          "lemma": "Eh",
+          "grammar": "Pronoun, Singular, 1st Person",
+          "dictionary_definition": "[Eh]"
         },
         {
           "key": 2,
-          "display_form": "нестрашна́,",
-          "lemma": "нестра́шный",
-          "grammar": "Adj (short), Singular, Feminine",
-          "dictionary_definition": "[нестрашный]"
+          "display_form": "eh,",
+          "lemma": "eh",
+          "grammar": "Interjection",
+          "dictionary_definition": "[eh]"
         },
         {
           "key": 3,
-          "display_form": "с",
-          "lemma": "с",
-          "grammar": "Preposition / Noun, Plural, Feminine, Nominative / Particle / Noun, Singular, Feminine, Nominative / Noun, Singular, Feminine, Genitive / Noun, Singular, Feminine, Dative / Noun, Singular, Feminine, Accusative / Noun, Singular, Feminine, Instrumental / Noun, Singular, Feminine, Locative / Noun, Plural, Feminine, Genitive / Noun, Plural, Feminine, Dative / Noun, Plural, Feminine, Accusative / Noun, Plural, Feminine, Instrumental / Noun, Plural, Feminine, Locative / Noun, Singular, Neuter, Nominative / Noun, Singular, Neuter, Genitive / Noun, Singular, Neuter, Dative / Noun, Singular, Neuter, Accusative / Noun, Singular, Neuter, Instrumental / Noun, Singular, Neuter, Locative / Noun, Plural, Neuter, Nominative / Noun, Plural, Neuter, Genitive / Noun, Plural, Neuter, Dative / Noun, Plural, Neuter, Accusative / Noun, Plural, Neuter, Instrumental / Noun, Plural, Neuter, Locative",
-          "dictionary_definition": "with; from, in the course of; since; off, remove from"
+          "display_form": "santa,",
+          "lemma": "Santa",
+          "grammar": "Proper Noun",
+          "dictionary_definition": "[Santa]"
         },
         {
           "key": 4,
-          "display_form": "ней",
-          "lemma": "она́",
-          "grammar": "Pronoun, 3rd Person, Singular, Feminine, Locative / Pronoun, 3rd Person, Singular, Feminine, Instrumental / Pronoun, 3rd Person, Singular, Feminine, Dative / Pronoun, 3rd Person, Singular, Feminine, Genitive",
-          "dictionary_definition": "she"
+          "display_form": "nei",
+          "lemma": "in il",
+          "grammar": "Preposition, Plural, Masculine, Definite",
+          "dictionary_definition": "[inil]"
         },
         {
           "key": 5,
-          "display_form": "встреча́лись",
-          "lemma": "встреча́ться",
-          "grammar": "Verb, Past, Plural",
-          "dictionary_definition": "meet, encounter, be found, be met with; rendez-vous, rendezvous; to date; to see"
+          "display_form": "tuoi",
+          "lemma": "tuo",
+          "grammar": "Pronoun, Plural, Masculine",
+          "dictionary_definition": "[tuo]"
         },
         {
           "key": 6,
-          "display_form": "не",
-          "lemma": "не́",
-          "grammar": "Particle",
-          "dictionary_definition": "not"
+          "display_form": "occhi",
+          "lemma": "occhio",
+          "grammar": "Noun, Plural, Masculine",
+          "dictionary_definition": "the organ of sight"
         },
         {
           "key": 7,
-          "display_form": "ра́з",
-          "lemma": "ра́з",
-          "grammar": "Noun, Plural, Masculine, Genitive / Adverb / Conjunction / Noun, Singular, Masculine, Accusative / Noun, Singular, Masculine, Nominative",
-          "dictionary_definition": "time; one; once; if, since"
-        },
-        {
-          "key": 8,
-          "display_form": "мы",
-          "lemma": "мы́",
-          "grammar": "Pronoun, 1st Person, Plural, Nominative",
-          "dictionary_definition": "we"
-        },
-        {
-          "key": 9,
-          "display_form": "в",
-          "lemma": "в",
-          "grammar": "Preposition / Noun, Singular, Masculine, Genitive / Noun, Singular, Masculine, Locative / Noun, Singular, Masculine, Nominative / Noun, Singular, Masculine, Dative / Noun, Singular, Masculine, Accusative / Noun, Singular, Masculine, Instrumental / Noun, Plural, Masculine, Nominative / Noun, Plural, Masculine, Genitive / Noun, Plural, Masculine, Dative / Noun, Plural, Masculine, Accusative / Noun, Plural, Masculine, Instrumental / Noun, Plural, Masculine, Locative",
-          "dictionary_definition": "in, at, on, within; to, into, for"
-        },
-        {
-          "key": 10,
-          "display_form": "степи́",
-          "lemma": "сте́пь",
-          "grammar": "Noun, Singular, Feminine, Dative / Noun, Plural, Feminine, Nominative / Noun, Singular, Feminine, Genitive / Noun, Plural, Feminine, Accusative / Noun, Singular, Feminine, Locative / Noun, Singular, Feminine, Prepositional",
-          "dictionary_definition": "steppe / veld"
+          "display_form": "santa",
+          "lemma": "Santa",
+          "grammar": "Proper Noun",
+          "dictionary_definition": "[Santa]"
         }
       ]
     },
     {
-      "start_time_ms": 123930,
-      "end_time_ms": 132300,
-      "original_line": "Вот и теперь надо мною она кружится",
-      "phonetic_line": "Во́т и тепе́рь на́до мно́ю она́ кру́жится",
-      "translation": "Now she's spinning over me.",
+      "start_time_ms": 31590,
+      "end_time_ms": 35700,
+      "original_line": "Nei tuoi tocchi salto, danzo, salta",
+      "phonetic_line": null,
+      "translation": "In your jumping touches, danzo, jump",
       "words": [
         {
           "key": 1,
-          "display_form": "Во́т",
-          "lemma": "во́т",
-          "grammar": "Particle",
-          "dictionary_definition": "here is, here are, this is, there, there you go"
+          "display_form": "Nei",
+          "lemma": "in il",
+          "grammar": "Preposition, Plural, Masculine, Definite",
+          "dictionary_definition": "[inil]"
         },
         {
           "key": 2,
-          "display_form": "и",
-          "lemma": "и",
-          "grammar": "Conjunction / Particle / Interjection / Noun, Singular, Masculine, Nominative / Noun, Singular, Masculine, Genitive / Noun, Singular, Masculine, Dative / Noun, Singular, Masculine, Accusative / Noun, Singular, Masculine, Instrumental / Noun, Singular, Masculine, Locative / Noun, Plural, Masculine, Nominative / Noun, Plural, Masculine, Genitive / Noun, Plural, Masculine, Dative / Noun, Plural, Masculine, Accusative / Noun, Plural, Masculine, Instrumental / Noun, Plural, Masculine, Locative",
-          "dictionary_definition": "and; also, too"
+          "display_form": "tuoi",
+          "lemma": "tuo",
+          "grammar": "Pronoun, Plural, Masculine",
+          "dictionary_definition": "[tuo]"
         },
         {
           "key": 3,
-          "display_form": "тепе́рь",
-          "lemma": "тепе́рь",
+          "display_form": "tocchi",
+          "lemma": "toccare",
+          "grammar": "Verb, Singular, Present, Subjunctive, 3rd Person",
+          "dictionary_definition": "cause injuries or bodily harm to"
+        },
+        {
+          "key": 4,
+          "display_form": "salto,",
+          "lemma": "salto",
+          "grammar": "Noun, Singular, Masculine",
+          "dictionary_definition": "an abrupt transition"
+        },
+        {
+          "key": 5,
+          "display_form": "danzo,",
+          "lemma": "danzo",
+          "grammar": "Verb, Plural, Present, Indicative, 3rd Person",
+          "dictionary_definition": "[danzo]"
+        },
+        {
+          "key": 6,
+          "display_form": "salta",
+          "lemma": "saltare",
+          "grammar": "Verb, Singular, Present, Indicative, 3rd Person",
+          "dictionary_definition": "burst outward, usually with noise"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 35700,
+      "end_time_ms": 36720,
+      "original_line": "Eh, eh",
+      "phonetic_line": null,
+      "translation": "Huh?",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Eh,",
+          "lemma": "Eh",
+          "grammar": "Pronoun, Singular, 1st Person",
+          "dictionary_definition": "[Eh]"
+        },
+        {
+          "key": 2,
+          "display_form": "eh",
+          "lemma": "eh",
+          "grammar": "Interjection",
+          "dictionary_definition": "[eh]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 36720,
+      "end_time_ms": 41580,
+      "original_line": "Mama, liberata dal karma",
+      "phonetic_line": null,
+      "translation": "Mama, free from karma",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Mama,",
+          "lemma": "Mama",
+          "grammar": "Proper Noun",
+          "dictionary_definition": "[Mama]"
+        },
+        {
+          "key": 2,
+          "display_form": "liberata",
+          "lemma": "liberato",
+          "grammar": "Adjective, Singular, Feminine",
+          "dictionary_definition": "[liberato]"
+        },
+        {
+          "key": 3,
+          "display_form": "dal",
+          "lemma": "da il",
+          "grammar": "Preposition, Singular, Masculine, Definite",
+          "dictionary_definition": "[dail]"
+        },
+        {
+          "key": 4,
+          "display_form": "karma",
+          "lemma": "Karma",
+          "grammar": "Proper Noun",
+          "dictionary_definition": "(Hinduism and Buddhism) the effects of a person's actions that determine his destiny in his next incarnation"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 41580,
+      "end_time_ms": 45240,
+      "original_line": "Calipso, fai l'alta marea (marea)",
+      "phonetic_line": null,
+      "translation": "Calipso, do the high tide (marea)",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Calipso,",
+          "lemma": "calipso",
+          "grammar": "Adjective, Singular, Masculine",
+          "dictionary_definition": "[calipso]"
+        },
+        {
+          "key": 2,
+          "display_form": "fai",
+          "lemma": "fare",
+          "grammar": "Verb, Singular, Present, Indicative, 2nd Person",
+          "dictionary_definition": "give certain properties to something"
+        },
+        {
+          "key": 3,
+          "display_form": "l'alta",
+          "lemma": "laltare",
+          "grammar": "Verb, Singular, Present, Indicative, 3rd Person",
+          "dictionary_definition": "[laltare]"
+        },
+        {
+          "key": 4,
+          "display_form": "marea",
+          "lemma": "mareo",
+          "grammar": "Noun, Singular, Feminine",
+          "dictionary_definition": "[mareo]"
+        },
+        {
+          "key": 5,
+          "display_form": "(marea)",
+          "lemma": "mareo",
+          "grammar": "Noun, Singular, Feminine",
+          "dictionary_definition": "[mareo]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 45240,
+      "end_time_ms": 48800,
+      "original_line": "A sud nelle tue labbra",
+      "phonetic_line": null,
+      "translation": "South in your lips",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "A",
+          "lemma": "a",
+          "grammar": "Preposition",
+          "dictionary_definition": "[a]"
+        },
+        {
+          "key": 2,
+          "display_form": "sud",
+          "lemma": "sud",
+          "grammar": "Noun, Singular, Masculine",
+          "dictionary_definition": "situated in or facing or moving toward or coming from the south"
+        },
+        {
+          "key": 3,
+          "display_form": "nelle",
+          "lemma": "in il",
+          "grammar": "Preposition, Plural, Feminine, Definite",
+          "dictionary_definition": "[inil]"
+        },
+        {
+          "key": 4,
+          "display_form": "tue",
+          "lemma": "tuo",
+          "grammar": "Determiner, Plural, Feminine",
+          "dictionary_definition": "[tuo]"
+        },
+        {
+          "key": 5,
+          "display_form": "labbra",
+          "lemma": "labbrare",
+          "grammar": "Verb, Singular, Present, Indicative, 3rd Person",
+          "dictionary_definition": "[labbrare]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 48800,
+      "end_time_ms": 52230,
+      "original_line": "Foresta, caligo, marea (marea)",
+      "phonetic_line": null,
+      "translation": "Forest, caligo, tide (marea)",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Foresta,",
+          "lemma": "foresta",
+          "grammar": "Noun, Singular",
+          "dictionary_definition": "the trees and other plants in a large densely wooded area"
+        },
+        {
+          "key": 2,
+          "display_form": "caligo,",
+          "lemma": "caligo",
+          "grammar": "Noun, Singular, Masculine",
+          "dictionary_definition": "[caligo]"
+        },
+        {
+          "key": 3,
+          "display_form": "marea",
+          "lemma": "mareo",
+          "grammar": "Noun, Singular, Feminine",
+          "dictionary_definition": "[mareo]"
+        },
+        {
+          "key": 4,
+          "display_form": "(marea)",
+          "lemma": "mareo",
+          "grammar": "Noun, Singular, Feminine",
+          "dictionary_definition": "[mareo]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 52230,
+      "end_time_ms": 56170,
+      "original_line": "Liberata da rabbia",
+      "phonetic_line": null,
+      "translation": "Freed from rage",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Liberata",
+          "lemma": "Liberata",
+          "grammar": "Proper Noun",
+          "dictionary_definition": "[Liberata]"
+        },
+        {
+          "key": 2,
+          "display_form": "da",
+          "lemma": "da",
+          "grammar": "Preposition",
+          "dictionary_definition": "[da]"
+        },
+        {
+          "key": 3,
+          "display_form": "rabbia",
+          "lemma": "rabbia",
+          "grammar": "Noun, Singular, Feminine",
+          "dictionary_definition": "a strong emotion; a feeling that is oriented toward some real or supposed grievance"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 56170,
+      "end_time_ms": 59850,
+      "original_line": "Calipso, fai l'alta marea (marea)",
+      "phonetic_line": null,
+      "translation": "Calipso, do the high tide (marea)",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Calipso,",
+          "lemma": "calipso",
+          "grammar": "Adjective, Singular, Masculine",
+          "dictionary_definition": "[calipso]"
+        },
+        {
+          "key": 2,
+          "display_form": "fai",
+          "lemma": "fare",
+          "grammar": "Verb, Singular, Present, Indicative, 2nd Person",
+          "dictionary_definition": "give certain properties to something"
+        },
+        {
+          "key": 3,
+          "display_form": "l'alta",
+          "lemma": "laltare",
+          "grammar": "Verb, Singular, Present, Indicative, 3rd Person",
+          "dictionary_definition": "[laltare]"
+        },
+        {
+          "key": 4,
+          "display_form": "marea",
+          "lemma": "mareo",
+          "grammar": "Noun, Singular, Feminine",
+          "dictionary_definition": "[mareo]"
+        },
+        {
+          "key": 5,
+          "display_form": "(marea)",
+          "lemma": "mareo",
+          "grammar": "Noun, Singular, Feminine",
+          "dictionary_definition": "[mareo]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 59850,
+      "end_time_ms": 63690,
+      "original_line": "A sud nelle tue labbra",
+      "phonetic_line": null,
+      "translation": "South in your lips",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "A",
+          "lemma": "a",
+          "grammar": "Preposition",
+          "dictionary_definition": "[a]"
+        },
+        {
+          "key": 2,
+          "display_form": "sud",
+          "lemma": "sud",
+          "grammar": "Noun, Singular, Masculine",
+          "dictionary_definition": "situated in or facing or moving toward or coming from the south"
+        },
+        {
+          "key": 3,
+          "display_form": "nelle",
+          "lemma": "in il",
+          "grammar": "Preposition, Plural, Feminine, Definite",
+          "dictionary_definition": "[inil]"
+        },
+        {
+          "key": 4,
+          "display_form": "tue",
+          "lemma": "tuo",
+          "grammar": "Determiner, Plural, Feminine",
+          "dictionary_definition": "[tuo]"
+        },
+        {
+          "key": 5,
+          "display_form": "labbra",
+          "lemma": "labbrare",
+          "grammar": "Verb, Singular, Present, Indicative, 3rd Person",
+          "dictionary_definition": "[labbrare]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 63690,
+      "end_time_ms": 66910,
+      "original_line": "Foresta, caligo, marea (marea)",
+      "phonetic_line": null,
+      "translation": "Forest, caligo, tide (marea)",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Foresta,",
+          "lemma": "foresta",
+          "grammar": "Noun, Singular",
+          "dictionary_definition": "the trees and other plants in a large densely wooded area"
+        },
+        {
+          "key": 2,
+          "display_form": "caligo,",
+          "lemma": "caligo",
+          "grammar": "Noun, Singular, Masculine",
+          "dictionary_definition": "[caligo]"
+        },
+        {
+          "key": 3,
+          "display_form": "marea",
+          "lemma": "mareo",
+          "grammar": "Noun, Singular, Feminine",
+          "dictionary_definition": "[mareo]"
+        },
+        {
+          "key": 4,
+          "display_form": "(marea)",
+          "lemma": "mareo",
+          "grammar": "Noun, Singular, Feminine",
+          "dictionary_definition": "[mareo]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 66910,
+      "end_time_ms": 68120,
+      "original_line": "Ma-ma-ma-ma-marea",
+      "phonetic_line": null,
+      "translation": "Ma-ma-ma-ma-marea",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Ma-ma-ma-ma-marea",
+          "lemma": "Mamamamamarea",
+          "grammar": "Proper Noun",
+          "dictionary_definition": "[Mamamamamarea]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 68120,
+      "end_time_ms": 69770,
+      "original_line": "Ma-ma-ma-ma-marea",
+      "phonetic_line": null,
+      "translation": "Ma-ma-ma-ma-marea",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Ma-ma-ma-ma-marea",
+          "lemma": "Mamamamamarea",
+          "grammar": "Proper Noun",
+          "dictionary_definition": "[Mamamamamarea]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 69770,
+      "end_time_ms": 71580,
+      "original_line": "Ma-ma-ma-ma-marea",
+      "phonetic_line": null,
+      "translation": "Ma-ma-ma-ma-marea",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Ma-ma-ma-ma-marea",
+          "lemma": "Mamamamamarea",
+          "grammar": "Proper Noun",
+          "dictionary_definition": "[Mamamamamarea]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 71580,
+      "end_time_ms": 73400,
+      "original_line": "Marea, marea",
+      "phonetic_line": null,
+      "translation": "Tide, tide",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Marea,",
+          "lemma": "Marea",
+          "grammar": "Proper Noun",
+          "dictionary_definition": "the periodic rise and fall of the sea level under the gravitational pull of the moon"
+        },
+        {
+          "key": 2,
+          "display_form": "marea",
+          "lemma": "mareo",
+          "grammar": "Noun, Singular, Feminine",
+          "dictionary_definition": "[mareo]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 73400,
+      "end_time_ms": 75200,
+      "original_line": "Ma-ma-ma-ma-marea",
+      "phonetic_line": null,
+      "translation": "Ma-ma-ma-ma-marea",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Ma-ma-ma-ma-marea",
+          "lemma": "Mamamamamarea",
+          "grammar": "Proper Noun",
+          "dictionary_definition": "[Mamamamamarea]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 75200,
+      "end_time_ms": 76930,
+      "original_line": "Ma-ma-ma-ma-marea",
+      "phonetic_line": null,
+      "translation": "Ma-ma-ma-ma-marea",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Ma-ma-ma-ma-marea",
+          "lemma": "Mamamamamarea",
+          "grammar": "Proper Noun",
+          "dictionary_definition": "[Mamamamamarea]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 76930,
+      "end_time_ms": 78810,
+      "original_line": "Ma-ma-ma-ma-marea",
+      "phonetic_line": null,
+      "translation": "Ma-ma-ma-ma-marea",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Ma-ma-ma-ma-marea",
+          "lemma": "Mamamamamarea",
+          "grammar": "Proper Noun",
+          "dictionary_definition": "[Mamamamamarea]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 78810,
+      "end_time_ms": 83710,
+      "original_line": "Marea, marea",
+      "phonetic_line": null,
+      "translation": "Tide, tide",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Marea,",
+          "lemma": "Marea",
+          "grammar": "Proper Noun",
+          "dictionary_definition": "the periodic rise and fall of the sea level under the gravitational pull of the moon"
+        },
+        {
+          "key": 2,
+          "display_form": "marea",
+          "lemma": "mareo",
+          "grammar": "Noun, Singular, Feminine",
+          "dictionary_definition": "[mareo]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 83710,
+      "end_time_ms": 89400,
+      "original_line": "Sarò, sarò come non immaginavi",
+      "phonetic_line": null,
+      "translation": "I'll be like you didn't imagine.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Sarò,",
+          "lemma": "Sarò",
+          "grammar": "Auxiliary Verb, Singular, Future, Indicative, 1st Person",
+          "dictionary_definition": "[Sarò]"
+        },
+        {
+          "key": 2,
+          "display_form": "sarò",
+          "lemma": "essere",
+          "grammar": "Auxiliary Verb, Singular, Future, Indicative, 1st Person",
+          "dictionary_definition": "give certain properties to something"
+        },
+        {
+          "key": 3,
+          "display_form": "come",
+          "lemma": "come",
+          "grammar": "Preposition",
+          "dictionary_definition": "to the same degree (often followed by `as')"
+        },
+        {
+          "key": 4,
+          "display_form": "non",
+          "lemma": "non",
           "grammar": "Adverb",
-          "dictionary_definition": "now, nowadays, today"
-        },
-        {
-          "key": 4,
-          "display_form": "на́до",
-          "lemma": "на́до",
-          "grammar": "Predicative, Present / Preposition",
-          "dictionary_definition": "need; it is necessary, have to; = над"
+          "dictionary_definition": "only a very short time before; ; ; ; ; - W.B.Yeats"
         },
         {
           "key": 5,
-          "display_form": "мно́ю",
-          "lemma": "я",
-          "grammar": "Pronoun, 1st Person, Singular, Instrumental",
-          "dictionary_definition": "I, me, myself"
-        },
-        {
-          "key": 6,
-          "display_form": "она́",
-          "lemma": "она́",
-          "grammar": "Pronoun, 3rd Person, Singular, Feminine, Nominative",
-          "dictionary_definition": "she"
-        },
-        {
-          "key": 7,
-          "display_form": "кру́жится",
-          "lemma": "кружи́ться",
-          "grammar": "Verb, Present, 3rd Person, Singular",
-          "dictionary_definition": "whirl spin go round in circles; be dizzy"
+          "display_form": "immaginavi",
+          "lemma": "immaginavi",
+          "grammar": "Noun, Plural, Feminine",
+          "dictionary_definition": "[immaginavi]"
         }
       ]
     },
     {
-      "start_time_ms": 132300,
-      "end_time_ms": 138970,
-      "original_line": "Ты меня ждёшь, и у детской кроватки не спишь",
-      "phonetic_line": "Ты меня́ ждёшь, и у де́тской крова́тки не спи́шь",
-      "translation": "You're waiting for me, and you can't sleep at the crib.",
+      "start_time_ms": 89400,
+      "end_time_ms": 92690,
+      "original_line": "Sarò rose e spine sui fianchi",
+      "phonetic_line": null,
+      "translation": "I will be roses and thorns on the sides",
       "words": [
         {
           "key": 1,
-          "display_form": "Ты",
-          "lemma": "ты́",
-          "grammar": "Pronoun, 2nd Person, Singular, Nominative",
-          "dictionary_definition": "you"
+          "display_form": "Sarò",
+          "lemma": "Sarò",
+          "grammar": "Auxiliary Verb, Singular, Future, Indicative, 1st Person",
+          "dictionary_definition": "[Sarò]"
         },
         {
           "key": 2,
-          "display_form": "меня́",
-          "lemma": "я",
-          "grammar": "Pronoun, 1st Person, Singular, Accusative / Pronoun, 1st Person, Singular, Genitive",
-          "dictionary_definition": "I, me, myself"
+          "display_form": "rose",
+          "lemma": "roso",
+          "grammar": "Verb, Singular, Past, Indicative, 3rd Person",
+          "dictionary_definition": "[roso]"
         },
         {
           "key": 3,
-          "display_form": "ждёшь,",
-          "lemma": "жда́ть",
-          "grammar": "Verb, Present, 2nd Person, Singular",
-          "dictionary_definition": "to wait, to expect, to await"
+          "display_form": "e",
+          "lemma": "e",
+          "grammar": "Conjunction",
+          "dictionary_definition": "the cardinal compass point that is at 90 degrees"
         },
         {
           "key": 4,
-          "display_form": "и",
-          "lemma": "и",
-          "grammar": "Conjunction / Particle / Interjection / Noun, Singular, Masculine, Nominative / Noun, Singular, Masculine, Genitive / Noun, Singular, Masculine, Dative / Noun, Singular, Masculine, Accusative / Noun, Singular, Masculine, Instrumental / Noun, Singular, Masculine, Locative / Noun, Plural, Masculine, Nominative / Noun, Plural, Masculine, Genitive / Noun, Plural, Masculine, Dative / Noun, Plural, Masculine, Accusative / Noun, Plural, Masculine, Instrumental / Noun, Plural, Masculine, Locative",
-          "dictionary_definition": "and; also, too"
+          "display_form": "spine",
+          "lemma": "spina",
+          "grammar": "Noun, Plural, Feminine",
+          "dictionary_definition": "a bone of a fish"
         },
         {
           "key": 5,
-          "display_form": "у",
-          "lemma": "у",
-          "grammar": "Preposition / Interjection",
-          "dictionary_definition": "(possession); by, at (place); with; from (take, borrow)"
+          "display_form": "sui",
+          "lemma": "su il",
+          "grammar": "Preposition, Plural, Masculine, Definite",
+          "dictionary_definition": "[suil]"
         },
         {
           "key": 6,
-          "display_form": "де́тской",
-          "lemma": "де́тский",
-          "grammar": "Adjective, Singular, Feminine, Genitive / Adjective, Singular, Feminine, Locative / Adjective, Singular, Feminine, Instrumental / Noun, Singular, Feminine, Genitive / Adjective, Singular, Feminine, Dative / Noun, Singular, Feminine, Dative / Noun, Singular, Feminine, Instrumental / Noun, Singular, Feminine, Locative",
-          "dictionary_definition": "children's, childish, infantile, puerile, childlike, child; baby"
-        },
-        {
-          "key": 7,
-          "display_form": "крова́тки",
-          "lemma": "крова́тка",
-          "grammar": "Noun, Singular, Feminine, Genitive / Noun, Plural, Feminine, Nominative / Noun, Plural, Feminine, Accusative",
-          "dictionary_definition": "crib"
-        },
-        {
-          "key": 8,
-          "display_form": "не",
-          "lemma": "не́",
-          "grammar": "Particle",
-          "dictionary_definition": "not"
-        },
-        {
-          "key": 9,
-          "display_form": "спи́шь",
-          "lemma": "спа́ть",
-          "grammar": "Verb, Present, 2nd Person, Singular",
-          "dictionary_definition": "to sleep"
+          "display_form": "fianchi",
+          "lemma": "fianco",
+          "grammar": "Noun, Plural, Masculine",
+          "dictionary_definition": "either the left or right half of a body"
         }
       ]
     },
     {
-      "start_time_ms": 138970,
-      "end_time_ms": 155820,
-      "original_line": "И поэтому, знаю, со мной ничего не случится",
-      "phonetic_line": "И поэ́тому, зна́ю, со мно́й ничего́ не случи́тся",
-      "translation": "And so, I know nothing will happen to me.",
+      "start_time_ms": 92690,
+      "end_time_ms": 98020,
+      "original_line": "Sarò ghiaccio e vino, e tremerai, tremerai",
+      "phonetic_line": null,
+      "translation": "I will be ice and wine, and you will tremble.",
       "words": [
         {
           "key": 1,
-          "display_form": "И",
-          "lemma": "и",
-          "grammar": "Conjunction / Particle / Interjection / Noun, Singular, Masculine, Nominative / Noun, Singular, Masculine, Genitive / Noun, Singular, Masculine, Dative / Noun, Singular, Masculine, Accusative / Noun, Singular, Masculine, Instrumental / Noun, Singular, Masculine, Locative / Noun, Plural, Masculine, Nominative / Noun, Plural, Masculine, Genitive / Noun, Plural, Masculine, Dative / Noun, Plural, Masculine, Accusative / Noun, Plural, Masculine, Instrumental / Noun, Plural, Masculine, Locative / Noun, Singular, Feminine, Nominative / Noun, Singular, Feminine, Genitive / Noun, Singular, Feminine, Dative / Noun, Singular, Feminine, Accusative / Noun, Singular, Feminine, Instrumental / Noun, Singular, Feminine, Locative",
-          "dictionary_definition": "and; also, too"
+          "display_form": "Sarò",
+          "lemma": "Sarò",
+          "grammar": "Auxiliary Verb, Singular, Future, Indicative, 1st Person",
+          "dictionary_definition": "[Sarò]"
         },
         {
           "key": 2,
-          "display_form": "поэ́тому,",
-          "lemma": "поэ́тому",
+          "display_form": "ghiaccio",
+          "lemma": "ghiaccio",
+          "grammar": "Noun, Singular, Masculine",
+          "dictionary_definition": "water frozen in the solid state"
+        },
+        {
+          "key": 3,
+          "display_form": "e",
+          "lemma": "e",
+          "grammar": "Conjunction",
+          "dictionary_definition": "the cardinal compass point that is at 90 degrees"
+        },
+        {
+          "key": 4,
+          "display_form": "vino,",
+          "lemma": "vino",
+          "grammar": "Noun, Singular, Masculine",
+          "dictionary_definition": "fermented juice (of grapes especially)"
+        },
+        {
+          "key": 5,
+          "display_form": "e",
+          "lemma": "e",
+          "grammar": "Conjunction",
+          "dictionary_definition": "the cardinal compass point that is at 90 degrees"
+        },
+        {
+          "key": 6,
+          "display_form": "tremerai,",
+          "lemma": "tremerao",
+          "grammar": "Noun, Plural, Masculine",
+          "dictionary_definition": "[tremerao]"
+        },
+        {
+          "key": 7,
+          "display_form": "tremerai",
+          "lemma": "tremerao",
+          "grammar": "Noun, Plural, Masculine",
+          "dictionary_definition": "[tremerao]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 98020,
+      "end_time_ms": 101330,
+      "original_line": "Samba, coi tuoi occhi samba",
+      "phonetic_line": null,
+      "translation": "Samba, with your eyes samba",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Samba,",
+          "lemma": "samba",
+          "grammar": "Noun, Singular, Feminine",
+          "dictionary_definition": "[samba]"
+        },
+        {
+          "key": 2,
+          "display_form": "coi",
+          "lemma": "con il",
+          "grammar": "Preposition, Plural, Masculine, Definite",
+          "dictionary_definition": "[conil]"
+        },
+        {
+          "key": 3,
+          "display_form": "tuoi",
+          "lemma": "tuo",
+          "grammar": "Pronoun, Plural, Masculine",
+          "dictionary_definition": "[tuo]"
+        },
+        {
+          "key": 4,
+          "display_form": "occhi",
+          "lemma": "occhio",
+          "grammar": "Noun, Plural, Masculine",
+          "dictionary_definition": "the organ of sight"
+        },
+        {
+          "key": 5,
+          "display_form": "samba",
+          "lemma": "sambo",
+          "grammar": "Noun, Singular, Feminine",
+          "dictionary_definition": "[sambo]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 101330,
+      "end_time_ms": 104920,
+      "original_line": "Lividi alle gambe, mani sulla faccia",
+      "phonetic_line": null,
+      "translation": "Livious to the legs, hands on the face",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Lividi",
+          "lemma": "Lividi",
+          "grammar": "Proper Noun",
+          "dictionary_definition": "[Lividi]"
+        },
+        {
+          "key": 2,
+          "display_form": "alle",
+          "lemma": "a il",
+          "grammar": "Preposition, Plural, Feminine, Definite",
+          "dictionary_definition": "[ail]"
+        },
+        {
+          "key": 3,
+          "display_form": "gambe,",
+          "lemma": "gamba",
+          "grammar": "Noun, Plural, Feminine",
+          "dictionary_definition": "a cloth covering consisting of the part of a pair of trousers that covers a person's leg"
+        },
+        {
+          "key": 4,
+          "display_form": "mani",
+          "lemma": "mano",
+          "grammar": "Noun, Plural, Feminine",
+          "dictionary_definition": "a thin layer covering something"
+        },
+        {
+          "key": 5,
+          "display_form": "sulla",
+          "lemma": "su il",
+          "grammar": "Preposition, Singular, Feminine, Definite",
+          "dictionary_definition": "[suil]"
+        },
+        {
+          "key": 6,
+          "display_form": "faccia",
+          "lemma": "fare",
+          "grammar": "Noun, Singular, Feminine",
+          "dictionary_definition": "give certain properties to something"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 104920,
+      "end_time_ms": 108630,
+      "original_line": "Eh, eh, santa, nei miei occhi santa",
+      "phonetic_line": null,
+      "translation": "Oh, my God.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Eh,",
+          "lemma": "Eh",
+          "grammar": "Pronoun, Singular, 1st Person",
+          "dictionary_definition": "[Eh]"
+        },
+        {
+          "key": 2,
+          "display_form": "eh,",
+          "lemma": "eh",
+          "grammar": "Interjection",
+          "dictionary_definition": "[eh]"
+        },
+        {
+          "key": 3,
+          "display_form": "santa,",
+          "lemma": "Santa",
+          "grammar": "Proper Noun",
+          "dictionary_definition": "[Santa]"
+        },
+        {
+          "key": 4,
+          "display_form": "nei",
+          "lemma": "in il",
+          "grammar": "Preposition, Plural, Masculine, Definite",
+          "dictionary_definition": "[inil]"
+        },
+        {
+          "key": 5,
+          "display_form": "miei",
+          "lemma": "mio",
+          "grammar": "Determiner, Plural, Masculine",
+          "dictionary_definition": "[mio]"
+        },
+        {
+          "key": 6,
+          "display_form": "occhi",
+          "lemma": "occhio",
+          "grammar": "Noun, Plural, Masculine",
+          "dictionary_definition": "the organ of sight"
+        },
+        {
+          "key": 7,
+          "display_form": "santa",
+          "lemma": "Santa",
+          "grammar": "Proper Noun",
+          "dictionary_definition": "[Santa]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 108630,
+      "end_time_ms": 112580,
+      "original_line": "Nei miei tocchi salti, danzi, salta",
+      "phonetic_line": null,
+      "translation": "In my touches jump, danzi, jump",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Nei",
+          "lemma": "in il",
+          "grammar": "Preposition, Plural, Masculine, Definite",
+          "dictionary_definition": "[inil]"
+        },
+        {
+          "key": 2,
+          "display_form": "miei",
+          "lemma": "mio",
+          "grammar": "Determiner, Plural, Masculine",
+          "dictionary_definition": "[mio]"
+        },
+        {
+          "key": 3,
+          "display_form": "tocchi",
+          "lemma": "toccare",
+          "grammar": "Verb, Singular, Present, Subjunctive, 3rd Person",
+          "dictionary_definition": "cause injuries or bodily harm to"
+        },
+        {
+          "key": 4,
+          "display_form": "salti,",
+          "lemma": "salto",
+          "grammar": "Noun, Plural, Masculine",
+          "dictionary_definition": "an abrupt transition"
+        },
+        {
+          "key": 5,
+          "display_form": "danzi,",
+          "lemma": "danzi",
           "grammar": "Adverb",
-          "dictionary_definition": "that is why, therefore, so"
-        },
-        {
-          "key": 3,
-          "display_form": "зна́ю,",
-          "lemma": "зна́ть",
-          "grammar": "Verb, Present, 1st Person, Singular",
-          "dictionary_definition": "nobility, noble people"
-        },
-        {
-          "key": 4,
-          "display_form": "со",
-          "lemma": "с",
-          "grammar": "Preposition / Noun, Singular, Feminine, Nominative / Noun, Singular, Feminine, Genitive / Noun, Singular, Feminine, Dative / Noun, Singular, Feminine, Accusative / Noun, Singular, Feminine, Instrumental / Noun, Singular, Feminine, Locative / Noun, Plural, Feminine, Nominative / Noun, Plural, Feminine, Genitive / Noun, Plural, Feminine, Dative / Noun, Plural, Feminine, Accusative / Noun, Plural, Feminine, Instrumental / Noun, Plural, Feminine, Locative",
-          "dictionary_definition": "with; from, in the course of; since; off, remove from"
-        },
-        {
-          "key": 5,
-          "display_form": "мно́й",
-          "lemma": "я",
-          "grammar": "Pronoun, 1st Person, Singular, Instrumental",
-          "dictionary_definition": "I, me, myself"
+          "dictionary_definition": "[danzi]"
         },
         {
           "key": 6,
-          "display_form": "ничего́",
-          "lemma": "ничего́",
-          "grammar": "Adverb / Particle / Pronoun, Singular, Neuter, Genitive / Pronoun, Singular, Neuter, Nominative",
-          "dictionary_definition": "nothing, not anything; never mind, all right; not badly, passably, so-so, not bad"
-        },
-        {
-          "key": 7,
-          "display_form": "не",
-          "lemma": "не́",
-          "grammar": "Particle",
-          "dictionary_definition": "not"
-        },
-        {
-          "key": 8,
-          "display_form": "случи́тся",
-          "lemma": "случи́ться",
-          "grammar": "Verb, Future, 3rd Person, Singular",
-          "dictionary_definition": "to happen, occur; to come about (с + instrumental)"
+          "display_form": "salta",
+          "lemma": "saltare",
+          "grammar": "Verb, Singular, Present, Indicative, 3rd Person",
+          "dictionary_definition": "burst outward, usually with noise"
         }
       ]
     },
     {
-      "start_time_ms": 155820,
-      "end_time_ms": 159820,
-      "original_line": "И поэтому, знаю, со мной ничего не случится",
-      "phonetic_line": "И поэ́тому, зна́ю, со мно́й ничего́ не случи́тся",
-      "translation": "And so, I know nothing will happen to me.",
+      "start_time_ms": 112580,
+      "end_time_ms": 113080,
+      "original_line": "Eh, eh",
+      "phonetic_line": null,
+      "translation": "Huh?",
       "words": [
         {
           "key": 1,
-          "display_form": "И",
-          "lemma": "и",
-          "grammar": "Conjunction / Particle / Interjection / Noun, Singular, Masculine, Nominative / Noun, Singular, Masculine, Genitive / Noun, Singular, Masculine, Dative / Noun, Singular, Masculine, Accusative / Noun, Singular, Masculine, Instrumental / Noun, Singular, Masculine, Locative / Noun, Plural, Masculine, Nominative / Noun, Plural, Masculine, Genitive / Noun, Plural, Masculine, Dative / Noun, Plural, Masculine, Accusative / Noun, Plural, Masculine, Instrumental / Noun, Plural, Masculine, Locative / Noun, Singular, Feminine, Nominative / Noun, Singular, Feminine, Genitive / Noun, Singular, Feminine, Dative / Noun, Singular, Feminine, Accusative / Noun, Singular, Feminine, Instrumental / Noun, Singular, Feminine, Locative",
-          "dictionary_definition": "and; also, too"
+          "display_form": "Eh,",
+          "lemma": "Eh",
+          "grammar": "Pronoun, Singular, 1st Person",
+          "dictionary_definition": "[Eh]"
         },
         {
           "key": 2,
-          "display_form": "поэ́тому,",
-          "lemma": "поэ́тому",
-          "grammar": "Adverb",
-          "dictionary_definition": "that is why, therefore, so"
+          "display_form": "eh",
+          "lemma": "eh",
+          "grammar": "Interjection",
+          "dictionary_definition": "[eh]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 113080,
+      "end_time_ms": 118440,
+      "original_line": "Mama, liberata dal karma",
+      "phonetic_line": null,
+      "translation": "Mama, free from karma",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Mama,",
+          "lemma": "Mama",
+          "grammar": "Proper Noun",
+          "dictionary_definition": "[Mama]"
+        },
+        {
+          "key": 2,
+          "display_form": "liberata",
+          "lemma": "liberato",
+          "grammar": "Adjective, Singular, Feminine",
+          "dictionary_definition": "[liberato]"
         },
         {
           "key": 3,
-          "display_form": "зна́ю,",
-          "lemma": "зна́ть",
-          "grammar": "Verb, Present, 1st Person, Singular",
-          "dictionary_definition": "nobility, noble people"
+          "display_form": "dal",
+          "lemma": "da il",
+          "grammar": "Preposition, Singular, Masculine, Definite",
+          "dictionary_definition": "[dail]"
         },
         {
           "key": 4,
-          "display_form": "со",
-          "lemma": "с",
-          "grammar": "Preposition / Noun, Singular, Feminine, Nominative / Noun, Singular, Feminine, Genitive / Noun, Singular, Feminine, Dative / Noun, Singular, Feminine, Accusative / Noun, Singular, Feminine, Instrumental / Noun, Singular, Feminine, Locative / Noun, Plural, Feminine, Nominative / Noun, Plural, Feminine, Genitive / Noun, Plural, Feminine, Dative / Noun, Plural, Feminine, Accusative / Noun, Plural, Feminine, Instrumental / Noun, Plural, Feminine, Locative",
-          "dictionary_definition": "with; from, in the course of; since; off, remove from"
+          "display_form": "karma",
+          "lemma": "Karma",
+          "grammar": "Proper Noun",
+          "dictionary_definition": "(Hinduism and Buddhism) the effects of a person's actions that determine his destiny in his next incarnation"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 118440,
+      "end_time_ms": 122170,
+      "original_line": "Calipso, fai l'alta marea (marea)",
+      "phonetic_line": null,
+      "translation": "Calipso, do the high tide (marea)",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Calipso,",
+          "lemma": "calipso",
+          "grammar": "Adjective, Singular, Masculine",
+          "dictionary_definition": "[calipso]"
+        },
+        {
+          "key": 2,
+          "display_form": "fai",
+          "lemma": "fare",
+          "grammar": "Verb, Singular, Present, Indicative, 2nd Person",
+          "dictionary_definition": "give certain properties to something"
+        },
+        {
+          "key": 3,
+          "display_form": "l'alta",
+          "lemma": "laltare",
+          "grammar": "Verb, Singular, Present, Indicative, 3rd Person",
+          "dictionary_definition": "[laltare]"
+        },
+        {
+          "key": 4,
+          "display_form": "marea",
+          "lemma": "mareo",
+          "grammar": "Noun, Singular, Feminine",
+          "dictionary_definition": "[mareo]"
         },
         {
           "key": 5,
-          "display_form": "мно́й",
-          "lemma": "я",
-          "grammar": "Pronoun, 1st Person, Singular, Instrumental",
-          "dictionary_definition": "I, me, myself"
+          "display_form": "(marea)",
+          "lemma": "mareo",
+          "grammar": "Noun, Singular, Feminine",
+          "dictionary_definition": "[mareo]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 122170,
+      "end_time_ms": 125660,
+      "original_line": "A sud nelle tue labbra",
+      "phonetic_line": null,
+      "translation": "South in your lips",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "A",
+          "lemma": "a",
+          "grammar": "Preposition",
+          "dictionary_definition": "[a]"
+        },
+        {
+          "key": 2,
+          "display_form": "sud",
+          "lemma": "sud",
+          "grammar": "Noun, Singular, Masculine",
+          "dictionary_definition": "situated in or facing or moving toward or coming from the south"
+        },
+        {
+          "key": 3,
+          "display_form": "nelle",
+          "lemma": "in il",
+          "grammar": "Preposition, Plural, Feminine, Definite",
+          "dictionary_definition": "[inil]"
+        },
+        {
+          "key": 4,
+          "display_form": "tue",
+          "lemma": "tuo",
+          "grammar": "Determiner, Plural, Feminine",
+          "dictionary_definition": "[tuo]"
+        },
+        {
+          "key": 5,
+          "display_form": "labbra",
+          "lemma": "labbrare",
+          "grammar": "Verb, Singular, Present, Indicative, 3rd Person",
+          "dictionary_definition": "[labbrare]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 125660,
+      "end_time_ms": 127880,
+      "original_line": "Foresta, caligo, marea",
+      "phonetic_line": null,
+      "translation": "Forest, caligo, tide",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Foresta,",
+          "lemma": "foresta",
+          "grammar": "Noun, Singular",
+          "dictionary_definition": "the trees and other plants in a large densely wooded area"
+        },
+        {
+          "key": 2,
+          "display_form": "caligo,",
+          "lemma": "caligo",
+          "grammar": "Noun, Singular, Masculine",
+          "dictionary_definition": "[caligo]"
+        },
+        {
+          "key": 3,
+          "display_form": "marea",
+          "lemma": "mareo",
+          "grammar": "Noun, Singular, Feminine",
+          "dictionary_definition": "[mareo]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 127880,
+      "end_time_ms": 129850,
+      "original_line": "Ma-ma-ma-ma-marea",
+      "phonetic_line": null,
+      "translation": "Ma-ma-ma-ma-marea",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Ma-ma-ma-ma-marea",
+          "lemma": "Mamamamamarea",
+          "grammar": "Proper Noun",
+          "dictionary_definition": "[Mamamamamarea]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 129850,
+      "end_time_ms": 131770,
+      "original_line": "Ma-ma-ma-ma-marea",
+      "phonetic_line": null,
+      "translation": "Ma-ma-ma-ma-marea",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Ma-ma-ma-ma-marea",
+          "lemma": "Mamamamamarea",
+          "grammar": "Proper Noun",
+          "dictionary_definition": "[Mamamamamarea]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 131770,
+      "end_time_ms": 133680,
+      "original_line": "Ma-ma-ma-ma-marea",
+      "phonetic_line": null,
+      "translation": "Ma-ma-ma-ma-marea",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Ma-ma-ma-ma-marea",
+          "lemma": "Mamamamamarea",
+          "grammar": "Proper Noun",
+          "dictionary_definition": "[Mamamamamarea]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 133680,
+      "end_time_ms": 135300,
+      "original_line": "Marea, marea",
+      "phonetic_line": null,
+      "translation": "Tide, tide",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Marea,",
+          "lemma": "Marea",
+          "grammar": "Proper Noun",
+          "dictionary_definition": "the periodic rise and fall of the sea level under the gravitational pull of the moon"
+        },
+        {
+          "key": 2,
+          "display_form": "marea",
+          "lemma": "mareo",
+          "grammar": "Noun, Singular, Feminine",
+          "dictionary_definition": "[mareo]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 135300,
+      "end_time_ms": 137120,
+      "original_line": "Ma-ma-ma-ma-marea",
+      "phonetic_line": null,
+      "translation": "Ma-ma-ma-ma-marea",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Ma-ma-ma-ma-marea",
+          "lemma": "Mamamamamarea",
+          "grammar": "Proper Noun",
+          "dictionary_definition": "[Mamamamamarea]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 137120,
+      "end_time_ms": 138920,
+      "original_line": "Ma-ma-ma-ma-marea",
+      "phonetic_line": null,
+      "translation": "Ma-ma-ma-ma-marea",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Ma-ma-ma-ma-marea",
+          "lemma": "Mamamamamarea",
+          "grammar": "Proper Noun",
+          "dictionary_definition": "[Mamamamamarea]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 138920,
+      "end_time_ms": 140810,
+      "original_line": "Ma-ma-ma-ma-marea",
+      "phonetic_line": null,
+      "translation": "Ma-ma-ma-ma-marea",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Ma-ma-ma-ma-marea",
+          "lemma": "Mamamamamarea",
+          "grammar": "Proper Noun",
+          "dictionary_definition": "[Mamamamamarea]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 140810,
+      "end_time_ms": 142730,
+      "original_line": "Marea, marea",
+      "phonetic_line": null,
+      "translation": "Tide, tide",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Marea,",
+          "lemma": "Marea",
+          "grammar": "Proper Noun",
+          "dictionary_definition": "the periodic rise and fall of the sea level under the gravitational pull of the moon"
+        },
+        {
+          "key": 2,
+          "display_form": "marea",
+          "lemma": "mareo",
+          "grammar": "Noun, Singular, Feminine",
+          "dictionary_definition": "[mareo]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 142730,
+      "end_time_ms": 145590,
+      "original_line": "Resta nei miei sogni, amore, non uscire mai",
+      "phonetic_line": null,
+      "translation": "Stay in my dreams, love, never go out",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Resta",
+          "lemma": "restare",
+          "grammar": "Verb, Singular, Present, Indicative, 3rd Person",
+          "dictionary_definition": "stay the same; remain in a certain state"
+        },
+        {
+          "key": 2,
+          "display_form": "nei",
+          "lemma": "in il",
+          "grammar": "Preposition, Plural, Masculine, Definite",
+          "dictionary_definition": "[inil]"
+        },
+        {
+          "key": 3,
+          "display_form": "miei",
+          "lemma": "mio",
+          "grammar": "Determiner, Plural, Masculine",
+          "dictionary_definition": "[mio]"
+        },
+        {
+          "key": 4,
+          "display_form": "sogni,",
+          "lemma": "sogno",
+          "grammar": "Noun, Plural, Masculine",
+          "dictionary_definition": "a series of mental images and emotions occurring during sleep"
+        },
+        {
+          "key": 5,
+          "display_form": "amore,",
+          "lemma": "amore",
+          "grammar": "Noun, Singular, Masculine",
+          "dictionary_definition": "any object of warm affection or devotion"
         },
         {
           "key": 6,
-          "display_form": "ничего́",
-          "lemma": "ничего́",
-          "grammar": "Adverb / Particle / Pronoun, Singular, Neuter, Genitive / Pronoun, Singular, Neuter, Nominative",
-          "dictionary_definition": "nothing, not anything; never mind, all right; not badly, passably, so-so, not bad"
+          "display_form": "non",
+          "lemma": "non",
+          "grammar": "Adverb",
+          "dictionary_definition": "only a very short time before; ; ; ; ; - W.B.Yeats"
         },
         {
           "key": 7,
-          "display_form": "не",
-          "lemma": "не́",
-          "grammar": "Particle",
-          "dictionary_definition": "not"
+          "display_form": "uscire",
+          "lemma": "uscire",
+          "grammar": "Verb",
+          "dictionary_definition": "appear or become visible; make a showing"
         },
         {
           "key": 8,
-          "display_form": "случи́тся",
-          "lemma": "случи́ться",
-          "grammar": "Verb, Future, 3rd Person, Singular",
-          "dictionary_definition": "to happen, occur; to come about (с + instrumental)"
+          "display_form": "mai",
+          "lemma": "mai",
+          "grammar": "Adverb",
+          "dictionary_definition": "not ever; at no time in the past or future"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 145590,
+      "end_time_ms": 149380,
+      "original_line": "Resta fantasia e non darmi modo di averti",
+      "phonetic_line": null,
+      "translation": "You stay fancy and don't give me a chance to have you",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Resta",
+          "lemma": "restare",
+          "grammar": "Verb, Singular, Present, Indicative, 3rd Person",
+          "dictionary_definition": "stay the same; remain in a certain state"
+        },
+        {
+          "key": 2,
+          "display_form": "fantasia",
+          "lemma": "fantasia",
+          "grammar": "Noun, Singular, Feminine",
+          "dictionary_definition": "imagination unrestricted by reality"
+        },
+        {
+          "key": 3,
+          "display_form": "e",
+          "lemma": "e",
+          "grammar": "Conjunction",
+          "dictionary_definition": "the cardinal compass point that is at 90 degrees"
+        },
+        {
+          "key": 4,
+          "display_form": "non",
+          "lemma": "non",
+          "grammar": "Adverb",
+          "dictionary_definition": "only a very short time before; ; ; ; ; - W.B.Yeats"
+        },
+        {
+          "key": 5,
+          "display_form": "darmi",
+          "lemma": "dare mi",
+          "grammar": "Verb, Singular, 1st Person",
+          "dictionary_definition": "[daremi]"
+        },
+        {
+          "key": 6,
+          "display_form": "modo",
+          "lemma": "modo",
+          "grammar": "Noun, Singular, Masculine",
+          "dictionary_definition": "how a result is obtained or an end is achieved"
+        },
+        {
+          "key": 7,
+          "display_form": "di",
+          "lemma": "di",
+          "grammar": "Preposition",
+          "dictionary_definition": "[di]"
+        },
+        {
+          "key": 8,
+          "display_form": "averti",
+          "lemma": "avere ti",
+          "grammar": "Verb, Singular, 2nd Person",
+          "dictionary_definition": "[avereti]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 149380,
+      "end_time_ms": 153080,
+      "original_line": "Resta nei miei incubi quando te ne andrai",
+      "phonetic_line": null,
+      "translation": "Stay in my nightmares when you leave",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Resta",
+          "lemma": "restare",
+          "grammar": "Verb, Singular, Present, Indicative, 3rd Person",
+          "dictionary_definition": "stay the same; remain in a certain state"
+        },
+        {
+          "key": 2,
+          "display_form": "nei",
+          "lemma": "in il",
+          "grammar": "Preposition, Plural, Masculine, Definite",
+          "dictionary_definition": "[inil]"
+        },
+        {
+          "key": 3,
+          "display_form": "miei",
+          "lemma": "mio",
+          "grammar": "Determiner, Plural, Masculine",
+          "dictionary_definition": "[mio]"
+        },
+        {
+          "key": 4,
+          "display_form": "incubi",
+          "lemma": "incubo",
+          "grammar": "Noun, Plural, Masculine",
+          "dictionary_definition": "a terrifying or deeply upsetting dream"
+        },
+        {
+          "key": 5,
+          "display_form": "quando",
+          "lemma": "quando",
+          "grammar": "Conjunction",
+          "dictionary_definition": "as soon as"
+        },
+        {
+          "key": 6,
+          "display_form": "te",
+          "lemma": "te",
+          "grammar": "Pronoun, Singular, 2nd Person",
+          "dictionary_definition": "[te]"
+        },
+        {
+          "key": 7,
+          "display_form": "ne",
+          "lemma": "in",
+          "grammar": "Pronoun",
+          "dictionary_definition": "[in]"
+        },
+        {
+          "key": 8,
+          "display_form": "andrai",
+          "lemma": "andrai",
+          "grammar": "Verb, Singular, Present, Conditional, 1st Person",
+          "dictionary_definition": "[andrai]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 153080,
+      "end_time_ms": 157530,
+      "original_line": "E non tornare mai, mai, mai",
+      "phonetic_line": null,
+      "translation": "And never come back, never",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "E",
+          "lemma": "e",
+          "grammar": "Conjunction",
+          "dictionary_definition": "the cardinal compass point that is at 90 degrees"
+        },
+        {
+          "key": 2,
+          "display_form": "non",
+          "lemma": "non",
+          "grammar": "Adverb",
+          "dictionary_definition": "only a very short time before; ; ; ; ; - W.B.Yeats"
+        },
+        {
+          "key": 3,
+          "display_form": "tornare",
+          "lemma": "tornare",
+          "grammar": "Verb",
+          "dictionary_definition": "be restored"
+        },
+        {
+          "key": 4,
+          "display_form": "mai,",
+          "lemma": "mai",
+          "grammar": "Adverb",
+          "dictionary_definition": "not ever; at no time in the past or future"
+        },
+        {
+          "key": 5,
+          "display_form": "mai,",
+          "lemma": "mai",
+          "grammar": "Adverb",
+          "dictionary_definition": "not ever; at no time in the past or future"
+        },
+        {
+          "key": 6,
+          "display_form": "mai",
+          "lemma": "mai",
+          "grammar": "Adverb",
+          "dictionary_definition": "not ever; at no time in the past or future"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 157530,
+      "end_time_ms": 162140,
+      "original_line": "Mama, liberata dal karma",
+      "phonetic_line": null,
+      "translation": "Mama, free from karma",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Mama,",
+          "lemma": "Mama",
+          "grammar": "Proper Noun",
+          "dictionary_definition": "[Mama]"
+        },
+        {
+          "key": 2,
+          "display_form": "liberata",
+          "lemma": "liberato",
+          "grammar": "Adjective, Singular, Feminine",
+          "dictionary_definition": "[liberato]"
+        },
+        {
+          "key": 3,
+          "display_form": "dal",
+          "lemma": "da il",
+          "grammar": "Preposition, Singular, Masculine, Definite",
+          "dictionary_definition": "[dail]"
+        },
+        {
+          "key": 4,
+          "display_form": "karma",
+          "lemma": "Karma",
+          "grammar": "Proper Noun",
+          "dictionary_definition": "(Hinduism and Buddhism) the effects of a person's actions that determine his destiny in his next incarnation"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 162140,
+      "end_time_ms": 165930,
+      "original_line": "Calipso, fai l'alta marea (marea)",
+      "phonetic_line": null,
+      "translation": "Calipso, do the high tide (marea)",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Calipso,",
+          "lemma": "calipso",
+          "grammar": "Adjective, Singular, Masculine",
+          "dictionary_definition": "[calipso]"
+        },
+        {
+          "key": 2,
+          "display_form": "fai",
+          "lemma": "fare",
+          "grammar": "Verb, Singular, Present, Indicative, 2nd Person",
+          "dictionary_definition": "give certain properties to something"
+        },
+        {
+          "key": 3,
+          "display_form": "l'alta",
+          "lemma": "laltare",
+          "grammar": "Verb, Singular, Present, Indicative, 3rd Person",
+          "dictionary_definition": "[laltare]"
+        },
+        {
+          "key": 4,
+          "display_form": "marea",
+          "lemma": "mareo",
+          "grammar": "Noun, Singular, Feminine",
+          "dictionary_definition": "[mareo]"
+        },
+        {
+          "key": 5,
+          "display_form": "(marea)",
+          "lemma": "mareo",
+          "grammar": "Noun, Singular, Feminine",
+          "dictionary_definition": "[mareo]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 165930,
+      "end_time_ms": 169330,
+      "original_line": "A sud nelle tue labbra",
+      "phonetic_line": null,
+      "translation": "South in your lips",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "A",
+          "lemma": "a",
+          "grammar": "Preposition",
+          "dictionary_definition": "[a]"
+        },
+        {
+          "key": 2,
+          "display_form": "sud",
+          "lemma": "sud",
+          "grammar": "Noun, Singular, Masculine",
+          "dictionary_definition": "situated in or facing or moving toward or coming from the south"
+        },
+        {
+          "key": 3,
+          "display_form": "nelle",
+          "lemma": "in il",
+          "grammar": "Preposition, Plural, Feminine, Definite",
+          "dictionary_definition": "[inil]"
+        },
+        {
+          "key": 4,
+          "display_form": "tue",
+          "lemma": "tuo",
+          "grammar": "Determiner, Plural, Feminine",
+          "dictionary_definition": "[tuo]"
+        },
+        {
+          "key": 5,
+          "display_form": "labbra",
+          "lemma": "labbrare",
+          "grammar": "Verb, Singular, Present, Indicative, 3rd Person",
+          "dictionary_definition": "[labbrare]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 169330,
+      "end_time_ms": 172350,
+      "original_line": "Foresta, caligo, marea",
+      "phonetic_line": null,
+      "translation": "Forest, caligo, tide",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Foresta,",
+          "lemma": "foresta",
+          "grammar": "Noun, Singular",
+          "dictionary_definition": "the trees and other plants in a large densely wooded area"
+        },
+        {
+          "key": 2,
+          "display_form": "caligo,",
+          "lemma": "caligo",
+          "grammar": "Noun, Singular, Masculine",
+          "dictionary_definition": "[caligo]"
+        },
+        {
+          "key": 3,
+          "display_form": "marea",
+          "lemma": "mareo",
+          "grammar": "Noun, Singular, Feminine",
+          "dictionary_definition": "[mareo]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 172350,
+      "end_time_ms": 173870,
+      "original_line": "Ma-ma-ma-ma-marea",
+      "phonetic_line": null,
+      "translation": "Ma-ma-ma-ma-marea",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Ma-ma-ma-ma-marea",
+          "lemma": "Mamamamamarea",
+          "grammar": "Proper Noun",
+          "dictionary_definition": "[Mamamamamarea]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 173870,
+      "end_time_ms": 175570,
+      "original_line": "Ma-ma-ma-ma-marea",
+      "phonetic_line": null,
+      "translation": "Ma-ma-ma-ma-marea",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Ma-ma-ma-ma-marea",
+          "lemma": "Mamamamamarea",
+          "grammar": "Proper Noun",
+          "dictionary_definition": "[Mamamamamarea]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 175570,
+      "end_time_ms": 177410,
+      "original_line": "Ma-ma-ma-ma-marea",
+      "phonetic_line": null,
+      "translation": "Ma-ma-ma-ma-marea",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Ma-ma-ma-ma-marea",
+          "lemma": "Mamamamamarea",
+          "grammar": "Proper Noun",
+          "dictionary_definition": "[Mamamamamarea]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 177410,
+      "end_time_ms": 179260,
+      "original_line": "Marea, marea",
+      "phonetic_line": null,
+      "translation": "Tide, tide",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Marea,",
+          "lemma": "Marea",
+          "grammar": "Proper Noun",
+          "dictionary_definition": "the periodic rise and fall of the sea level under the gravitational pull of the moon"
+        },
+        {
+          "key": 2,
+          "display_form": "marea",
+          "lemma": "mareo",
+          "grammar": "Noun, Singular, Feminine",
+          "dictionary_definition": "[mareo]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 179260,
+      "end_time_ms": 181170,
+      "original_line": "Ma-ma-ma-ma-marea",
+      "phonetic_line": null,
+      "translation": "Ma-ma-ma-ma-marea",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Ma-ma-ma-ma-marea",
+          "lemma": "Mamamamamarea",
+          "grammar": "Proper Noun",
+          "dictionary_definition": "[Mamamamamarea]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 181170,
+      "end_time_ms": 183010,
+      "original_line": "Ma-ma-ma-ma-marea",
+      "phonetic_line": null,
+      "translation": "Ma-ma-ma-ma-marea",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Ma-ma-ma-ma-marea",
+          "lemma": "Mamamamamarea",
+          "grammar": "Proper Noun",
+          "dictionary_definition": "[Mamamamamarea]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 183010,
+      "end_time_ms": 184890,
+      "original_line": "Ma-ma-ma-ma-marea",
+      "phonetic_line": null,
+      "translation": "Ma-ma-ma-ma-marea",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Ma-ma-ma-ma-marea",
+          "lemma": "Mamamamamarea",
+          "grammar": "Proper Noun",
+          "dictionary_definition": "[Mamamamamarea]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 184890,
+      "end_time_ms": 188890,
+      "original_line": "Marea, marea",
+      "phonetic_line": null,
+      "translation": "Tide, tide",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Marea,",
+          "lemma": "Marea",
+          "grammar": "Proper Noun",
+          "dictionary_definition": "the periodic rise and fall of the sea level under the gravitational pull of the moon"
+        },
+        {
+          "key": 2,
+          "display_form": "marea",
+          "lemma": "mareo",
+          "grammar": "Noun, Singular, Feminine",
+          "dictionary_definition": "[mareo]"
         }
       ]
     }

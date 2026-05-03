@@ -328,18 +328,23 @@ def translate_batch(texts: list[str], source_lang: str, target_lang: str) -> lis
 
 # ── Line processor ────────────────────────────────────────────────────────────
 
-# ── OpenRussian lookup ────────────────────────────────────────────────────────
+# ── Language dictionary lookups ──────────────────────────────────────────────
 
-_or_lookup_fn = None  # set to a callable once loaded
+_or_lookup_fn = None   # OpenRussian (ru)
+_it_lookup_fn = None   # Italian OMW  (it)
+
+
+def _backend_dir() -> str:
+    d = str((Path(__file__).parent.parent / "backend").resolve())
+    if d not in sys.path:
+        sys.path.insert(0, d)
+    return d
 
 
 def _load_openrussian() -> None:
     """Attempt to load the OpenRussian index from the backend cache."""
     global _or_lookup_fn
-    # Try to import the backend's openrussian module (backend must be in sys.path)
-    backend_dir = str((Path(__file__).parent.parent / "backend").resolve())
-    if backend_dir not in sys.path:
-        sys.path.insert(0, backend_dir)
+    _backend_dir()
     try:
         from openrussian import ensure_loaded, lookup  # type: ignore[import]
         ensure_loaded()
@@ -350,14 +355,31 @@ def _load_openrussian() -> None:
         _or_lookup_fn = None
 
 
+def _load_italian_dict() -> None:
+    """Load Italian OMW dictionary from the backend module."""
+    global _it_lookup_fn
+    _backend_dir()
+    try:
+        from italian_dict import ensure_loaded, lookup  # type: ignore[import]
+        ensure_loaded()
+        _it_lookup_fn = lookup
+    except Exception as exc:
+        print(f"  [Italian dict] Could not load: {exc}")
+        _it_lookup_fn = None
+
+
 def _resolve_definition(lemma: str, lang_code: str) -> str:
-    """Return a definition string for the lemma (OpenRussian for 'ru', else stub)."""
+    """Return an English definition for the lemma using the appropriate dictionary."""
     clean_lemma = re.sub(r"[^\w]", "", lemma, flags=re.UNICODE)
     if lang_code == "ru" and _or_lookup_fn is not None:
         definition = _or_lookup_fn(clean_lemma)
         if definition:
             return definition
-    return f"[{clean_lemma}]"  # stub — replaced by backend on the fly for Russian
+    if lang_code == "it" and _it_lookup_fn is not None:
+        definition = _it_lookup_fn(clean_lemma)
+        if definition:
+            return definition
+    return f"[{clean_lemma}]"  # stub
 
 
 # ── Backend push ──────────────────────────────────────────────────────────────
@@ -384,7 +406,7 @@ def push_to_backend(api_url: str, payload: dict, replace_id: int | None = None) 
     url = base + "/api/songs"
     print(f"\n[6/5] Pushing to backend: {url} …")
     try:
-        r = requests.post(url, json=payload, timeout=30)
+        r = requests.post(url, json=payload, timeout=90)
         if not r.ok:
             print(f"  [Backend] Error {r.status_code}: {r.text[:200]}")
         else:
@@ -476,9 +498,11 @@ def main() -> None:
     backend = lang.make_backend()
     backend.load()
 
-    # ── 3b. OpenRussian (Russian only)
+    # ── 3b. Language dictionaries
     if args.lang == "ru":
         _load_openrussian()
+    elif args.lang == "it":
+        _load_italian_dict()
 
     # ── 4. Per-line processing
     print("\n[4/5] Processing lines …")
