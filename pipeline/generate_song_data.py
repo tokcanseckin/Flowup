@@ -330,8 +330,10 @@ def translate_batch(texts: list[str], source_lang: str, target_lang: str) -> lis
 
 # ── Language dictionary lookups ──────────────────────────────────────────────
 
-_or_lookup_fn = None   # OpenRussian (ru)
-_it_lookup_fn = None   # Italian OMW  (it)
+_or_lookup_fn     = None   # OpenRussian single-def (ru)
+_or_lookup_all_fn = None   # OpenRussian all-defs   (ru)
+_it_lookup_fn     = None   # Italian OMW single-def (it)
+_it_lookup_all_fn = None   # Italian OMW all-defs   (it)
 
 
 def _backend_dir() -> str:
@@ -343,43 +345,72 @@ def _backend_dir() -> str:
 
 def _load_openrussian() -> None:
     """Attempt to load the OpenRussian index from the backend cache."""
-    global _or_lookup_fn
+    global _or_lookup_fn, _or_lookup_all_fn
     _backend_dir()
     try:
-        from openrussian import ensure_loaded, lookup  # type: ignore[import]
+        from openrussian import ensure_loaded, lookup, lookup_all  # type: ignore[import]
         ensure_loaded()
         _or_lookup_fn = lookup
+        _or_lookup_all_fn = lookup_all
         print("  [OpenRussian] Dictionary loaded.")
     except Exception as exc:
         print(f"  [OpenRussian] Could not load dictionary: {exc}")
         _or_lookup_fn = None
+        _or_lookup_all_fn = None
 
 
 def _load_italian_dict() -> None:
     """Load Italian OMW dictionary from the backend module."""
-    global _it_lookup_fn
+    global _it_lookup_fn, _it_lookup_all_fn
     _backend_dir()
     try:
-        from italian_dict import ensure_loaded, lookup  # type: ignore[import]
+        from italian_dict import ensure_loaded, lookup, lookup_all  # type: ignore[import]
         ensure_loaded()
         _it_lookup_fn = lookup
+        _it_lookup_all_fn = lookup_all
     except Exception as exc:
         print(f"  [Italian dict] Could not load: {exc}")
         _it_lookup_fn = None
+        _it_lookup_all_fn = None
 
 
-def _resolve_definition(lemma: str, lang_code: str) -> str:
-    """Return an English definition for the lemma using the appropriate dictionary."""
+def _rank_definitions(candidates: list[str], translation: str) -> list[str]:
+    """Re-order candidates so the one with most word-overlap with `translation` comes first.
+
+    Only content words longer than 2 characters are counted to avoid noise
+    from common stop-words ('a', 'to', 'of', …).
+    """
+    if not translation or len(candidates) <= 1:
+        return candidates
+    trans_words = set(re.findall(r'\w+', translation.lower()))
+    trans_words = {w for w in trans_words if len(w) > 2}
+
+    def _score(defn: str) -> int:
+        return sum(1 for w in re.findall(r'\w+', defn.lower()) if w in trans_words)
+
+    return sorted(candidates, key=_score, reverse=True)
+
+
+def _resolve_definition(lemma: str, lang_code: str, translation: str = "") -> str:
+    """Return the best English definition for the lemma.
+
+    Fetches all candidate definitions from the appropriate dictionary, then
+    ranks them by word-overlap with `translation` so the most contextually
+    relevant meaning appears first.  Falls back to a stub if nothing is found.
+    """
     clean_lemma = re.sub(r"[^\w]", "", lemma, flags=re.UNICODE)
-    if lang_code == "ru" and _or_lookup_fn is not None:
-        definition = _or_lookup_fn(clean_lemma)
-        if definition:
-            return definition
-    if lang_code == "it" and _it_lookup_fn is not None:
-        definition = _it_lookup_fn(clean_lemma)
-        if definition:
-            return definition
-    return f"[{clean_lemma}]"  # stub
+    candidates: list[str] = []
+
+    if lang_code == "ru" and _or_lookup_all_fn is not None:
+        candidates = _or_lookup_all_fn(clean_lemma) or []
+    elif lang_code == "it" and _it_lookup_all_fn is not None:
+        candidates = _it_lookup_all_fn(clean_lemma) or []
+
+    if not candidates:
+        return f"[{clean_lemma}]"
+
+    ranked = _rank_definitions(candidates, translation)
+    return ranked[0]
 
 
 # ── Backend push ──────────────────────────────────────────────────────────────
@@ -447,7 +478,7 @@ def process_line(
             "display_form":         analysis.display_form,
             "lemma":                analysis.lemma,
             "grammar":              analysis.grammar,
-            "dictionary_definition": _resolve_definition(analysis.lemma, lang_code),
+            "dictionary_definition": _resolve_definition(analysis.lemma, lang_code, translation),
         })
         key += 1
 
