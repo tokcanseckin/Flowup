@@ -243,6 +243,13 @@ export function useSpotifyPlayer(token: string | null): PlayerState & PlayerCont
     deviceIdRef.current = targetDeviceId
     setState(prev => ({ ...prev, deviceId: targetDeviceId, error: null }))
 
+    // Reset position immediately so the lyrics player shows 0:00 for the new
+    // track before the first player_state_changed event fires.
+    basePositionRef.current  = 0
+    baseTimestampRef.current = Date.now()
+    isPlayingRef.current     = false
+    setState(prev => ({ ...prev, currentPositionMs: 0, isPlaying: false }))
+
     const playRes = await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${targetDeviceId}`, {
       method: 'PUT',
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
