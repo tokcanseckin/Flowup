@@ -231,7 +231,61 @@ function ProgressBar({ posMs, durMs, onSeek }: { posMs: number; durMs: number; o
   )
 }
 
-// ── Player view ───────────────────────────────────────────────────────────────
+// ── Album-art color extraction ──────────────────────────────────────────────
+
+function rgbToHsl(r: number, g: number, b: number): [number, number, number] {
+  r /= 255; g /= 255; b /= 255
+  const max = Math.max(r, g, b), min = Math.min(r, g, b)
+  let h = 0, s = 0
+  const l = (max + min) / 2
+  if (max !== min) {
+    const d = max - min
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min)
+    switch (max) {
+      case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break
+      case g: h = ((b - r) / d + 2) / 6;                break
+      case b: h = ((r - g) / d + 4) / 6;                break
+    }
+  }
+  return [Math.round(h * 360), Math.round(s * 100), Math.round(l * 100)]
+}
+
+function useAlbumBg(albumArtUrl: string | null): string {
+  const [bg, setBg] = useState('#0d0d14')
+  useEffect(() => {
+    if (!albumArtUrl) { setBg('#0d0d14'); return }
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.onload = () => {
+      try {
+        const SIZE = 30
+        const canvas = document.createElement('canvas')
+        canvas.width = canvas.height = SIZE
+        const ctx = canvas.getContext('2d')
+        if (!ctx) return
+        ctx.drawImage(img, 0, 0, SIZE, SIZE)
+        const data = ctx.getImageData(0, 0, SIZE, SIZE).data
+        let r = 0, g = 0, b = 0
+        const count = SIZE * SIZE
+        for (let i = 0; i < data.length; i += 4) {
+          r += data[i]; g += data[i + 1]; b += data[i + 2]
+        }
+        const [h, s] = rgbToHsl(r / count, g / count, b / count)
+        const sat = Math.min(s, 70)
+        setBg(
+          `radial-gradient(ellipse 140% 90% at 50% 115%, ` +
+          `hsl(${h},${sat}%,10%) 0%, ` +
+          `hsl(${h},${Math.max(sat - 30, 5)}%,5%) 65%)`
+        )
+      } catch { setBg('#0d0d14') }
+    }
+    img.onerror = () => setBg('#0d0d14')
+    img.src = albumArtUrl
+  }, [albumArtUrl])
+  return bg
+}
+
+// ── Player view ────────────────────────────────────────────────────────────────
 
 function PlayerView({
   song, user, onBack, onLogout, onPrev, onNext, canPrev, canNext,
@@ -250,6 +304,7 @@ function PlayerView({
   const [infoVisible, setInfoVisible] = useState(false)
   const autoPausedRef = useRef(false)
   const player = useSpotifyPlayer(localStorage.getItem('sp_access_token'))
+  const albumBg = useAlbumBg(player.albumArtUrl)
 
   const handleLoadTrack = useCallback(async () => {
     setLoading(true)
@@ -293,7 +348,7 @@ function PlayerView({
   }, [infoVisible, player.isPlaying, player.pause, player.resume])
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: '#0d0d14' }}>
+    <div className="min-h-screen flex flex-col" style={{ background: albumBg, transition: 'background 1.2s ease' }}>
 
       {/* Header */}
       <header className="glass sticky top-0 z-20 flex items-center justify-between px-6 py-3 border-b border-gray-800/60">
