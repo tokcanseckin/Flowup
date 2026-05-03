@@ -106,14 +106,18 @@ class PyMorphyBackend(NLPBackend):
 
         if best:
             lemma  = best.normal_form
+            # Try to get stress for lemma from RUAccent applied to lemma form itself.
+            # RUAccent is context-sensitive, so applying to the full line (annotated_token)
+            # gives better results. We prefer lemma with stress if possible.
             lemma_display = self._accent_text(lemma) if self._accent else lemma
             grammar = _humanize(best)
         else:
-            lemma = lemma_display = clean
+            lemma = clean
+            lemma_display = self._accent_text(lemma) if self._accent else lemma
             grammar = "Unknown"
 
         return WordAnalysis(
-            display_form=annotated_token,
-            lemma=lemma_display,
+            display_form=annotated_token,  # Declined form WITH stress from full-line RUAccent processing
+            lemma=lemma_display,            # Nominative form WITH stress applied separately
             grammar=grammar,
         )
