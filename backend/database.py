@@ -6,7 +6,7 @@ import os
 import time
 from collections.abc import Generator
 
-from sqlalchemy import Column, ForeignKey, Integer, String, Text, create_engine
+from sqlalchemy import Column, ForeignKey, Integer, String, Text, UniqueConstraint, create_engine
 from sqlalchemy.orm import DeclarativeBase, Session, relationship, sessionmaker
 
 DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///./flowup.db")
@@ -93,6 +93,45 @@ class Word(Base):
     dictionary_definition = Column(Text,    nullable=True)
 
     line = relationship("Line", back_populates="words")
+
+
+class Playlist(Base):
+    __tablename__ = "playlists"
+
+    id                  = Column(Integer, primary_key=True)
+    spotify_playlist_id = Column(String(128), unique=True, nullable=True)
+    name                = Column(String(512), nullable=False)
+    description         = Column(Text,        nullable=True)
+    # CEFR-style level: A1, A2, B1, B2, C1, C2
+    difficulty_level    = Column(String(8),   nullable=True)
+    language_code       = Column(String(8),   nullable=True)
+    created_at          = Column(Integer,     default=lambda: int(time.time()))
+
+    playlist_songs = relationship(
+        "PlaylistSong",
+        back_populates="playlist",
+        order_by="PlaylistSong.position",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+    )
+
+    @property
+    def song_count(self) -> int:
+        return len(self.playlist_songs)
+
+
+class PlaylistSong(Base):
+    """Junction table: ordered list of songs within a playlist."""
+    __tablename__ = "playlist_songs"
+    __table_args__ = (UniqueConstraint("playlist_id", "song_id", name="uq_playlist_song"),)
+
+    id          = Column(Integer, primary_key=True)
+    playlist_id = Column(Integer, ForeignKey("playlists.id", ondelete="CASCADE"), nullable=False)
+    song_id     = Column(Integer, ForeignKey("songs.id",     ondelete="CASCADE"), nullable=False)
+    position    = Column(Integer, nullable=False, default=0)
+
+    playlist = relationship("Playlist", back_populates="playlist_songs")
+    song     = relationship("Song")
 
 
 def create_tables() -> None:

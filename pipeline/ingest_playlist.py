@@ -77,6 +77,34 @@ def fetch_existing_uris(api_url: str) -> set[str]:
         return set()
 
 
+def create_backend_playlist(
+    api_url: str,
+    playlist_id: str,
+    name: str,
+    song_ids: list[int],
+    difficulty_level: str | None,
+    language_code: str,
+) -> None:
+    """POST a Playlist record to the backend."""
+    url = api_url.rstrip("/") + "/api/playlists"
+    payload = {
+        "spotify_playlist_id": playlist_id,
+        "name": name,
+        "difficulty_level": difficulty_level,
+        "language_code": language_code,
+        "song_ids": song_ids,
+    }
+    try:
+        r = requests.post(url, json=payload, timeout=15)
+        if r.status_code == 201:
+            data = r.json()
+            print(f"\n  [Backend] Playlist created (id={data['id']}, {data['song_count']} songs).")
+        else:
+            print(f"  [Backend] Playlist creation returned {r.status_code}: {r.text[:200]}")
+    except requests.RequestException as exc:
+        print(f"  [Backend] Playlist creation failed: {exc}")
+
+
 # ── Pipeline runner ───────────────────────────────────────────────────────────
 
 def run_pipeline(
@@ -144,6 +172,9 @@ def main() -> None:
                    help="Seconds to wait between tracks (default: 2)")
     p.add_argument("--offset-ms", type=int, default=0, dest="offset_ms",
                    help="Timestamp offset passed to generate_song_data.py")
+    p.add_argument("--difficulty", default=None, dest="difficulty",
+                   metavar="LEVEL",
+                   help="CEFR difficulty level to tag the playlist (A1|A2|B1|B2|C1|C2)")
     args = p.parse_args()
 
     output_dir = Path(__file__).parent / args.output_dir
@@ -166,6 +197,8 @@ def main() -> None:
     fail_count = 0
     skipped = 0
 
+    ingested_song_ids: list[int] = []
+
     for i, track in enumerate(tracks, 1):
         artist = track["artists"][0]["name"] if track.get("artists") else "Unknown"
         title  = track["name"]
@@ -182,9 +215,19 @@ def main() -> None:
             skipped += 1
             continue
 
-        success = run_pipeline(track, args.lang, args.api_url, output_dir, extra_args)
-        if success:
+        ok = run_pipeline(track, args.lang, args.api_url, output_dir, extra_args)
+        if ok:
             ok_count += 1
+            # Try to find the song's backend id by URI
+            if args.api_url:
+                try:
+                    songs_r = requests.get(args.api_url.rstrip("/") + "/api/songs", timeout=10)
+                    if songs_r.ok:
+                        match = next((s for s in songs_r.json() if s.get("spotify_uri") == uri), None)
+                        if match:
+                            ingested_song_ids.append(match["id"])
+                except Exception:
+                    pass
         else:
             fail_count += 1
 
@@ -196,6 +239,18 @@ def main() -> None:
         print(f"  Done — {ok_count} succeeded, {fail_count} failed, {skipped} skipped.")
         print(f"  JSON files in: {output_dir}")
         print(f"{'═' * 60}")
+
+        # Create the playlist record in the backend
+        if args.api_url and ingested_song_ids:
+            playlist_name = f"PL – {args.playlist_id}"
+            create_backend_playlist(
+                api_url=args.api_url,
+                playlist_id=args.playlist_id,
+                name=playlist_name,
+                song_ids=ingested_song_ids,
+                difficulty_level=args.difficulty,
+                language_code=args.lang,
+            )
 
 
 if __name__ == "__main__":

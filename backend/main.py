@@ -35,11 +35,17 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
-from database import Line, Song, User, Word, create_tables, get_db
+from database import Line, Playlist, PlaylistSong, Song, User, Word, create_tables, get_db
 from models import (
     LanguageIngest,
     LanguageResponse,
     LineResponse,
+    PlaylistAddSong,
+    PlaylistCreate,
+    PlaylistResponse,
+    PlaylistSongEntry,
+    PlaylistSummaryResponse,
+    PlaylistUpdate,
     SongDetailResponse,
     SongIngest,
     SongSummaryResponse,
@@ -251,6 +257,140 @@ def export_song(song_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Song not found")
     detail = _song_detail(song)
     return JSONResponse(content=detail.model_dump())
+
+
+# ── Playlists ──────────────────────────────────────────────────────────────────
+
+def _playlist_song_entry(ps: PlaylistSong) -> PlaylistSongEntry:
+    return PlaylistSongEntry(
+        position=ps.position,
+        song_id=ps.song.id,
+        spotify_uri=ps.song.spotify_uri,
+        title=ps.song.title,
+        artist=ps.song.artist,
+    )
+
+
+def _playlist_response(pl: Playlist) -> PlaylistResponse:
+    return PlaylistResponse(
+        id=pl.id,
+        spotify_playlist_id=pl.spotify_playlist_id,
+        name=pl.name,
+        description=pl.description,
+        difficulty_level=pl.difficulty_level,
+        language_code=pl.language_code,
+        song_count=pl.song_count,
+        songs=[_playlist_song_entry(ps) for ps in pl.playlist_songs],
+    )
+
+
+def _playlist_summary(pl: Playlist) -> PlaylistSummaryResponse:
+    return PlaylistSummaryResponse(
+        id=pl.id,
+        spotify_playlist_id=pl.spotify_playlist_id,
+        name=pl.name,
+        description=pl.description,
+        difficulty_level=pl.difficulty_level,
+        language_code=pl.language_code,
+        song_count=pl.song_count,
+    )
+
+
+@app.get("/api/playlists", response_model=list[PlaylistSummaryResponse])
+def list_playlists(db: Session = Depends(get_db)):
+    playlists = db.query(Playlist).order_by(Playlist.created_at.desc()).all()
+    return [_playlist_summary(pl) for pl in playlists]
+
+
+@app.post("/api/playlists", response_model=PlaylistResponse, status_code=201)
+def create_playlist(body: PlaylistCreate, db: Session = Depends(get_db)):
+    pl = Playlist(
+        spotify_playlist_id=body.spotify_playlist_id,
+        name=body.name,
+        description=body.description,
+        difficulty_level=body.difficulty_level,
+        language_code=body.language_code,
+    )
+    db.add(pl)
+    db.flush()
+
+    for pos, song_id in enumerate(body.song_ids):
+        song = db.get(Song, song_id)
+        if not song:
+            raise HTTPException(status_code=404, detail=f"Song {song_id} not found")
+        db.add(PlaylistSong(playlist_id=pl.id, song_id=song_id, position=pos))
+
+    db.commit()
+    db.refresh(pl)
+    return _playlist_response(pl)
+
+
+@app.get("/api/playlists/{playlist_id}", response_model=PlaylistResponse)
+def get_playlist(playlist_id: int, db: Session = Depends(get_db)):
+    pl = db.get(Playlist, playlist_id)
+    if not pl:
+        raise HTTPException(status_code=404, detail="Playlist not found")
+    return _playlist_response(pl)
+
+
+@app.patch("/api/playlists/{playlist_id}", response_model=PlaylistResponse)
+def update_playlist(playlist_id: int, body: PlaylistUpdate, db: Session = Depends(get_db)):
+    pl = db.get(Playlist, playlist_id)
+    if not pl:
+        raise HTTPException(status_code=404, detail="Playlist not found")
+    if body.name is not None:
+        pl.name = body.name
+    if body.description is not None:
+        pl.description = body.description
+    if body.difficulty_level is not None:
+        pl.difficulty_level = body.difficulty_level
+    if body.language_code is not None:
+        pl.language_code = body.language_code
+    db.commit()
+    db.refresh(pl)
+    return _playlist_response(pl)
+
+
+@app.delete("/api/playlists/{playlist_id}", status_code=204)
+def delete_playlist(playlist_id: int, db: Session = Depends(get_db)):
+    pl = db.get(Playlist, playlist_id)
+    if not pl:
+        raise HTTPException(status_code=404, detail="Playlist not found")
+    db.delete(pl)
+    db.commit()
+
+
+@app.post("/api/playlists/{playlist_id}/songs", response_model=PlaylistResponse, status_code=201)
+def add_song_to_playlist(playlist_id: int, body: PlaylistAddSong, db: Session = Depends(get_db)):
+    pl = db.get(Playlist, playlist_id)
+    if not pl:
+        raise HTTPException(status_code=404, detail="Playlist not found")
+    song = db.get(Song, body.song_id)
+    if not song:
+        raise HTTPException(status_code=404, detail=f"Song {body.song_id} not found")
+    # Check duplicate
+    existing = db.query(PlaylistSong).filter_by(playlist_id=playlist_id, song_id=body.song_id).first()
+    if existing:
+        raise HTTPException(status_code=409, detail="Song already in playlist")
+    pos = body.position if body.position is not None else (pl.song_count)
+    db.add(PlaylistSong(playlist_id=pl.id, song_id=body.song_id, position=pos))
+    db.commit()
+    db.refresh(pl)
+    return _playlist_response(pl)
+
+
+@app.delete("/api/playlists/{playlist_id}/songs/{song_id}", response_model=PlaylistResponse)
+def remove_song_from_playlist(playlist_id: int, song_id: int, db: Session = Depends(get_db)):
+    pl = db.get(Playlist, playlist_id)
+    if not pl:
+        raise HTTPException(status_code=404, detail="Playlist not found")
+    ps = db.query(PlaylistSong).filter_by(playlist_id=playlist_id, song_id=song_id).first()
+    if not ps:
+        raise HTTPException(status_code=404, detail="Song not in playlist")
+    db.delete(ps)
+    db.commit()
+    db.refresh(pl)
+    return _playlist_response(pl)
 
 
 # ── Users ──────────────────────────────────────────────────────────────────────
