@@ -14,6 +14,8 @@ export interface PlayerState {
 
 export interface PlayerControls {
   togglePlay: () => Promise<void>
+  pause: () => Promise<void>
+  resume: () => Promise<void>
   seekTo: (ms: number) => Promise<void>
   loadAndPlayTrack: (trackUri: string) => Promise<void>
 }
@@ -147,6 +149,14 @@ export function useSpotifyPlayer(token: string | null): PlayerState & PlayerCont
     await playerRef.current?.togglePlay()
   }, [])
 
+  const pause = useCallback(async () => {
+    await playerRef.current?.pause()
+  }, [])
+
+  const resume = useCallback(async () => {
+    await playerRef.current?.resume()
+  }, [])
+
   const seekTo = useCallback(async (ms: number) => {
     basePositionRef.current  = ms
     baseTimestampRef.current = Date.now()
@@ -191,5 +201,5 @@ export function useSpotifyPlayer(token: string | null): PlayerState & PlayerCont
     }
   }, [token])
 
-  return { ...state, togglePlay, seekTo, loadAndPlayTrack }
+  return { ...state, togglePlay, pause, resume, seekTo, loadAndPlayTrack }
 }
