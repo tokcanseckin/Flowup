@@ -49,6 +49,28 @@ export interface SongDetail {
   lines: SongLine[]
 }
 
+export interface PlaylistSongEntry {
+  position: number
+  song_id: number
+  spotify_uri: string
+  title: string
+  artist: string | null
+}
+
+export interface PlaylistSummary {
+  id: number
+  spotify_playlist_id: string | null
+  name: string
+  description: string | null
+  difficulty_level: string | null
+  language_code: string | null
+  song_count: number
+}
+
+export interface PlaylistDetail extends PlaylistSummary {
+  songs: PlaylistSongEntry[]
+}
+
 export interface BackendUser {
   id: number
   spotify_id: string
@@ -82,6 +104,12 @@ export const api = {
 
   getSong: (id: number): Promise<SongDetail> =>
     apiFetch(`/songs/${id}`),
+
+  listPlaylists: (): Promise<PlaylistSummary[]> =>
+    apiFetch('/playlists'),
+
+  getPlaylist: (id: number): Promise<PlaylistDetail> =>
+    apiFetch(`/playlists/${id}`),
 
   syncUser: (body: {
     spotify_id: string
