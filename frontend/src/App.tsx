@@ -275,7 +275,7 @@ function PlayerView({
     return () => {
       cancelled = true
     }
-  }, [player, player.isReady, song.spotify_uri])
+  }, [player.isReady, player.loadAndPlayTrack, song.spotify_uri])
 
   useEffect(() => {
     if (infoVisible) {

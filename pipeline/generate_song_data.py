@@ -135,6 +135,8 @@ def build_arg_parser() -> argparse.ArgumentParser:
                         "When set, the processed song is also pushed to the backend database.")
     p.add_argument("--lrc-file",    dest="lrc_file", default="",
                    help="Path to a local .lrc file to use instead of fetching from LRCLIB.")
+    p.add_argument("--replace-id",  dest="replace_id", type=int, default=None,
+                   help="Delete this song ID from the backend before pushing the re-processed version.")
     return p
 
 # ── LRC helpers ───────────────────────────────────────────────────────────────
@@ -360,9 +362,26 @@ def _resolve_definition(lemma: str, lang_code: str) -> str:
 
 # ── Backend push ──────────────────────────────────────────────────────────────
 
-def push_to_backend(api_url: str, payload: dict) -> None:
-    """POST the processed song JSON to the FlowUp backend API."""
-    url = api_url.rstrip("/") + "/api/songs"
+def push_to_backend(api_url: str, payload: dict, replace_id: int | None = None) -> None:
+    """POST the processed song JSON to the FlowUp backend API.
+
+    If replace_id is given, the existing song is deleted first so the new
+    version takes its place (playlist associations are preserved on the
+    new song ID — callers should re-add if needed).
+    """
+    base = api_url.rstrip("/")
+    if replace_id is not None:
+        print(f"\n[6/5] Deleting old song id={replace_id} …")
+        try:
+            d = requests.delete(f"{base}/api/songs/{replace_id}", timeout=10)
+            if d.status_code in (204, 200):
+                print(f"  [Backend] Deleted song {replace_id}.")
+            else:
+                print(f"  [Backend] Delete returned {d.status_code}: {d.text[:200]}")
+        except requests.RequestException as exc:
+            print(f"  [Backend] Delete error: {exc}")
+
+    url = base + "/api/songs"
     print(f"\n[6/5] Pushing to backend: {url} …")
     try:
         r = requests.post(url, json=payload, timeout=30)
@@ -495,7 +514,7 @@ def main() -> None:
 
     # ── 6. Push to backend (optional)
     if args.api_url:
-        push_to_backend(args.api_url, output)
+        push_to_backend(args.api_url, output, replace_id=args.replace_id)
 
     print(f"\n✓  Done — {len(lines)} lines.")
     print(sep)

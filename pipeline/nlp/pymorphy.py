@@ -17,8 +17,15 @@ _VOWELS = "АЕЁИОУЫЭЮЯаеёиоуыэюя"
 
 
 def _normalize_stress_marks(text: str) -> str:
-    """Convert ruaccent's plus-before-vowel markers into combining acute accents."""
-    return re.sub(rf"\+([{_VOWELS}])", lambda m: m.group(1) + "\u0301", text)
+    """Convert ruaccent's plus-before-vowel markers into combining acute accents.
+
+    Also strips any redundant combining acute that lands on ё/Ё, which are
+    inherently stressed in Russian and need no additional mark.
+    """
+    result = re.sub(rf"\+([{_VOWELS}])", lambda m: m.group(1) + "\u0301", text)
+    # Remove U+0301 immediately after ё or Ё (already stressed by nature).
+    result = re.sub(r"([ёЁ])\u0301", r"\1", result)
+    return result
 
 # ── Grammar tag maps (pymorphy3 internal codes → human labels) ────────────────
 
@@ -32,7 +39,7 @@ _POS = {
 }
 _CASE = {
     "nomn": "Nominative", "gent": "Genitive",  "datv": "Dative",
-    "accs": "Accusative", "ablt": "Ablative",  "loct": "Locative",
+    "accs": "Accusative", "ablt": "Instrumental", "loct": "Locative",
     "voct": "Vocative",   "gen2": "Genitive 2", "loc2": "Prepositional",
 }
 _GEND = {"masc": "Masculine", "femn": "Feminine",  "neut": "Neuter"}
@@ -82,21 +89,52 @@ class PyMorphyBackend(NLPBackend):
             self._accent.load(omograph_model_size="turbo", use_dictionary=True)
             print("       ruaccent ready.")
 
+    def _run_accent(self, text: str) -> str:
+        """Call the underlying ruaccent API and return the raw (un-normalised) result."""
+        if hasattr(self._accent, "process_text"):
+            return self._accent.process_text(text)
+        if hasattr(self._accent, "process_all"):
+            out = self._accent.process_all(text)
+            if isinstance(out, list):
+                return out[0] if out else text
+            return out
+        return text
+
     def _accent_text(self, text: str) -> str:
-        """Apply stress marks with compatibility across ruaccent versions."""
+        """Apply stress marks with compatibility across ruaccent versions.
+
+        ruaccent is context-sensitive and intentionally leaves some common
+        function words (e.g. 'только', 'тускло') without stress marks when
+        they appear mid-sentence.  We fix this with a per-word retry: any
+        space-separated token that still contains no stress marker after
+        full-line processing is retried in isolation so that single-word
+        context triggers the dictionary lookup.
+        """
         if self._accent is None:
             return text
 
         try:
-            # Newer ruaccent builds expose process_all(), older ones process_text().
-            if hasattr(self._accent, "process_text"):
-                return _normalize_stress_marks(self._accent.process_text(text))
+            annotated = _normalize_stress_marks(self._run_accent(text))
 
-            if hasattr(self._accent, "process_all"):
-                out = self._accent.process_all(text)
-                if isinstance(out, list):
-                    return _normalize_stress_marks(out[0] if out else text)
-                return _normalize_stress_marks(out)
+            # Per-word retry for tokens that received no stress mark.
+            orig_tokens  = text.split()
+            annot_tokens = annotated.split()
+
+            if len(orig_tokens) != len(annot_tokens):
+                # Token count mismatch — return as-is to avoid misalignment.
+                return annotated
+
+            fixed: list[str] = []
+            for orig, annot in zip(orig_tokens, annot_tokens):
+                # Check whether this token already carries a combining acute (U+0301).
+                if "\u0301" not in annot and sum(1 for c in orig if c in _VOWELS) > 1:
+                    # Retry the word in isolation.
+                    solo = _normalize_stress_marks(self._run_accent(orig))
+                    fixed.append(solo if "\u0301" in solo else annot)
+                else:
+                    fixed.append(annot)
+
+            return " ".join(fixed)
         except Exception:
             pass  # fall through to raw text on any ruaccent/ONNX failure
 
@@ -117,11 +155,15 @@ class PyMorphyBackend(NLPBackend):
 
         if best:
             lemma  = best.normal_form
-            # Try to get stress for lemma from RUAccent applied to lemma form itself.
-            # RUAccent is context-sensitive, so applying to the full line (annotated_token)
-            # gives better results. We prefer lemma with stress if possible.
             lemma_display = self._accent_text(lemma) if self._accent else lemma
-            grammar = _humanize(best)
+
+            # Collect all distinct grammatical readings, preserving probability order.
+            seen: dict[str, None] = {}
+            for p in parses:
+                h = _humanize(p)
+                if h and h != "Unknown":
+                    seen[h] = None
+            grammar = " / ".join(seen) if seen else "Unknown"
         else:
             lemma = clean
             lemma_display = self._accent_text(lemma) if self._accent else lemma
