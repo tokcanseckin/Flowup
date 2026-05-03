@@ -1,4 +1,11 @@
+# ── Always required ───────────────────────────────────────────────────────────
 requests>=2.31.0
+
+# ── Russian / Ukrainian (--lang ru, --lang uk) ────────────────────────────────
+# pymorphy3 ships dictionaries for both languages.
 pymorphy3>=2.0.2
+
+# ── Russian stress marks (--lang ru only) ─────────────────────────────────────
+# ruaccent uses an ONNX model for context-aware omograph disambiguation.
 ruaccent>=0.0.10
 onnxruntime>=1.17.0

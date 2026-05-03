@@ -39,7 +39,7 @@ function AuthScreen({ onConnect }: AuthScreenProps) {
             </h1>
           </div>
           <p className="text-gray-500 text-sm leading-relaxed max-w-xs mx-auto">
-            Learn Russian through music.<br/>
+            Learn languages through music.<br/>
             Real lyrics. Real grammar. Real context.
           </p>
         </div>
@@ -299,7 +299,12 @@ export default function App() {
           {/* Panel header */}
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800/80">
             <div>
-              <h2 className="font-semibold text-white">{songData.title}</h2>
+              <div className="flex items-center gap-2">
+                <h2 className="font-semibold text-white">{songData.title}</h2>
+                <span className="text-[10px] font-mono font-medium text-indigo-400 bg-indigo-950/60 border border-indigo-900/50 px-1.5 py-0.5 rounded-md uppercase tracking-wider">
+                  {songData.language.name}
+                </span>
+              </div>
               <p className="text-xs text-gray-600 mt-0.5">
                 Press{' '}
                 <kbd className="font-mono bg-gray-800 text-gray-400 px-1 py-0.5 rounded text-[10px]">1</kbd>
