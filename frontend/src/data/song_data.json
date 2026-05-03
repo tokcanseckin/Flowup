@@ -1,6 +1,7 @@
 {
-  "spotify_uri": "spotify:track:4uLU6hMCjMI75M1A2tKUQC",
+  "spotify_uri": "spotify:track:4iRg9tHDgmRPvv56IC46Pl",
   "title": "Группа Крови — Кино",
+  "artist": "Кино",
   "language": {
     "code": "ru",
     "name": "Russian",
@@ -9,126 +10,219 @@
   },
   "lines": [
     {
-      "start_time_ms": 14800,
-      "end_time_ms": 19200,
-      "original_line": "Тёплое место, но улицы ждут",
-      "phonetic_line": "Тёплое ме́сто, но у́лицы ждут",
-      "translation": "A warm place, but the streets are waiting",
+      "start_time_ms": 45010,
+      "end_time_ms": 54090,
+      "original_line": "Тёплое место, но улицы ждут отпечатков наших ног",
+      "phonetic_line": "Тёплое ме́сто, но у́лицы жду́т отпеча́тков на́ших но́г",
+      "translation": "Warm place, but the streets are waiting for our footprints",
       "words": [
         {
           "key": 1,
           "display_form": "Тёплое",
           "lemma": "тёплый",
-          "grammar": "Adjective, Nominative, Singular, Neuter",
-          "dictionary_definition": "warm, cozy, comforting"
+          "grammar": "Adjective, Singular, Neuter, Nominative",
+          "dictionary_definition": "warm, mild, cordial, kindly, affectionate"
         },
         {
           "key": 2,
           "display_form": "ме́сто,",
           "lemma": "ме́сто",
-          "grammar": "Noun, Nominative, Singular, Neuter",
-          "dictionary_definition": "place, spot, seat, location"
+          "grammar": "Noun, Singular, Neuter, Accusative",
+          "dictionary_definition": "place, spot, site, locality, seat; region, area; site, scene; room, space"
         },
         {
           "key": 3,
           "display_form": "но",
-          "lemma": "но",
+          "lemma": "но́",
           "grammar": "Conjunction",
-          "dictionary_definition": "but, however, yet"
+          "dictionary_definition": "but"
         },
         {
           "key": 4,
           "display_form": "у́лицы",
           "lemma": "у́лица",
-          "grammar": "Noun, Nominative, Plural, Feminine",
-          "dictionary_definition": "street, road (pl: streets)"
+          "grammar": "Noun, Singular, Feminine, Genitive",
+          "dictionary_definition": "street"
         },
         {
           "key": 5,
-          "display_form": "ждут",
+          "display_form": "жду́т",
           "lemma": "жда́ть",
           "grammar": "Verb, Present, 3rd Person, Plural",
-          "dictionary_definition": "to wait, to await, to expect"
+          "dictionary_definition": "to wait, to expect, to await"
+        },
+        {
+          "key": 6,
+          "display_form": "отпеча́тков",
+          "lemma": "отпеча́ток",
+          "grammar": "Noun, Plural, Masculine, Genitive",
+          "dictionary_definition": "fingerprint; imprint, impress"
+        },
+        {
+          "key": 7,
+          "display_form": "на́ших",
+          "lemma": "на́ш",
+          "grammar": "Adjective, Plural, Genitive",
+          "dictionary_definition": "our"
+        },
+        {
+          "key": 8,
+          "display_form": "но́г",
+          "lemma": "нога́",
+          "grammar": "Noun, Plural, Feminine, Genitive",
+          "dictionary_definition": "leg, foot"
         }
       ]
     },
     {
-      "start_time_ms": 19200,
-      "end_time_ms": 23600,
-      "original_line": "Отправляться в дорогу зовут",
-      "phonetic_line": "Отправля́ться в доро́гу зову́т",
-      "translation": "They call us to set out on the road",
+      "start_time_ms": 54090,
+      "end_time_ms": 60930,
+      "original_line": "Звёздная пыль на сапогах",
+      "phonetic_line": "Звёздная пы́ль на сапога́х",
+      "translation": "Stardust on boots",
       "words": [
         {
           "key": 1,
-          "display_form": "Отправля́ться",
-          "lemma": "отправля́ться",
-          "grammar": "Verb (infinitive), Imperfective",
-          "dictionary_definition": "to set off, to depart, to head out"
+          "display_form": "Звёздная",
+          "lemma": "звёздный",
+          "grammar": "Adjective, Singular, Feminine, Nominative",
+          "dictionary_definition": "star, sidereal, starry, starlit, converging, stellar"
         },
         {
           "key": 2,
+          "display_form": "пы́ль",
+          "lemma": "пы́ль",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "dust"
+        },
+        {
+          "key": 3,
+          "display_form": "на",
+          "lemma": "на́",
+          "grammar": "Preposition",
+          "dictionary_definition": "on (place), during; on (day/week); on (means of transport); to (direction)"
+        },
+        {
+          "key": 4,
+          "display_form": "сапога́х",
+          "lemma": "сапо́г",
+          "grammar": "Noun, Plural, Masculine, Locative",
+          "dictionary_definition": "boot, top-boot, jackboot; wader, boot; very long boot"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 60930,
+      "end_time_ms": 69690,
+      "original_line": "Мягкое кресло, клетчатый плед, не нажатый вовремя курок",
+      "phonetic_line": "Мя́гкое кре́сло, кле́тчатый пле́д, не́ нажа́тый во́время куро́к",
+      "translation": "Soft chair, checkered plaid, not pulled the trigger in time",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Мя́гкое",
+          "lemma": "мя́гкий",
+          "grammar": "Adjective, Singular, Neuter, Nominative",
+          "dictionary_definition": "soft, tender; mild"
+        },
+        {
+          "key": 2,
+          "display_form": "кре́сло,",
+          "lemma": "кре́сло",
+          "grammar": "Noun, Singular, Neuter, Accusative",
+          "dictionary_definition": "armchair, easy chair, stall; responsible position, post"
+        },
+        {
+          "key": 3,
+          "display_form": "кле́тчатый",
+          "lemma": "кле́тчатый",
+          "grammar": "Adjective, Singular, Masculine, Nominative",
+          "dictionary_definition": "checkered, chequered; plaid"
+        },
+        {
+          "key": 4,
+          "display_form": "пле́д,",
+          "lemma": "пле́д",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "rug, plaid; blanket"
+        },
+        {
+          "key": 5,
+          "display_form": "не́",
+          "lemma": "не́",
+          "grammar": "Particle",
+          "dictionary_definition": "not"
+        },
+        {
+          "key": 6,
+          "display_form": "нажа́тый",
+          "lemma": "нажа́ть",
+          "grammar": "Participle, Past, Singular, Masculine, Nominative",
+          "dictionary_definition": "press, push"
+        },
+        {
+          "key": 7,
+          "display_form": "во́время",
+          "lemma": "во́время",
+          "grammar": "Adverb",
+          "dictionary_definition": "in time"
+        },
+        {
+          "key": 8,
+          "display_form": "куро́к",
+          "lemma": "куро́к",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "trigger"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 69690,
+      "end_time_ms": 75960,
+      "original_line": "Солнечный день в ослепительных снах",
+      "phonetic_line": "Со́лнечный де́нь в ослепи́тельных сна́х",
+      "translation": "A sunny day in dazzling dreams",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Со́лнечный",
+          "lemma": "со́лнечный",
+          "grammar": "Adjective, Singular, Masculine, Nominative",
+          "dictionary_definition": "sunny"
+        },
+        {
+          "key": 2,
+          "display_form": "де́нь",
+          "lemma": "де́нь",
+          "grammar": "Noun, Singular, Masculine, Accusative",
+          "dictionary_definition": "day, daytime; afternoon, early evening"
+        },
+        {
+          "key": 3,
           "display_form": "в",
           "lemma": "в",
           "grammar": "Preposition",
-          "dictionary_definition": "in, into, to (direction)"
-        },
-        {
-          "key": 3,
-          "display_form": "доро́гу",
-          "lemma": "доро́га",
-          "grammar": "Noun, Accusative, Singular, Feminine",
-          "dictionary_definition": "road, path, way, journey"
+          "dictionary_definition": "in, at, on, within; to, into, for"
         },
         {
           "key": 4,
-          "display_form": "зову́т",
-          "lemma": "зва́ть",
-          "grammar": "Verb, Present, 3rd Person, Plural",
-          "dictionary_definition": "to call, to invite, to summon"
+          "display_form": "ослепи́тельных",
+          "lemma": "ослепи́тельный",
+          "grammar": "Adjective, Plural, Genitive",
+          "dictionary_definition": "blinding, dazzling, glaring"
+        },
+        {
+          "key": 5,
+          "display_form": "сна́х",
+          "lemma": "со́н",
+          "grammar": "Noun, Plural, Masculine, Locative",
+          "dictionary_definition": "sleep; dream"
         }
       ]
     },
     {
-      "start_time_ms": 23600,
-      "end_time_ms": 28100,
-      "original_line": "Снова ты видишь вперёд",
-      "phonetic_line": "Сно́ва ты ви́дишь вперёд",
-      "translation": "Once again you look ahead",
-      "words": [
-        {
-          "key": 1,
-          "display_form": "Сно́ва",
-          "lemma": "сно́ва",
-          "grammar": "Adverb",
-          "dictionary_definition": "again, once more, anew"
-        },
-        {
-          "key": 2,
-          "display_form": "ты",
-          "lemma": "ты",
-          "grammar": "Pronoun, Nominative, 2nd Person, Singular",
-          "dictionary_definition": "you (informal singular)"
-        },
-        {
-          "key": 3,
-          "display_form": "ви́дишь",
-          "lemma": "ви́деть",
-          "grammar": "Verb, Present, 2nd Person, Singular",
-          "dictionary_definition": "to see, to perceive, to observe"
-        },
-        {
-          "key": 4,
-          "display_form": "вперёд",
-          "lemma": "вперёд",
-          "grammar": "Adverb",
-          "dictionary_definition": "forward, ahead, onwards"
-        }
-      ]
-    },
-    {
-      "start_time_ms": 28100,
-      "end_time_ms": 32600,
+      "start_time_ms": 75960,
+      "end_time_ms": 79120,
       "original_line": "Группа крови на рукаве",
       "phonetic_line": "Гру́ппа кро́ви на рукаве́",
       "translation": "Blood type on the sleeve",
@@ -137,439 +231,849 @@
           "key": 1,
           "display_form": "Гру́ппа",
           "lemma": "гру́ппа",
-          "grammar": "Noun, Nominative, Singular, Feminine",
-          "dictionary_definition": "group, team, band, cluster"
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "group, cluster, clump; A band"
         },
         {
           "key": 2,
           "display_form": "кро́ви",
-          "lemma": "кровь",
-          "grammar": "Noun, Genitive, Singular, Feminine",
-          "dictionary_definition": "blood (gen: of blood)"
+          "lemma": "кро́вь",
+          "grammar": "Noun, Singular, Feminine, Genitive",
+          "dictionary_definition": "blood"
         },
         {
           "key": 3,
           "display_form": "на",
-          "lemma": "на",
+          "lemma": "на́",
           "grammar": "Preposition",
-          "dictionary_definition": "on, upon, at (surface)"
+          "dictionary_definition": "on (place), during; on (day/week); on (means of transport); to (direction)"
         },
         {
           "key": 4,
           "display_form": "рукаве́",
-          "lemma": "рукав",
-          "grammar": "Noun, Locative, Singular, Masculine",
-          "dictionary_definition": "sleeve (of a garment)"
+          "lemma": "рука́в",
+          "grammar": "Noun, Singular, Masculine, Locative",
+          "dictionary_definition": "sleeve"
         }
       ]
     },
     {
-      "start_time_ms": 32600,
-      "end_time_ms": 37200,
+      "start_time_ms": 79120,
+      "end_time_ms": 84220,
       "original_line": "Мой порядковый номер на рукаве",
-      "phonetic_line": "Мой поря́дковый но́мер на рукаве́",
+      "phonetic_line": "Мо́й поря́дковый но́мер на рукаве́",
       "translation": "My serial number on the sleeve",
       "words": [
         {
           "key": 1,
-          "display_form": "Мой",
-          "lemma": "мой",
-          "grammar": "Pronoun, Nominative, Singular, Masculine",
-          "dictionary_definition": "my, mine (masculine)"
+          "display_form": "Мо́й",
+          "lemma": "мо́й",
+          "grammar": "Adjective, Singular, Masculine, Nominative",
+          "dictionary_definition": "my, mine, my people"
         },
         {
           "key": 2,
           "display_form": "поря́дковый",
           "lemma": "поря́дковый",
-          "grammar": "Adjective, Nominative, Singular, Masculine",
-          "dictionary_definition": "ordinal, serial, sequential"
+          "grammar": "Adjective, Singular, Masculine, Nominative",
+          "dictionary_definition": "ordinal"
         },
         {
           "key": 3,
           "display_form": "но́мер",
           "lemma": "но́мер",
-          "grammar": "Noun, Nominative, Singular, Masculine",
-          "dictionary_definition": "number, issue, size, room"
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "number, size, room, issue, item on the programme, turn, trick"
         },
         {
           "key": 4,
           "display_form": "на",
-          "lemma": "на",
+          "lemma": "на́",
           "grammar": "Preposition",
-          "dictionary_definition": "on, upon, at (surface)"
+          "dictionary_definition": "on (place), during; on (day/week); on (means of transport); to (direction)"
         },
         {
           "key": 5,
           "display_form": "рукаве́",
-          "lemma": "рукав",
-          "grammar": "Noun, Locative, Singular, Masculine",
-          "dictionary_definition": "sleeve (of a garment)"
+          "lemma": "рука́в",
+          "grammar": "Noun, Singular, Masculine, Locative",
+          "dictionary_definition": "sleeve"
         }
       ]
     },
     {
-      "start_time_ms": 37200,
-      "end_time_ms": 42000,
-      "original_line": "Пожелай мне удачи в бою",
-      "phonetic_line": "Пожела́й мне уда́чи в бою́",
-      "translation": "Wish me luck in battle",
+      "start_time_ms": 84220,
+      "end_time_ms": 91420,
+      "original_line": "Пожелай мне удачи в бою, пожелай мне",
+      "phonetic_line": "Пожела́й мне уда́чи в бою́, пожела́й мне",
+      "translation": "Wish me luck in battle, wish me luck",
       "words": [
         {
           "key": 1,
           "display_form": "Пожела́й",
           "lemma": "пожела́ть",
-          "grammar": "Verb, Imperative, 2nd Person, Singular, Perfective",
-          "dictionary_definition": "to wish (someone something); wish me!"
+          "grammar": "Verb, Singular",
+          "dictionary_definition": "wish, desire, covet"
         },
         {
           "key": 2,
           "display_form": "мне",
           "lemma": "я",
-          "grammar": "Pronoun, Dative, 1st Person, Singular",
-          "dictionary_definition": "me, to me (dative of я)"
+          "grammar": "Pronoun, 1st Person, Singular, Dative",
+          "dictionary_definition": "I, me, myself"
         },
         {
           "key": 3,
           "display_form": "уда́чи",
           "lemma": "уда́ча",
-          "grammar": "Noun, Genitive, Singular, Feminine",
-          "dictionary_definition": "luck, fortune, success"
+          "grammar": "Noun, Singular, Feminine, Genitive",
+          "dictionary_definition": "good luck, success, good fortune"
         },
         {
           "key": 4,
           "display_form": "в",
           "lemma": "в",
           "grammar": "Preposition",
-          "dictionary_definition": "in, during (location/time)"
+          "dictionary_definition": "in, at, on, within; to, into, for"
         },
         {
           "key": 5,
-          "display_form": "бою́",
-          "lemma": "бой",
-          "grammar": "Noun, Locative, Singular, Masculine",
-          "dictionary_definition": "battle, fight, combat"
-        }
-      ]
-    },
-    {
-      "start_time_ms": 42000,
-      "end_time_ms": 46800,
-      "original_line": "Пожелай мне не остаться в ней",
-      "phonetic_line": "Пожела́й мне не оста́ться в ней",
-      "translation": "Wish me not to remain in it",
-      "words": [
-        {
-          "key": 1,
-          "display_form": "Пожела́й",
-          "lemma": "пожела́ть",
-          "grammar": "Verb, Imperative, 2nd Person, Singular, Perfective",
-          "dictionary_definition": "to wish (someone something)"
-        },
-        {
-          "key": 2,
-          "display_form": "мне",
-          "lemma": "я",
-          "grammar": "Pronoun, Dative, 1st Person, Singular",
-          "dictionary_definition": "me, to me"
-        },
-        {
-          "key": 3,
-          "display_form": "не",
-          "lemma": "не",
-          "grammar": "Particle",
-          "dictionary_definition": "not (negation particle)"
-        },
-        {
-          "key": 4,
-          "display_form": "оста́ться",
-          "lemma": "оста́ться",
-          "grammar": "Verb (infinitive), Perfective",
-          "dictionary_definition": "to remain, to stay, to be left"
-        },
-        {
-          "key": 5,
-          "display_form": "в",
-          "lemma": "в",
-          "grammar": "Preposition",
-          "dictionary_definition": "in, inside"
+          "display_form": "бою́,",
+          "lemma": "бо́й",
+          "grammar": "Noun, Singular, Masculine, loc2",
+          "dictionary_definition": "fight; battle, combat"
         },
         {
           "key": 6,
-          "display_form": "ней",
-          "lemma": "она́",
-          "grammar": "Pronoun, Locative, 3rd Person, Singular, Feminine",
-          "dictionary_definition": "in her/it (prepositional of она)"
+          "display_form": "пожела́й",
+          "lemma": "пожела́ть",
+          "grammar": "Verb, Singular",
+          "dictionary_definition": "wish, desire, covet"
+        },
+        {
+          "key": 7,
+          "display_form": "мне",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Dative",
+          "dictionary_definition": "I, me, myself"
         }
       ]
     },
     {
-      "start_time_ms": 46800,
-      "end_time_ms": 51500,
-      "original_line": "Пожелай мне удачи в бою",
-      "phonetic_line": "Пожела́й мне уда́чи в бою́",
-      "translation": "Wish me luck in battle",
+      "start_time_ms": 91420,
+      "end_time_ms": 100290,
+      "original_line": "Не остаться в этой траве, не остаться в этой траве",
+      "phonetic_line": "Не оста́ться в э́той траве́, не оста́ться в э́той траве́",
+      "translation": "Not to stay in this grass, not to stay in this grass.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Не",
+          "lemma": "не́",
+          "grammar": "Particle",
+          "dictionary_definition": "not"
+        },
+        {
+          "key": 2,
+          "display_form": "оста́ться",
+          "lemma": "оста́ться",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "To remain; To stay"
+        },
+        {
+          "key": 3,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 4,
+          "display_form": "э́той",
+          "lemma": "э́тот",
+          "grammar": "Adjective, Singular, Feminine, Genitive",
+          "dictionary_definition": "this"
+        },
+        {
+          "key": 5,
+          "display_form": "траве́,",
+          "lemma": "трава́",
+          "grammar": "Noun, Singular, Feminine, Locative",
+          "dictionary_definition": "grass; weed; herb"
+        },
+        {
+          "key": 6,
+          "display_form": "не",
+          "lemma": "не́",
+          "grammar": "Particle",
+          "dictionary_definition": "not"
+        },
+        {
+          "key": 7,
+          "display_form": "оста́ться",
+          "lemma": "оста́ться",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "To remain; To stay"
+        },
+        {
+          "key": 8,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 9,
+          "display_form": "э́той",
+          "lemma": "э́тот",
+          "grammar": "Adjective, Singular, Feminine, Genitive",
+          "dictionary_definition": "this"
+        },
+        {
+          "key": 10,
+          "display_form": "траве́",
+          "lemma": "трава́",
+          "grammar": "Noun, Singular, Feminine, Locative",
+          "dictionary_definition": "grass; weed; herb"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 100290,
+      "end_time_ms": 110310,
+      "original_line": "Пожелай мне удачи, пожелай мне удачи",
+      "phonetic_line": "Пожела́й мне уда́чи, пожела́й мне уда́чи",
+      "translation": "Wish me luck, wish me luck.",
       "words": [
         {
           "key": 1,
           "display_form": "Пожела́й",
           "lemma": "пожела́ть",
-          "grammar": "Verb, Imperative, 2nd Person, Singular, Perfective",
-          "dictionary_definition": "to wish (someone something)"
+          "grammar": "Verb, Singular",
+          "dictionary_definition": "wish, desire, covet"
         },
         {
           "key": 2,
           "display_form": "мне",
           "lemma": "я",
-          "grammar": "Pronoun, Dative, 1st Person, Singular",
-          "dictionary_definition": "me, to me"
+          "grammar": "Pronoun, 1st Person, Singular, Dative",
+          "dictionary_definition": "I, me, myself"
         },
         {
           "key": 3,
+          "display_form": "уда́чи,",
+          "lemma": "уда́ча",
+          "grammar": "Noun, Singular, Feminine, Genitive",
+          "dictionary_definition": "good luck, success, good fortune"
+        },
+        {
+          "key": 4,
+          "display_form": "пожела́й",
+          "lemma": "пожела́ть",
+          "grammar": "Verb, Singular",
+          "dictionary_definition": "wish, desire, covet"
+        },
+        {
+          "key": 5,
+          "display_form": "мне",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Dative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 6,
           "display_form": "уда́чи",
           "lemma": "уда́ча",
-          "grammar": "Noun, Genitive, Singular, Feminine",
-          "dictionary_definition": "luck, fortune, success"
-        },
-        {
-          "key": 4,
-          "display_form": "в",
-          "lemma": "в",
-          "grammar": "Preposition",
-          "dictionary_definition": "in, during"
-        },
-        {
-          "key": 5,
-          "display_form": "бою́",
-          "lemma": "бой",
-          "grammar": "Noun, Locative, Singular, Masculine",
-          "dictionary_definition": "battle, fight, combat"
+          "grammar": "Noun, Singular, Feminine, Genitive",
+          "dictionary_definition": "good luck, success, good fortune"
         }
       ]
     },
     {
-      "start_time_ms": 51500,
-      "end_time_ms": 57000,
-      "original_line": "Я хочу быть с тобой",
-      "phonetic_line": "Я хочу́ быть с тобо́й",
-      "translation": "I want to be with you",
-      "words": [
-        {
-          "key": 1,
-          "display_form": "Я",
-          "lemma": "я",
-          "grammar": "Pronoun, Nominative, 1st Person, Singular",
-          "dictionary_definition": "I (first person singular)"
-        },
-        {
-          "key": 2,
-          "display_form": "хочу́",
-          "lemma": "хоте́ть",
-          "grammar": "Verb, Present, 1st Person, Singular",
-          "dictionary_definition": "to want, to wish, to desire"
-        },
-        {
-          "key": 3,
-          "display_form": "быть",
-          "lemma": "быть",
-          "grammar": "Verb (infinitive), Imperfective",
-          "dictionary_definition": "to be, to exist"
-        },
-        {
-          "key": 4,
-          "display_form": "с",
-          "lemma": "с",
-          "grammar": "Preposition",
-          "dictionary_definition": "with, together with"
-        },
-        {
-          "key": 5,
-          "display_form": "тобо́й",
-          "lemma": "ты",
-          "grammar": "Pronoun, Ablative, 2nd Person, Singular",
-          "dictionary_definition": "you (instrumental: with you)"
-        }
-      ]
+      "start_time_ms": 110310,
+      "end_time_ms": 125070,
+      "original_line": "♪",
+      "phonetic_line": "",
+      "translation": "♪",
+      "words": []
     },
     {
-      "start_time_ms": 57000,
-      "end_time_ms": 62500,
-      "original_line": "Я хочу быть с тобой",
-      "phonetic_line": "Я хочу́ быть с тобо́й",
-      "translation": "I want to be with you",
-      "words": [
-        {
-          "key": 1,
-          "display_form": "Я",
-          "lemma": "я",
-          "grammar": "Pronoun, Nominative, 1st Person, Singular",
-          "dictionary_definition": "I (first person singular)"
-        },
-        {
-          "key": 2,
-          "display_form": "хочу́",
-          "lemma": "хоте́ть",
-          "grammar": "Verb, Present, 1st Person, Singular",
-          "dictionary_definition": "to want, to wish, to desire"
-        },
-        {
-          "key": 3,
-          "display_form": "быть",
-          "lemma": "быть",
-          "grammar": "Verb (infinitive), Imperfective",
-          "dictionary_definition": "to be, to exist"
-        },
-        {
-          "key": 4,
-          "display_form": "с",
-          "lemma": "с",
-          "grammar": "Preposition",
-          "dictionary_definition": "with, together with"
-        },
-        {
-          "key": 5,
-          "display_form": "тобо́й",
-          "lemma": "ты",
-          "grammar": "Pronoun, Ablative, 2nd Person, Singular",
-          "dictionary_definition": "you (instrumental: with you)"
-        }
-      ]
-    },
-    {
-      "start_time_ms": 62500,
-      "end_time_ms": 68000,
-      "original_line": "И я хочу быть с тобой",
-      "phonetic_line": "И я хочу́ быть с тобо́й",
-      "translation": "And I want to be with you",
+      "start_time_ms": 125070,
+      "end_time_ms": 134060,
+      "original_line": "И есть чем платить, но я не хочу победы любой ценой",
+      "phonetic_line": "И есть чем плати́ть, но я не хочу́ побе́ды любо́й цено́й",
+      "translation": "I have a lot to pay, but I don’t want to win at any cost.",
       "words": [
         {
           "key": 1,
           "display_form": "И",
           "lemma": "и",
           "grammar": "Conjunction",
-          "dictionary_definition": "and, also, even"
+          "dictionary_definition": "and; also, too"
         },
         {
           "key": 2,
-          "display_form": "я",
-          "lemma": "я",
-          "grammar": "Pronoun, Nominative, 1st Person, Singular",
-          "dictionary_definition": "I (first person singular)"
+          "display_form": "есть",
+          "lemma": "е́сть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "there is, there are, eats"
         },
         {
           "key": 3,
-          "display_form": "хочу́",
-          "lemma": "хоте́ть",
-          "grammar": "Verb, Present, 1st Person, Singular",
-          "dictionary_definition": "to want, to wish, to desire"
+          "display_form": "чем",
+          "lemma": "чё́м",
+          "grammar": "Conjunction",
+          "dictionary_definition": "Prepositional of 'что'"
         },
         {
           "key": 4,
-          "display_form": "быть",
-          "lemma": "быть",
-          "grammar": "Verb (infinitive), Imperfective",
-          "dictionary_definition": "to be, to exist"
+          "display_form": "плати́ть,",
+          "lemma": "плати́ть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "to pay"
+        },
+        {
+          "key": 5,
+          "display_form": "но",
+          "lemma": "но́",
+          "grammar": "Conjunction",
+          "dictionary_definition": "but"
+        },
+        {
+          "key": 6,
+          "display_form": "я",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 7,
+          "display_form": "не",
+          "lemma": "не́",
+          "grammar": "Particle",
+          "dictionary_definition": "not"
+        },
+        {
+          "key": 8,
+          "display_form": "хочу́",
+          "lemma": "хоте́ть",
+          "grammar": "Verb, Present, 1st Person, Singular",
+          "dictionary_definition": "to want; to feel like; to mean"
+        },
+        {
+          "key": 9,
+          "display_form": "побе́ды",
+          "lemma": "побе́да",
+          "grammar": "Noun, Singular, Feminine, Genitive",
+          "dictionary_definition": "victory, win, triumph"
+        },
+        {
+          "key": 10,
+          "display_form": "любо́й",
+          "lemma": "любо́й",
+          "grammar": "Adjective, Singular, Feminine, Genitive",
+          "dictionary_definition": "any, every, anyone, either; as you like, randomly, arbitrary"
+        },
+        {
+          "key": 11,
+          "display_form": "цено́й",
+          "lemma": "цена́",
+          "grammar": "Noun, Singular, Feminine, Ablative",
+          "dictionary_definition": "cost, price"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 134060,
+      "end_time_ms": 140640,
+      "original_line": "Я никому не хочу ставить ногу на грудь",
+      "phonetic_line": "Я никому́ не хочу́ ста́вить но́гу на гру́дь",
+      "translation": "I don't want to put my foot on anyone's chest.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Я",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 2,
+          "display_form": "никому́",
+          "lemma": "никто́",
+          "grammar": "Pronoun, Singular, Dative",
+          "dictionary_definition": "nobody, no one"
+        },
+        {
+          "key": 3,
+          "display_form": "не",
+          "lemma": "не́",
+          "grammar": "Particle",
+          "dictionary_definition": "not"
+        },
+        {
+          "key": 4,
+          "display_form": "хочу́",
+          "lemma": "хоте́ть",
+          "grammar": "Verb, Present, 1st Person, Singular",
+          "dictionary_definition": "to want; to feel like; to mean"
+        },
+        {
+          "key": 5,
+          "display_form": "ста́вить",
+          "lemma": "ста́вить",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "to put or place"
+        },
+        {
+          "key": 6,
+          "display_form": "но́гу",
+          "lemma": "нога́",
+          "grammar": "Noun, Singular, Feminine, Accusative",
+          "dictionary_definition": "leg, foot"
+        },
+        {
+          "key": 7,
+          "display_form": "на",
+          "lemma": "на́",
+          "grammar": "Preposition",
+          "dictionary_definition": "on (place), during; on (day/week); on (means of transport); to (direction)"
+        },
+        {
+          "key": 8,
+          "display_form": "гру́дь",
+          "lemma": "гру́дь",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "breast; chest"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 140640,
+      "end_time_ms": 144810,
+      "original_line": "Я хотел бы остаться с тобой",
+      "phonetic_line": "Я хоте́л бы оста́ться с тобо́й",
+      "translation": "I'd like to stay with you.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Я",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 2,
+          "display_form": "хоте́л",
+          "lemma": "хоте́ть",
+          "grammar": "Verb, Past, Singular, Masculine",
+          "dictionary_definition": "to want; to feel like; to mean"
+        },
+        {
+          "key": 3,
+          "display_form": "бы",
+          "lemma": "бы",
+          "grammar": "Particle",
+          "dictionary_definition": "would (be able to)"
+        },
+        {
+          "key": 4,
+          "display_form": "оста́ться",
+          "lemma": "оста́ться",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "To remain; To stay"
         },
         {
           "key": 5,
           "display_form": "с",
           "lemma": "с",
           "grammar": "Preposition",
-          "dictionary_definition": "with, together with"
+          "dictionary_definition": "with; from, in the course of; since; off, remove from"
         },
         {
           "key": 6,
           "display_form": "тобо́й",
-          "lemma": "ты",
-          "grammar": "Pronoun, Ablative, 2nd Person, Singular",
-          "dictionary_definition": "you (instrumental: with you)"
+          "lemma": "ты́",
+          "grammar": "Pronoun, 2nd Person, Singular, Ablative",
+          "dictionary_definition": "you"
         }
       ]
     },
     {
-      "start_time_ms": 68000,
-      "end_time_ms": 73500,
-      "original_line": "Наши сердца требуют смены декораций",
-      "phonetic_line": "На́ши сердца́ тре́буют сме́ны декора́ций",
-      "translation": "Our hearts demand a change of scenery",
+      "start_time_ms": 144810,
+      "end_time_ms": 148450,
+      "original_line": "Просто остаться с тобой",
+      "phonetic_line": "Про́сто оста́ться с тобо́й",
+      "translation": "Just stay with you.",
       "words": [
         {
           "key": 1,
-          "display_form": "На́ши",
-          "lemma": "наш",
-          "grammar": "Pronoun, Nominative, Plural",
-          "dictionary_definition": "our, ours (plural)"
-        },
-        {
-          "key": 2,
-          "display_form": "сердца́",
-          "lemma": "се́рдце",
-          "grammar": "Noun, Nominative, Plural, Neuter",
-          "dictionary_definition": "hearts (pl. of сердце)"
-        },
-        {
-          "key": 3,
-          "display_form": "тре́буют",
-          "lemma": "тре́бовать",
-          "grammar": "Verb, Present, 3rd Person, Plural",
-          "dictionary_definition": "to demand, to require, to need"
-        },
-        {
-          "key": 4,
-          "display_form": "сме́ны",
-          "lemma": "сме́на",
-          "grammar": "Noun, Genitive, Singular, Feminine",
-          "dictionary_definition": "change, shift, replacement"
-        },
-        {
-          "key": 5,
-          "display_form": "декора́ций",
-          "lemma": "декора́ция",
-          "grammar": "Noun, Genitive, Plural, Feminine",
-          "dictionary_definition": "scenery, décor, set decoration"
-        }
-      ]
-    },
-    {
-      "start_time_ms": 73500,
-      "end_time_ms": 79000,
-      "original_line": "Это не больше, чем жест",
-      "phonetic_line": "Э́то не бо́льше, чем жест",
-      "translation": "This is no more than a gesture",
-      "words": [
-        {
-          "key": 1,
-          "display_form": "Э́то",
-          "lemma": "э́то",
-          "grammar": "Pronoun, Nominative, Singular, Neuter",
-          "dictionary_definition": "this, that, it (demonstrative)"
-        },
-        {
-          "key": 2,
-          "display_form": "не",
-          "lemma": "не",
+          "display_form": "Про́сто",
+          "lemma": "про́сто",
           "grammar": "Particle",
-          "dictionary_definition": "not (negation)"
+          "dictionary_definition": "it is simple, it is easy, simply; just, just only, only"
+        },
+        {
+          "key": 2,
+          "display_form": "оста́ться",
+          "lemma": "оста́ться",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "To remain; To stay"
         },
         {
           "key": 3,
-          "display_form": "бо́льше,",
-          "lemma": "бо́льше",
-          "grammar": "Adverb, Comparative",
-          "dictionary_definition": "more, greater (comparative)"
+          "display_form": "с",
+          "lemma": "с",
+          "grammar": "Preposition",
+          "dictionary_definition": "with; from, in the course of; since; off, remove from"
         },
         {
           "key": 4,
-          "display_form": "чем",
-          "lemma": "чем",
+          "display_form": "тобо́й",
+          "lemma": "ты́",
+          "grammar": "Pronoun, 2nd Person, Singular, Ablative",
+          "dictionary_definition": "you"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 148450,
+      "end_time_ms": 155600,
+      "original_line": "Но высокая в небе звезда зовёт меня в путь",
+      "phonetic_line": "Но высо́кая в не́бе звезда́ зовёт меня в пу́ть",
+      "translation": "But a star high in the sky is calling me on my way.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Но",
+          "lemma": "но́",
           "grammar": "Conjunction",
-          "dictionary_definition": "than (comparison)"
+          "dictionary_definition": "but"
+        },
+        {
+          "key": 2,
+          "display_form": "высо́кая",
+          "lemma": "высо́кий",
+          "grammar": "Adjective, Singular, Feminine, Nominative",
+          "dictionary_definition": "tall; high (altitude,intensity,pitch etc.); good, favorable, great, selfless, noble; lofty, elevated"
+        },
+        {
+          "key": 3,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 4,
+          "display_form": "не́бе",
+          "lemma": "нё́бо",
+          "grammar": "Noun, Singular, Neuter, Locative",
+          "dictionary_definition": "palate"
         },
         {
           "key": 5,
-          "display_form": "жест",
-          "lemma": "жест",
-          "grammar": "Noun, Nominative, Singular, Masculine",
-          "dictionary_definition": "gesture, motion, sign"
+          "display_form": "звезда́",
+          "lemma": "звезда́",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "star; famous person; name of service module on the International Space Station"
+        },
+        {
+          "key": 6,
+          "display_form": "зовёт",
+          "lemma": "зва́ть",
+          "grammar": "Verb, Present, 3rd Person, Singular",
+          "dictionary_definition": "to call (someone a name); to call (for someone or something); to invite"
+        },
+        {
+          "key": 7,
+          "display_form": "меня",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Accusative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 8,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 9,
+          "display_form": "пу́ть",
+          "lemma": "пу́ть",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "way, track, path"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 155600,
+      "end_time_ms": 159280,
+      "original_line": "Группа крови на рукаве",
+      "phonetic_line": "Гру́ппа кро́ви на рукаве́",
+      "translation": "Blood type on the sleeve",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Гру́ппа",
+          "lemma": "гру́ппа",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "group, cluster, clump; A band"
+        },
+        {
+          "key": 2,
+          "display_form": "кро́ви",
+          "lemma": "кро́вь",
+          "grammar": "Noun, Singular, Feminine, Genitive",
+          "dictionary_definition": "blood"
+        },
+        {
+          "key": 3,
+          "display_form": "на",
+          "lemma": "на́",
+          "grammar": "Preposition",
+          "dictionary_definition": "on (place), during; on (day/week); on (means of transport); to (direction)"
+        },
+        {
+          "key": 4,
+          "display_form": "рукаве́",
+          "lemma": "рука́в",
+          "grammar": "Noun, Singular, Masculine, Locative",
+          "dictionary_definition": "sleeve"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 159280,
+      "end_time_ms": 164370,
+      "original_line": "Мой порядковый номер на рукаве",
+      "phonetic_line": "Мо́й поря́дковый но́мер на рукаве́",
+      "translation": "My serial number on the sleeve",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Мо́й",
+          "lemma": "мо́й",
+          "grammar": "Adjective, Singular, Masculine, Nominative",
+          "dictionary_definition": "my, mine, my people"
+        },
+        {
+          "key": 2,
+          "display_form": "поря́дковый",
+          "lemma": "поря́дковый",
+          "grammar": "Adjective, Singular, Masculine, Nominative",
+          "dictionary_definition": "ordinal"
+        },
+        {
+          "key": 3,
+          "display_form": "но́мер",
+          "lemma": "но́мер",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "number, size, room, issue, item on the programme, turn, trick"
+        },
+        {
+          "key": 4,
+          "display_form": "на",
+          "lemma": "на́",
+          "grammar": "Preposition",
+          "dictionary_definition": "on (place), during; on (day/week); on (means of transport); to (direction)"
+        },
+        {
+          "key": 5,
+          "display_form": "рукаве́",
+          "lemma": "рука́в",
+          "grammar": "Noun, Singular, Masculine, Locative",
+          "dictionary_definition": "sleeve"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 164370,
+      "end_time_ms": 171880,
+      "original_line": "Пожелай мне удачи в бою, пожелай мне",
+      "phonetic_line": "Пожела́й мне уда́чи в бою́, пожела́й мне",
+      "translation": "Wish me luck in battle, wish me luck",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Пожела́й",
+          "lemma": "пожела́ть",
+          "grammar": "Verb, Singular",
+          "dictionary_definition": "wish, desire, covet"
+        },
+        {
+          "key": 2,
+          "display_form": "мне",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Dative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 3,
+          "display_form": "уда́чи",
+          "lemma": "уда́ча",
+          "grammar": "Noun, Singular, Feminine, Genitive",
+          "dictionary_definition": "good luck, success, good fortune"
+        },
+        {
+          "key": 4,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 5,
+          "display_form": "бою́,",
+          "lemma": "бо́й",
+          "grammar": "Noun, Singular, Masculine, loc2",
+          "dictionary_definition": "fight; battle, combat"
+        },
+        {
+          "key": 6,
+          "display_form": "пожела́й",
+          "lemma": "пожела́ть",
+          "grammar": "Verb, Singular",
+          "dictionary_definition": "wish, desire, covet"
+        },
+        {
+          "key": 7,
+          "display_form": "мне",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Dative",
+          "dictionary_definition": "I, me, myself"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 171880,
+      "end_time_ms": 180050,
+      "original_line": "Не остаться в этой траве, не остаться в этой траве",
+      "phonetic_line": "Не оста́ться в э́той траве́, не оста́ться в э́той траве́",
+      "translation": "Not to stay in this grass, not to stay in this grass.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Не",
+          "lemma": "не́",
+          "grammar": "Particle",
+          "dictionary_definition": "not"
+        },
+        {
+          "key": 2,
+          "display_form": "оста́ться",
+          "lemma": "оста́ться",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "To remain; To stay"
+        },
+        {
+          "key": 3,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 4,
+          "display_form": "э́той",
+          "lemma": "э́тот",
+          "grammar": "Adjective, Singular, Feminine, Genitive",
+          "dictionary_definition": "this"
+        },
+        {
+          "key": 5,
+          "display_form": "траве́,",
+          "lemma": "трава́",
+          "grammar": "Noun, Singular, Feminine, Locative",
+          "dictionary_definition": "grass; weed; herb"
+        },
+        {
+          "key": 6,
+          "display_form": "не",
+          "lemma": "не́",
+          "grammar": "Particle",
+          "dictionary_definition": "not"
+        },
+        {
+          "key": 7,
+          "display_form": "оста́ться",
+          "lemma": "оста́ться",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "To remain; To stay"
+        },
+        {
+          "key": 8,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 9,
+          "display_form": "э́той",
+          "lemma": "э́тот",
+          "grammar": "Adjective, Singular, Feminine, Genitive",
+          "dictionary_definition": "this"
+        },
+        {
+          "key": 10,
+          "display_form": "траве́",
+          "lemma": "трава́",
+          "grammar": "Noun, Singular, Feminine, Locative",
+          "dictionary_definition": "grass; weed; herb"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 180050,
+      "end_time_ms": 184050,
+      "original_line": "Пожелай мне удачи, пожелай мне удачи",
+      "phonetic_line": "Пожела́й мне уда́чи, пожела́й мне уда́чи",
+      "translation": "Wish me luck, wish me luck.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Пожела́й",
+          "lemma": "пожела́ть",
+          "grammar": "Verb, Singular",
+          "dictionary_definition": "wish, desire, covet"
+        },
+        {
+          "key": 2,
+          "display_form": "мне",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Dative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 3,
+          "display_form": "уда́чи,",
+          "lemma": "уда́ча",
+          "grammar": "Noun, Singular, Feminine, Genitive",
+          "dictionary_definition": "good luck, success, good fortune"
+        },
+        {
+          "key": 4,
+          "display_form": "пожела́й",
+          "lemma": "пожела́ть",
+          "grammar": "Verb, Singular",
+          "dictionary_definition": "wish, desire, covet"
+        },
+        {
+          "key": 5,
+          "display_form": "мне",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Dative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 6,
+          "display_form": "уда́чи",
+          "lemma": "уда́ча",
+          "grammar": "Noun, Singular, Feminine, Genitive",
+          "dictionary_definition": "good luck, success, good fortune"
         }
       ]
     }

@@ -10,8 +10,6 @@ interface TooltipState {
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-const LINE_HEIGHT_PX  = 88
-const VISIBLE_RADIUS  = 3
 const TOOLTIP_LINGER_MS = 2500
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -22,13 +20,6 @@ function findActiveLineIndex(lines: SongDetail['lines'], posMs: number): number 
     if (posMs >= lines[i].start_time_ms && posMs < lines[i].end_time_ms) return i
   }
   return -1
-}
-
-function lineStyle(distance: number): { opacity: number; scale: number } {
-  if (distance === 0) return { opacity: 1,    scale: 1    }
-  if (distance === 1) return { opacity: 0.45, scale: 0.9  }
-  if (distance === 2) return { opacity: 0.2,  scale: 0.82 }
-  return                     { opacity: 0,    scale: 0.75 }
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -45,6 +36,8 @@ export default function LyricsPlayer({ currentPositionMs, songData }: Props) {
   const activeIndex = findActiveLineIndex(lines, currentPositionMs)
   const activeLine  = activeIndex >= 0 ? lines[activeIndex] : null
 
+  const containerRef = useRef<HTMLDivElement | null>(null)
+  const lineRefs = useRef<Map<number, HTMLDivElement>>(new Map())
   const wordRefs = useRef<Map<number, HTMLSpanElement>>(new Map())
 
   const [tooltip, setTooltip] = useState<TooltipState | null>(null)
@@ -77,7 +70,7 @@ export default function LyricsPlayer({ currentPositionMs, songData }: Props) {
       setTooltip({
         word,
         x: rect ? rect.left + rect.width / 2 : window.innerWidth / 2,
-        y: rect ? rect.top  + window.scrollY  : 200,
+        y: rect ? rect.top : 200,
         exiting: false,
       })
       timerRef.current = setTimeout(dismissTooltip, TOOLTIP_LINGER_MS)
@@ -100,44 +93,47 @@ export default function LyricsPlayer({ currentPositionMs, songData }: Props) {
     else    wordRefs.current.delete(key)
   }, [])
 
-  // ── Tape geometry ──────────────────────────────────────────────────────────
-  const CONTAINER_H   = 420
-  const CENTER_OFFSET = CONTAINER_H / 2 - LINE_HEIGHT_PX / 2
-  const tapeY = activeIndex >= 0
-    ? CENTER_OFFSET - activeIndex * LINE_HEIGHT_PX
-    : CENTER_OFFSET
+  const setLineRef = useCallback((index: number, el: HTMLDivElement | null) => {
+    if (el) lineRefs.current.set(index, el)
+    else    lineRefs.current.delete(index)
+  }, [])
+
+  useEffect(() => {
+    if (activeIndex < 0) return
+
+    const container = containerRef.current
+    const activeEl = lineRefs.current.get(activeIndex)
+    if (!container || !activeEl) return
+
+    const containerRect = container.getBoundingClientRect()
+    const activeRect = activeEl.getBoundingClientRect()
+    const padding = 24
+
+    if (activeRect.top < containerRect.top + padding || activeRect.bottom > containerRect.bottom - padding) {
+      activeEl.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+  }, [activeIndex])
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <div
-      className="relative select-none"
-      style={{ height: CONTAINER_H }}
+      ref={containerRef}
+      className="relative select-none overflow-y-auto"
+      style={{ maxHeight: '70vh' }}
       dir={language.direction}
       lang={language.code}
     >
-      {/* Fade masks */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-24 z-10"
-           style={{ background: 'linear-gradient(to bottom, #12121f, transparent)' }} />
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 z-10"
-           style={{ background: 'linear-gradient(to top, #12121f, transparent)' }} />
-
-      {/* Scrolling tape */}
-      <div
-        className="absolute inset-x-0 transition-transform duration-500 ease-out"
-        style={{ transform: `translateY(${tapeY}px)` }}
-      >
+      <div className="flex flex-col gap-1 py-4">
         {lines.map((line, idx) => {
-          const distance = Math.abs(idx - activeIndex)
-          if (distance > VISIBLE_RADIUS) return null
-
-          const { opacity, scale } = lineStyle(distance)
-          const isActive = distance === 0
+          const isActive = idx === activeIndex
 
           return (
             <div
               key={idx}
-              className="flex flex-col items-center justify-center text-center px-8 transition-all duration-500"
-              style={{ height: LINE_HEIGHT_PX, opacity, transform: `scale(${scale})` }}
+              ref={el => setLineRef(idx, el)}
+              className={`px-8 py-3 rounded-xl text-center transition-colors duration-200 ${
+                isActive ? 'bg-indigo-900/30' : ''
+              }`}
             >
               {isActive ? (
                 <ActiveLineContent
@@ -146,7 +142,9 @@ export default function LyricsPlayer({ currentPositionMs, songData }: Props) {
                   setWordRef={setWordRef}
                 />
               ) : (
-                <span className="stressed lyrics-text text-gray-400 text-lg leading-tight">
+                <span className={`stressed lyrics-text text-lg leading-tight ${
+                  activeIndex === -1 || idx < activeIndex ? 'text-gray-600' : 'text-gray-400'
+                }`}>
                   {line.original_line}
                 </span>
               )}
@@ -155,9 +153,8 @@ export default function LyricsPlayer({ currentPositionMs, songData }: Props) {
         })}
       </div>
 
-      {/* Empty state */}
       {activeIndex === -1 && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+        <div className="flex flex-col items-center justify-center gap-2 py-16">
           <p className="text-gray-600 text-sm">Waiting for playback…</p>
           <p className="text-gray-700 text-xs">Load a track and press Play</p>
         </div>
@@ -205,10 +202,11 @@ function ActiveLineContent({ line, isRTL, setWordRef }: ActiveLineProps) {
         ))}
       </div>
 
-      {/* Translation */}
-      <p className="mt-3 text-indigo-300/80 text-sm italic tracking-wide">
-        {line.translation}
-      </p>
+      {line.translation && (
+        <p className="mt-3 text-indigo-300/80 text-sm italic tracking-wide">
+          {line.translation}
+        </p>
+      )}
 
       <p className="mt-1.5 text-gray-700 text-xs">press a number key to inspect</p>
     </div>
@@ -228,7 +226,7 @@ function Tooltip({ state, onDismiss }: TooltipProps) {
   return (
     <div
       className={`fixed z-50 pointer-events-auto ${exiting ? 'animate-tooltip-exit' : 'animate-tooltip-enter'}`}
-      style={{ left: x, top: y + window.scrollY, transform: 'translate(-50%, calc(-100% - 14px))' }}
+      style={{ left: x, top: y, transform: 'translate(-50%, calc(-100% - 14px))' }}
       onClick={onDismiss}
     >
       {/* Arrow */}
