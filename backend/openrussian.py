@@ -110,6 +110,50 @@ def _extract_text_from_html(html: str) -> str:
     return text.strip()
 
 
+def _query_wiktionary_russian(lemma: str) -> Optional[str]:
+    """Query Russian Wiktionary (ru.wiktionary.org) for native Russian definitions.
+    
+    Falls back to English Wiktionary if Russian definitions unavailable.
+    """
+    if lemma in _wiktionary_cache:
+        return _wiktionary_cache[lemma]
+    
+    try:
+        # Try Russian Wiktionary first
+        url = f"https://ru.wiktionary.org/api/rest_v1/page/definition/{lemma}"
+        headers = {
+            "User-Agent": "Flowup Russian Learning App (https://github.com/your-repo)",
+        }
+        r = requests.get(url, headers=headers, timeout=5)
+        if r.status_code == 200:
+            try:
+                data = r.json()
+                # Try to extract definitions from Russian Wiktionary
+                if isinstance(data, dict):
+                    # Russian Wiktionary returns definitions in "en" or "ru" key
+                    defs = []
+                    for lang_key in ["en", "ru"]:
+                        if lang_key in data:
+                            for entry in data.get(lang_key, []):
+                                if isinstance(entry, dict) and "definitions" in entry:
+                                    for def_obj in entry["definitions"]:
+                                        if isinstance(def_obj, dict) and "definition" in def_obj:
+                                            html_def = def_obj["definition"]
+                                            plain_def = _extract_text_from_html(html_def)
+                                            if plain_def:
+                                                defs.append(plain_def)
+                    if defs:
+                        result = "; ".join(defs[:3])
+                        _wiktionary_cache[lemma] = result
+                        return result
+            except (ValueError, KeyError, IndexError):
+                pass  # Fall through to English Wiktionary
+    except Exception:
+        pass  # Silent fail, try English Wiktionary
+    
+    # Fall back to English Wiktionary if Russian unavailable
+    return _query_wiktionary(lemma)
+
 def _query_wiktionary(lemma: str) -> Optional[str]:
     """Query Wiktionary API for English definition of Russian word."""
     if lemma in _wiktionary_cache:
@@ -244,5 +288,5 @@ def lookup(lemma: str) -> Optional[str]:
     if result is not None:
         return result
     
-    # Try live Wiktionary lookup as fallback
-    return _query_wiktionary(lemma.lower().strip())
+    # Try Russian Wiktionary first for native definitions, falls back to English
+    return _query_wiktionary_russian(lemma.lower().strip())
