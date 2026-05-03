@@ -74,10 +74,27 @@ class PyMorphyBackend(NLPBackend):
             self._accent.load(omograph_model_size="turbo", use_dictionary=True)
             print("       ruaccent ready.")
 
+    def _accent_text(self, text: str) -> str:
+        """Apply stress marks with compatibility across ruaccent versions."""
+        if self._accent is None:
+            return text
+
+        # Newer ruaccent builds expose process_all(), older ones process_text().
+        if hasattr(self._accent, "process_text"):
+            return self._accent.process_text(text)
+
+        if hasattr(self._accent, "process_all"):
+            out = self._accent.process_all(text)
+            if isinstance(out, list):
+                return out[0] if out else text
+            return out
+
+        return text
+
     def annotate_line(self, text: str) -> str | None:
         if self._accent is None:
             return None
-        return self._accent.process_text(text)
+        return self._accent_text(text)
 
     def analyze_token(self, raw_token: str, annotated_token: str) -> WordAnalysis:
         clean = re.sub(r"[^\w]", "", raw_token, flags=re.UNICODE)
@@ -89,7 +106,7 @@ class PyMorphyBackend(NLPBackend):
 
         if best:
             lemma  = best.normal_form
-            lemma_display = self._accent.process_text(lemma) if self._accent else lemma
+            lemma_display = self._accent_text(lemma) if self._accent else lemma
             grammar = _humanize(best)
         else:
             lemma = lemma_display = clean

@@ -1,6 +1,10 @@
 # ── Always required ───────────────────────────────────────────────────────────
 requests>=2.31.0
 
+# ── Offline sentence translation fallback ─────────────────────────────────────
+# Argos Translate runs fully offline once language models are installed.
+argostranslate>=1.9.6
+
 # ── Russian / Ukrainian (--lang ru, --lang uk) ────────────────────────────────
 # pymorphy3 ships dictionaries for both languages.
 pymorphy3>=2.0.2
@@ -9,3 +13,17 @@ pymorphy3>=2.0.2
 # ruaccent uses an ONNX model for context-aware omograph disambiguation.
 ruaccent>=0.0.10
 onnxruntime>=1.17.0
+
+# ── Multilingual morphology (--lang de/es/fr/it/nl/pl/pt/ja/zh/ko) ────────────
+# spaCy core; language models are downloaded separately:
+#   python -m spacy download de_core_news_sm   (German)
+#   python -m spacy download es_core_news_sm   (Spanish)
+#   python -m spacy download fr_core_news_sm   (French)
+#   python -m spacy download it_core_news_sm   (Italian)
+#   python -m spacy download nl_core_news_sm   (Dutch)
+#   python -m spacy download pl_core_news_sm   (Polish)
+#   python -m spacy download pt_core_news_sm   (Portuguese)
+#   python -m spacy download ja_core_news_sm   (Japanese)
+#   python -m spacy download zh_core_web_sm    (Chinese)
+#   python -m spacy download ko_core_news_sm   (Korean)
+spacy>=3.7.0

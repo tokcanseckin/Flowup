@@ -161,18 +161,34 @@ export function useSpotifyPlayer(token: string | null): PlayerState & PlayerCont
     const deviceId = deviceIdRef.current
     if (!deviceId || !token) return
 
-    // Transfer playback silently, then queue the track
-    await fetch('https://api.spotify.com/v1/me/player', {
+    // Transfer playback to this device
+    const transferRes = await fetch('https://api.spotify.com/v1/me/player', {
       method: 'PUT',
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ device_ids: [deviceId], play: false }),
     })
+    if (!transferRes.ok && transferRes.status !== 204) {
+      const body = await transferRes.json().catch(() => ({})) as { error?: { message?: string } }
+      setState(prev => ({
+        ...prev,
+        error: `Playback transfer failed (${transferRes.status}): ${body.error?.message ?? transferRes.statusText}`,
+      }))
+      return
+    }
 
-    await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
+    // Start the track
+    const playRes = await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
       method: 'PUT',
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ uris: [trackUri], position_ms: 0 }),
     })
+    if (!playRes.ok) {
+      const body = await playRes.json().catch(() => ({})) as { error?: { message?: string } }
+      setState(prev => ({
+        ...prev,
+        error: `Play request failed (${playRes.status}): ${body.error?.message ?? playRes.statusText}`,
+      }))
+    }
   }, [token])
 
   return { ...state, togglePlay, seekTo, loadAndPlayTrack }
