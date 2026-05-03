@@ -135,7 +135,7 @@ class SpaCyBackend(NLPBackend):
             )
 
         pos_label   = _POS_LABELS.get(token.pos_, token.pos_) if token.pos_ else ""
-        morph_dict  = dict(token.morph)
+        morph_dict  = token.morph.to_dict() if hasattr(token.morph, "to_dict") else dict(token.morph)
         morph_parts = _humanize_morph(morph_dict)
 
         grammar = ", ".join(p for p in [pos_label] + morph_parts if p) or "Unknown"

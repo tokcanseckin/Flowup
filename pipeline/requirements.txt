@@ -14,6 +14,11 @@ pymorphy3>=2.0.2
 ruaccent>=0.0.10
 onnxruntime>=1.17.0
 
+# ── Italian dictionary (--lang it) ────────────────────────────────────────────
+# NLTK with Open Multilingual Wordnet gives offline Italian→English definitions.
+# Data is downloaded automatically on first use (~10 MB).
+nltk>=3.8.0
+
 # ── Multilingual morphology (--lang de/es/fr/it/nl/pl/pt/ja/zh/ko) ────────────
 # spaCy core; language models are downloaded separately:
 #   python -m spacy download de_core_news_sm   (German)
