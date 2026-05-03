@@ -346,6 +346,23 @@ def ensure_loaded() -> None:
         _lookup = _build_lookup()
 
 
+def lookup_all(lemma: str) -> list[str]:
+    """Return all English definitions for lemma as a list.
+
+    Splits the "; "-joined string stored in the CSV lookup (up to 4 senses)
+    and, if absent, falls back to Wiktionary (which may also return several
+    senses joined the same way).
+    """
+    if _lookup is None:
+        return []
+    combined = _lookup.get(lemma.lower().strip())
+    if combined is None:
+        combined = _query_wiktionary_russian(lemma.lower().strip())
+    if not combined:
+        return []
+    return [d.strip() for d in combined.split(";") if d.strip()]
+
+
 def lookup(lemma: str) -> Optional[str]:
     """Return English definition(s) for lemma.
     
@@ -355,12 +372,5 @@ def lookup(lemma: str) -> Optional[str]:
     3. Fall back to English Wiktionary API
     4. Return None if all fail (caller uses lemma as placeholder)
     """
-    if _lookup is None:
-        return None
-    
-    result = _lookup.get(lemma.lower().strip())
-    if result is not None:
-        return result
-    
-    # Try Russian Wiktionary first for native definitions, falls back to English
-    return _query_wiktionary_russian(lemma.lower().strip())
+    defs = lookup_all(lemma)
+    return "; ".join(defs) if defs else None

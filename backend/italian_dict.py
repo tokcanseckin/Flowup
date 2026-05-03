@@ -38,6 +38,27 @@ def ensure_loaded() -> None:
         _loaded = True  # mark as attempted so we don't retry
 
 
+def lookup_all(lemma: str) -> list[str]:
+    """
+    Return all English definitions for an Italian lemma (one per synset).
+
+    Looks up Italian synsets in OMW-1.4 and collects definitions from each
+    matching Princeton WordNet synset (definitions are in English).
+    """
+    if _wn is None:
+        return []
+    results: list[str] = []
+    try:
+        synsets = _wn.synsets(lemma.lower(), lang="ita")
+        for syn in synsets:
+            defn = syn.definition()
+            if defn and defn not in results:
+                results.append(defn)
+    except Exception:
+        pass
+    return results
+
+
 def lookup(lemma: str) -> Optional[str]:
     """
     Return an English definition for an Italian lemma, or None if not found.
@@ -45,14 +66,5 @@ def lookup(lemma: str) -> Optional[str]:
     Looks up Italian synsets in OMW-1.4 and returns the definition of the
     first matching Princeton WordNet synset (definitions are in English).
     """
-    if _wn is None:
-        return None
-    try:
-        synsets = _wn.synsets(lemma.lower(), lang="ita")
-        if synsets:
-            definition = synsets[0].definition()
-            if definition:
-                return definition
-    except Exception:
-        pass
-    return None
+    defs = lookup_all(lemma)
+    return defs[0] if defs else None
