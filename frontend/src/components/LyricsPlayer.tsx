@@ -1,5 +1,56 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { SongDetail } from '../api/client'
+
+// ── Stop-word sets (keyed by language code) ─────────────────────────────────
+// These words are still clickable, but don't consume a keyboard index (1-9).
+
+const STOP_WORDS: Record<string, Set<string>> = {
+  ru: new Set([
+    // pronouns
+    'я', 'ты', 'он', 'она', 'оно', 'мы', 'вы', 'они', 'себя', 'свой', 'своя', 'своё', 'свои',
+    // prepositions
+    'в', 'во', 'на', 'с', 'со', 'из', 'к', 'ко', 'у', 'от', 'за', 'по', 'до', 'при', 'без', 'для', 'о', 'об', 'обо', 'под', 'над',
+    'перед', 'через', 'про', 'между', 'около', 'после', 'против', 'вокруг',
+    // conjunctions & particles
+    'и', 'или', 'но', 'а', 'да', 'же', 'ведь', 'даже', 'уже', 'ещё', 'еще', 'тоже', 'то',
+    'что', 'как', 'так', 'не', 'ни', 'бы', 'ли', 'ну', 'вот', 'тут', 'там',
+    // demonstratives
+    'этот', 'эта', 'это', 'эти', 'тот', 'та', 'те', 'всё', 'весь', 'все', 'сам', 'сама', 'само', 'сами',
+  ]),
+  it: new Set([
+    // pronouns
+    'io', 'tu', 'lui', 'lei', 'noi', 'voi', 'loro', 'mi', 'ti', 'ci', 'vi', 'si',
+    'lo', 'la', 'li', 'le', 'me', 'te', 'ne', 'gli', 'egli', 'ella', 'esso', 'essa',
+    // prepositions
+    'di', 'a', 'in', 'con', 'su', 'per', 'da', 'tra', 'fra', 'sotto', 'sopra',
+    'dentro', 'fuori', 'dopo', 'prima', 'durante', 'senza', 'verso', 'contro', 'entro',
+    // conjunctions & particles
+    'e', 'o', 'ma', 'se', 'che', 'però', 'anche', 'pure', 'già', 'ancora', 'sempre',
+    'mai', 'non', 'né', 'come', 'quando', 'dove', 'poi', 'ora', 'più', 'meno',
+    // articles & demonstratives (lemma form)
+    'il', 'lo', 'la', 'i', 'gli', 'le', 'un', 'uno', 'una',
+    'questo', 'questa', 'questi', 'queste', 'quello', 'quella', 'quelli', 'quelle',
+    'tutto', 'tutta', 'tutti', 'tutte', 'altro', 'altra', 'altri', 'altre',
+    'ogni', 'qualche', 'quale', 'quali',
+  ]),
+}
+
+/** Returns true if word should be excluded from numbered keyboard indexing. */
+function isStopWord(lemma: string, langCode: string): boolean {
+  const set = STOP_WORDS[langCode]
+  if (!set) return false
+  return set.has(lemma.toLowerCase())
+}
+
+/** Returns the word.key values of the indexable (non-stop) words in a line, max 9. */
+function computeIndexedKeys(words: WordType[], langCode: string): number[] {
+  const result: number[] = []
+  for (const w of words) {
+    if (!isStopWord(w.lemma, langCode)) result.push(w.key)
+    if (result.length === 9) break
+  }
+  return result
+}
 
 type LineType = SongDetail['lines'][number]
 type WordType = LineType['words'][number]
@@ -60,9 +111,16 @@ interface Props {
 export default function LyricsPlayer({ currentPositionMs, songData, onInfoVisibilityChange, onSeek }: Props) {
   const { lines, language } = songData
   const isRTL = language.direction === 'rtl'
+  const langCode = language.code
 
   const activeIndex = findActiveLineIndex(lines, currentPositionMs)
   const activeLine = activeIndex >= 0 ? lines[activeIndex] : null
+
+  // Pre-compute indexed (non-stop) word keys for the active line
+  const indexedWordKeys = useMemo(
+    () => activeLine ? computeIndexedKeys(activeLine.words, langCode) : [],
+    [activeLine, langCode]
+  )
 
   const [isPhone, setIsPhone] = useState(false)
   const [inspectState, setInspectState] = useState<InspectState | null>(null)
@@ -137,11 +195,12 @@ export default function LyricsPlayer({ currentPositionMs, songData, onInfoVisibi
     const num = parseInt(key, 10)
     if (Number.isNaN(num) || num < 1 || num > 9 || !activeLine) return null
 
-    const word = activeLine.words.find(w => w.key === num)
-    if (!word) return null
+    // Map keyboard number to the nth indexable (non-stop) word
+    const wordKey = indexedWordKeys[num - 1]
+    if (wordKey === undefined) return null
 
-    return { type: 'word', lineIndex: activeIndex, wordKey: num }
-  }, [activeIndex, activeLine])
+    return { type: 'word', lineIndex: activeIndex, wordKey }
+  }, [activeIndex, activeLine, indexedWordKeys])
 
   useEffect(() => {
     const media = window.matchMedia('(max-width: 767px)')
@@ -296,6 +355,7 @@ export default function LyricsPlayer({ currentPositionMs, songData, onInfoVisibi
                         lineIndex={idx}
                         isRTL={isRTL}
                         hideWordIndexes={isPhone}
+                        indexedWordKeys={indexedWordKeys}
                         startPointerPress={startPointerPress}
                         endPointerPress={endPointerPress}
                       />
@@ -353,6 +413,7 @@ interface ActiveLineProps {
   lineIndex: number
   isRTL: boolean
   hideWordIndexes: boolean
+  indexedWordKeys: number[]
   startPointerPress: (target: InspectTarget) => void
   endPointerPress: (cancelOnly?: boolean) => void
 }
@@ -362,6 +423,7 @@ function ActiveLineContent({
   lineIndex,
   isRTL,
   hideWordIndexes,
+  indexedWordKeys,
   startPointerPress,
   endPointerPress,
 }: ActiveLineProps) {
@@ -376,6 +438,7 @@ function ActiveLineContent({
       >
         {line.words.map(word => {
           const target: InspectTarget = { type: 'word', lineIndex, wordKey: word.key }
+          const displayIdx = indexedWordKeys.indexOf(word.key)  // -1 for stop words
 
           return (
             <button
@@ -390,7 +453,7 @@ function ActiveLineContent({
               <span className="stressed lyrics-text text-white text-2xl font-semibold tracking-wide">
                 {word.display_form}
               </span>
-              {!hideWordIndexes && (
+              {!hideWordIndexes && displayIdx >= 0 && (
                 <sup
                   className="
                     ml-0.5 text-[10px] font-mono font-medium leading-none
@@ -398,7 +461,7 @@ function ActiveLineContent({
                     transition-colors duration-150
                   "
                 >
-                  {word.key}
+                  {displayIdx + 1}
                 </sup>
               )}
             </button>
