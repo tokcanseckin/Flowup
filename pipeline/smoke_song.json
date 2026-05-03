@@ -1,0 +1,1127 @@
+{
+  "spotify_uri": "spotify:track:4uLU6hMCjMI75M1A2tKUQC",
+  "title": "Группа Крови",
+  "artist": "Кино",
+  "language": {
+    "code": "ru",
+    "name": "Russian",
+    "script": "Cyrillic",
+    "direction": "ltr"
+  },
+  "lines": [
+    {
+      "start_time_ms": 44750,
+      "end_time_ms": 48420,
+      "original_line": "Тёплое место, но улицы ждут",
+      "phonetic_line": "Тёплое м+есто, но +улицы жд+ут",
+      "translation": "[mock – set DEEPL_API_KEY] Тёплое место, но улицы ждут",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Тёплое",
+          "lemma": "тёплый",
+          "grammar": "Adjective, Singular, Neuter, Nominative",
+          "dictionary_definition": "[тёплый]"
+        },
+        {
+          "key": 2,
+          "display_form": "м+есто,",
+          "lemma": "м+есто",
+          "grammar": "Noun, Singular, Neuter, Accusative",
+          "dictionary_definition": "[место]"
+        },
+        {
+          "key": 3,
+          "display_form": "но",
+          "lemma": "н+о",
+          "grammar": "Conjunction",
+          "dictionary_definition": "[но]"
+        },
+        {
+          "key": 4,
+          "display_form": "+улицы",
+          "lemma": "+улица",
+          "grammar": "Noun, Singular, Feminine, Genitive",
+          "dictionary_definition": "[улица]"
+        },
+        {
+          "key": 5,
+          "display_form": "жд+ут",
+          "lemma": "жд+ать",
+          "grammar": "Verb, Present, 3rd Person, Plural",
+          "dictionary_definition": "[ждать]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 48420,
+      "end_time_ms": 54110,
+      "original_line": "Отпечатков наших ног",
+      "phonetic_line": "Отпеч+атков н+аших н+ог",
+      "translation": "[mock – set DEEPL_API_KEY] Отпечатков наших ног",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Отпеч+атков",
+          "lemma": "отпеч+аток",
+          "grammar": "Noun, Plural, Masculine, Genitive",
+          "dictionary_definition": "[отпечаток]"
+        },
+        {
+          "key": 2,
+          "display_form": "н+аших",
+          "lemma": "н+аш",
+          "grammar": "Adjective, Plural, Genitive",
+          "dictionary_definition": "[наш]"
+        },
+        {
+          "key": 3,
+          "display_form": "н+ог",
+          "lemma": "ног+а",
+          "grammar": "Noun, Plural, Feminine, Genitive",
+          "dictionary_definition": "[нога]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 54110,
+      "end_time_ms": 60830,
+      "original_line": "Звёздная пыль на сапогах",
+      "phonetic_line": "Звёздная п+ыль на сапог+ах",
+      "translation": "[mock – set DEEPL_API_KEY] Звёздная пыль на сапогах",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Звёздная",
+          "lemma": "звёздный",
+          "grammar": "Adjective, Singular, Feminine, Nominative",
+          "dictionary_definition": "[звёздный]"
+        },
+        {
+          "key": 2,
+          "display_form": "п+ыль",
+          "lemma": "п+ыль",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "[пыль]"
+        },
+        {
+          "key": 3,
+          "display_form": "на",
+          "lemma": "н+а",
+          "grammar": "Preposition",
+          "dictionary_definition": "[на]"
+        },
+        {
+          "key": 4,
+          "display_form": "сапог+ах",
+          "lemma": "сап+ог",
+          "grammar": "Noun, Plural, Masculine, Locative",
+          "dictionary_definition": "[сапог]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 60830,
+      "end_time_ms": 64550,
+      "original_line": "Мягкое кресло, клетчатый плед",
+      "phonetic_line": "М+ягкое кр+есло, кл+етчатый пл+ед",
+      "translation": "[mock – set DEEPL_API_KEY] Мягкое кресло, клетчатый плед",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "М+ягкое",
+          "lemma": "м+ягкий",
+          "grammar": "Adjective, Singular, Neuter, Nominative",
+          "dictionary_definition": "[мягкий]"
+        },
+        {
+          "key": 2,
+          "display_form": "кр+есло,",
+          "lemma": "кр+есло",
+          "grammar": "Noun, Singular, Neuter, Accusative",
+          "dictionary_definition": "[кресло]"
+        },
+        {
+          "key": 3,
+          "display_form": "кл+етчатый",
+          "lemma": "кл+етчатый",
+          "grammar": "Adjective, Singular, Masculine, Nominative",
+          "dictionary_definition": "[клетчатый]"
+        },
+        {
+          "key": 4,
+          "display_form": "пл+ед",
+          "lemma": "пл+ед",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "[плед]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 64550,
+      "end_time_ms": 69630,
+      "original_line": "Не нажатый вовремя курок",
+      "phonetic_line": "Н+е наж+атый в+овремя кур+ок",
+      "translation": "[mock – set DEEPL_API_KEY] Не нажатый вовремя курок",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Н+е",
+          "lemma": "н+е",
+          "grammar": "Particle",
+          "dictionary_definition": "[не]"
+        },
+        {
+          "key": 2,
+          "display_form": "наж+атый",
+          "lemma": "наж+ать",
+          "grammar": "Participle, Past, Singular, Masculine, Nominative",
+          "dictionary_definition": "[нажать]"
+        },
+        {
+          "key": 3,
+          "display_form": "в+овремя",
+          "lemma": "в+овремя",
+          "grammar": "Adverb",
+          "dictionary_definition": "[вовремя]"
+        },
+        {
+          "key": 4,
+          "display_form": "кур+ок",
+          "lemma": "кур+ок",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "[курок]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 69630,
+      "end_time_ms": 76030,
+      "original_line": "Солнечный день в ослепительных снах",
+      "phonetic_line": "С+олнечный д+ень в ослеп+ительных сн+ах",
+      "translation": "[mock – set DEEPL_API_KEY] Солнечный день в ослепительных снах",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "С+олнечный",
+          "lemma": "с+олнечный",
+          "grammar": "Adjective, Singular, Masculine, Nominative",
+          "dictionary_definition": "[солнечный]"
+        },
+        {
+          "key": 2,
+          "display_form": "д+ень",
+          "lemma": "д+ень",
+          "grammar": "Noun, Singular, Masculine, Accusative",
+          "dictionary_definition": "[день]"
+        },
+        {
+          "key": 3,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "[в]"
+        },
+        {
+          "key": 4,
+          "display_form": "ослеп+ительных",
+          "lemma": "ослеп+ительный",
+          "grammar": "Adjective, Plural, Genitive",
+          "dictionary_definition": "[ослепительный]"
+        },
+        {
+          "key": 5,
+          "display_form": "сн+ах",
+          "lemma": "с+он",
+          "grammar": "Noun, Plural, Masculine, Locative",
+          "dictionary_definition": "[сон]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 76030,
+      "end_time_ms": 79390,
+      "original_line": "Группа крови на рукаве",
+      "phonetic_line": "Гр+уппа кр+ови на рукав+е",
+      "translation": "[mock – set DEEPL_API_KEY] Группа крови на рукаве",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Гр+уппа",
+          "lemma": "гр+уппа",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "[группа]"
+        },
+        {
+          "key": 2,
+          "display_form": "кр+ови",
+          "lemma": "кр+овь",
+          "grammar": "Noun, Singular, Feminine, Genitive",
+          "dictionary_definition": "[кровь]"
+        },
+        {
+          "key": 3,
+          "display_form": "на",
+          "lemma": "н+а",
+          "grammar": "Preposition",
+          "dictionary_definition": "[на]"
+        },
+        {
+          "key": 4,
+          "display_form": "рукав+е",
+          "lemma": "рук+ав",
+          "grammar": "Noun, Singular, Masculine, Locative",
+          "dictionary_definition": "[рукав]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 79390,
+      "end_time_ms": 84440,
+      "original_line": "Мой порядковый номер на рукаве",
+      "phonetic_line": "М+ой пор+ядковый н+омер на рукав+е",
+      "translation": "[mock – set DEEPL_API_KEY] Мой порядковый номер на рукаве",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "М+ой",
+          "lemma": "м+ой",
+          "grammar": "Adjective, Singular, Masculine, Nominative",
+          "dictionary_definition": "[мой]"
+        },
+        {
+          "key": 2,
+          "display_form": "пор+ядковый",
+          "lemma": "пор+ядковый",
+          "grammar": "Adjective, Singular, Masculine, Nominative",
+          "dictionary_definition": "[порядковый]"
+        },
+        {
+          "key": 3,
+          "display_form": "н+омер",
+          "lemma": "н+омер",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "[номер]"
+        },
+        {
+          "key": 4,
+          "display_form": "на",
+          "lemma": "н+а",
+          "grammar": "Preposition",
+          "dictionary_definition": "[на]"
+        },
+        {
+          "key": 5,
+          "display_form": "рукав+е",
+          "lemma": "рук+ав",
+          "grammar": "Noun, Singular, Masculine, Locative",
+          "dictionary_definition": "[рукав]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 84440,
+      "end_time_ms": 91660,
+      "original_line": "Пожелай мне удачи в бою, пожелай мне",
+      "phonetic_line": "Пожел+ай мне уд+ачи в бо+ю, пожел+ай мне",
+      "translation": "[mock – set DEEPL_API_KEY] Пожелай мне удачи в бою, пожелай мне",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Пожел+ай",
+          "lemma": "пожел+ать",
+          "grammar": "Verb, Singular",
+          "dictionary_definition": "[пожелать]"
+        },
+        {
+          "key": 2,
+          "display_form": "мне",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Dative",
+          "dictionary_definition": "[я]"
+        },
+        {
+          "key": 3,
+          "display_form": "уд+ачи",
+          "lemma": "уд+ача",
+          "grammar": "Noun, Singular, Feminine, Genitive",
+          "dictionary_definition": "[удача]"
+        },
+        {
+          "key": 4,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "[в]"
+        },
+        {
+          "key": 5,
+          "display_form": "бо+ю,",
+          "lemma": "б+ой",
+          "grammar": "Noun, Singular, Masculine, loc2",
+          "dictionary_definition": "[бой]"
+        },
+        {
+          "key": 6,
+          "display_form": "пожел+ай",
+          "lemma": "пожел+ать",
+          "grammar": "Verb, Singular",
+          "dictionary_definition": "[пожелать]"
+        },
+        {
+          "key": 7,
+          "display_form": "мне",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Dative",
+          "dictionary_definition": "[я]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 91660,
+      "end_time_ms": 96190,
+      "original_line": "Не остаться в этой траве",
+      "phonetic_line": "Н+е ост+аться в +этой трав+е",
+      "translation": "[mock – set DEEPL_API_KEY] Не остаться в этой траве",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Н+е",
+          "lemma": "н+е",
+          "grammar": "Particle",
+          "dictionary_definition": "[не]"
+        },
+        {
+          "key": 2,
+          "display_form": "ост+аться",
+          "lemma": "ост+аться",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "[остаться]"
+        },
+        {
+          "key": 3,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "[в]"
+        },
+        {
+          "key": 4,
+          "display_form": "+этой",
+          "lemma": "+этот",
+          "grammar": "Adjective, Singular, Feminine, Genitive",
+          "dictionary_definition": "[этот]"
+        },
+        {
+          "key": 5,
+          "display_form": "трав+е",
+          "lemma": "трав+а",
+          "grammar": "Noun, Singular, Feminine, Locative",
+          "dictionary_definition": "[трава]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 96190,
+      "end_time_ms": 100310,
+      "original_line": "Не остаться в этой траве",
+      "phonetic_line": "Н+е ост+аться в +этой трав+е",
+      "translation": "[mock – set DEEPL_API_KEY] Не остаться в этой траве",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Н+е",
+          "lemma": "н+е",
+          "grammar": "Particle",
+          "dictionary_definition": "[не]"
+        },
+        {
+          "key": 2,
+          "display_form": "ост+аться",
+          "lemma": "ост+аться",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "[остаться]"
+        },
+        {
+          "key": 3,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "[в]"
+        },
+        {
+          "key": 4,
+          "display_form": "+этой",
+          "lemma": "+этот",
+          "grammar": "Adjective, Singular, Feminine, Genitive",
+          "dictionary_definition": "[этот]"
+        },
+        {
+          "key": 5,
+          "display_form": "трав+е",
+          "lemma": "трав+а",
+          "grammar": "Noun, Singular, Feminine, Locative",
+          "dictionary_definition": "[трава]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 100310,
+      "end_time_ms": 124310,
+      "original_line": "Пожелай мне удачи, пожелай мне удачи",
+      "phonetic_line": "Пожел+ай мне уд+ачи, пожел+ай мне уд+ачи",
+      "translation": "[mock – set DEEPL_API_KEY] Пожелай мне удачи, пожелай мне удачи",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Пожел+ай",
+          "lemma": "пожел+ать",
+          "grammar": "Verb, Singular",
+          "dictionary_definition": "[пожелать]"
+        },
+        {
+          "key": 2,
+          "display_form": "мне",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Dative",
+          "dictionary_definition": "[я]"
+        },
+        {
+          "key": 3,
+          "display_form": "уд+ачи,",
+          "lemma": "уд+ача",
+          "grammar": "Noun, Singular, Feminine, Genitive",
+          "dictionary_definition": "[удача]"
+        },
+        {
+          "key": 4,
+          "display_form": "пожел+ай",
+          "lemma": "пожел+ать",
+          "grammar": "Verb, Singular",
+          "dictionary_definition": "[пожелать]"
+        },
+        {
+          "key": 5,
+          "display_form": "мне",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Dative",
+          "dictionary_definition": "[я]"
+        },
+        {
+          "key": 6,
+          "display_form": "уд+ачи",
+          "lemma": "уд+ача",
+          "grammar": "Noun, Singular, Feminine, Genitive",
+          "dictionary_definition": "[удача]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 124310,
+      "end_time_ms": 128510,
+      "original_line": "И есть чем платить, но я не хочу",
+      "phonetic_line": "И есть чем плат+ить, но я не хоч+у",
+      "translation": "[mock – set DEEPL_API_KEY] И есть чем платить, но я не хочу",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "И",
+          "lemma": "и",
+          "grammar": "Conjunction",
+          "dictionary_definition": "[и]"
+        },
+        {
+          "key": 2,
+          "display_form": "есть",
+          "lemma": "+есть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "[есть]"
+        },
+        {
+          "key": 3,
+          "display_form": "чем",
+          "lemma": "ч+ём",
+          "grammar": "Conjunction",
+          "dictionary_definition": "[чём]"
+        },
+        {
+          "key": 4,
+          "display_form": "плат+ить,",
+          "lemma": "плат+ить",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "[платить]"
+        },
+        {
+          "key": 5,
+          "display_form": "но",
+          "lemma": "н+о",
+          "grammar": "Conjunction",
+          "dictionary_definition": "[но]"
+        },
+        {
+          "key": 6,
+          "display_form": "я",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "[я]"
+        },
+        {
+          "key": 7,
+          "display_form": "не",
+          "lemma": "н+е",
+          "grammar": "Particle",
+          "dictionary_definition": "[не]"
+        },
+        {
+          "key": 8,
+          "display_form": "хоч+у",
+          "lemma": "хот+еть",
+          "grammar": "Verb, Present, 1st Person, Singular",
+          "dictionary_definition": "[хотеть]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 128510,
+      "end_time_ms": 133460,
+      "original_line": "Победы любой ценой",
+      "phonetic_line": "Поб+еды люб+ой цен+ой",
+      "translation": "[mock – set DEEPL_API_KEY] Победы любой ценой",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Поб+еды",
+          "lemma": "поб+еда",
+          "grammar": "Noun, Singular, Feminine, Genitive",
+          "dictionary_definition": "[победа]"
+        },
+        {
+          "key": 2,
+          "display_form": "люб+ой",
+          "lemma": "люб+ой",
+          "grammar": "Adjective, Singular, Feminine, Genitive",
+          "dictionary_definition": "[любой]"
+        },
+        {
+          "key": 3,
+          "display_form": "цен+ой",
+          "lemma": "цен+а",
+          "grammar": "Noun, Singular, Feminine, Ablative",
+          "dictionary_definition": "[цена]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 133460,
+      "end_time_ms": 140670,
+      "original_line": "Я никому не хочу ставить ногу на грудь",
+      "phonetic_line": "Я ником+у не хоч+у ст+авить н+огу на гр+удь",
+      "translation": "[mock – set DEEPL_API_KEY] Я никому не хочу ставить ногу на грудь",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Я",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "[я]"
+        },
+        {
+          "key": 2,
+          "display_form": "ником+у",
+          "lemma": "никт+о",
+          "grammar": "Pronoun, Singular, Dative",
+          "dictionary_definition": "[никто]"
+        },
+        {
+          "key": 3,
+          "display_form": "не",
+          "lemma": "н+е",
+          "grammar": "Particle",
+          "dictionary_definition": "[не]"
+        },
+        {
+          "key": 4,
+          "display_form": "хоч+у",
+          "lemma": "хот+еть",
+          "grammar": "Verb, Present, 1st Person, Singular",
+          "dictionary_definition": "[хотеть]"
+        },
+        {
+          "key": 5,
+          "display_form": "ст+авить",
+          "lemma": "ст+авить",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "[ставить]"
+        },
+        {
+          "key": 6,
+          "display_form": "н+огу",
+          "lemma": "ног+а",
+          "grammar": "Noun, Singular, Feminine, Accusative",
+          "dictionary_definition": "[нога]"
+        },
+        {
+          "key": 7,
+          "display_form": "на",
+          "lemma": "н+а",
+          "grammar": "Preposition",
+          "dictionary_definition": "[на]"
+        },
+        {
+          "key": 8,
+          "display_form": "гр+удь",
+          "lemma": "гр+удь",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "[грудь]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 140670,
+      "end_time_ms": 144430,
+      "original_line": "Я хотел бы остаться с тобой",
+      "phonetic_line": "Я хот+ел бы ост+аться с тоб+ой",
+      "translation": "[mock – set DEEPL_API_KEY] Я хотел бы остаться с тобой",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Я",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "[я]"
+        },
+        {
+          "key": 2,
+          "display_form": "хот+ел",
+          "lemma": "хот+еть",
+          "grammar": "Verb, Past, Singular, Masculine",
+          "dictionary_definition": "[хотеть]"
+        },
+        {
+          "key": 3,
+          "display_form": "бы",
+          "lemma": "бы",
+          "grammar": "Particle",
+          "dictionary_definition": "[бы]"
+        },
+        {
+          "key": 4,
+          "display_form": "ост+аться",
+          "lemma": "ост+аться",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "[остаться]"
+        },
+        {
+          "key": 5,
+          "display_form": "с",
+          "lemma": "с",
+          "grammar": "Preposition",
+          "dictionary_definition": "[с]"
+        },
+        {
+          "key": 6,
+          "display_form": "тоб+ой",
+          "lemma": "т+ы",
+          "grammar": "Pronoun, 2nd Person, Singular, Ablative",
+          "dictionary_definition": "[ты]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 144430,
+      "end_time_ms": 148430,
+      "original_line": "Просто остаться с тобой",
+      "phonetic_line": "Пр+осто ост+аться с тоб+ой",
+      "translation": "[mock – set DEEPL_API_KEY] Просто остаться с тобой",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Пр+осто",
+          "lemma": "пр+осто",
+          "grammar": "Particle",
+          "dictionary_definition": "[просто]"
+        },
+        {
+          "key": 2,
+          "display_form": "ост+аться",
+          "lemma": "ост+аться",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "[остаться]"
+        },
+        {
+          "key": 3,
+          "display_form": "с",
+          "lemma": "с",
+          "grammar": "Preposition",
+          "dictionary_definition": "[с]"
+        },
+        {
+          "key": 4,
+          "display_form": "тоб+ой",
+          "lemma": "т+ы",
+          "grammar": "Pronoun, 2nd Person, Singular, Ablative",
+          "dictionary_definition": "[ты]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 148430,
+      "end_time_ms": 152110,
+      "original_line": "Но высокая в небе звезда",
+      "phonetic_line": "Но выс+окая в н+ебе звезд+а",
+      "translation": "[mock – set DEEPL_API_KEY] Но высокая в небе звезда",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Но",
+          "lemma": "н+о",
+          "grammar": "Conjunction",
+          "dictionary_definition": "[но]"
+        },
+        {
+          "key": 2,
+          "display_form": "выс+окая",
+          "lemma": "выс+окий",
+          "grammar": "Adjective, Singular, Feminine, Nominative",
+          "dictionary_definition": "[высокий]"
+        },
+        {
+          "key": 3,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "[в]"
+        },
+        {
+          "key": 4,
+          "display_form": "н+ебе",
+          "lemma": "н+ёбо",
+          "grammar": "Noun, Singular, Neuter, Locative",
+          "dictionary_definition": "[нёбо]"
+        },
+        {
+          "key": 5,
+          "display_form": "звезд+а",
+          "lemma": "звезд+а",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "[звезда]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 152110,
+      "end_time_ms": 155750,
+      "original_line": "Зовёт меня в путь",
+      "phonetic_line": "Зовёт мен+я в п+уть",
+      "translation": "[mock – set DEEPL_API_KEY] Зовёт меня в путь",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Зовёт",
+          "lemma": "зв+ать",
+          "grammar": "Verb, Present, 3rd Person, Singular",
+          "dictionary_definition": "[звать]"
+        },
+        {
+          "key": 2,
+          "display_form": "мен+я",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Accusative",
+          "dictionary_definition": "[я]"
+        },
+        {
+          "key": 3,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "[в]"
+        },
+        {
+          "key": 4,
+          "display_form": "п+уть",
+          "lemma": "п+уть",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "[путь]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 155750,
+      "end_time_ms": 158950,
+      "original_line": "Группа крови на рукаве",
+      "phonetic_line": "Гр+уппа кр+ови на рукав+е",
+      "translation": "[mock – set DEEPL_API_KEY] Группа крови на рукаве",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Гр+уппа",
+          "lemma": "гр+уппа",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "[группа]"
+        },
+        {
+          "key": 2,
+          "display_form": "кр+ови",
+          "lemma": "кр+овь",
+          "grammar": "Noun, Singular, Feminine, Genitive",
+          "dictionary_definition": "[кровь]"
+        },
+        {
+          "key": 3,
+          "display_form": "на",
+          "lemma": "н+а",
+          "grammar": "Preposition",
+          "dictionary_definition": "[на]"
+        },
+        {
+          "key": 4,
+          "display_form": "рукав+е",
+          "lemma": "рук+ав",
+          "grammar": "Noun, Singular, Masculine, Locative",
+          "dictionary_definition": "[рукав]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 158950,
+      "end_time_ms": 164110,
+      "original_line": "Мой порядковый номер на рукаве",
+      "phonetic_line": "М+ой пор+ядковый н+омер на рукав+е",
+      "translation": "[mock – set DEEPL_API_KEY] Мой порядковый номер на рукаве",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "М+ой",
+          "lemma": "м+ой",
+          "grammar": "Adjective, Singular, Masculine, Nominative",
+          "dictionary_definition": "[мой]"
+        },
+        {
+          "key": 2,
+          "display_form": "пор+ядковый",
+          "lemma": "пор+ядковый",
+          "grammar": "Adjective, Singular, Masculine, Nominative",
+          "dictionary_definition": "[порядковый]"
+        },
+        {
+          "key": 3,
+          "display_form": "н+омер",
+          "lemma": "н+омер",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "[номер]"
+        },
+        {
+          "key": 4,
+          "display_form": "на",
+          "lemma": "н+а",
+          "grammar": "Preposition",
+          "dictionary_definition": "[на]"
+        },
+        {
+          "key": 5,
+          "display_form": "рукав+е",
+          "lemma": "рук+ав",
+          "grammar": "Noun, Singular, Masculine, Locative",
+          "dictionary_definition": "[рукав]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 164110,
+      "end_time_ms": 171100,
+      "original_line": "Пожелай мне удачи в бою, пожелай мне",
+      "phonetic_line": "Пожел+ай мне уд+ачи в бо+ю, пожел+ай мне",
+      "translation": "[mock – set DEEPL_API_KEY] Пожелай мне удачи в бою, пожелай мне",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Пожел+ай",
+          "lemma": "пожел+ать",
+          "grammar": "Verb, Singular",
+          "dictionary_definition": "[пожелать]"
+        },
+        {
+          "key": 2,
+          "display_form": "мне",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Dative",
+          "dictionary_definition": "[я]"
+        },
+        {
+          "key": 3,
+          "display_form": "уд+ачи",
+          "lemma": "уд+ача",
+          "grammar": "Noun, Singular, Feminine, Genitive",
+          "dictionary_definition": "[удача]"
+        },
+        {
+          "key": 4,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "[в]"
+        },
+        {
+          "key": 5,
+          "display_form": "бо+ю,",
+          "lemma": "б+ой",
+          "grammar": "Noun, Singular, Masculine, loc2",
+          "dictionary_definition": "[бой]"
+        },
+        {
+          "key": 6,
+          "display_form": "пожел+ай",
+          "lemma": "пожел+ать",
+          "grammar": "Verb, Singular",
+          "dictionary_definition": "[пожелать]"
+        },
+        {
+          "key": 7,
+          "display_form": "мне",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Dative",
+          "dictionary_definition": "[я]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 171100,
+      "end_time_ms": 175990,
+      "original_line": "Не остаться в этой траве",
+      "phonetic_line": "Н+е ост+аться в +этой трав+е",
+      "translation": "[mock – set DEEPL_API_KEY] Не остаться в этой траве",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Н+е",
+          "lemma": "н+е",
+          "grammar": "Particle",
+          "dictionary_definition": "[не]"
+        },
+        {
+          "key": 2,
+          "display_form": "ост+аться",
+          "lemma": "ост+аться",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "[остаться]"
+        },
+        {
+          "key": 3,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "[в]"
+        },
+        {
+          "key": 4,
+          "display_form": "+этой",
+          "lemma": "+этот",
+          "grammar": "Adjective, Singular, Feminine, Genitive",
+          "dictionary_definition": "[этот]"
+        },
+        {
+          "key": 5,
+          "display_form": "трав+е",
+          "lemma": "трав+а",
+          "grammar": "Noun, Singular, Feminine, Locative",
+          "dictionary_definition": "[трава]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 175990,
+      "end_time_ms": 179990,
+      "original_line": "Не остаться в этой траве",
+      "phonetic_line": "Н+е ост+аться в +этой трав+е",
+      "translation": "[mock – set DEEPL_API_KEY] Не остаться в этой траве",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Н+е",
+          "lemma": "н+е",
+          "grammar": "Particle",
+          "dictionary_definition": "[не]"
+        },
+        {
+          "key": 2,
+          "display_form": "ост+аться",
+          "lemma": "ост+аться",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "[остаться]"
+        },
+        {
+          "key": 3,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "[в]"
+        },
+        {
+          "key": 4,
+          "display_form": "+этой",
+          "lemma": "+этот",
+          "grammar": "Adjective, Singular, Feminine, Genitive",
+          "dictionary_definition": "[этот]"
+        },
+        {
+          "key": 5,
+          "display_form": "трав+е",
+          "lemma": "трав+а",
+          "grammar": "Noun, Singular, Feminine, Locative",
+          "dictionary_definition": "[трава]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 179990,
+      "end_time_ms": 183990,
+      "original_line": "Пожелай мне удачи, пожелай мне удачи",
+      "phonetic_line": "Пожел+ай мне уд+ачи, пожел+ай мне уд+ачи",
+      "translation": "[mock – set DEEPL_API_KEY] Пожелай мне удачи, пожелай мне удачи",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Пожел+ай",
+          "lemma": "пожел+ать",
+          "grammar": "Verb, Singular",
+          "dictionary_definition": "[пожелать]"
+        },
+        {
+          "key": 2,
+          "display_form": "мне",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Dative",
+          "dictionary_definition": "[я]"
+        },
+        {
+          "key": 3,
+          "display_form": "уд+ачи,",
+          "lemma": "уд+ача",
+          "grammar": "Noun, Singular, Feminine, Genitive",
+          "dictionary_definition": "[удача]"
+        },
+        {
+          "key": 4,
+          "display_form": "пожел+ай",
+          "lemma": "пожел+ать",
+          "grammar": "Verb, Singular",
+          "dictionary_definition": "[пожелать]"
+        },
+        {
+          "key": 5,
+          "display_form": "мне",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Dative",
+          "dictionary_definition": "[я]"
+        },
+        {
+          "key": 6,
+          "display_form": "уд+ачи",
+          "lemma": "уд+ача",
+          "grammar": "Noun, Singular, Feminine, Genitive",
+          "dictionary_definition": "[удача]"
+        }
+      ]
+    }
+  ]
+}

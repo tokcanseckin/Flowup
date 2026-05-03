@@ -1,41 +1,8 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
-import rawSongData from '../data/song_data.json'
-
-// ── Types ─────────────────────────────────────────────────────────────────────
-
-interface Word {
-  key: number
-  display_form: string          // annotated inflected form (stress marks, tone, etc.)
-  lemma: string                 // dictionary base form, possibly annotated
-  grammar: string
-  dictionary_definition: string
-}
-
-interface LyricLine {
-  start_time_ms: number
-  end_time_ms: number
-  original_line: string
-  phonetic_line: string | null  // null when the backend produces no phonetic annotation
-  translation: string
-  words: Word[]
-}
-
-interface LanguageMeta {
-  code: string
-  name: string
-  script: string
-  direction: 'ltr' | 'rtl'
-}
-
-interface SongData {
-  spotify_uri: string
-  title: string
-  language: LanguageMeta
-  lines: LyricLine[]
-}
+import { SongDetail } from '../api/client'
 
 interface TooltipState {
-  word: Word
+  word: SongDetail['lines'][number]['words'][number]
   x: number   // page-relative X centre of the word element
   y: number   // page-relative top of the word element
   exiting: boolean
@@ -43,14 +10,13 @@ interface TooltipState {
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-const songData = rawSongData as SongData
 const LINE_HEIGHT_PX  = 88
 const VISIBLE_RADIUS  = 3
 const TOOLTIP_LINGER_MS = 2500
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function findActiveLineIndex(lines: LyricLine[], posMs: number): number {
+function findActiveLineIndex(lines: SongDetail['lines'], posMs: number): number {
   if (posMs <= 0) return -1
   for (let i = lines.length - 1; i >= 0; i--) {
     if (posMs >= lines[i].start_time_ms && posMs < lines[i].end_time_ms) return i
@@ -69,9 +35,10 @@ function lineStyle(distance: number): { opacity: number; scale: number } {
 
 interface Props {
   currentPositionMs: number
+  songData: SongDetail
 }
 
-export default function LyricsPlayer({ currentPositionMs }: Props) {
+export default function LyricsPlayer({ currentPositionMs, songData }: Props) {
   const { lines, language } = songData
   const isRTL = language.direction === 'rtl'
 
@@ -204,7 +171,7 @@ export default function LyricsPlayer({ currentPositionMs }: Props) {
 // ── Active line ───────────────────────────────────────────────────────────────
 
 interface ActiveLineProps {
-  line: LyricLine
+  line: SongDetail['lines'][number]
   isRTL: boolean
   setWordRef: (key: number, el: HTMLSpanElement | null) => void
 }
