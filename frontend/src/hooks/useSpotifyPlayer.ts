@@ -51,6 +51,9 @@ export function useSpotifyPlayer(token: string | null): PlayerState & PlayerCont
   const isPlayingRef     = useRef(false)
   const deviceIdRef      = useRef<string | null>(null)
   const playerRef        = useRef<Spotify.Player | null>(null)
+  // URI we asked Spotify to play; used to discard stale state-change events
+  // from the previous track that arrive while the new one is loading.
+  const pendingUriRef    = useRef<string | null>(null)
 
   // ── 100 ms position ticker ────────────────────────────────────────────────
   useEffect(() => {
@@ -84,11 +87,18 @@ export function useSpotifyPlayer(token: string | null): PlayerState & PlayerCont
 
       player.addListener('player_state_changed', state => {
         if (!state) return
+        const track = state.track_window.current_track
+
+        // If we're waiting for a specific track to start, discard any events
+        // from the previous track to prevent stale positions overwriting the
+        // reset-to-0 we applied when the new track was requested.
+        if (pendingUriRef.current !== null && track?.uri !== pendingUriRef.current) return
+        pendingUriRef.current = null  // confirmed — stop filtering
+
         basePositionRef.current  = state.position
         baseTimestampRef.current = Date.now()
         isPlayingRef.current     = !state.paused
 
-        const track = state.track_window.current_track
         setState(prev => ({
           ...prev,
           isPlaying:         !state.paused,
@@ -249,6 +259,10 @@ export function useSpotifyPlayer(token: string | null): PlayerState & PlayerCont
     baseTimestampRef.current = Date.now()
     isPlayingRef.current     = false
     setState(prev => ({ ...prev, currentPositionMs: 0, isPlaying: false }))
+
+    // Mark the expected track URI so player_state_changed events from the
+    // previous track (which may arrive during the transition) are discarded.
+    pendingUriRef.current = trackUri
 
     const playRes = await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${targetDeviceId}`, {
       method: 'PUT',
