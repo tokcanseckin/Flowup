@@ -1,0 +1,1054 @@
+{
+  "spotify_uri": "spotify:track:4lQXlqgD09JrGdphtODwpB",
+  "title": "Старый отель",
+  "artist": "Bravo",
+  "language": {
+    "code": "ru",
+    "name": "Russian",
+    "script": "Cyrillic",
+    "direction": "ltr"
+  },
+  "lines": [
+    {
+      "start_time_ms": 15570,
+      "end_time_ms": 23420,
+      "original_line": "Полупустой вагон метро, длинный тоннель",
+      "phonetic_line": "Полупусто́й ваго́н метро́, дли́нный тонне́ль",
+      "translation": "Half-empty subway car, long tunnel",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Полупусто́й",
+          "lemma": "полупусто́й",
+          "grammar": "Adjective, Singular, Feminine, Ablative",
+          "dictionary_definition": "half-empty"
+        },
+        {
+          "key": 2,
+          "display_form": "ваго́н",
+          "lemma": "ваго́н",
+          "grammar": "Noun, Singular, Masculine, Accusative",
+          "dictionary_definition": "wagon, car, carriage, coach"
+        },
+        {
+          "key": 3,
+          "display_form": "метро́,",
+          "lemma": "метро́",
+          "grammar": "Noun, Singular, Neuter, Locative",
+          "dictionary_definition": "metro; subway; underground"
+        },
+        {
+          "key": 4,
+          "display_form": "дли́нный",
+          "lemma": "дли́нный",
+          "grammar": "Adjective, Singular, Masculine, Nominative",
+          "dictionary_definition": "long, lengthy"
+        },
+        {
+          "key": 5,
+          "display_form": "тонне́ль",
+          "lemma": "тонне́ль",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "tunnel"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 23420,
+      "end_time_ms": 31390,
+      "original_line": "Меня везёт ночной экспресс в старый отель",
+      "phonetic_line": "Меня́ везёт ночно́й экспре́сс в ста́рый оте́ль",
+      "translation": "I'm taking a night express to an old hotel.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Меня́",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Accusative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 2,
+          "display_form": "везёт",
+          "lemma": "везти́",
+          "grammar": "Verb, Present, 3rd Person, Singular",
+          "dictionary_definition": "to transport someone/something (by vehicle); to be lucky"
+        },
+        {
+          "key": 3,
+          "display_form": "ночно́й",
+          "lemma": "ночно́й",
+          "grammar": "Adjective, Singular, Feminine, Genitive",
+          "dictionary_definition": "night, nightly; nocturnal"
+        },
+        {
+          "key": 4,
+          "display_form": "экспре́сс",
+          "lemma": "экспре́сс",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "express"
+        },
+        {
+          "key": 5,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 6,
+          "display_form": "ста́рый",
+          "lemma": "ста́рый",
+          "grammar": "Adjective, Singular, Masculine, Nominative",
+          "dictionary_definition": "old, ancient"
+        },
+        {
+          "key": 7,
+          "display_form": "оте́ль",
+          "lemma": "оте́ль",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "hotel"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 31390,
+      "end_time_ms": 39430,
+      "original_line": "И пусть меня никто не ждёт у дверей",
+      "phonetic_line": "И пу́сть меня́ никто́ не ждёт у двере́й",
+      "translation": "No one is waiting for me at the door.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "И",
+          "lemma": "и",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 2,
+          "display_form": "пу́сть",
+          "lemma": "пу́сть",
+          "grammar": "Particle",
+          "dictionary_definition": "let"
+        },
+        {
+          "key": 3,
+          "display_form": "меня́",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Accusative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 4,
+          "display_form": "никто́",
+          "lemma": "никто́",
+          "grammar": "Pronoun, Singular, Nominative",
+          "dictionary_definition": "nobody, no one"
+        },
+        {
+          "key": 5,
+          "display_form": "не",
+          "lemma": "не́",
+          "grammar": "Particle",
+          "dictionary_definition": "not"
+        },
+        {
+          "key": 6,
+          "display_form": "ждёт",
+          "lemma": "жда́ть",
+          "grammar": "Verb, Present, 3rd Person, Singular",
+          "dictionary_definition": "to wait, to expect, to await"
+        },
+        {
+          "key": 7,
+          "display_form": "у",
+          "lemma": "у",
+          "grammar": "Preposition",
+          "dictionary_definition": "(possession); by, at (place); with; from (take, borrow)"
+        },
+        {
+          "key": 8,
+          "display_form": "двере́й",
+          "lemma": "две́рь",
+          "grammar": "Noun, Plural, Feminine, Genitive",
+          "dictionary_definition": "door"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 39430,
+      "end_time_ms": 50420,
+      "original_line": "Вези меня ночной экспресс, вези меня скорей",
+      "phonetic_line": "Вези́ меня́ ночно́й экспре́сс, вези́ меня́ скоре́й",
+      "translation": "Drive me the night express, drive me fast.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Вези́",
+          "lemma": "везти́",
+          "grammar": "Verb, Singular",
+          "dictionary_definition": "to transport someone/something (by vehicle); to be lucky"
+        },
+        {
+          "key": 2,
+          "display_form": "меня́",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Accusative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 3,
+          "display_form": "ночно́й",
+          "lemma": "ночно́й",
+          "grammar": "Adjective, Singular, Feminine, Genitive",
+          "dictionary_definition": "night, nightly; nocturnal"
+        },
+        {
+          "key": 4,
+          "display_form": "экспре́сс,",
+          "lemma": "экспре́сс",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "express"
+        },
+        {
+          "key": 5,
+          "display_form": "вези́",
+          "lemma": "везти́",
+          "grammar": "Verb, Singular",
+          "dictionary_definition": "to transport someone/something (by vehicle); to be lucky"
+        },
+        {
+          "key": 6,
+          "display_form": "меня́",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Accusative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 7,
+          "display_form": "скоре́й",
+          "lemma": "ско́рый",
+          "grammar": "Comparative",
+          "dictionary_definition": "quick, fast, swift; near, forthcoming; (rail transport) express"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 50420,
+      "end_time_ms": 58470,
+      "original_line": "Город плывёт в море цветных огней",
+      "phonetic_line": "Го́род плывёт в мо́ре цветны́х огне́й",
+      "translation": "The city floats in a sea of colored lights",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Го́род",
+          "lemma": "го́род",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "city, town"
+        },
+        {
+          "key": 2,
+          "display_form": "плывёт",
+          "lemma": "плы́ть",
+          "grammar": "Verb, Present, 3rd Person, Singular",
+          "dictionary_definition": "swim; float/sail"
+        },
+        {
+          "key": 3,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 4,
+          "display_form": "мо́ре",
+          "lemma": "мо́ре",
+          "grammar": "Noun, Singular, Neuter, Locative",
+          "dictionary_definition": "sea, ocean"
+        },
+        {
+          "key": 5,
+          "display_form": "цветны́х",
+          "lemma": "цветно́й",
+          "grammar": "Adjective, Plural, Locative",
+          "dictionary_definition": "coloured, colour"
+        },
+        {
+          "key": 6,
+          "display_form": "огне́й",
+          "lemma": "ого́нь",
+          "grammar": "Noun, Plural, Masculine, Genitive",
+          "dictionary_definition": "fire; flame, light"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 58470,
+      "end_time_ms": 65790,
+      "original_line": "Город живёт счастьем своих людей",
+      "phonetic_line": "Го́род живёт сча́стьем свои́х люде́й",
+      "translation": "The city lives the happiness of its people.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Го́род",
+          "lemma": "го́род",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "city, town"
+        },
+        {
+          "key": 2,
+          "display_form": "живёт",
+          "lemma": "жи́ть",
+          "grammar": "Verb, Present, 3rd Person, Singular",
+          "dictionary_definition": "to live"
+        },
+        {
+          "key": 3,
+          "display_form": "сча́стьем",
+          "lemma": "сча́стие",
+          "grammar": "Noun, Singular, Neuter, Ablative",
+          "dictionary_definition": "happiness, luck, good fortune"
+        },
+        {
+          "key": 4,
+          "display_form": "свои́х",
+          "lemma": "сво́й",
+          "grammar": "Adjective, Plural, Genitive",
+          "dictionary_definition": "one's own (reflexive)"
+        },
+        {
+          "key": 5,
+          "display_form": "люде́й",
+          "lemma": "челове́к",
+          "grammar": "Noun, Plural, Masculine, Genitive",
+          "dictionary_definition": "person, man, people; menial, servant"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 65790,
+      "end_time_ms": 73900,
+      "original_line": "Старый отель, двери свои открой",
+      "phonetic_line": "Ста́рый оте́ль, две́ри свои́ откро́й",
+      "translation": "Old hotel, open your doors",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Ста́рый",
+          "lemma": "ста́рый",
+          "grammar": "Adjective, Singular, Masculine, Nominative",
+          "dictionary_definition": "old, ancient"
+        },
+        {
+          "key": 2,
+          "display_form": "оте́ль,",
+          "lemma": "оте́ль",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "hotel"
+        },
+        {
+          "key": 3,
+          "display_form": "две́ри",
+          "lemma": "две́рь",
+          "grammar": "Noun, Singular, Feminine, Genitive",
+          "dictionary_definition": "door"
+        },
+        {
+          "key": 4,
+          "display_form": "свои́",
+          "lemma": "сво́й",
+          "grammar": "Adjective, Plural, Accusative",
+          "dictionary_definition": "one's own (reflexive)"
+        },
+        {
+          "key": 5,
+          "display_form": "откро́й",
+          "lemma": "откры́ть",
+          "grammar": "Verb, Singular",
+          "dictionary_definition": "to open"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 73900,
+      "end_time_ms": 82710,
+      "original_line": "Старый отель, в полночь меня укрой",
+      "phonetic_line": "Ста́рый оте́ль, в по́лночь меня́ укро́й",
+      "translation": "Old hotel, cover me at midnight",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Ста́рый",
+          "lemma": "ста́рый",
+          "grammar": "Adjective, Singular, Masculine, Nominative",
+          "dictionary_definition": "old, ancient"
+        },
+        {
+          "key": 2,
+          "display_form": "оте́ль,",
+          "lemma": "оте́ль",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "hotel"
+        },
+        {
+          "key": 3,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 4,
+          "display_form": "по́лночь",
+          "lemma": "по́лночь",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "midnight"
+        },
+        {
+          "key": 5,
+          "display_form": "меня́",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Accusative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 6,
+          "display_form": "укро́й",
+          "lemma": "укры́ть",
+          "grammar": "Verb, Singular",
+          "dictionary_definition": "cover, shelter, conceal, harbour"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 82710,
+      "end_time_ms": 90420,
+      "original_line": "Hо тёплый дождь не бьёт в стекло мокрых карет",
+      "phonetic_line": "Hо тёплый до́ждь не бьёт в стекло́ мо́крых каре́т",
+      "translation": "But warm rain does not hit the glass of wet carriages.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Hо",
+          "lemma": "hо",
+          "grammar": "Unknown",
+          "dictionary_definition": "[hо]"
+        },
+        {
+          "key": 2,
+          "display_form": "тёплый",
+          "lemma": "тёплый",
+          "grammar": "Adjective, Singular, Masculine, Nominative",
+          "dictionary_definition": "warm, mild, cordial, kindly, affectionate"
+        },
+        {
+          "key": 3,
+          "display_form": "до́ждь",
+          "lemma": "до́ждь",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "rain"
+        },
+        {
+          "key": 4,
+          "display_form": "не",
+          "lemma": "не́",
+          "grammar": "Particle",
+          "dictionary_definition": "not"
+        },
+        {
+          "key": 5,
+          "display_form": "бьёт",
+          "lemma": "би́ть",
+          "grammar": "Verb, Present, 3rd Person, Singular",
+          "dictionary_definition": "to beat, hit, strike; to chime; to clap"
+        },
+        {
+          "key": 6,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 7,
+          "display_form": "стекло́",
+          "lemma": "стекло́",
+          "grammar": "Noun, Singular, Neuter, Nominative",
+          "dictionary_definition": "glass, glassware; pane, window"
+        },
+        {
+          "key": 8,
+          "display_form": "мо́крых",
+          "lemma": "мо́крый",
+          "grammar": "Adjective, Plural, Genitive",
+          "dictionary_definition": "wet, moist, soggy"
+        },
+        {
+          "key": 9,
+          "display_form": "каре́т",
+          "lemma": "каре́та",
+          "grammar": "Noun, Plural, Feminine, Genitive",
+          "dictionary_definition": "carriage, coach"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 90420,
+      "end_time_ms": 98320,
+      "original_line": "И электронное табло смотрит мне вслед",
+      "phonetic_line": "И электро́нное табло́ смо́трит мне всле́д",
+      "translation": "And the electronic scoreboard is watching me.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "И",
+          "lemma": "и",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 2,
+          "display_form": "электро́нное",
+          "lemma": "электро́нный",
+          "grammar": "Adjective, Singular, Neuter, Nominative",
+          "dictionary_definition": "electronic"
+        },
+        {
+          "key": 3,
+          "display_form": "табло́",
+          "lemma": "табло́",
+          "grammar": "Noun, Singular, Neuter, Accusative",
+          "dictionary_definition": "indicator board, score-board"
+        },
+        {
+          "key": 4,
+          "display_form": "смо́трит",
+          "lemma": "смотре́ть",
+          "grammar": "Verb, Present, 3rd Person, Singular",
+          "dictionary_definition": "to look, to watch"
+        },
+        {
+          "key": 5,
+          "display_form": "мне",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Dative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 6,
+          "display_form": "всле́д",
+          "lemma": "всле́д",
+          "grammar": "Preposition",
+          "dictionary_definition": "following, subsequent; after"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 98320,
+      "end_time_ms": 106200,
+      "original_line": "Домов кварталы спят давно, видят сны",
+      "phonetic_line": "Домо́в кварта́лы спя́т давно́, ви́дят сны́",
+      "translation": "Homes have been sleeping for a long time, dreaming",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Домо́в",
+          "lemma": "до́м",
+          "grammar": "Noun, Plural, Masculine, Genitive",
+          "dictionary_definition": "house, home, house-hold"
+        },
+        {
+          "key": 2,
+          "display_form": "кварта́лы",
+          "lemma": "кварта́л",
+          "grammar": "Noun, Plural, Masculine, Accusative",
+          "dictionary_definition": "quarter/block (of year/city)"
+        },
+        {
+          "key": 3,
+          "display_form": "спя́т",
+          "lemma": "спа́ть",
+          "grammar": "Verb, Present, 3rd Person, Plural",
+          "dictionary_definition": "to sleep"
+        },
+        {
+          "key": 4,
+          "display_form": "давно́,",
+          "lemma": "давно́",
+          "grammar": "Adverb",
+          "dictionary_definition": "how long, long ago; a long time ago, for a long time"
+        },
+        {
+          "key": 5,
+          "display_form": "ви́дят",
+          "lemma": "ви́деть",
+          "grammar": "Verb, Present, 3rd Person, Plural",
+          "dictionary_definition": "to see"
+        },
+        {
+          "key": 6,
+          "display_form": "сны́",
+          "lemma": "со́н",
+          "grammar": "Noun, Plural, Masculine, Nominative",
+          "dictionary_definition": "sleep; dream"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 106200,
+      "end_time_ms": 117090,
+      "original_line": "И смотрит вновь в моё окно тень слепой луны",
+      "phonetic_line": "И смо́трит вно́вь в моё окно́ те́нь слепо́й луны́",
+      "translation": "And the shadow of the blind moon looks out my window again.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "И",
+          "lemma": "и",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 2,
+          "display_form": "смо́трит",
+          "lemma": "смотре́ть",
+          "grammar": "Verb, Present, 3rd Person, Singular",
+          "dictionary_definition": "to look, to watch"
+        },
+        {
+          "key": 3,
+          "display_form": "вно́вь",
+          "lemma": "вно́вь",
+          "grammar": "Adverb",
+          "dictionary_definition": "again, once again, afresh, anew; newly"
+        },
+        {
+          "key": 4,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 5,
+          "display_form": "моё",
+          "lemma": "мо́й",
+          "grammar": "Adjective, Singular, Neuter, Nominative",
+          "dictionary_definition": "my, mine, my people"
+        },
+        {
+          "key": 6,
+          "display_form": "окно́",
+          "lemma": "окно́",
+          "grammar": "Noun, Singular, Neuter, Accusative",
+          "dictionary_definition": "window, casement-window, window-sill, gap, opening, port, slot"
+        },
+        {
+          "key": 7,
+          "display_form": "те́нь",
+          "lemma": "те́нь",
+          "grammar": "Noun, Singular, Feminine, Accusative",
+          "dictionary_definition": "shade; shadow, silhouette (ghost, phantom); hint (vestige)"
+        },
+        {
+          "key": 8,
+          "display_form": "слепо́й",
+          "lemma": "слепо́й",
+          "grammar": "Adjective, Singular, Masculine, Nominative",
+          "dictionary_definition": "blind"
+        },
+        {
+          "key": 9,
+          "display_form": "луны́",
+          "lemma": "луна́",
+          "grammar": "Noun, Singular, Feminine, Genitive",
+          "dictionary_definition": "moon"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 117090,
+      "end_time_ms": 124960,
+      "original_line": "Город плывёт в море цветных огней",
+      "phonetic_line": "Го́род плывёт в мо́ре цветны́х огне́й",
+      "translation": "The city floats in a sea of colored lights",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Го́род",
+          "lemma": "го́род",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "city, town"
+        },
+        {
+          "key": 2,
+          "display_form": "плывёт",
+          "lemma": "плы́ть",
+          "grammar": "Verb, Present, 3rd Person, Singular",
+          "dictionary_definition": "swim; float/sail"
+        },
+        {
+          "key": 3,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 4,
+          "display_form": "мо́ре",
+          "lemma": "мо́ре",
+          "grammar": "Noun, Singular, Neuter, Locative",
+          "dictionary_definition": "sea, ocean"
+        },
+        {
+          "key": 5,
+          "display_form": "цветны́х",
+          "lemma": "цветно́й",
+          "grammar": "Adjective, Plural, Locative",
+          "dictionary_definition": "coloured, colour"
+        },
+        {
+          "key": 6,
+          "display_form": "огне́й",
+          "lemma": "ого́нь",
+          "grammar": "Noun, Plural, Masculine, Genitive",
+          "dictionary_definition": "fire; flame, light"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 124960,
+      "end_time_ms": 132860,
+      "original_line": "Город живёт счастьем своих людей",
+      "phonetic_line": "Го́род живёт сча́стьем свои́х люде́й",
+      "translation": "The city lives the happiness of its people.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Го́род",
+          "lemma": "го́род",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "city, town"
+        },
+        {
+          "key": 2,
+          "display_form": "живёт",
+          "lemma": "жи́ть",
+          "grammar": "Verb, Present, 3rd Person, Singular",
+          "dictionary_definition": "to live"
+        },
+        {
+          "key": 3,
+          "display_form": "сча́стьем",
+          "lemma": "сча́стие",
+          "grammar": "Noun, Singular, Neuter, Ablative",
+          "dictionary_definition": "happiness, luck, good fortune"
+        },
+        {
+          "key": 4,
+          "display_form": "свои́х",
+          "lemma": "сво́й",
+          "grammar": "Adjective, Plural, Genitive",
+          "dictionary_definition": "one's own (reflexive)"
+        },
+        {
+          "key": 5,
+          "display_form": "люде́й",
+          "lemma": "челове́к",
+          "grammar": "Noun, Plural, Masculine, Genitive",
+          "dictionary_definition": "person, man, people; menial, servant"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 132860,
+      "end_time_ms": 141040,
+      "original_line": "Старый отель, двери свои открой",
+      "phonetic_line": "Ста́рый оте́ль, две́ри свои́ откро́й",
+      "translation": "Old hotel, open your doors",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Ста́рый",
+          "lemma": "ста́рый",
+          "grammar": "Adjective, Singular, Masculine, Nominative",
+          "dictionary_definition": "old, ancient"
+        },
+        {
+          "key": 2,
+          "display_form": "оте́ль,",
+          "lemma": "оте́ль",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "hotel"
+        },
+        {
+          "key": 3,
+          "display_form": "две́ри",
+          "lemma": "две́рь",
+          "grammar": "Noun, Singular, Feminine, Genitive",
+          "dictionary_definition": "door"
+        },
+        {
+          "key": 4,
+          "display_form": "свои́",
+          "lemma": "сво́й",
+          "grammar": "Adjective, Plural, Accusative",
+          "dictionary_definition": "one's own (reflexive)"
+        },
+        {
+          "key": 5,
+          "display_form": "откро́й",
+          "lemma": "откры́ть",
+          "grammar": "Verb, Singular",
+          "dictionary_definition": "to open"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 141040,
+      "end_time_ms": 180910,
+      "original_line": "Старый отель, в полночь меня укрой",
+      "phonetic_line": "Ста́рый оте́ль, в по́лночь меня́ укро́й",
+      "translation": "Old hotel, cover me at midnight",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Ста́рый",
+          "lemma": "ста́рый",
+          "grammar": "Adjective, Singular, Masculine, Nominative",
+          "dictionary_definition": "old, ancient"
+        },
+        {
+          "key": 2,
+          "display_form": "оте́ль,",
+          "lemma": "оте́ль",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "hotel"
+        },
+        {
+          "key": 3,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 4,
+          "display_form": "по́лночь",
+          "lemma": "по́лночь",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "midnight"
+        },
+        {
+          "key": 5,
+          "display_form": "меня́",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Accusative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 6,
+          "display_form": "укро́й",
+          "lemma": "укры́ть",
+          "grammar": "Verb, Singular",
+          "dictionary_definition": "cover, shelter, conceal, harbour"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 180910,
+      "end_time_ms": 188170,
+      "original_line": "Город плывёт в море цветных огней",
+      "phonetic_line": "Го́род плывёт в мо́ре цветны́х огне́й",
+      "translation": "The city floats in a sea of colored lights",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Го́род",
+          "lemma": "го́род",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "city, town"
+        },
+        {
+          "key": 2,
+          "display_form": "плывёт",
+          "lemma": "плы́ть",
+          "grammar": "Verb, Present, 3rd Person, Singular",
+          "dictionary_definition": "swim; float/sail"
+        },
+        {
+          "key": 3,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 4,
+          "display_form": "мо́ре",
+          "lemma": "мо́ре",
+          "grammar": "Noun, Singular, Neuter, Locative",
+          "dictionary_definition": "sea, ocean"
+        },
+        {
+          "key": 5,
+          "display_form": "цветны́х",
+          "lemma": "цветно́й",
+          "grammar": "Adjective, Plural, Locative",
+          "dictionary_definition": "coloured, colour"
+        },
+        {
+          "key": 6,
+          "display_form": "огне́й",
+          "lemma": "ого́нь",
+          "grammar": "Noun, Plural, Masculine, Genitive",
+          "dictionary_definition": "fire; flame, light"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 188170,
+      "end_time_ms": 196210,
+      "original_line": "Город живёт счастьем своих людей",
+      "phonetic_line": "Го́род живёт сча́стьем свои́х люде́й",
+      "translation": "The city lives the happiness of its people.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Го́род",
+          "lemma": "го́род",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "city, town"
+        },
+        {
+          "key": 2,
+          "display_form": "живёт",
+          "lemma": "жи́ть",
+          "grammar": "Verb, Present, 3rd Person, Singular",
+          "dictionary_definition": "to live"
+        },
+        {
+          "key": 3,
+          "display_form": "сча́стьем",
+          "lemma": "сча́стие",
+          "grammar": "Noun, Singular, Neuter, Ablative",
+          "dictionary_definition": "happiness, luck, good fortune"
+        },
+        {
+          "key": 4,
+          "display_form": "свои́х",
+          "lemma": "сво́й",
+          "grammar": "Adjective, Plural, Genitive",
+          "dictionary_definition": "one's own (reflexive)"
+        },
+        {
+          "key": 5,
+          "display_form": "люде́й",
+          "lemma": "челове́к",
+          "grammar": "Noun, Plural, Masculine, Genitive",
+          "dictionary_definition": "person, man, people; menial, servant"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 196210,
+      "end_time_ms": 204020,
+      "original_line": "Старый отель, двери свои открой",
+      "phonetic_line": "Ста́рый оте́ль, две́ри свои́ откро́й",
+      "translation": "Old hotel, open your doors",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Ста́рый",
+          "lemma": "ста́рый",
+          "grammar": "Adjective, Singular, Masculine, Nominative",
+          "dictionary_definition": "old, ancient"
+        },
+        {
+          "key": 2,
+          "display_form": "оте́ль,",
+          "lemma": "оте́ль",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "hotel"
+        },
+        {
+          "key": 3,
+          "display_form": "две́ри",
+          "lemma": "две́рь",
+          "grammar": "Noun, Singular, Feminine, Genitive",
+          "dictionary_definition": "door"
+        },
+        {
+          "key": 4,
+          "display_form": "свои́",
+          "lemma": "сво́й",
+          "grammar": "Adjective, Plural, Accusative",
+          "dictionary_definition": "one's own (reflexive)"
+        },
+        {
+          "key": 5,
+          "display_form": "откро́й",
+          "lemma": "откры́ть",
+          "grammar": "Verb, Singular",
+          "dictionary_definition": "to open"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 204020,
+      "end_time_ms": 208020,
+      "original_line": "Старый отель в полночь меня укрой",
+      "phonetic_line": "Ста́рый оте́ль в по́лночь меня́ укро́й",
+      "translation": "Old hotel at midnight cover me up",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Ста́рый",
+          "lemma": "ста́рый",
+          "grammar": "Adjective, Singular, Masculine, Nominative",
+          "dictionary_definition": "old, ancient"
+        },
+        {
+          "key": 2,
+          "display_form": "оте́ль",
+          "lemma": "оте́ль",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "hotel"
+        },
+        {
+          "key": 3,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 4,
+          "display_form": "по́лночь",
+          "lemma": "по́лночь",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "midnight"
+        },
+        {
+          "key": 5,
+          "display_form": "меня́",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Accusative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 6,
+          "display_form": "укро́й",
+          "lemma": "укры́ть",
+          "grammar": "Verb, Singular",
+          "dictionary_definition": "cover, shelter, conceal, harbour"
+        }
+      ]
+    }
+  ]
+}

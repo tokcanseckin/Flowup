@@ -1,0 +1,2207 @@
+{
+  "spotify_uri": "spotify:track:2m3PVx1gsVB5upxi94IW8I",
+  "title": "Жить в кайф",
+  "artist": "Max Korzh",
+  "language": {
+    "code": "ru",
+    "name": "Russian",
+    "script": "Cyrillic",
+    "direction": "ltr"
+  },
+  "lines": [
+    {
+      "start_time_ms": 5000,
+      "end_time_ms": 8830,
+      "original_line": "В истерике кружилась мама Валя",
+      "phonetic_line": "В исте́рике кружи́лась ма́ма Валя́",
+      "translation": "Valya's mother was spinning in hysterics.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "В",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 2,
+          "display_form": "исте́рике",
+          "lemma": "исте́рика",
+          "grammar": "Noun, Singular, Feminine, Locative",
+          "dictionary_definition": "hysterics"
+        },
+        {
+          "key": 3,
+          "display_form": "кружи́лась",
+          "lemma": "кружи́ться",
+          "grammar": "Verb, Past, Singular, Feminine",
+          "dictionary_definition": "whirl spin go round in circles; be dizzy"
+        },
+        {
+          "key": 4,
+          "display_form": "ма́ма",
+          "lemma": "ма́ма",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "mom, mama, mommy, mummy"
+        },
+        {
+          "key": 5,
+          "display_form": "Валя́",
+          "lemma": "ва́ля",
+          "grammar": "Noun, Singular, Nominative",
+          "dictionary_definition": "present adverbial imperfective participle of вали́ть (valítʹ)"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 8830,
+      "end_time_ms": 11300,
+      "original_line": "На заднем фоне замер папа Толя",
+      "phonetic_line": "На за́днем фо́не за́мер па́па То́ля",
+      "translation": "In the background, Tol's dad froze.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "На",
+          "lemma": "на́",
+          "grammar": "Preposition",
+          "dictionary_definition": "on (place), during; on (day/week); on (means of transport); to (direction)"
+        },
+        {
+          "key": 2,
+          "display_form": "за́днем",
+          "lemma": "за́дний",
+          "grammar": "Adjective, Singular, Masculine, Locative",
+          "dictionary_definition": "back, rear, hind"
+        },
+        {
+          "key": 3,
+          "display_form": "фо́не",
+          "lemma": "фо́н",
+          "grammar": "Noun, Singular, Masculine, Locative",
+          "dictionary_definition": "background"
+        },
+        {
+          "key": 4,
+          "display_form": "за́мер",
+          "lemma": "замере́ть",
+          "grammar": "Verb, Past, Singular, Masculine",
+          "dictionary_definition": "to freeze, stand motionless; (figurative) to come to a standstill; to die down (of a sound); to remain unspoken"
+        },
+        {
+          "key": 5,
+          "display_form": "па́па",
+          "lemma": "па́па",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "dad, father; Pope"
+        },
+        {
+          "key": 6,
+          "display_form": "То́ля",
+          "lemma": "то́ля",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "tar paper"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 11300,
+      "end_time_ms": 15120,
+      "original_line": "В радиусе метра воцарился жесточайший хаос",
+      "phonetic_line": "В ра́диусе ме́тра воцари́лся жесточа́йший ха́ос",
+      "translation": "In the radius of a meter reigned violent chaos.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "В",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 2,
+          "display_form": "ра́диусе",
+          "lemma": "ра́диус",
+          "grammar": "Noun, Singular, Masculine, Locative",
+          "dictionary_definition": "radius"
+        },
+        {
+          "key": 3,
+          "display_form": "ме́тра",
+          "lemma": "ме́тр",
+          "grammar": "Noun, Singular, Masculine, Genitive",
+          "dictionary_definition": "metre, metre measure ruler, master"
+        },
+        {
+          "key": 4,
+          "display_form": "воцари́лся",
+          "lemma": "воцари́ться",
+          "grammar": "Verb, Past, Singular, Masculine",
+          "dictionary_definition": "ascend the throne, set in, be established"
+        },
+        {
+          "key": 5,
+          "display_form": "жесточа́йший",
+          "lemma": "жесто́кий",
+          "grammar": "Adjective, Singular, Masculine, Nominative",
+          "dictionary_definition": "cruel/brutal"
+        },
+        {
+          "key": 6,
+          "display_form": "ха́ос",
+          "lemma": "ха́ос",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "chaos, mess"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 15120,
+      "end_time_ms": 18930,
+      "original_line": "Когда всем понятно стало: сын остался без диплома",
+      "phonetic_line": "Когда́ все́м поня́тно ста́ло: сы́н оста́лся бе́з дипло́ма",
+      "translation": "When it became clear to everyone: the son was left without a diploma",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Когда́",
+          "lemma": "когда́",
+          "grammar": "Conjunction",
+          "dictionary_definition": "when, while, as"
+        },
+        {
+          "key": 2,
+          "display_form": "все́м",
+          "lemma": "ве́сь",
+          "grammar": "Adjective, Plural, Dative",
+          "dictionary_definition": "village, village community"
+        },
+        {
+          "key": 3,
+          "display_form": "поня́тно",
+          "lemma": "поня́тно",
+          "grammar": "Adverb",
+          "dictionary_definition": "it is clear, naturally, of course, clearly, plainly, forcibly, perspicuously, alright"
+        },
+        {
+          "key": 4,
+          "display_form": "ста́ло:",
+          "lemma": "ста́ть",
+          "grammar": "Verb, Past, Singular, Neuter",
+          "dictionary_definition": "to become; to begin to, be; to stand; to become, get, grow"
+        },
+        {
+          "key": 5,
+          "display_form": "сы́н",
+          "lemma": "сы́н",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "son; child; (poetic plural) sons"
+        },
+        {
+          "key": 6,
+          "display_form": "оста́лся",
+          "lemma": "оста́ться",
+          "grammar": "Verb, Past, Singular, Masculine",
+          "dictionary_definition": "To remain; To stay"
+        },
+        {
+          "key": 7,
+          "display_form": "бе́з",
+          "lemma": "бе́з",
+          "grammar": "Preposition",
+          "dictionary_definition": "without; to (time)"
+        },
+        {
+          "key": 8,
+          "display_form": "дипло́ма",
+          "lemma": "дипло́м",
+          "grammar": "Noun, Singular, Masculine, Genitive",
+          "dictionary_definition": "diploma, certificate of degree, award, prize"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 18930,
+      "end_time_ms": 22840,
+      "original_line": "Мама не кричи, хватит, плакать не смей",
+      "phonetic_line": "Ма́ма не кричи́, хва́тит, пла́кать не сме́й",
+      "translation": "Mommy, don't scream, stop crying.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Ма́ма",
+          "lemma": "ма́ма",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "mom, mama, mommy, mummy"
+        },
+        {
+          "key": 2,
+          "display_form": "не",
+          "lemma": "не́",
+          "grammar": "Particle",
+          "dictionary_definition": "not"
+        },
+        {
+          "key": 3,
+          "display_form": "кричи́,",
+          "lemma": "крича́ть",
+          "grammar": "Verb, Singular",
+          "dictionary_definition": "to shout, cry, scream, yell"
+        },
+        {
+          "key": 4,
+          "display_form": "хва́тит,",
+          "lemma": "хвати́ть",
+          "grammar": "Verb, Future, Singular",
+          "dictionary_definition": "be enough; STOP"
+        },
+        {
+          "key": 5,
+          "display_form": "пла́кать",
+          "lemma": "пла́кать",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "cry"
+        },
+        {
+          "key": 6,
+          "display_form": "не",
+          "lemma": "не́",
+          "grammar": "Particle",
+          "dictionary_definition": "not"
+        },
+        {
+          "key": 7,
+          "display_form": "сме́й",
+          "lemma": "сме́ть",
+          "grammar": "Verb, Singular",
+          "dictionary_definition": "to dare"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 22840,
+      "end_time_ms": 26140,
+      "original_line": "Я не спорю надо, но послушай, отец",
+      "phonetic_line": "Я не спо́рю на́до, но́ послу́шай, оте́ц",
+      "translation": "I'm not arguing, but listen, Father.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Я",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 2,
+          "display_form": "не",
+          "lemma": "не́",
+          "grammar": "Particle",
+          "dictionary_definition": "not"
+        },
+        {
+          "key": 3,
+          "display_form": "спо́рю",
+          "lemma": "споро́ть",
+          "grammar": "Verb, Future, 1st Person, Singular",
+          "dictionary_definition": "rip off"
+        },
+        {
+          "key": 4,
+          "display_form": "на́до,",
+          "lemma": "на́до",
+          "grammar": "Predicative, Present",
+          "dictionary_definition": "need; it is necessary, have to; = над"
+        },
+        {
+          "key": 5,
+          "display_form": "но́",
+          "lemma": "но́",
+          "grammar": "Conjunction",
+          "dictionary_definition": "but"
+        },
+        {
+          "key": 6,
+          "display_form": "послу́шай,",
+          "lemma": "послу́шать",
+          "grammar": "Verb, Singular",
+          "dictionary_definition": "to listen; to hear"
+        },
+        {
+          "key": 7,
+          "display_form": "оте́ц",
+          "lemma": "оте́ц",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "father"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 26140,
+      "end_time_ms": 29910,
+      "original_line": "Есть у меня своя волна, и на своей волне",
+      "phonetic_line": "Е́сть у меня́ своя́ волна́, и на́ свое́й волне́",
+      "translation": "I have my own wave, and on my own wave.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Е́сть",
+          "lemma": "е́сть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "there is, there are, eats"
+        },
+        {
+          "key": 2,
+          "display_form": "у",
+          "lemma": "у",
+          "grammar": "Preposition",
+          "dictionary_definition": "(possession); by, at (place); with; from (take, borrow)"
+        },
+        {
+          "key": 3,
+          "display_form": "меня́",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Accusative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 4,
+          "display_form": "своя́",
+          "lemma": "сво́й",
+          "grammar": "Adjective, Singular, Feminine, Nominative",
+          "dictionary_definition": "one's own (reflexive)"
+        },
+        {
+          "key": 5,
+          "display_form": "волна́,",
+          "lemma": "волна́",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "wave, breaker"
+        },
+        {
+          "key": 6,
+          "display_form": "и",
+          "lemma": "и",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 7,
+          "display_form": "на́",
+          "lemma": "на́",
+          "grammar": "Preposition",
+          "dictionary_definition": "on (place), during; on (day/week); on (means of transport); to (direction)"
+        },
+        {
+          "key": 8,
+          "display_form": "свое́й",
+          "lemma": "сво́й",
+          "grammar": "Adjective, Singular, Feminine, Genitive",
+          "dictionary_definition": "one's own (reflexive)"
+        },
+        {
+          "key": 9,
+          "display_form": "волне́",
+          "lemma": "волна́",
+          "grammar": "Noun, Singular, Feminine, Locative",
+          "dictionary_definition": "wave, breaker"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 29910,
+      "end_time_ms": 33260,
+      "original_line": "Меня где-то поджидает успех",
+      "phonetic_line": "Меня где́-то поджида́ет успе́х",
+      "translation": "I've got success somewhere.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Меня",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Accusative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 2,
+          "display_form": "где́-то",
+          "lemma": "гдеть",
+          "grammar": "Participle (short), Past, Singular, Neuter",
+          "dictionary_definition": "[гдеть]"
+        },
+        {
+          "key": 3,
+          "display_form": "поджида́ет",
+          "lemma": "поджида́ть",
+          "grammar": "Verb, Present, 3rd Person, Singular",
+          "dictionary_definition": "to await; (carry and element of surprise for the one waiting)"
+        },
+        {
+          "key": 4,
+          "display_form": "успе́х",
+          "lemma": "успе́х",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "success"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 33260,
+      "end_time_ms": 36880,
+      "original_line": "Боже, как хотел я увидеть свет",
+      "phonetic_line": "Бо́же, как хоте́л я уви́деть све́т",
+      "translation": "God, I wanted to see the light.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Бо́же,",
+          "lemma": "бо́г",
+          "grammar": "Noun, Singular, Masculine, Vocative",
+          "dictionary_definition": "God, god"
+        },
+        {
+          "key": 2,
+          "display_form": "как",
+          "lemma": "ка́к",
+          "grammar": "Conjunction",
+          "dictionary_definition": "how; what; like, as; because"
+        },
+        {
+          "key": 3,
+          "display_form": "хоте́л",
+          "lemma": "хоте́ть",
+          "grammar": "Verb, Past, Singular, Masculine",
+          "dictionary_definition": "to want; to feel like; to mean"
+        },
+        {
+          "key": 4,
+          "display_form": "я",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 5,
+          "display_form": "уви́деть",
+          "lemma": "уви́деть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "to see"
+        },
+        {
+          "key": 6,
+          "display_form": "све́т",
+          "lemma": "све́т",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "light; world; high society"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 36880,
+      "end_time_ms": 40660,
+      "original_line": "И, как посчитал бы нужным жить, мечтал",
+      "phonetic_line": "И, как посчита́л бы ну́жным жи́ть, мечта́л",
+      "translation": "And, as I thought necessary to live, I dreamed",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "И,",
+          "lemma": "и",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 2,
+          "display_form": "как",
+          "lemma": "ка́к",
+          "grammar": "Conjunction",
+          "dictionary_definition": "how; what; like, as; because"
+        },
+        {
+          "key": 3,
+          "display_form": "посчита́л",
+          "lemma": "посчита́ть",
+          "grammar": "Verb, Past, Singular, Masculine",
+          "dictionary_definition": "count, calculate; consider/think"
+        },
+        {
+          "key": 4,
+          "display_form": "бы",
+          "lemma": "бы",
+          "grammar": "Particle",
+          "dictionary_definition": "would (be able to)"
+        },
+        {
+          "key": 5,
+          "display_form": "ну́жным",
+          "lemma": "ну́жный",
+          "grammar": "Adjective, Singular, Neuter, Ablative",
+          "dictionary_definition": "necessary, needed, the right, the correct; need"
+        },
+        {
+          "key": 6,
+          "display_form": "жи́ть,",
+          "lemma": "жи́ть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "to live"
+        },
+        {
+          "key": 7,
+          "display_form": "мечта́л",
+          "lemma": "мечта́ть",
+          "grammar": "Verb, Past, Singular, Masculine",
+          "dictionary_definition": "dream"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 40660,
+      "end_time_ms": 44590,
+      "original_line": "И вот однажды, как обычно, я летал во сне",
+      "phonetic_line": "И во́т одна́жды, ка́к обы́чно, я лета́л во сне́",
+      "translation": "And then one day, as usual, I was flying in my sleep.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "И",
+          "lemma": "и",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 2,
+          "display_form": "во́т",
+          "lemma": "во́т",
+          "grammar": "Particle",
+          "dictionary_definition": "here is, here are, this is, there, there you go"
+        },
+        {
+          "key": 3,
+          "display_form": "одна́жды,",
+          "lemma": "одна́жды",
+          "grammar": "Adverb",
+          "dictionary_definition": "one day; once (only one time)"
+        },
+        {
+          "key": 4,
+          "display_form": "ка́к",
+          "lemma": "ка́к",
+          "grammar": "Conjunction",
+          "dictionary_definition": "how; what; like, as; because"
+        },
+        {
+          "key": 5,
+          "display_form": "обы́чно,",
+          "lemma": "обы́чно",
+          "grammar": "Adverb",
+          "dictionary_definition": "usually, generally, commonly, as a rule"
+        },
+        {
+          "key": 6,
+          "display_form": "я",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 7,
+          "display_form": "лета́л",
+          "lemma": "лета́ть",
+          "grammar": "Verb, Past, Singular, Masculine",
+          "dictionary_definition": "fly, flutter - multi way"
+        },
+        {
+          "key": 8,
+          "display_form": "во",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 9,
+          "display_form": "сне́",
+          "lemma": "со́н",
+          "grammar": "Noun, Singular, Masculine, Locative",
+          "dictionary_definition": "sleep; dream"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 44590,
+      "end_time_ms": 48070,
+      "original_line": "Вдруг увидел Солнце, и тогда себе сказал",
+      "phonetic_line": "Вдру́г уви́дел Со́лнце, и тогда́ себе́ сказа́л",
+      "translation": "Suddenly he saw the sun, and then he said to himself.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Вдру́г",
+          "lemma": "вдру́г",
+          "grammar": "Adverb",
+          "dictionary_definition": "suddenly, all of a sudden, in case, what if"
+        },
+        {
+          "key": 2,
+          "display_form": "уви́дел",
+          "lemma": "уви́деть",
+          "grammar": "Verb, Past, Singular, Masculine",
+          "dictionary_definition": "to see"
+        },
+        {
+          "key": 3,
+          "display_form": "Со́лнце,",
+          "lemma": "со́лнце",
+          "grammar": "Noun, Singular, Neuter, Nominative",
+          "dictionary_definition": "sun"
+        },
+        {
+          "key": 4,
+          "display_form": "и",
+          "lemma": "и",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 5,
+          "display_form": "тогда́",
+          "lemma": "тогда́",
+          "grammar": "Adverb",
+          "dictionary_definition": "then, while, at that time, at that moment"
+        },
+        {
+          "key": 6,
+          "display_form": "себе́",
+          "lemma": "себя́",
+          "grammar": "Pronoun, Singular, Dative",
+          "dictionary_definition": "oneself, ourselves, yourselves, himself, herself, itself, yourself, myself, themselves"
+        },
+        {
+          "key": 7,
+          "display_form": "сказа́л",
+          "lemma": "сказа́ть",
+          "grammar": "Verb, Past, Singular, Masculine",
+          "dictionary_definition": "to say, to tell, to speak, to talk"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 48070,
+      "end_time_ms": 51850,
+      "original_line": "Я выбираю — жить в кайф!",
+      "phonetic_line": "Я выбира́ю — жи́ть в ка́йф!",
+      "translation": "I choose to live high!",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Я",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 2,
+          "display_form": "выбира́ю",
+          "lemma": "выбира́ть",
+          "grammar": "Verb, Present, 1st Person, Singular",
+          "dictionary_definition": "choose, select, pick out, take out; elect"
+        },
+        {
+          "key": 3,
+          "display_form": "жи́ть",
+          "lemma": "жи́ть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "to live"
+        },
+        {
+          "key": 4,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 5,
+          "display_form": "ка́йф!",
+          "lemma": "ка́йф",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "cool, dope, awesome, great"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 51850,
+      "end_time_ms": 55680,
+      "original_line": "Я выбираю — жить в кайф!",
+      "phonetic_line": "Я выбира́ю — жи́ть в ка́йф!",
+      "translation": "I choose to live high!",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Я",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 2,
+          "display_form": "выбира́ю",
+          "lemma": "выбира́ть",
+          "grammar": "Verb, Present, 1st Person, Singular",
+          "dictionary_definition": "choose, select, pick out, take out; elect"
+        },
+        {
+          "key": 3,
+          "display_form": "жи́ть",
+          "lemma": "жи́ть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "to live"
+        },
+        {
+          "key": 4,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 5,
+          "display_form": "ка́йф!",
+          "lemma": "ка́йф",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "cool, dope, awesome, great"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 55680,
+      "end_time_ms": 59540,
+      "original_line": "Я выбираю — жить в кайф!",
+      "phonetic_line": "Я выбира́ю — жи́ть в ка́йф!",
+      "translation": "I choose to live high!",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Я",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 2,
+          "display_form": "выбира́ю",
+          "lemma": "выбира́ть",
+          "grammar": "Verb, Present, 1st Person, Singular",
+          "dictionary_definition": "choose, select, pick out, take out; elect"
+        },
+        {
+          "key": 3,
+          "display_form": "жи́ть",
+          "lemma": "жи́ть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "to live"
+        },
+        {
+          "key": 4,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 5,
+          "display_form": "ка́йф!",
+          "lemma": "ка́йф",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "cool, dope, awesome, great"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 59540,
+      "end_time_ms": 65220,
+      "original_line": "Я выбираю — жить в кайф!",
+      "phonetic_line": "Я выбира́ю — жи́ть в ка́йф!",
+      "translation": "I choose to live high!",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Я",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 2,
+          "display_form": "выбира́ю",
+          "lemma": "выбира́ть",
+          "grammar": "Verb, Present, 1st Person, Singular",
+          "dictionary_definition": "choose, select, pick out, take out; elect"
+        },
+        {
+          "key": 3,
+          "display_form": "жи́ть",
+          "lemma": "жи́ть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "to live"
+        },
+        {
+          "key": 4,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 5,
+          "display_form": "ка́йф!",
+          "lemma": "ка́йф",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "cool, dope, awesome, great"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 65220,
+      "end_time_ms": 68620,
+      "original_line": "Это был сон, в котором я не прогорал",
+      "phonetic_line": "Э́то был со́н, в кото́ром я не прогора́л",
+      "translation": "It was a dream in which I didn't burn out.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Э́то",
+          "lemma": "э́то",
+          "grammar": "Particle",
+          "dictionary_definition": "this is, that is"
+        },
+        {
+          "key": 2,
+          "display_form": "был",
+          "lemma": "бы́ть",
+          "grammar": "Verb, Past, Singular, Masculine",
+          "dictionary_definition": "to be; (present tense) 'есть'  - there is, there are; has been"
+        },
+        {
+          "key": 3,
+          "display_form": "со́н,",
+          "lemma": "со́н",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "sleep; dream"
+        },
+        {
+          "key": 4,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 5,
+          "display_form": "кото́ром",
+          "lemma": "кото́рый",
+          "grammar": "Adjective, Singular, Masculine, Locative",
+          "dictionary_definition": "which, that, what"
+        },
+        {
+          "key": 6,
+          "display_form": "я",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 7,
+          "display_form": "не",
+          "lemma": "не́",
+          "grammar": "Particle",
+          "dictionary_definition": "not"
+        },
+        {
+          "key": 8,
+          "display_form": "прогора́л",
+          "lemma": "прогора́ть",
+          "grammar": "Verb, Past, Singular, Masculine",
+          "dictionary_definition": "burn down, burn through, go bankrupt, be ruined"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 68620,
+      "end_time_ms": 72380,
+      "original_line": "Не огорчал родных и не нуждался ни в чём",
+      "phonetic_line": "Не огорча́л родны́х и не́ нужда́лся ни в чём",
+      "translation": "He did not disappoint his family and did not need anything.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Не",
+          "lemma": "не́",
+          "grammar": "Particle",
+          "dictionary_definition": "not"
+        },
+        {
+          "key": 2,
+          "display_form": "огорча́л",
+          "lemma": "огорча́ть",
+          "grammar": "Verb, Past, Singular, Masculine",
+          "dictionary_definition": "to upset"
+        },
+        {
+          "key": 3,
+          "display_form": "родны́х",
+          "lemma": "ро́дный",
+          "grammar": "Adjective, Plural, Locative",
+          "dictionary_definition": "[родный]"
+        },
+        {
+          "key": 4,
+          "display_form": "и",
+          "lemma": "и",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 5,
+          "display_form": "не́",
+          "lemma": "не́",
+          "grammar": "Particle",
+          "dictionary_definition": "not"
+        },
+        {
+          "key": 6,
+          "display_form": "нужда́лся",
+          "lemma": "нужда́ться",
+          "grammar": "Verb, Past, Singular, Masculine",
+          "dictionary_definition": "to (be in) need, stand in need; to want for / to require"
+        },
+        {
+          "key": 7,
+          "display_form": "ни",
+          "lemma": "ни́",
+          "grammar": "Particle",
+          "dictionary_definition": "neither; no"
+        },
+        {
+          "key": 8,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 9,
+          "display_form": "чём",
+          "lemma": "что́",
+          "grammar": "Pronoun, Singular, Neuter, Locative",
+          "dictionary_definition": "what; that"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 72380,
+      "end_time_ms": 75370,
+      "original_line": "В котором мне не пришлось скрывать глаза",
+      "phonetic_line": "В кото́ром мне́ не пришло́сь скрыва́ть глаза́",
+      "translation": "Which I didn't have to hide my eyes.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "В",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 2,
+          "display_form": "кото́ром",
+          "lemma": "кото́рый",
+          "grammar": "Adjective, Singular, Masculine, Locative",
+          "dictionary_definition": "which, that, what"
+        },
+        {
+          "key": 3,
+          "display_form": "мне́",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Dative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 4,
+          "display_form": "не",
+          "lemma": "не́",
+          "grammar": "Particle",
+          "dictionary_definition": "not"
+        },
+        {
+          "key": 5,
+          "display_form": "пришло́сь",
+          "lemma": "прийти́сь",
+          "grammar": "Verb, Past, Singular, Neuter",
+          "dictionary_definition": "to have to, to come; to be fit for; to be necessary, to be required (impersonal)"
+        },
+        {
+          "key": 6,
+          "display_form": "скрыва́ть",
+          "lemma": "скрыва́ть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "hide"
+        },
+        {
+          "key": 7,
+          "display_form": "глаза́",
+          "lemma": "гла́з",
+          "grammar": "Noun, Plural, Masculine, Accusative",
+          "dictionary_definition": "eye"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 75370,
+      "end_time_ms": 79440,
+      "original_line": "И лгать давним знакомым, мол, в жизни моей всё хорошо",
+      "phonetic_line": "И лга́ть да́вним знако́мым, мол, в жи́зни мое́й всё хорошо́",
+      "translation": "And lying to old acquaintances, they say, everything is fine in my life.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "И",
+          "lemma": "и",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 2,
+          "display_form": "лга́ть",
+          "lemma": "лга́ть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "lie, tell lies"
+        },
+        {
+          "key": 3,
+          "display_form": "да́вним",
+          "lemma": "да́вний",
+          "grammar": "Adjective, Singular, Masculine, Ablative",
+          "dictionary_definition": "old or long ago (adj)"
+        },
+        {
+          "key": 4,
+          "display_form": "знако́мым,",
+          "lemma": "знако́мый",
+          "grammar": "Adjective, Plural, Dative",
+          "dictionary_definition": "acquaintance, friend, conocido"
+        },
+        {
+          "key": 5,
+          "display_form": "мол,",
+          "lemma": "мо́л",
+          "grammar": "Particle",
+          "dictionary_definition": "(colloquial) supposedly was said/they say"
+        },
+        {
+          "key": 6,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 7,
+          "display_form": "жи́зни",
+          "lemma": "жи́знь",
+          "grammar": "Noun, Singular, Feminine, Genitive",
+          "dictionary_definition": "life, existence"
+        },
+        {
+          "key": 8,
+          "display_form": "мое́й",
+          "lemma": "мо́й",
+          "grammar": "Adjective, Singular, Feminine, Genitive",
+          "dictionary_definition": "my, mine, my people"
+        },
+        {
+          "key": 9,
+          "display_form": "всё",
+          "lemma": "всё",
+          "grammar": "Particle",
+          "dictionary_definition": "always, all the time, the whole time, still, only, all, all the same, however, nevertheless; everything, often"
+        },
+        {
+          "key": 10,
+          "display_form": "хорошо́",
+          "lemma": "хорошо́",
+          "grammar": "Adverb",
+          "dictionary_definition": "it is good, it is pleasant, well, good"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 79440,
+      "end_time_ms": 83360,
+      "original_line": "В моём рюкзаке — пару маек, носки",
+      "phonetic_line": "В моём рюкзаке́ — па́ру ма́ек, носки́",
+      "translation": "In my backpack - a pair of T-shirts, socks.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "В",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 2,
+          "display_form": "моём",
+          "lemma": "мо́й",
+          "grammar": "Adjective, Singular, Masculine, Locative",
+          "dictionary_definition": "my, mine, my people"
+        },
+        {
+          "key": 3,
+          "display_form": "рюкзаке́",
+          "lemma": "рюкза́к",
+          "grammar": "Noun, Singular, Masculine, Locative",
+          "dictionary_definition": "backpack"
+        },
+        {
+          "key": 4,
+          "display_form": "па́ру",
+          "lemma": "па́ра",
+          "grammar": "Noun, Singular, Feminine, Accusative",
+          "dictionary_definition": "couple, match; pair; around two, few, two"
+        },
+        {
+          "key": 5,
+          "display_form": "ма́ек,",
+          "lemma": "ма́йка",
+          "grammar": "Noun, Plural, Feminine, Genitive",
+          "dictionary_definition": "T-shirt"
+        },
+        {
+          "key": 6,
+          "display_form": "носки́",
+          "lemma": "носка́",
+          "grammar": "Noun, Singular, Feminine, Genitive",
+          "dictionary_definition": "carrying, bearing"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 83360,
+      "end_time_ms": 86850,
+      "original_line": "И пускай начало оставляет желать лучшего",
+      "phonetic_line": "И пуска́й нача́ло оставля́ет жела́ть лу́чшего",
+      "translation": "And let the beginning leave much to be desired.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "И",
+          "lemma": "и",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 2,
+          "display_form": "пуска́й",
+          "lemma": "пуска́й",
+          "grammar": "Conjunction",
+          "dictionary_definition": "let"
+        },
+        {
+          "key": 3,
+          "display_form": "нача́ло",
+          "lemma": "нача́ло",
+          "grammar": "Noun, Singular, Neuter, Nominative",
+          "dictionary_definition": "beginning, commencement, start, onset; source, origin; (in plural) principles, basis, basics; command, authority"
+        },
+        {
+          "key": 4,
+          "display_form": "оставля́ет",
+          "lemma": "оставля́ть",
+          "grammar": "Verb, Present, 3rd Person, Singular",
+          "dictionary_definition": "to leave, to leave alone; to abandon, to give up; to drop, to stop"
+        },
+        {
+          "key": 5,
+          "display_form": "жела́ть",
+          "lemma": "жела́ть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "wish, desire, covet"
+        },
+        {
+          "key": 6,
+          "display_form": "лу́чшего",
+          "lemma": "хоро́ший",
+          "grammar": "Adjective, Singular, Neuter, Genitive",
+          "dictionary_definition": "good, nice"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 86850,
+      "end_time_ms": 90040,
+      "original_line": "Все, кто меня помнят, знают, я не был таким",
+      "phonetic_line": "Все́, кто меня́ по́мнят, зна́ют, я не был таки́м",
+      "translation": "Anyone who remembers me knows I wasn’t.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Все́,",
+          "lemma": "всё",
+          "grammar": "Particle",
+          "dictionary_definition": "always, all the time, the whole time, still, only, all, all the same, however, nevertheless; everything, often"
+        },
+        {
+          "key": 2,
+          "display_form": "кто",
+          "lemma": "кто́",
+          "grammar": "Pronoun, Singular, Masculine, Nominative",
+          "dictionary_definition": "who?; who"
+        },
+        {
+          "key": 3,
+          "display_form": "меня́",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Accusative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 4,
+          "display_form": "по́мнят,",
+          "lemma": "по́мнить",
+          "grammar": "Verb, Present, 3rd Person, Plural",
+          "dictionary_definition": "to remember"
+        },
+        {
+          "key": 5,
+          "display_form": "зна́ют,",
+          "lemma": "зна́ть",
+          "grammar": "Verb, Present, 3rd Person, Plural",
+          "dictionary_definition": "nobility, noble people"
+        },
+        {
+          "key": 6,
+          "display_form": "я",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 7,
+          "display_form": "не",
+          "lemma": "не́",
+          "grammar": "Particle",
+          "dictionary_definition": "not"
+        },
+        {
+          "key": 8,
+          "display_form": "был",
+          "lemma": "бы́ть",
+          "grammar": "Verb, Past, Singular, Masculine",
+          "dictionary_definition": "to be; (present tense) 'есть'  - there is, there are; has been"
+        },
+        {
+          "key": 9,
+          "display_form": "таки́м",
+          "lemma": "тако́й",
+          "grammar": "Adjective, Singular, Masculine, Ablative",
+          "dictionary_definition": "such, so, that sort of; be like this, as, be"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 90040,
+      "end_time_ms": 93300,
+      "original_line": "А значит, и у вас получится",
+      "phonetic_line": "А зна́чит, и у ва́с полу́чится",
+      "translation": "Which means you can do it.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "А",
+          "lemma": "а",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and (as contrast)"
+        },
+        {
+          "key": 2,
+          "display_form": "зна́чит,",
+          "lemma": "зна́чит",
+          "grammar": "Conjunction",
+          "dictionary_definition": "so, then, well then"
+        },
+        {
+          "key": 3,
+          "display_form": "и",
+          "lemma": "и",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 4,
+          "display_form": "у",
+          "lemma": "у",
+          "grammar": "Preposition",
+          "dictionary_definition": "(possession); by, at (place); with; from (take, borrow)"
+        },
+        {
+          "key": 5,
+          "display_form": "ва́с",
+          "lemma": "вы́",
+          "grammar": "Pronoun, 2nd Person, Plural, Accusative",
+          "dictionary_definition": "you (plural); you (formal)"
+        },
+        {
+          "key": 6,
+          "display_form": "полу́чится",
+          "lemma": "получи́ться",
+          "grammar": "Verb, Future, 3rd Person, Singular",
+          "dictionary_definition": "To succeed, to work out; To happen; to be received, It turned out (to be)"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 93300,
+      "end_time_ms": 97260,
+      "original_line": "Ведь всё, что я хотел — это видеть свет",
+      "phonetic_line": "Ведь всё, что я хоте́л — э́то ви́деть све́т",
+      "translation": "All I wanted to do was see the light.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Ведь",
+          "lemma": "ве́дь",
+          "grammar": "Particle",
+          "dictionary_definition": "in fact, after all, surely, indeed; given that, as, because; Isn't it?"
+        },
+        {
+          "key": 2,
+          "display_form": "всё,",
+          "lemma": "всё",
+          "grammar": "Particle",
+          "dictionary_definition": "always, all the time, the whole time, still, only, all, all the same, however, nevertheless; everything, often"
+        },
+        {
+          "key": 3,
+          "display_form": "что",
+          "lemma": "что́",
+          "grammar": "Conjunction",
+          "dictionary_definition": "what; that"
+        },
+        {
+          "key": 4,
+          "display_form": "я",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 5,
+          "display_form": "хоте́л",
+          "lemma": "хоте́ть",
+          "grammar": "Verb, Past, Singular, Masculine",
+          "dictionary_definition": "to want; to feel like; to mean"
+        },
+        {
+          "key": 6,
+          "display_form": "э́то",
+          "lemma": "э́то",
+          "grammar": "Particle",
+          "dictionary_definition": "this is, that is"
+        },
+        {
+          "key": 7,
+          "display_form": "ви́деть",
+          "lemma": "ви́деть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "to see"
+        },
+        {
+          "key": 8,
+          "display_form": "све́т",
+          "lemma": "све́т",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "light; world; high society"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 97260,
+      "end_time_ms": 100910,
+      "original_line": "И, как посчитал бы нужным жить, мечтал",
+      "phonetic_line": "И, как посчита́л бы ну́жным жи́ть, мечта́л",
+      "translation": "And, as I thought necessary to live, I dreamed",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "И,",
+          "lemma": "и",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 2,
+          "display_form": "как",
+          "lemma": "ка́к",
+          "grammar": "Conjunction",
+          "dictionary_definition": "how; what; like, as; because"
+        },
+        {
+          "key": 3,
+          "display_form": "посчита́л",
+          "lemma": "посчита́ть",
+          "grammar": "Verb, Past, Singular, Masculine",
+          "dictionary_definition": "count, calculate; consider/think"
+        },
+        {
+          "key": 4,
+          "display_form": "бы",
+          "lemma": "бы",
+          "grammar": "Particle",
+          "dictionary_definition": "would (be able to)"
+        },
+        {
+          "key": 5,
+          "display_form": "ну́жным",
+          "lemma": "ну́жный",
+          "grammar": "Adjective, Singular, Neuter, Ablative",
+          "dictionary_definition": "necessary, needed, the right, the correct; need"
+        },
+        {
+          "key": 6,
+          "display_form": "жи́ть,",
+          "lemma": "жи́ть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "to live"
+        },
+        {
+          "key": 7,
+          "display_form": "мечта́л",
+          "lemma": "мечта́ть",
+          "grammar": "Verb, Past, Singular, Masculine",
+          "dictionary_definition": "dream"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 100910,
+      "end_time_ms": 104970,
+      "original_line": "И вот однажды, как обычно, я летал во сне",
+      "phonetic_line": "И во́т одна́жды, ка́к обы́чно, я лета́л во сне́",
+      "translation": "And then one day, as usual, I was flying in my sleep.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "И",
+          "lemma": "и",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 2,
+          "display_form": "во́т",
+          "lemma": "во́т",
+          "grammar": "Particle",
+          "dictionary_definition": "here is, here are, this is, there, there you go"
+        },
+        {
+          "key": 3,
+          "display_form": "одна́жды,",
+          "lemma": "одна́жды",
+          "grammar": "Adverb",
+          "dictionary_definition": "one day; once (only one time)"
+        },
+        {
+          "key": 4,
+          "display_form": "ка́к",
+          "lemma": "ка́к",
+          "grammar": "Conjunction",
+          "dictionary_definition": "how; what; like, as; because"
+        },
+        {
+          "key": 5,
+          "display_form": "обы́чно,",
+          "lemma": "обы́чно",
+          "grammar": "Adverb",
+          "dictionary_definition": "usually, generally, commonly, as a rule"
+        },
+        {
+          "key": 6,
+          "display_form": "я",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 7,
+          "display_form": "лета́л",
+          "lemma": "лета́ть",
+          "grammar": "Verb, Past, Singular, Masculine",
+          "dictionary_definition": "fly, flutter - multi way"
+        },
+        {
+          "key": 8,
+          "display_form": "во",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 9,
+          "display_form": "сне́",
+          "lemma": "со́н",
+          "grammar": "Noun, Singular, Masculine, Locative",
+          "dictionary_definition": "sleep; dream"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 104970,
+      "end_time_ms": 108530,
+      "original_line": "Вдруг услышав музыку, я сам себе сказал",
+      "phonetic_line": "Вдру́г услы́шав му́зыку, я са́м себе́ сказа́л",
+      "translation": "When I heard the music, I told myself.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Вдру́г",
+          "lemma": "вдру́г",
+          "grammar": "Adverb",
+          "dictionary_definition": "suddenly, all of a sudden, in case, what if"
+        },
+        {
+          "key": 2,
+          "display_form": "услы́шав",
+          "lemma": "услы́шать",
+          "grammar": "Gerund, Past",
+          "dictionary_definition": "to hear"
+        },
+        {
+          "key": 3,
+          "display_form": "му́зыку,",
+          "lemma": "му́зыка",
+          "grammar": "Noun, Singular, Feminine, Accusative",
+          "dictionary_definition": "music"
+        },
+        {
+          "key": 4,
+          "display_form": "я",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 5,
+          "display_form": "са́м",
+          "lemma": "са́м",
+          "grammar": "Adjective, Singular, Masculine, Nominative",
+          "dictionary_definition": "ourselves, yourself, oneself, yourselves, himself, herself, itself, themselves"
+        },
+        {
+          "key": 6,
+          "display_form": "себе́",
+          "lemma": "себя́",
+          "grammar": "Pronoun, Singular, Dative",
+          "dictionary_definition": "oneself, ourselves, yourselves, himself, herself, itself, yourself, myself, themselves"
+        },
+        {
+          "key": 7,
+          "display_form": "сказа́л",
+          "lemma": "сказа́ть",
+          "grammar": "Verb, Past, Singular, Masculine",
+          "dictionary_definition": "to say, to tell, to speak, to talk"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 108530,
+      "end_time_ms": 112480,
+      "original_line": "Я выбираю — жить в кайф!",
+      "phonetic_line": "Я выбира́ю — жи́ть в ка́йф!",
+      "translation": "I choose to live high!",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Я",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 2,
+          "display_form": "выбира́ю",
+          "lemma": "выбира́ть",
+          "grammar": "Verb, Present, 1st Person, Singular",
+          "dictionary_definition": "choose, select, pick out, take out; elect"
+        },
+        {
+          "key": 3,
+          "display_form": "жи́ть",
+          "lemma": "жи́ть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "to live"
+        },
+        {
+          "key": 4,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 5,
+          "display_form": "ка́йф!",
+          "lemma": "ка́йф",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "cool, dope, awesome, great"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 112480,
+      "end_time_ms": 116210,
+      "original_line": "Я выбираю — жить в кайф!",
+      "phonetic_line": "Я выбира́ю — жи́ть в ка́йф!",
+      "translation": "I choose to live high!",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Я",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 2,
+          "display_form": "выбира́ю",
+          "lemma": "выбира́ть",
+          "grammar": "Verb, Present, 1st Person, Singular",
+          "dictionary_definition": "choose, select, pick out, take out; elect"
+        },
+        {
+          "key": 3,
+          "display_form": "жи́ть",
+          "lemma": "жи́ть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "to live"
+        },
+        {
+          "key": 4,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 5,
+          "display_form": "ка́йф!",
+          "lemma": "ка́йф",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "cool, dope, awesome, great"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 116210,
+      "end_time_ms": 120040,
+      "original_line": "Я выбираю — жить в кайф!",
+      "phonetic_line": "Я выбира́ю — жи́ть в ка́йф!",
+      "translation": "I choose to live high!",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Я",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 2,
+          "display_form": "выбира́ю",
+          "lemma": "выбира́ть",
+          "grammar": "Verb, Present, 1st Person, Singular",
+          "dictionary_definition": "choose, select, pick out, take out; elect"
+        },
+        {
+          "key": 3,
+          "display_form": "жи́ть",
+          "lemma": "жи́ть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "to live"
+        },
+        {
+          "key": 4,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 5,
+          "display_form": "ка́йф!",
+          "lemma": "ка́йф",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "cool, dope, awesome, great"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 120040,
+      "end_time_ms": 123920,
+      "original_line": "Я выбираю — жить в кайф!",
+      "phonetic_line": "Я выбира́ю — жи́ть в ка́йф!",
+      "translation": "I choose to live high!",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Я",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 2,
+          "display_form": "выбира́ю",
+          "lemma": "выбира́ть",
+          "grammar": "Verb, Present, 1st Person, Singular",
+          "dictionary_definition": "choose, select, pick out, take out; elect"
+        },
+        {
+          "key": 3,
+          "display_form": "жи́ть",
+          "lemma": "жи́ть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "to live"
+        },
+        {
+          "key": 4,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 5,
+          "display_form": "ка́йф!",
+          "lemma": "ка́йф",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "cool, dope, awesome, great"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 123920,
+      "end_time_ms": 127610,
+      "original_line": "Боже, как хотел я увидеть свет",
+      "phonetic_line": "Бо́же, как хоте́л я уви́деть све́т",
+      "translation": "God, I wanted to see the light.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Бо́же,",
+          "lemma": "бо́г",
+          "grammar": "Noun, Singular, Masculine, Vocative",
+          "dictionary_definition": "God, god"
+        },
+        {
+          "key": 2,
+          "display_form": "как",
+          "lemma": "ка́к",
+          "grammar": "Conjunction",
+          "dictionary_definition": "how; what; like, as; because"
+        },
+        {
+          "key": 3,
+          "display_form": "хоте́л",
+          "lemma": "хоте́ть",
+          "grammar": "Verb, Past, Singular, Masculine",
+          "dictionary_definition": "to want; to feel like; to mean"
+        },
+        {
+          "key": 4,
+          "display_form": "я",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 5,
+          "display_form": "уви́деть",
+          "lemma": "уви́деть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "to see"
+        },
+        {
+          "key": 6,
+          "display_form": "све́т",
+          "lemma": "све́т",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "light; world; high society"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 127610,
+      "end_time_ms": 131360,
+      "original_line": "И, как посчитал бы нужным жить, мечтал",
+      "phonetic_line": "И, как посчита́л бы ну́жным жи́ть, мечта́л",
+      "translation": "And, as I thought necessary to live, I dreamed",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "И,",
+          "lemma": "и",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 2,
+          "display_form": "как",
+          "lemma": "ка́к",
+          "grammar": "Conjunction",
+          "dictionary_definition": "how; what; like, as; because"
+        },
+        {
+          "key": 3,
+          "display_form": "посчита́л",
+          "lemma": "посчита́ть",
+          "grammar": "Verb, Past, Singular, Masculine",
+          "dictionary_definition": "count, calculate; consider/think"
+        },
+        {
+          "key": 4,
+          "display_form": "бы",
+          "lemma": "бы",
+          "grammar": "Particle",
+          "dictionary_definition": "would (be able to)"
+        },
+        {
+          "key": 5,
+          "display_form": "ну́жным",
+          "lemma": "ну́жный",
+          "grammar": "Adjective, Singular, Neuter, Ablative",
+          "dictionary_definition": "necessary, needed, the right, the correct; need"
+        },
+        {
+          "key": 6,
+          "display_form": "жи́ть,",
+          "lemma": "жи́ть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "to live"
+        },
+        {
+          "key": 7,
+          "display_form": "мечта́л",
+          "lemma": "мечта́ть",
+          "grammar": "Verb, Past, Singular, Masculine",
+          "dictionary_definition": "dream"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 131360,
+      "end_time_ms": 134960,
+      "original_line": "И вот однажды, как обычно, я летал во сне",
+      "phonetic_line": "И во́т одна́жды, ка́к обы́чно, я лета́л во сне́",
+      "translation": "And then one day, as usual, I was flying in my sleep.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "И",
+          "lemma": "и",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 2,
+          "display_form": "во́т",
+          "lemma": "во́т",
+          "grammar": "Particle",
+          "dictionary_definition": "here is, here are, this is, there, there you go"
+        },
+        {
+          "key": 3,
+          "display_form": "одна́жды,",
+          "lemma": "одна́жды",
+          "grammar": "Adverb",
+          "dictionary_definition": "one day; once (only one time)"
+        },
+        {
+          "key": 4,
+          "display_form": "ка́к",
+          "lemma": "ка́к",
+          "grammar": "Conjunction",
+          "dictionary_definition": "how; what; like, as; because"
+        },
+        {
+          "key": 5,
+          "display_form": "обы́чно,",
+          "lemma": "обы́чно",
+          "grammar": "Adverb",
+          "dictionary_definition": "usually, generally, commonly, as a rule"
+        },
+        {
+          "key": 6,
+          "display_form": "я",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 7,
+          "display_form": "лета́л",
+          "lemma": "лета́ть",
+          "grammar": "Verb, Past, Singular, Masculine",
+          "dictionary_definition": "fly, flutter - multi way"
+        },
+        {
+          "key": 8,
+          "display_form": "во",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 9,
+          "display_form": "сне́",
+          "lemma": "со́н",
+          "grammar": "Noun, Singular, Masculine, Locative",
+          "dictionary_definition": "sleep; dream"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 134960,
+      "end_time_ms": 138950,
+      "original_line": "Вдруг увидел Солнце, и тогда себе сказал",
+      "phonetic_line": "Вдру́г уви́дел Со́лнце, и тогда́ себе́ сказа́л",
+      "translation": "Suddenly he saw the sun, and then he said to himself.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Вдру́г",
+          "lemma": "вдру́г",
+          "grammar": "Adverb",
+          "dictionary_definition": "suddenly, all of a sudden, in case, what if"
+        },
+        {
+          "key": 2,
+          "display_form": "уви́дел",
+          "lemma": "уви́деть",
+          "grammar": "Verb, Past, Singular, Masculine",
+          "dictionary_definition": "to see"
+        },
+        {
+          "key": 3,
+          "display_form": "Со́лнце,",
+          "lemma": "со́лнце",
+          "grammar": "Noun, Singular, Neuter, Nominative",
+          "dictionary_definition": "sun"
+        },
+        {
+          "key": 4,
+          "display_form": "и",
+          "lemma": "и",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 5,
+          "display_form": "тогда́",
+          "lemma": "тогда́",
+          "grammar": "Adverb",
+          "dictionary_definition": "then, while, at that time, at that moment"
+        },
+        {
+          "key": 6,
+          "display_form": "себе́",
+          "lemma": "себя́",
+          "grammar": "Pronoun, Singular, Dative",
+          "dictionary_definition": "oneself, ourselves, yourselves, himself, herself, itself, yourself, myself, themselves"
+        },
+        {
+          "key": 7,
+          "display_form": "сказа́л",
+          "lemma": "сказа́ть",
+          "grammar": "Verb, Past, Singular, Masculine",
+          "dictionary_definition": "to say, to tell, to speak, to talk"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 138950,
+      "end_time_ms": 142620,
+      "original_line": "Я выбираю — жить в кайф!",
+      "phonetic_line": "Я выбира́ю — жи́ть в ка́йф!",
+      "translation": "I choose to live high!",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Я",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 2,
+          "display_form": "выбира́ю",
+          "lemma": "выбира́ть",
+          "grammar": "Verb, Present, 1st Person, Singular",
+          "dictionary_definition": "choose, select, pick out, take out; elect"
+        },
+        {
+          "key": 3,
+          "display_form": "жи́ть",
+          "lemma": "жи́ть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "to live"
+        },
+        {
+          "key": 4,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 5,
+          "display_form": "ка́йф!",
+          "lemma": "ка́йф",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "cool, dope, awesome, great"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 142620,
+      "end_time_ms": 146270,
+      "original_line": "Я выбираю — жить в кайф!",
+      "phonetic_line": "Я выбира́ю — жи́ть в ка́йф!",
+      "translation": "I choose to live high!",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Я",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 2,
+          "display_form": "выбира́ю",
+          "lemma": "выбира́ть",
+          "grammar": "Verb, Present, 1st Person, Singular",
+          "dictionary_definition": "choose, select, pick out, take out; elect"
+        },
+        {
+          "key": 3,
+          "display_form": "жи́ть",
+          "lemma": "жи́ть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "to live"
+        },
+        {
+          "key": 4,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 5,
+          "display_form": "ка́йф!",
+          "lemma": "ка́йф",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "cool, dope, awesome, great"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 146270,
+      "end_time_ms": 150020,
+      "original_line": "Я выбираю — жить в кайф!",
+      "phonetic_line": "Я выбира́ю — жи́ть в ка́йф!",
+      "translation": "I choose to live high!",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Я",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 2,
+          "display_form": "выбира́ю",
+          "lemma": "выбира́ть",
+          "grammar": "Verb, Present, 1st Person, Singular",
+          "dictionary_definition": "choose, select, pick out, take out; elect"
+        },
+        {
+          "key": 3,
+          "display_form": "жи́ть",
+          "lemma": "жи́ть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "to live"
+        },
+        {
+          "key": 4,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 5,
+          "display_form": "ка́йф!",
+          "lemma": "ка́йф",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "cool, dope, awesome, great"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 150020,
+      "end_time_ms": 154020,
+      "original_line": "Я выбираю — жить в кайф!",
+      "phonetic_line": "Я выбира́ю — жи́ть в ка́йф!",
+      "translation": "I choose to live high!",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Я",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 2,
+          "display_form": "выбира́ю",
+          "lemma": "выбира́ть",
+          "grammar": "Verb, Present, 1st Person, Singular",
+          "dictionary_definition": "choose, select, pick out, take out; elect"
+        },
+        {
+          "key": 3,
+          "display_form": "жи́ть",
+          "lemma": "жи́ть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "to live"
+        },
+        {
+          "key": 4,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 5,
+          "display_form": "ка́йф!",
+          "lemma": "ка́йф",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "cool, dope, awesome, great"
+        }
+      ]
+    }
+  ]
+}

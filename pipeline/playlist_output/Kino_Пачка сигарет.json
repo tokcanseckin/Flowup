@@ -1,0 +1,1236 @@
+{
+  "spotify_uri": "spotify:track:7tjVRlo5QYUpPOocaJb387",
+  "title": "Пачка сигарет",
+  "artist": "Kino",
+  "language": {
+    "code": "ru",
+    "name": "Russian",
+    "script": "Cyrillic",
+    "direction": "ltr"
+  },
+  "lines": [
+    {
+      "start_time_ms": 20540,
+      "end_time_ms": 27460,
+      "original_line": "Я сижу и смотрю в чужое небо из чужого окна",
+      "phonetic_line": "Я сижу́ и смотрю́ в чужо́е нё́бо и́з чужо́го окна́",
+      "translation": "I sit and look into someone else's sky from someone else's window.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Я",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 2,
+          "display_form": "сижу́",
+          "lemma": "сиде́ть",
+          "grammar": "Verb, Present, 1st Person, Singular",
+          "dictionary_definition": "to sit, be perched, be, fit"
+        },
+        {
+          "key": 3,
+          "display_form": "и",
+          "lemma": "и",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 4,
+          "display_form": "смотрю́",
+          "lemma": "смотре́ть",
+          "grammar": "Verb, Present, 1st Person, Singular",
+          "dictionary_definition": "to look, to watch"
+        },
+        {
+          "key": 5,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 6,
+          "display_form": "чужо́е",
+          "lemma": "чужо́е",
+          "grammar": "Noun, Singular, Neuter, Nominative",
+          "dictionary_definition": "nominative/accusative neuter singular of чужо́й (čužój); something belonging to someone else"
+        },
+        {
+          "key": 7,
+          "display_form": "нё́бо",
+          "lemma": "нё́бо",
+          "grammar": "Noun, Singular, Neuter, Nominative",
+          "dictionary_definition": "palate"
+        },
+        {
+          "key": 8,
+          "display_form": "и́з",
+          "lemma": "и́з",
+          "grammar": "Preposition",
+          "dictionary_definition": "from (the inside of); out of"
+        },
+        {
+          "key": 9,
+          "display_form": "чужо́го",
+          "lemma": "чужо́е",
+          "grammar": "Noun, Singular, Neuter, Genitive",
+          "dictionary_definition": "nominative/accusative neuter singular of чужо́й (čužój); something belonging to someone else"
+        },
+        {
+          "key": 10,
+          "display_form": "окна́",
+          "lemma": "окно́",
+          "grammar": "Noun, Singular, Neuter, Genitive",
+          "dictionary_definition": "window, casement-window, window-sill, gap, opening, port, slot"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 27460,
+      "end_time_ms": 32920,
+      "original_line": "И не вижу ни одной знакомой звезды",
+      "phonetic_line": "И не ви́жу ни́ одно́й знако́мой звё́зды",
+      "translation": "And I don't see any familiar stars.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "И",
+          "lemma": "и",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 2,
+          "display_form": "не",
+          "lemma": "не́",
+          "grammar": "Particle",
+          "dictionary_definition": "not"
+        },
+        {
+          "key": 3,
+          "display_form": "ви́жу",
+          "lemma": "ви́деть",
+          "grammar": "Verb, Present, 1st Person, Singular",
+          "dictionary_definition": "to see"
+        },
+        {
+          "key": 4,
+          "display_form": "ни́",
+          "lemma": "ни́",
+          "grammar": "Particle",
+          "dictionary_definition": "neither; no"
+        },
+        {
+          "key": 5,
+          "display_form": "одно́й",
+          "lemma": "оди́н",
+          "grammar": "Adjective, Singular, Feminine, Genitive",
+          "dictionary_definition": "one"
+        },
+        {
+          "key": 6,
+          "display_form": "знако́мой",
+          "lemma": "знако́мый",
+          "grammar": "Adjective, Singular, Feminine, Genitive",
+          "dictionary_definition": "acquaintance, friend, conocido"
+        },
+        {
+          "key": 7,
+          "display_form": "звё́зды",
+          "lemma": "звезда́",
+          "grammar": "Noun, Singular, Feminine, Genitive",
+          "dictionary_definition": "star; famous person; name of service module on the International Space Station"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 32920,
+      "end_time_ms": 38220,
+      "original_line": "Я ходил по всем дорогам и туда, и сюда",
+      "phonetic_line": "Я ходи́л по все́м доро́гам и туда́, и сюда́",
+      "translation": "I walked all the way there and here.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Я",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 2,
+          "display_form": "ходи́л",
+          "lemma": "ходи́ть",
+          "grammar": "Verb, Past, Singular, Masculine",
+          "dictionary_definition": "go, walk, move, pass"
+        },
+        {
+          "key": 3,
+          "display_form": "по",
+          "lemma": "по́",
+          "grammar": "Preposition",
+          "dictionary_definition": "along, down, through, across, around; about, under, for, on; by the means of (por medio de), on; hit or punch somewhere"
+        },
+        {
+          "key": 4,
+          "display_form": "все́м",
+          "lemma": "ве́сь",
+          "grammar": "Adjective, Plural, Dative",
+          "dictionary_definition": "village, village community"
+        },
+        {
+          "key": 5,
+          "display_form": "доро́гам",
+          "lemma": "доро́га",
+          "grammar": "Noun, Plural, Feminine, Dative",
+          "dictionary_definition": "road, way, journey"
+        },
+        {
+          "key": 6,
+          "display_form": "и",
+          "lemma": "и",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 7,
+          "display_form": "туда́,",
+          "lemma": "туда́",
+          "grammar": "Adverb",
+          "dictionary_definition": "there, to there"
+        },
+        {
+          "key": 8,
+          "display_form": "и",
+          "lemma": "и",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 9,
+          "display_form": "сюда́",
+          "lemma": "сюда́",
+          "grammar": "Adverb",
+          "dictionary_definition": "here"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 38220,
+      "end_time_ms": 43540,
+      "original_line": "Обернулся и не смог разглядеть следы",
+      "phonetic_line": "Оберну́лся и не смо́г разгляде́ть следы́",
+      "translation": "Turned around and couldn't see the tracks.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Оберну́лся",
+          "lemma": "оберну́ться",
+          "grammar": "Verb, Past, Singular, Masculine",
+          "dictionary_definition": "to result in; to lead to; to turn around"
+        },
+        {
+          "key": 2,
+          "display_form": "и",
+          "lemma": "и",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 3,
+          "display_form": "не",
+          "lemma": "не́",
+          "grammar": "Particle",
+          "dictionary_definition": "not"
+        },
+        {
+          "key": 4,
+          "display_form": "смо́г",
+          "lemma": "смо́чь",
+          "grammar": "Verb, Past, Singular, Masculine",
+          "dictionary_definition": "to be able, can"
+        },
+        {
+          "key": 5,
+          "display_form": "разгляде́ть",
+          "lemma": "разгляде́ть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "to discern, to make out; to detect, figure out"
+        },
+        {
+          "key": 6,
+          "display_form": "следы́",
+          "lemma": "сле́д",
+          "grammar": "Noun, Plural, Masculine, Accusative",
+          "dictionary_definition": "footprint; trail, trace, track"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 43540,
+      "end_time_ms": 49420,
+      "original_line": "Но если есть в кармане пачка сигарет",
+      "phonetic_line": "Но е́сли е́сть в карма́не па́чка сигаре́т",
+      "translation": "But if you have a pack of cigarettes in your pocket.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Но",
+          "lemma": "но́",
+          "grammar": "Conjunction",
+          "dictionary_definition": "but"
+        },
+        {
+          "key": 2,
+          "display_form": "е́сли",
+          "lemma": "е́сли",
+          "grammar": "Conjunction",
+          "dictionary_definition": "if; in case, subject to"
+        },
+        {
+          "key": 3,
+          "display_form": "е́сть",
+          "lemma": "е́сть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "there is, there are, eats"
+        },
+        {
+          "key": 4,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 5,
+          "display_form": "карма́не",
+          "lemma": "карма́н",
+          "grammar": "Noun, Singular, Masculine, Locative",
+          "dictionary_definition": "pocket"
+        },
+        {
+          "key": 6,
+          "display_form": "па́чка",
+          "lemma": "па́чка",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "packet, bundle, batch, sheaf, pack, parcel, tutu"
+        },
+        {
+          "key": 7,
+          "display_form": "сигаре́т",
+          "lemma": "сигаре́та",
+          "grammar": "Noun, Plural, Feminine, Genitive",
+          "dictionary_definition": "cigarette"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 49420,
+      "end_time_ms": 54780,
+      "original_line": "Значит, всё не так уж плохо на сегодняшний день",
+      "phonetic_line": "Зна́чит, всё не та́к уж пло́хо на́ сего́дняшний де́нь",
+      "translation": "So it's not that bad today.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Зна́чит,",
+          "lemma": "зна́чит",
+          "grammar": "Conjunction",
+          "dictionary_definition": "so, then, well then"
+        },
+        {
+          "key": 2,
+          "display_form": "всё",
+          "lemma": "всё",
+          "grammar": "Particle",
+          "dictionary_definition": "always, all the time, the whole time, still, only, all, all the same, however, nevertheless; everything, often"
+        },
+        {
+          "key": 3,
+          "display_form": "не",
+          "lemma": "не́",
+          "grammar": "Particle",
+          "dictionary_definition": "not"
+        },
+        {
+          "key": 4,
+          "display_form": "та́к",
+          "lemma": "та́к",
+          "grammar": "Conjunction",
+          "dictionary_definition": "so, thus, like this, this way, then; exactly how"
+        },
+        {
+          "key": 5,
+          "display_form": "уж",
+          "lemma": "у́ж",
+          "grammar": "Adverb",
+          "dictionary_definition": "really; not that; already"
+        },
+        {
+          "key": 6,
+          "display_form": "пло́хо",
+          "lemma": "пло́хо",
+          "grammar": "Predicative, Present",
+          "dictionary_definition": "it is bad; hard"
+        },
+        {
+          "key": 7,
+          "display_form": "на́",
+          "lemma": "на́",
+          "grammar": "Preposition",
+          "dictionary_definition": "on (place), during; on (day/week); on (means of transport); to (direction)"
+        },
+        {
+          "key": 8,
+          "display_form": "сего́дняшний",
+          "lemma": "сего́дняшний",
+          "grammar": "Adjective, Singular, Masculine, Accusative",
+          "dictionary_definition": "today's, today"
+        },
+        {
+          "key": 9,
+          "display_form": "де́нь",
+          "lemma": "де́нь",
+          "grammar": "Noun, Singular, Masculine, Accusative",
+          "dictionary_definition": "day, daytime; afternoon, early evening"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 54780,
+      "end_time_ms": 60120,
+      "original_line": "И билет на самолёт с серебристым крылом",
+      "phonetic_line": "И биле́т на самолёт с серебри́стым крыло́м",
+      "translation": "And a plane ticket with a silver wing.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "И",
+          "lemma": "и",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 2,
+          "display_form": "биле́т",
+          "lemma": "биле́т",
+          "grammar": "Noun, Singular, Masculine, Accusative",
+          "dictionary_definition": "ticket, card"
+        },
+        {
+          "key": 3,
+          "display_form": "на",
+          "lemma": "на́",
+          "grammar": "Preposition",
+          "dictionary_definition": "on (place), during; on (day/week); on (means of transport); to (direction)"
+        },
+        {
+          "key": 4,
+          "display_form": "самолёт",
+          "lemma": "самолёт",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "aircraft, aeroplane, airplane, plane, air-liner"
+        },
+        {
+          "key": 5,
+          "display_form": "с",
+          "lemma": "с",
+          "grammar": "Preposition",
+          "dictionary_definition": "with; from, in the course of; since; off, remove from"
+        },
+        {
+          "key": 6,
+          "display_form": "серебри́стым",
+          "lemma": "серебри́стый",
+          "grammar": "Adjective, Singular, Masculine, Ablative",
+          "dictionary_definition": "silvery, silver (color)"
+        },
+        {
+          "key": 7,
+          "display_form": "крыло́м",
+          "lemma": "крыло́",
+          "grammar": "Noun, Singular, Neuter, Ablative",
+          "dictionary_definition": "wing"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 60120,
+      "end_time_ms": 86540,
+      "original_line": "Что, взлетая, оставляет земле лишь тень",
+      "phonetic_line": "Что́, взлета́я, оставля́ет земле́ лишь те́нь",
+      "translation": "When the earth rises, it leaves only a shadow.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Что́,",
+          "lemma": "что́",
+          "grammar": "Conjunction",
+          "dictionary_definition": "what; that"
+        },
+        {
+          "key": 2,
+          "display_form": "взлета́я,",
+          "lemma": "взлета́ть",
+          "grammar": "Gerund, Present",
+          "dictionary_definition": "fly up, take wing, flush; take off (flying)"
+        },
+        {
+          "key": 3,
+          "display_form": "оставля́ет",
+          "lemma": "оставля́ть",
+          "grammar": "Verb, Present, 3rd Person, Singular",
+          "dictionary_definition": "to leave, to leave alone; to abandon, to give up; to drop, to stop"
+        },
+        {
+          "key": 4,
+          "display_form": "земле́",
+          "lemma": "земля́",
+          "grammar": "Noun, Singular, Feminine, Locative",
+          "dictionary_definition": "earth; land"
+        },
+        {
+          "key": 5,
+          "display_form": "лишь",
+          "lemma": "ли́шь",
+          "grammar": "Particle",
+          "dictionary_definition": "only, as soon as, merely, just"
+        },
+        {
+          "key": 6,
+          "display_form": "те́нь",
+          "lemma": "те́нь",
+          "grammar": "Noun, Singular, Feminine, Accusative",
+          "dictionary_definition": "shade; shadow, silhouette (ghost, phantom); hint (vestige)"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 86540,
+      "end_time_ms": 93340,
+      "original_line": "И никто не хотел быть виноватым без вина",
+      "phonetic_line": "И никто́ не хоте́л быть винова́тым бе́з вина́",
+      "translation": "No one wanted to be guilty without wine.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "И",
+          "lemma": "и",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 2,
+          "display_form": "никто́",
+          "lemma": "никто́",
+          "grammar": "Pronoun, Singular, Nominative",
+          "dictionary_definition": "nobody, no one"
+        },
+        {
+          "key": 3,
+          "display_form": "не",
+          "lemma": "не́",
+          "grammar": "Particle",
+          "dictionary_definition": "not"
+        },
+        {
+          "key": 4,
+          "display_form": "хоте́л",
+          "lemma": "хоте́ть",
+          "grammar": "Verb, Past, Singular, Masculine",
+          "dictionary_definition": "to want; to feel like; to mean"
+        },
+        {
+          "key": 5,
+          "display_form": "быть",
+          "lemma": "бы́ть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "to be; (present tense) 'есть'  - there is, there are; has been"
+        },
+        {
+          "key": 6,
+          "display_form": "винова́тым",
+          "lemma": "винова́тый",
+          "grammar": "Adjective, Singular, Masculine, Ablative",
+          "dictionary_definition": "guilty"
+        },
+        {
+          "key": 7,
+          "display_form": "бе́з",
+          "lemma": "бе́з",
+          "grammar": "Preposition",
+          "dictionary_definition": "without; to (time)"
+        },
+        {
+          "key": 8,
+          "display_form": "вина́",
+          "lemma": "вино́",
+          "grammar": "Noun, Singular, Neuter, Genitive",
+          "dictionary_definition": "wine, liquor, spirits"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 93340,
+      "end_time_ms": 98880,
+      "original_line": "И никто не хотел руками жар загребать",
+      "phonetic_line": "И никто́ не хоте́л рука́ми жа́р загреба́ть",
+      "translation": "And no one wanted to put their hands on the heat.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "И",
+          "lemma": "и",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 2,
+          "display_form": "никто́",
+          "lemma": "никто́",
+          "grammar": "Pronoun, Singular, Nominative",
+          "dictionary_definition": "nobody, no one"
+        },
+        {
+          "key": 3,
+          "display_form": "не",
+          "lemma": "не́",
+          "grammar": "Particle",
+          "dictionary_definition": "not"
+        },
+        {
+          "key": 4,
+          "display_form": "хоте́л",
+          "lemma": "хоте́ть",
+          "grammar": "Verb, Past, Singular, Masculine",
+          "dictionary_definition": "to want; to feel like; to mean"
+        },
+        {
+          "key": 5,
+          "display_form": "рука́ми",
+          "lemma": "рука́",
+          "grammar": "Noun, Plural, Feminine, Ablative",
+          "dictionary_definition": "hand; arm; handwriting"
+        },
+        {
+          "key": 6,
+          "display_form": "жа́р",
+          "lemma": "жа́р",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "heat; ardour; fever"
+        },
+        {
+          "key": 7,
+          "display_form": "загреба́ть",
+          "lemma": "загреба́ть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "to rake up/rake into one pile"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 98880,
+      "end_time_ms": 104260,
+      "original_line": "А без музыки на миру смерть не красна",
+      "phonetic_line": "А без му́зыки на миру́ сме́рть не красна́",
+      "translation": "Without music, death is not red.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "А",
+          "lemma": "а",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and (as contrast)"
+        },
+        {
+          "key": 2,
+          "display_form": "без",
+          "lemma": "бе́з",
+          "grammar": "Preposition",
+          "dictionary_definition": "without; to (time)"
+        },
+        {
+          "key": 3,
+          "display_form": "му́зыки",
+          "lemma": "му́зыка",
+          "grammar": "Noun, Singular, Feminine, Genitive",
+          "dictionary_definition": "music"
+        },
+        {
+          "key": 4,
+          "display_form": "на",
+          "lemma": "на́",
+          "grammar": "Preposition",
+          "dictionary_definition": "on (place), during; on (day/week); on (means of transport); to (direction)"
+        },
+        {
+          "key": 5,
+          "display_form": "миру́",
+          "lemma": "ми́р",
+          "grammar": "Noun, Singular, Masculine, Dative",
+          "dictionary_definition": "world; peace"
+        },
+        {
+          "key": 6,
+          "display_form": "сме́рть",
+          "lemma": "сме́рть",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "death; (emphatic with как) dying for; desperately"
+        },
+        {
+          "key": 7,
+          "display_form": "не",
+          "lemma": "не́",
+          "grammar": "Particle",
+          "dictionary_definition": "not"
+        },
+        {
+          "key": 8,
+          "display_form": "красна́",
+          "lemma": "кра́сный",
+          "grammar": "Adj (short), Singular, Feminine",
+          "dictionary_definition": "red, Communist"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 104260,
+      "end_time_ms": 109590,
+      "original_line": "А без музыки не хочется пропадать",
+      "phonetic_line": "А без му́зыки не хо́чется пропада́ть",
+      "translation": "Without music, you don’t want to disappear.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "А",
+          "lemma": "а",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and (as contrast)"
+        },
+        {
+          "key": 2,
+          "display_form": "без",
+          "lemma": "бе́з",
+          "grammar": "Preposition",
+          "dictionary_definition": "without; to (time)"
+        },
+        {
+          "key": 3,
+          "display_form": "му́зыки",
+          "lemma": "му́зыка",
+          "grammar": "Noun, Singular, Feminine, Genitive",
+          "dictionary_definition": "music"
+        },
+        {
+          "key": 4,
+          "display_form": "не",
+          "lemma": "не́",
+          "grammar": "Particle",
+          "dictionary_definition": "not"
+        },
+        {
+          "key": 5,
+          "display_form": "хо́чется",
+          "lemma": "хоте́ться",
+          "grammar": "Verb, Present, Singular",
+          "dictionary_definition": "(impersonal) to like, desire; want"
+        },
+        {
+          "key": 6,
+          "display_form": "пропада́ть",
+          "lemma": "пропада́ть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "be missing, be lost, disappear, vanish, die, pass, perish, be wasted"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 109590,
+      "end_time_ms": 115340,
+      "original_line": "Но если есть в кармане пачка сигарет",
+      "phonetic_line": "Но е́сли е́сть в карма́не па́чка сигаре́т",
+      "translation": "But if you have a pack of cigarettes in your pocket.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Но",
+          "lemma": "но́",
+          "grammar": "Conjunction",
+          "dictionary_definition": "but"
+        },
+        {
+          "key": 2,
+          "display_form": "е́сли",
+          "lemma": "е́сли",
+          "grammar": "Conjunction",
+          "dictionary_definition": "if; in case, subject to"
+        },
+        {
+          "key": 3,
+          "display_form": "е́сть",
+          "lemma": "е́сть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "there is, there are, eats"
+        },
+        {
+          "key": 4,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 5,
+          "display_form": "карма́не",
+          "lemma": "карма́н",
+          "grammar": "Noun, Singular, Masculine, Locative",
+          "dictionary_definition": "pocket"
+        },
+        {
+          "key": 6,
+          "display_form": "па́чка",
+          "lemma": "па́чка",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "packet, bundle, batch, sheaf, pack, parcel, tutu"
+        },
+        {
+          "key": 7,
+          "display_form": "сигаре́т",
+          "lemma": "сигаре́та",
+          "grammar": "Noun, Plural, Feminine, Genitive",
+          "dictionary_definition": "cigarette"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 115340,
+      "end_time_ms": 120800,
+      "original_line": "Значит, всё не так уж плохо на сегодняшний день",
+      "phonetic_line": "Зна́чит, всё не та́к уж пло́хо на́ сего́дняшний де́нь",
+      "translation": "So it's not that bad today.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Зна́чит,",
+          "lemma": "зна́чит",
+          "grammar": "Conjunction",
+          "dictionary_definition": "so, then, well then"
+        },
+        {
+          "key": 2,
+          "display_form": "всё",
+          "lemma": "всё",
+          "grammar": "Particle",
+          "dictionary_definition": "always, all the time, the whole time, still, only, all, all the same, however, nevertheless; everything, often"
+        },
+        {
+          "key": 3,
+          "display_form": "не",
+          "lemma": "не́",
+          "grammar": "Particle",
+          "dictionary_definition": "not"
+        },
+        {
+          "key": 4,
+          "display_form": "та́к",
+          "lemma": "та́к",
+          "grammar": "Conjunction",
+          "dictionary_definition": "so, thus, like this, this way, then; exactly how"
+        },
+        {
+          "key": 5,
+          "display_form": "уж",
+          "lemma": "у́ж",
+          "grammar": "Adverb",
+          "dictionary_definition": "really; not that; already"
+        },
+        {
+          "key": 6,
+          "display_form": "пло́хо",
+          "lemma": "пло́хо",
+          "grammar": "Predicative, Present",
+          "dictionary_definition": "it is bad; hard"
+        },
+        {
+          "key": 7,
+          "display_form": "на́",
+          "lemma": "на́",
+          "grammar": "Preposition",
+          "dictionary_definition": "on (place), during; on (day/week); on (means of transport); to (direction)"
+        },
+        {
+          "key": 8,
+          "display_form": "сего́дняшний",
+          "lemma": "сего́дняшний",
+          "grammar": "Adjective, Singular, Masculine, Accusative",
+          "dictionary_definition": "today's, today"
+        },
+        {
+          "key": 9,
+          "display_form": "де́нь",
+          "lemma": "де́нь",
+          "grammar": "Noun, Singular, Masculine, Accusative",
+          "dictionary_definition": "day, daytime; afternoon, early evening"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 120800,
+      "end_time_ms": 126180,
+      "original_line": "И билет на самолёт с серебристым крылом",
+      "phonetic_line": "И биле́т на самолёт с серебри́стым крыло́м",
+      "translation": "And a plane ticket with a silver wing.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "И",
+          "lemma": "и",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 2,
+          "display_form": "биле́т",
+          "lemma": "биле́т",
+          "grammar": "Noun, Singular, Masculine, Accusative",
+          "dictionary_definition": "ticket, card"
+        },
+        {
+          "key": 3,
+          "display_form": "на",
+          "lemma": "на́",
+          "grammar": "Preposition",
+          "dictionary_definition": "on (place), during; on (day/week); on (means of transport); to (direction)"
+        },
+        {
+          "key": 4,
+          "display_form": "самолёт",
+          "lemma": "самолёт",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "aircraft, aeroplane, airplane, plane, air-liner"
+        },
+        {
+          "key": 5,
+          "display_form": "с",
+          "lemma": "с",
+          "grammar": "Preposition",
+          "dictionary_definition": "with; from, in the course of; since; off, remove from"
+        },
+        {
+          "key": 6,
+          "display_form": "серебри́стым",
+          "lemma": "серебри́стый",
+          "grammar": "Adjective, Singular, Masculine, Ablative",
+          "dictionary_definition": "silvery, silver (color)"
+        },
+        {
+          "key": 7,
+          "display_form": "крыло́м",
+          "lemma": "крыло́",
+          "grammar": "Noun, Singular, Neuter, Ablative",
+          "dictionary_definition": "wing"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 126180,
+      "end_time_ms": 153590,
+      "original_line": "Что, взлетая, оставляет земле лишь тень",
+      "phonetic_line": "Что́, взлета́я, оставля́ет земле́ лишь те́нь",
+      "translation": "When the earth rises, it leaves only a shadow.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Что́,",
+          "lemma": "что́",
+          "grammar": "Conjunction",
+          "dictionary_definition": "what; that"
+        },
+        {
+          "key": 2,
+          "display_form": "взлета́я,",
+          "lemma": "взлета́ть",
+          "grammar": "Gerund, Present",
+          "dictionary_definition": "fly up, take wing, flush; take off (flying)"
+        },
+        {
+          "key": 3,
+          "display_form": "оставля́ет",
+          "lemma": "оставля́ть",
+          "grammar": "Verb, Present, 3rd Person, Singular",
+          "dictionary_definition": "to leave, to leave alone; to abandon, to give up; to drop, to stop"
+        },
+        {
+          "key": 4,
+          "display_form": "земле́",
+          "lemma": "земля́",
+          "grammar": "Noun, Singular, Feminine, Locative",
+          "dictionary_definition": "earth; land"
+        },
+        {
+          "key": 5,
+          "display_form": "лишь",
+          "lemma": "ли́шь",
+          "grammar": "Particle",
+          "dictionary_definition": "only, as soon as, merely, just"
+        },
+        {
+          "key": 6,
+          "display_form": "те́нь",
+          "lemma": "те́нь",
+          "grammar": "Noun, Singular, Feminine, Accusative",
+          "dictionary_definition": "shade; shadow, silhouette (ghost, phantom); hint (vestige)"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 153590,
+      "end_time_ms": 159280,
+      "original_line": "Но если есть в кармане пачка сигарет",
+      "phonetic_line": "Но е́сли е́сть в карма́не па́чка сигаре́т",
+      "translation": "But if you have a pack of cigarettes in your pocket.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Но",
+          "lemma": "но́",
+          "grammar": "Conjunction",
+          "dictionary_definition": "but"
+        },
+        {
+          "key": 2,
+          "display_form": "е́сли",
+          "lemma": "е́сли",
+          "grammar": "Conjunction",
+          "dictionary_definition": "if; in case, subject to"
+        },
+        {
+          "key": 3,
+          "display_form": "е́сть",
+          "lemma": "е́сть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "there is, there are, eats"
+        },
+        {
+          "key": 4,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 5,
+          "display_form": "карма́не",
+          "lemma": "карма́н",
+          "grammar": "Noun, Singular, Masculine, Locative",
+          "dictionary_definition": "pocket"
+        },
+        {
+          "key": 6,
+          "display_form": "па́чка",
+          "lemma": "па́чка",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "packet, bundle, batch, sheaf, pack, parcel, tutu"
+        },
+        {
+          "key": 7,
+          "display_form": "сигаре́т",
+          "lemma": "сигаре́та",
+          "grammar": "Noun, Plural, Feminine, Genitive",
+          "dictionary_definition": "cigarette"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 159280,
+      "end_time_ms": 164600,
+      "original_line": "Значит, всё не так уж плохо на сегодняшний день",
+      "phonetic_line": "Зна́чит, всё не та́к уж пло́хо на́ сего́дняшний де́нь",
+      "translation": "So it's not that bad today.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Зна́чит,",
+          "lemma": "зна́чит",
+          "grammar": "Conjunction",
+          "dictionary_definition": "so, then, well then"
+        },
+        {
+          "key": 2,
+          "display_form": "всё",
+          "lemma": "всё",
+          "grammar": "Particle",
+          "dictionary_definition": "always, all the time, the whole time, still, only, all, all the same, however, nevertheless; everything, often"
+        },
+        {
+          "key": 3,
+          "display_form": "не",
+          "lemma": "не́",
+          "grammar": "Particle",
+          "dictionary_definition": "not"
+        },
+        {
+          "key": 4,
+          "display_form": "та́к",
+          "lemma": "та́к",
+          "grammar": "Conjunction",
+          "dictionary_definition": "so, thus, like this, this way, then; exactly how"
+        },
+        {
+          "key": 5,
+          "display_form": "уж",
+          "lemma": "у́ж",
+          "grammar": "Adverb",
+          "dictionary_definition": "really; not that; already"
+        },
+        {
+          "key": 6,
+          "display_form": "пло́хо",
+          "lemma": "пло́хо",
+          "grammar": "Predicative, Present",
+          "dictionary_definition": "it is bad; hard"
+        },
+        {
+          "key": 7,
+          "display_form": "на́",
+          "lemma": "на́",
+          "grammar": "Preposition",
+          "dictionary_definition": "on (place), during; on (day/week); on (means of transport); to (direction)"
+        },
+        {
+          "key": 8,
+          "display_form": "сего́дняшний",
+          "lemma": "сего́дняшний",
+          "grammar": "Adjective, Singular, Masculine, Accusative",
+          "dictionary_definition": "today's, today"
+        },
+        {
+          "key": 9,
+          "display_form": "де́нь",
+          "lemma": "де́нь",
+          "grammar": "Noun, Singular, Masculine, Accusative",
+          "dictionary_definition": "day, daytime; afternoon, early evening"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 164600,
+      "end_time_ms": 170040,
+      "original_line": "И билет на самолёт с серебристым крылом",
+      "phonetic_line": "И биле́т на самолёт с серебри́стым крыло́м",
+      "translation": "And a plane ticket with a silver wing.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "И",
+          "lemma": "и",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 2,
+          "display_form": "биле́т",
+          "lemma": "биле́т",
+          "grammar": "Noun, Singular, Masculine, Accusative",
+          "dictionary_definition": "ticket, card"
+        },
+        {
+          "key": 3,
+          "display_form": "на",
+          "lemma": "на́",
+          "grammar": "Preposition",
+          "dictionary_definition": "on (place), during; on (day/week); on (means of transport); to (direction)"
+        },
+        {
+          "key": 4,
+          "display_form": "самолёт",
+          "lemma": "самолёт",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "aircraft, aeroplane, airplane, plane, air-liner"
+        },
+        {
+          "key": 5,
+          "display_form": "с",
+          "lemma": "с",
+          "grammar": "Preposition",
+          "dictionary_definition": "with; from, in the course of; since; off, remove from"
+        },
+        {
+          "key": 6,
+          "display_form": "серебри́стым",
+          "lemma": "серебри́стый",
+          "grammar": "Adjective, Singular, Masculine, Ablative",
+          "dictionary_definition": "silvery, silver (color)"
+        },
+        {
+          "key": 7,
+          "display_form": "крыло́м",
+          "lemma": "крыло́",
+          "grammar": "Noun, Singular, Neuter, Ablative",
+          "dictionary_definition": "wing"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 170040,
+      "end_time_ms": 174040,
+      "original_line": "Что, взлетая, оставляет земле лишь тень (лишь тень)",
+      "phonetic_line": "Что́, взлета́я, оставля́ет земле́ лишь те́нь(лишь те́нь)",
+      "translation": "The earth is only a shadow, but a shadow.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Что́,",
+          "lemma": "что́",
+          "grammar": "Conjunction",
+          "dictionary_definition": "what; that"
+        },
+        {
+          "key": 2,
+          "display_form": "взлета́я,",
+          "lemma": "взлета́ть",
+          "grammar": "Gerund, Present",
+          "dictionary_definition": "fly up, take wing, flush; take off (flying)"
+        },
+        {
+          "key": 3,
+          "display_form": "оставля́ет",
+          "lemma": "оставля́ть",
+          "grammar": "Verb, Present, 3rd Person, Singular",
+          "dictionary_definition": "to leave, to leave alone; to abandon, to give up; to drop, to stop"
+        },
+        {
+          "key": 4,
+          "display_form": "земле́",
+          "lemma": "земля́",
+          "grammar": "Noun, Singular, Feminine, Locative",
+          "dictionary_definition": "earth; land"
+        },
+        {
+          "key": 5,
+          "display_form": "лишь",
+          "lemma": "ли́шь",
+          "grammar": "Particle",
+          "dictionary_definition": "only, as soon as, merely, just"
+        },
+        {
+          "key": 6,
+          "display_form": "те́нь(лишь",
+          "lemma": "те́нь",
+          "grammar": "Noun, Singular, Feminine, Accusative",
+          "dictionary_definition": "shade; shadow, silhouette (ghost, phantom); hint (vestige)"
+        },
+        {
+          "key": 7,
+          "display_form": "те́нь)",
+          "lemma": "ли́шь",
+          "grammar": "Particle",
+          "dictionary_definition": "only, as soon as, merely, just"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,731 @@
+{
+  "spotify_uri": "spotify:track:0u6SJZRhC1KSguPxLACkt9",
+  "title": "Спокойная ночь",
+  "artist": "Kino",
+  "language": {
+    "code": "ru",
+    "name": "Russian",
+    "script": "Cyrillic",
+    "direction": "ltr"
+  },
+  "lines": [
+    {
+      "start_time_ms": 49570,
+      "end_time_ms": 57940,
+      "original_line": "Крыши домов дрожат под тяжестью дней",
+      "phonetic_line": "Кры́ши домо́в дрожа́т под тя́жестью дне́й",
+      "translation": "House roofs tremble under the weight of days",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Кры́ши",
+          "lemma": "кры́ша",
+          "grammar": "Noun, Singular, Feminine, Genitive",
+          "dictionary_definition": "roof"
+        },
+        {
+          "key": 2,
+          "display_form": "домо́в",
+          "lemma": "до́м",
+          "grammar": "Noun, Plural, Masculine, Genitive",
+          "dictionary_definition": "house, home, house-hold"
+        },
+        {
+          "key": 3,
+          "display_form": "дрожа́т",
+          "lemma": "дрожа́ть",
+          "grammar": "Verb, Present, 3rd Person, Plural",
+          "dictionary_definition": "shiver/tremble"
+        },
+        {
+          "key": 4,
+          "display_form": "под",
+          "lemma": "по́д",
+          "grammar": "Preposition",
+          "dictionary_definition": "under, near; below; underneath; to go down/below"
+        },
+        {
+          "key": 5,
+          "display_form": "тя́жестью",
+          "lemma": "тя́жесть",
+          "grammar": "Noun, Singular, Feminine, Ablative",
+          "dictionary_definition": "weight, heaviness, gravity"
+        },
+        {
+          "key": 6,
+          "display_form": "дне́й",
+          "lemma": "де́нь",
+          "grammar": "Noun, Plural, Masculine, Genitive",
+          "dictionary_definition": "day, daytime; afternoon, early evening"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 57940,
+      "end_time_ms": 67370,
+      "original_line": "Небесный пастух пасёт облака",
+      "phonetic_line": "Небе́сный пасту́х пасёт облака́",
+      "translation": "Heavenly shepherd herds the clouds",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Небе́сный",
+          "lemma": "небе́сный",
+          "grammar": "Adjective, Singular, Masculine, Nominative",
+          "dictionary_definition": "heavenly celestial divine"
+        },
+        {
+          "key": 2,
+          "display_form": "пасту́х",
+          "lemma": "пасту́х",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "shepherd, cattle rancher"
+        },
+        {
+          "key": 3,
+          "display_form": "пасёт",
+          "lemma": "пасти́",
+          "grammar": "Verb, Present, 3rd Person, Singular",
+          "dictionary_definition": "graze, pasture, shepherd; surveil, track, shadow, convoy; watch over; to follow, to tail"
+        },
+        {
+          "key": 4,
+          "display_form": "облака́",
+          "lemma": "о́блако",
+          "grammar": "Noun, Plural, Neuter, Nominative",
+          "dictionary_definition": "cloud"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 67370,
+      "end_time_ms": 75880,
+      "original_line": "Город стреляет в ночь дробью огней",
+      "phonetic_line": "Го́род стреля́ет в но́чь дро́бью огне́й",
+      "translation": "The city shoots at night with shot fires",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Го́род",
+          "lemma": "го́род",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "city, town"
+        },
+        {
+          "key": 2,
+          "display_form": "стреля́ет",
+          "lemma": "стреля́ть",
+          "grammar": "Verb, Present, 3rd Person, Singular",
+          "dictionary_definition": "to shoot"
+        },
+        {
+          "key": 3,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 4,
+          "display_form": "но́чь",
+          "lemma": "но́чь",
+          "grammar": "Noun, Singular, Feminine, Accusative",
+          "dictionary_definition": "night"
+        },
+        {
+          "key": 5,
+          "display_form": "дро́бью",
+          "lemma": "дро́бь",
+          "grammar": "Noun, Singular, Feminine, Ablative",
+          "dictionary_definition": "fraction"
+        },
+        {
+          "key": 6,
+          "display_form": "огне́й",
+          "lemma": "ого́нь",
+          "grammar": "Noun, Plural, Masculine, Genitive",
+          "dictionary_definition": "fire; flame, light"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 75880,
+      "end_time_ms": 85280,
+      "original_line": "Но ночь сильней, её власть велика",
+      "phonetic_line": "Но но́чь сильне́й, её власть велика́",
+      "translation": "But the night is stronger, her power is greater.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Но",
+          "lemma": "но́",
+          "grammar": "Conjunction",
+          "dictionary_definition": "but"
+        },
+        {
+          "key": 2,
+          "display_form": "но́чь",
+          "lemma": "но́чь",
+          "grammar": "Noun, Singular, Feminine, Accusative",
+          "dictionary_definition": "night"
+        },
+        {
+          "key": 3,
+          "display_form": "сильне́й,",
+          "lemma": "си́льный",
+          "grammar": "Comparative",
+          "dictionary_definition": "strong, powerful, fierce, keen, intense, violent, towering, potent, impressive, hard, heavy, good"
+        },
+        {
+          "key": 4,
+          "display_form": "её",
+          "lemma": "её",
+          "grammar": "Adjective, Singular, Neuter, Genitive",
+          "dictionary_definition": "her"
+        },
+        {
+          "key": 5,
+          "display_form": "власть",
+          "lemma": "вла́сть",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "power; authority, authorities"
+        },
+        {
+          "key": 6,
+          "display_form": "велика́",
+          "lemma": "большо́й",
+          "grammar": "Adj (short), Singular, Feminine",
+          "dictionary_definition": "big, large, great, important, grown-up"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 85280,
+      "end_time_ms": 97130,
+      "original_line": "Тем, кто ложится спать — спокойного сна",
+      "phonetic_line": "Тем, кто́ ложи́тся спа́ть — споко́йного сна́",
+      "translation": "For those who go to bed, sleep well.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Тем,",
+          "lemma": "те́м",
+          "grammar": "Conjunction",
+          "dictionary_definition": "the, so much the"
+        },
+        {
+          "key": 2,
+          "display_form": "кто́",
+          "lemma": "кто́",
+          "grammar": "Pronoun, Singular, Masculine, Nominative",
+          "dictionary_definition": "who?; who"
+        },
+        {
+          "key": 3,
+          "display_form": "ложи́тся",
+          "lemma": "ложи́ться",
+          "grammar": "Verb, Present, 3rd Person, Singular",
+          "dictionary_definition": "lie down (4); go to bed"
+        },
+        {
+          "key": 4,
+          "display_form": "спа́ть",
+          "lemma": "спа́ть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "to sleep"
+        },
+        {
+          "key": 5,
+          "display_form": "споко́йного",
+          "lemma": "споко́йный",
+          "grammar": "Adjective, Singular, Neuter, Genitive",
+          "dictionary_definition": "quiet, calm, tranquil, placid, serene, easy-tempered, composed, easy; reassure"
+        },
+        {
+          "key": 6,
+          "display_form": "сна́",
+          "lemma": "со́н",
+          "grammar": "Noun, Singular, Masculine, Genitive",
+          "dictionary_definition": "sleep; dream"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 97130,
+      "end_time_ms": 102930,
+      "original_line": "Спокойная ночь",
+      "phonetic_line": "Споко́йная но́чь",
+      "translation": "Good night.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Споко́йная",
+          "lemma": "споко́йный",
+          "grammar": "Adjective, Singular, Feminine, Nominative",
+          "dictionary_definition": "quiet, calm, tranquil, placid, serene, easy-tempered, composed, easy; reassure"
+        },
+        {
+          "key": 2,
+          "display_form": "но́чь",
+          "lemma": "но́чь",
+          "grammar": "Noun, Singular, Feminine, Accusative",
+          "dictionary_definition": "night"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 102930,
+      "end_time_ms": 114980,
+      "original_line": "Тем, кто ложится спать — спокойного сна",
+      "phonetic_line": "Тем, кто́ ложи́тся спа́ть — споко́йного сна́",
+      "translation": "For those who go to bed, sleep well.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Тем,",
+          "lemma": "те́м",
+          "grammar": "Conjunction",
+          "dictionary_definition": "the, so much the"
+        },
+        {
+          "key": 2,
+          "display_form": "кто́",
+          "lemma": "кто́",
+          "grammar": "Pronoun, Singular, Masculine, Nominative",
+          "dictionary_definition": "who?; who"
+        },
+        {
+          "key": 3,
+          "display_form": "ложи́тся",
+          "lemma": "ложи́ться",
+          "grammar": "Verb, Present, 3rd Person, Singular",
+          "dictionary_definition": "lie down (4); go to bed"
+        },
+        {
+          "key": 4,
+          "display_form": "спа́ть",
+          "lemma": "спа́ть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "to sleep"
+        },
+        {
+          "key": 5,
+          "display_form": "споко́йного",
+          "lemma": "споко́йный",
+          "grammar": "Adjective, Singular, Neuter, Genitive",
+          "dictionary_definition": "quiet, calm, tranquil, placid, serene, easy-tempered, composed, easy; reassure"
+        },
+        {
+          "key": 6,
+          "display_form": "сна́",
+          "lemma": "со́н",
+          "grammar": "Noun, Singular, Masculine, Genitive",
+          "dictionary_definition": "sleep; dream"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 114980,
+      "end_time_ms": 134060,
+      "original_line": "Спокойная ночь",
+      "phonetic_line": "Споко́йная но́чь",
+      "translation": "Good night.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Споко́йная",
+          "lemma": "споко́йный",
+          "grammar": "Adjective, Singular, Feminine, Nominative",
+          "dictionary_definition": "quiet, calm, tranquil, placid, serene, easy-tempered, composed, easy; reassure"
+        },
+        {
+          "key": 2,
+          "display_form": "но́чь",
+          "lemma": "но́чь",
+          "grammar": "Noun, Singular, Feminine, Accusative",
+          "dictionary_definition": "night"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 134060,
+      "end_time_ms": 143020,
+      "original_line": "Я ждал это время, и вот это время пришло",
+      "phonetic_line": "Я жда́л это вре́мя, и во́т это вре́мя пришло́",
+      "translation": "I waited for this time and this time has come.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Я",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 2,
+          "display_form": "жда́л",
+          "lemma": "жда́ть",
+          "grammar": "Verb, Past, Singular, Masculine",
+          "dictionary_definition": "to wait, to expect, to await"
+        },
+        {
+          "key": 3,
+          "display_form": "это",
+          "lemma": "э́то",
+          "grammar": "Particle",
+          "dictionary_definition": "this is, that is"
+        },
+        {
+          "key": 4,
+          "display_form": "вре́мя,",
+          "lemma": "вре́мя",
+          "grammar": "Noun, Singular, Neuter, Accusative",
+          "dictionary_definition": "time, times, tense, weather"
+        },
+        {
+          "key": 5,
+          "display_form": "и",
+          "lemma": "и",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 6,
+          "display_form": "во́т",
+          "lemma": "во́т",
+          "grammar": "Particle",
+          "dictionary_definition": "here is, here are, this is, there, there you go"
+        },
+        {
+          "key": 7,
+          "display_form": "это",
+          "lemma": "э́то",
+          "grammar": "Particle",
+          "dictionary_definition": "this is, that is"
+        },
+        {
+          "key": 8,
+          "display_form": "вре́мя",
+          "lemma": "вре́мя",
+          "grammar": "Noun, Singular, Neuter, Accusative",
+          "dictionary_definition": "time, times, tense, weather"
+        },
+        {
+          "key": 9,
+          "display_form": "пришло́",
+          "lemma": "прийти́",
+          "grammar": "Verb, Past, Singular, Neuter",
+          "dictionary_definition": "come, arrive"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 143020,
+      "end_time_ms": 152370,
+      "original_line": "Те, кто молчал, перестали молчать",
+      "phonetic_line": "Те́, кто молча́л, переста́ли молча́ть",
+      "translation": "Those who were silent ceased to be silent.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Те́,",
+          "lemma": "то́т",
+          "grammar": "Adjective, Plural, Nominative",
+          "dictionary_definition": "that"
+        },
+        {
+          "key": 2,
+          "display_form": "кто",
+          "lemma": "кто́",
+          "grammar": "Pronoun, Singular, Masculine, Nominative",
+          "dictionary_definition": "who?; who"
+        },
+        {
+          "key": 3,
+          "display_form": "молча́л,",
+          "lemma": "молча́ть",
+          "grammar": "Verb, Past, Singular, Masculine",
+          "dictionary_definition": "to be silent"
+        },
+        {
+          "key": 4,
+          "display_form": "переста́ли",
+          "lemma": "переста́ть",
+          "grammar": "Verb, Past, Plural",
+          "dictionary_definition": "to cease/stop/quit"
+        },
+        {
+          "key": 5,
+          "display_form": "молча́ть",
+          "lemma": "молча́ть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "to be silent"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 152370,
+      "end_time_ms": 161220,
+      "original_line": "Те, кому нечего ждать, садятся в седло",
+      "phonetic_line": "Те́, ко́му не́чего жда́ть, садя́тся в седло́",
+      "translation": "Those who have nothing to wait, sit in the saddle.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Те́,",
+          "lemma": "то́т",
+          "grammar": "Adjective, Plural, Nominative",
+          "dictionary_definition": "that"
+        },
+        {
+          "key": 2,
+          "display_form": "ко́му",
+          "lemma": "кто́",
+          "grammar": "Pronoun, Singular, Masculine, Dative",
+          "dictionary_definition": "who?; who"
+        },
+        {
+          "key": 3,
+          "display_form": "не́чего",
+          "lemma": "не́чего",
+          "grammar": "Pronoun, Singular, Genitive",
+          "dictionary_definition": "nothing"
+        },
+        {
+          "key": 4,
+          "display_form": "жда́ть,",
+          "lemma": "жда́ть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "to wait, to expect, to await"
+        },
+        {
+          "key": 5,
+          "display_form": "садя́тся",
+          "lemma": "сади́ться",
+          "grammar": "Verb, Present, 3rd Person, Plural",
+          "dictionary_definition": "sit down; get on"
+        },
+        {
+          "key": 6,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 7,
+          "display_form": "седло́",
+          "lemma": "седло́",
+          "grammar": "Noun, Singular, Neuter, Nominative",
+          "dictionary_definition": "saddle"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 161220,
+      "end_time_ms": 169660,
+      "original_line": "Их не догнать, уже не догнать",
+      "phonetic_line": "И́х не догна́ть, уже́ не догна́ть",
+      "translation": "We can't catch them, we can't catch them.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "И́х",
+          "lemma": "они́",
+          "grammar": "Pronoun, 3rd Person, Plural, Accusative",
+          "dictionary_definition": "they"
+        },
+        {
+          "key": 2,
+          "display_form": "не",
+          "lemma": "не́",
+          "grammar": "Particle",
+          "dictionary_definition": "not"
+        },
+        {
+          "key": 3,
+          "display_form": "догна́ть,",
+          "lemma": "догна́ть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "catch up, overtake, come up, run down, overhaul"
+        },
+        {
+          "key": 4,
+          "display_form": "уже́",
+          "lemma": "уже́",
+          "grammar": "Adverb",
+          "dictionary_definition": "already, by this time, by now, ready, no longer"
+        },
+        {
+          "key": 5,
+          "display_form": "не",
+          "lemma": "не́",
+          "grammar": "Particle",
+          "dictionary_definition": "not"
+        },
+        {
+          "key": 6,
+          "display_form": "догна́ть",
+          "lemma": "догна́ть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "catch up, overtake, come up, run down, overhaul"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 169660,
+      "end_time_ms": 181900,
+      "original_line": "А тем, кто ложится спать — спокойного сна",
+      "phonetic_line": "А тем, кто́ ложи́тся спа́ть — споко́йного сна́",
+      "translation": "And for those who go to sleep, sleep well.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "А",
+          "lemma": "а",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and (as contrast)"
+        },
+        {
+          "key": 2,
+          "display_form": "тем,",
+          "lemma": "те́м",
+          "grammar": "Conjunction",
+          "dictionary_definition": "the, so much the"
+        },
+        {
+          "key": 3,
+          "display_form": "кто́",
+          "lemma": "кто́",
+          "grammar": "Pronoun, Singular, Masculine, Nominative",
+          "dictionary_definition": "who?; who"
+        },
+        {
+          "key": 4,
+          "display_form": "ложи́тся",
+          "lemma": "ложи́ться",
+          "grammar": "Verb, Present, 3rd Person, Singular",
+          "dictionary_definition": "lie down (4); go to bed"
+        },
+        {
+          "key": 5,
+          "display_form": "спа́ть",
+          "lemma": "спа́ть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "to sleep"
+        },
+        {
+          "key": 6,
+          "display_form": "споко́йного",
+          "lemma": "споко́йный",
+          "grammar": "Adjective, Singular, Neuter, Genitive",
+          "dictionary_definition": "quiet, calm, tranquil, placid, serene, easy-tempered, composed, easy; reassure"
+        },
+        {
+          "key": 7,
+          "display_form": "сна́",
+          "lemma": "со́н",
+          "grammar": "Noun, Singular, Masculine, Genitive",
+          "dictionary_definition": "sleep; dream"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 181900,
+      "end_time_ms": 187770,
+      "original_line": "Спокойная ночь",
+      "phonetic_line": "Споко́йная но́чь",
+      "translation": "Good night.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Споко́йная",
+          "lemma": "споко́йный",
+          "grammar": "Adjective, Singular, Feminine, Nominative",
+          "dictionary_definition": "quiet, calm, tranquil, placid, serene, easy-tempered, composed, easy; reassure"
+        },
+        {
+          "key": 2,
+          "display_form": "но́чь",
+          "lemma": "но́чь",
+          "grammar": "Noun, Singular, Feminine, Accusative",
+          "dictionary_definition": "night"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 187770,
+      "end_time_ms": 218830,
+      "original_line": "Тем, кто ложится спать — спокойного сна",
+      "phonetic_line": "Тем, кто́ ложи́тся спа́ть — споко́йного сна́",
+      "translation": "For those who go to bed, sleep well.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Тем,",
+          "lemma": "те́м",
+          "grammar": "Conjunction",
+          "dictionary_definition": "the, so much the"
+        },
+        {
+          "key": 2,
+          "display_form": "кто́",
+          "lemma": "кто́",
+          "grammar": "Pronoun, Singular, Masculine, Nominative",
+          "dictionary_definition": "who?; who"
+        },
+        {
+          "key": 3,
+          "display_form": "ложи́тся",
+          "lemma": "ложи́ться",
+          "grammar": "Verb, Present, 3rd Person, Singular",
+          "dictionary_definition": "lie down (4); go to bed"
+        },
+        {
+          "key": 4,
+          "display_form": "спа́ть",
+          "lemma": "спа́ть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "to sleep"
+        },
+        {
+          "key": 5,
+          "display_form": "споко́йного",
+          "lemma": "споко́йный",
+          "grammar": "Adjective, Singular, Neuter, Genitive",
+          "dictionary_definition": "quiet, calm, tranquil, placid, serene, easy-tempered, composed, easy; reassure"
+        },
+        {
+          "key": 6,
+          "display_form": "сна́",
+          "lemma": "со́н",
+          "grammar": "Noun, Singular, Masculine, Genitive",
+          "dictionary_definition": "sleep; dream"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 218830,
+      "end_time_ms": 222830,
+      "original_line": "Спокойная ночь",
+      "phonetic_line": "Споко́йная но́чь",
+      "translation": "Good night.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Споко́йная",
+          "lemma": "споко́йный",
+          "grammar": "Adjective, Singular, Feminine, Nominative",
+          "dictionary_definition": "quiet, calm, tranquil, placid, serene, easy-tempered, composed, easy; reassure"
+        },
+        {
+          "key": 2,
+          "display_form": "но́чь",
+          "lemma": "но́чь",
+          "grammar": "Noun, Singular, Feminine, Accusative",
+          "dictionary_definition": "night"
+        }
+      ]
+    }
+  ]
+}

@@ -33,7 +33,7 @@ _POS = {
 _CASE = {
     "nomn": "Nominative", "gent": "Genitive",  "datv": "Dative",
     "accs": "Accusative", "ablt": "Ablative",  "loct": "Locative",
-    "voct": "Vocative",   "gen2": "Genitive 2",
+    "voct": "Vocative",   "gen2": "Genitive 2", "loc2": "Prepositional",
 }
 _GEND = {"masc": "Masculine", "femn": "Feminine",  "neut": "Neuter"}
 _NUM  = {"sing": "Singular",  "plur": "Plural"}
@@ -87,15 +87,18 @@ class PyMorphyBackend(NLPBackend):
         if self._accent is None:
             return text
 
-        # Newer ruaccent builds expose process_all(), older ones process_text().
-        if hasattr(self._accent, "process_text"):
-            return _normalize_stress_marks(self._accent.process_text(text))
+        try:
+            # Newer ruaccent builds expose process_all(), older ones process_text().
+            if hasattr(self._accent, "process_text"):
+                return _normalize_stress_marks(self._accent.process_text(text))
 
-        if hasattr(self._accent, "process_all"):
-            out = self._accent.process_all(text)
-            if isinstance(out, list):
-                return _normalize_stress_marks(out[0] if out else text)
-            return _normalize_stress_marks(out)
+            if hasattr(self._accent, "process_all"):
+                out = self._accent.process_all(text)
+                if isinstance(out, list):
+                    return _normalize_stress_marks(out[0] if out else text)
+                return _normalize_stress_marks(out)
+        except Exception:
+            pass  # fall through to raw text on any ruaccent/ONNX failure
 
         return text
 
