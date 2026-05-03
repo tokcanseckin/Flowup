@@ -261,7 +261,9 @@ def export_song(song_id: int, db: Session = Depends(get_db)):
 
 # ── Playlists ──────────────────────────────────────────────────────────────────
 
-def _playlist_song_entry(ps: PlaylistSong) -> PlaylistSongEntry:
+def _playlist_song_entry(ps: PlaylistSong) -> PlaylistSongEntry | None:
+    if ps.song is None:
+        return None  # dangling FK — song was deleted without cascade
     return PlaylistSongEntry(
         position=ps.position,
         song_id=ps.song.id,
@@ -272,6 +274,7 @@ def _playlist_song_entry(ps: PlaylistSong) -> PlaylistSongEntry:
 
 
 def _playlist_response(pl: Playlist) -> PlaylistResponse:
+    songs = [e for ps in pl.playlist_songs if (e := _playlist_song_entry(ps)) is not None]
     return PlaylistResponse(
         id=pl.id,
         spotify_playlist_id=pl.spotify_playlist_id,
@@ -280,7 +283,7 @@ def _playlist_response(pl: Playlist) -> PlaylistResponse:
         difficulty_level=pl.difficulty_level,
         language_code=pl.language_code,
         song_count=pl.song_count,
-        songs=[_playlist_song_entry(ps) for ps in pl.playlist_songs],
+        songs=songs,
     )
 
 

@@ -1,0 +1,1097 @@
+{
+  "spotify_uri": "spotify:track:7fss5WF5vuXRHvMsYRQXQH",
+  "title": "Темная ночь",
+  "artist": "Mark Bernes",
+  "language": {
+    "code": "ru",
+    "name": "Russian",
+    "script": "Cyrillic",
+    "direction": "ltr"
+  },
+  "lines": [
+    {
+      "start_time_ms": 13310,
+      "end_time_ms": 20460,
+      "original_line": "Тёмная ночь, только пули свистят по степи",
+      "phonetic_line": "Тёмная но́чь, то́лько пу́ли свистя́т по степи́",
+      "translation": "Dark night, only bullets whistling down the steppe",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Тёмная",
+          "lemma": "тёмный",
+          "grammar": "Adjective, Singular, Feminine, Nominative",
+          "dictionary_definition": "dark"
+        },
+        {
+          "key": 2,
+          "display_form": "но́чь,",
+          "lemma": "но́чь",
+          "grammar": "Noun, Singular, Feminine, Accusative / Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "night"
+        },
+        {
+          "key": 3,
+          "display_form": "то́лько",
+          "lemma": "то́лько",
+          "grammar": "Adverb / Particle / Conjunction",
+          "dictionary_definition": "only; just, simply"
+        },
+        {
+          "key": 4,
+          "display_form": "пу́ли",
+          "lemma": "пу́ля",
+          "grammar": "Noun, Plural, Feminine, Accusative / Noun, Singular, Feminine, Genitive / Noun, Plural, Feminine, Nominative",
+          "dictionary_definition": "bullet, projectile"
+        },
+        {
+          "key": 5,
+          "display_form": "свистя́т",
+          "lemma": "свисте́ть",
+          "grammar": "Verb, Present, 3rd Person, Plural",
+          "dictionary_definition": "to whistle"
+        },
+        {
+          "key": 6,
+          "display_form": "по",
+          "lemma": "по́",
+          "grammar": "Preposition / Noun, Singular, Neuter, Nominative / Noun, Singular, Neuter, Genitive / Noun, Singular, Neuter, Dative / Noun, Singular, Neuter, Accusative / Noun, Singular, Neuter, Instrumental / Noun, Singular, Neuter, Locative / Noun, Singular, Nominative / Noun, Singular, Genitive / Noun, Singular, Dative / Noun, Singular, Accusative / Noun, Singular, Instrumental / Noun, Singular, Locative / Noun, Plural, Nominative / Noun, Plural, Genitive / Noun, Plural, Dative / Noun, Plural, Accusative / Noun, Plural, Instrumental / Noun, Plural, Locative",
+          "dictionary_definition": "along, down, through, across, around; about, under, for, on; by the means of (por medio de), on; hit or punch somewhere"
+        },
+        {
+          "key": 7,
+          "display_form": "степи́",
+          "lemma": "сте́пь",
+          "grammar": "Noun, Singular, Feminine, Dative / Noun, Plural, Feminine, Nominative / Noun, Singular, Feminine, Genitive / Noun, Plural, Feminine, Accusative / Noun, Singular, Feminine, Locative / Noun, Singular, Feminine, Prepositional",
+          "dictionary_definition": "steppe / veld"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 20460,
+      "end_time_ms": 30980,
+      "original_line": "Только ветер гудит в проводах, тускло звёзды мерцают",
+      "phonetic_line": "То́лько ве́тер гуди́т в провода́х, ту́скло звёзды мерца́ют",
+      "translation": "Only the wind hums in the wires, dim stars twinkle",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "То́лько",
+          "lemma": "то́лько",
+          "grammar": "Adverb / Particle / Conjunction",
+          "dictionary_definition": "only; just, simply"
+        },
+        {
+          "key": 2,
+          "display_form": "ве́тер",
+          "lemma": "ве́тер",
+          "grammar": "Noun, Singular, Masculine, Nominative / Noun, Singular, Masculine, Accusative",
+          "dictionary_definition": "wind, breeze"
+        },
+        {
+          "key": 3,
+          "display_form": "гуди́т",
+          "lemma": "гуде́ть",
+          "grammar": "Verb, Present, 3rd Person, Singular",
+          "dictionary_definition": "buzz, drone, hoot, honk"
+        },
+        {
+          "key": 4,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition / Noun, Singular, Masculine, Genitive / Noun, Singular, Masculine, Locative / Noun, Singular, Masculine, Nominative / Noun, Singular, Masculine, Dative / Noun, Singular, Masculine, Accusative / Noun, Singular, Masculine, Instrumental / Noun, Plural, Masculine, Nominative / Noun, Plural, Masculine, Genitive / Noun, Plural, Masculine, Dative / Noun, Plural, Masculine, Accusative / Noun, Plural, Masculine, Instrumental / Noun, Plural, Masculine, Locative",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 5,
+          "display_form": "провода́х,",
+          "lemma": "про́воды",
+          "grammar": "Noun, Plural, Locative / Noun, Plural, Masculine, Locative",
+          "dictionary_definition": "seeing-off, send-off, farewell"
+        },
+        {
+          "key": 6,
+          "display_form": "ту́скло",
+          "lemma": "ту́скло",
+          "grammar": "Adverb / Verb, Past, Singular, Neuter / Adj (short), Singular, Neuter",
+          "dictionary_definition": "dimly, wanly"
+        },
+        {
+          "key": 7,
+          "display_form": "звёзды",
+          "lemma": "звезда́",
+          "grammar": "Noun, Plural, Feminine, Nominative / Noun, Plural, Feminine, Accusative",
+          "dictionary_definition": "star; famous person; name of service module on the International Space Station"
+        },
+        {
+          "key": 8,
+          "display_form": "мерца́ют",
+          "lemma": "мерца́ть",
+          "grammar": "Verb, Present, 3rd Person, Plural",
+          "dictionary_definition": "to twinkle/to shimmer, glimmer, flicker"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 30980,
+      "end_time_ms": 38240,
+      "original_line": "В тёмную ночь ты любимая знаю не спишь",
+      "phonetic_line": "В тёмную но́чь ты люби́мая зна́ю не спи́шь",
+      "translation": "On a dark night, you know you don't sleep.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "В",
+          "lemma": "в",
+          "grammar": "Preposition / Noun, Singular, Masculine, Genitive / Noun, Singular, Masculine, Locative / Noun, Singular, Masculine, Nominative / Noun, Singular, Masculine, Dative / Noun, Singular, Masculine, Accusative / Noun, Singular, Masculine, Instrumental / Noun, Plural, Masculine, Nominative / Noun, Plural, Masculine, Genitive / Noun, Plural, Masculine, Dative / Noun, Plural, Masculine, Accusative / Noun, Plural, Masculine, Instrumental / Noun, Plural, Masculine, Locative / Noun, Singular, Feminine, Nominative / Noun, Singular, Feminine, Genitive / Noun, Singular, Feminine, Dative / Noun, Singular, Feminine, Accusative / Noun, Singular, Feminine, Instrumental / Noun, Singular, Feminine, Locative",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 2,
+          "display_form": "тёмную",
+          "lemma": "тёмный",
+          "grammar": "Adjective, Singular, Feminine, Accusative",
+          "dictionary_definition": "dark"
+        },
+        {
+          "key": 3,
+          "display_form": "но́чь",
+          "lemma": "но́чь",
+          "grammar": "Noun, Singular, Feminine, Accusative / Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "night"
+        },
+        {
+          "key": 4,
+          "display_form": "ты",
+          "lemma": "ты́",
+          "grammar": "Pronoun, 2nd Person, Singular, Nominative",
+          "dictionary_definition": "you"
+        },
+        {
+          "key": 5,
+          "display_form": "люби́мая",
+          "lemma": "люби́мый",
+          "grammar": "Adjective, Singular, Feminine, Nominative / Participle, Present, Singular, Feminine, Nominative",
+          "dictionary_definition": "favorite, favourite, beloved, loved, adored"
+        },
+        {
+          "key": 6,
+          "display_form": "зна́ю",
+          "lemma": "зна́ть",
+          "grammar": "Verb, Present, 1st Person, Singular",
+          "dictionary_definition": "nobility, noble people"
+        },
+        {
+          "key": 7,
+          "display_form": "не",
+          "lemma": "не́",
+          "grammar": "Particle",
+          "dictionary_definition": "not"
+        },
+        {
+          "key": 8,
+          "display_form": "спи́шь",
+          "lemma": "спа́ть",
+          "grammar": "Verb, Present, 2nd Person, Singular",
+          "dictionary_definition": "to sleep"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 38240,
+      "end_time_ms": 48590,
+      "original_line": "И у детской кроватки тайком ты слезу утираешь",
+      "phonetic_line": "И у де́тской крова́тки тайко́м ты слезу́ утира́ешь",
+      "translation": "And at the crib, you secretly wipe away a tear.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "И",
+          "lemma": "и",
+          "grammar": "Conjunction / Particle / Interjection / Noun, Singular, Masculine, Nominative / Noun, Singular, Masculine, Genitive / Noun, Singular, Masculine, Dative / Noun, Singular, Masculine, Accusative / Noun, Singular, Masculine, Instrumental / Noun, Singular, Masculine, Locative / Noun, Plural, Masculine, Nominative / Noun, Plural, Masculine, Genitive / Noun, Plural, Masculine, Dative / Noun, Plural, Masculine, Accusative / Noun, Plural, Masculine, Instrumental / Noun, Plural, Masculine, Locative / Noun, Singular, Feminine, Nominative / Noun, Singular, Feminine, Genitive / Noun, Singular, Feminine, Dative / Noun, Singular, Feminine, Accusative / Noun, Singular, Feminine, Instrumental / Noun, Singular, Feminine, Locative",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 2,
+          "display_form": "у",
+          "lemma": "у",
+          "grammar": "Preposition / Interjection",
+          "dictionary_definition": "(possession); by, at (place); with; from (take, borrow)"
+        },
+        {
+          "key": 3,
+          "display_form": "де́тской",
+          "lemma": "де́тский",
+          "grammar": "Adjective, Singular, Feminine, Genitive / Adjective, Singular, Feminine, Locative / Adjective, Singular, Feminine, Instrumental / Noun, Singular, Feminine, Genitive / Adjective, Singular, Feminine, Dative / Noun, Singular, Feminine, Dative / Noun, Singular, Feminine, Instrumental / Noun, Singular, Feminine, Locative",
+          "dictionary_definition": "children's, childish, infantile, puerile, childlike, child; baby"
+        },
+        {
+          "key": 4,
+          "display_form": "крова́тки",
+          "lemma": "крова́тка",
+          "grammar": "Noun, Singular, Feminine, Genitive / Noun, Plural, Feminine, Nominative / Noun, Plural, Feminine, Accusative",
+          "dictionary_definition": "crib"
+        },
+        {
+          "key": 5,
+          "display_form": "тайко́м",
+          "lemma": "тайко́м",
+          "grammar": "Adverb",
+          "dictionary_definition": "secretly, in secret, surreptitiously, by stealth, on the quiet, on the sly"
+        },
+        {
+          "key": 6,
+          "display_form": "ты",
+          "lemma": "ты́",
+          "grammar": "Pronoun, 2nd Person, Singular, Nominative",
+          "dictionary_definition": "you"
+        },
+        {
+          "key": 7,
+          "display_form": "слезу́",
+          "lemma": "слеза́",
+          "grammar": "Noun, Singular, Feminine, Accusative / Verb, Future, 1st Person, Singular",
+          "dictionary_definition": "tear"
+        },
+        {
+          "key": 8,
+          "display_form": "утира́ешь",
+          "lemma": "утира́ть",
+          "grammar": "Verb, Present, 2nd Person, Singular",
+          "dictionary_definition": "wipe, dry"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 48590,
+      "end_time_ms": 56960,
+      "original_line": "Как я люблю глубину твоих ласковых глаз",
+      "phonetic_line": "Как я люблю́ глубину́ твои́х ла́сковых гла́з",
+      "translation": "How I love the depth of your gentle eyes",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Как",
+          "lemma": "ка́к",
+          "grammar": "Conjunction / Adverb / Particle",
+          "dictionary_definition": "how; what; like, as; because"
+        },
+        {
+          "key": 2,
+          "display_form": "я",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 3,
+          "display_form": "люблю́",
+          "lemma": "люби́ть",
+          "grammar": "Verb, Present, 1st Person, Singular",
+          "dictionary_definition": "love"
+        },
+        {
+          "key": 4,
+          "display_form": "глубину́",
+          "lemma": "глубина́",
+          "grammar": "Noun, Singular, Feminine, Accusative",
+          "dictionary_definition": "depth, intensity, profundity, heart; interior, back"
+        },
+        {
+          "key": 5,
+          "display_form": "твои́х",
+          "lemma": "тво́й",
+          "grammar": "Adjective, Plural, Genitive / Adjective, Plural, Locative / Adjective, Plural, Accusative",
+          "dictionary_definition": "your, yours"
+        },
+        {
+          "key": 6,
+          "display_form": "ла́сковых",
+          "lemma": "ла́сковый",
+          "grammar": "Adjective, Plural, Genitive / Adjective, Plural, Accusative / Adjective, Plural, Locative",
+          "dictionary_definition": "affectionate, caressing; tender, gentle, sweet"
+        },
+        {
+          "key": 7,
+          "display_form": "гла́з",
+          "lemma": "гла́з",
+          "grammar": "Noun, Plural, Masculine, Genitive / Noun, Singular, Masculine, Accusative / Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "eye"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 56960,
+      "end_time_ms": 65270,
+      "original_line": "Как я хочу к ним прижаться теперь губами",
+      "phonetic_line": "Как я хочу́ к ним прижа́ться тепе́рь губа́ми",
+      "translation": "How I want to snuggle my lips now",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Как",
+          "lemma": "ка́к",
+          "grammar": "Conjunction / Adverb / Particle",
+          "dictionary_definition": "how; what; like, as; because"
+        },
+        {
+          "key": 2,
+          "display_form": "я",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 3,
+          "display_form": "хочу́",
+          "lemma": "хоте́ть",
+          "grammar": "Verb, Present, 1st Person, Singular",
+          "dictionary_definition": "to want; to feel like; to mean"
+        },
+        {
+          "key": 4,
+          "display_form": "к",
+          "lemma": "к",
+          "grammar": "Preposition / Conjunction / Noun, Singular, Masculine, Nominative / Noun, Singular, Masculine, Genitive / Noun, Singular, Masculine, Dative / Noun, Singular, Masculine, Accusative / Noun, Singular, Masculine, Instrumental / Noun, Singular, Masculine, Locative / Noun, Plural, Masculine, Nominative / Noun, Plural, Masculine, Genitive / Noun, Plural, Masculine, Dative / Noun, Plural, Masculine, Accusative / Noun, Plural, Masculine, Instrumental / Noun, Plural, Masculine, Locative",
+          "dictionary_definition": "towards; to; by (time); for the purpose of"
+        },
+        {
+          "key": 5,
+          "display_form": "ним",
+          "lemma": "они́",
+          "grammar": "Pronoun, 3rd Person, Plural, Dative / Pronoun, 3rd Person, Singular, Masculine, Instrumental / Pronoun, 3rd Person, Singular, Neuter, Instrumental",
+          "dictionary_definition": "they"
+        },
+        {
+          "key": 6,
+          "display_form": "прижа́ться",
+          "lemma": "прижа́ться",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "to press up against something"
+        },
+        {
+          "key": 7,
+          "display_form": "тепе́рь",
+          "lemma": "тепе́рь",
+          "grammar": "Adverb",
+          "dictionary_definition": "now, nowadays, today"
+        },
+        {
+          "key": 8,
+          "display_form": "губа́ми",
+          "lemma": "губа́",
+          "grammar": "Noun, Plural, Feminine, Instrumental",
+          "dictionary_definition": "lip, inlet, bay, firth, tree-fungus"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 65270,
+      "end_time_ms": 72020,
+      "original_line": "Тёмная ночь разделяет, любимая, нас",
+      "phonetic_line": "Тёмная но́чь разделя́ет, люби́мая, на́с",
+      "translation": "The dark night divides us, love.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Тёмная",
+          "lemma": "тёмный",
+          "grammar": "Adjective, Singular, Feminine, Nominative",
+          "dictionary_definition": "dark"
+        },
+        {
+          "key": 2,
+          "display_form": "но́чь",
+          "lemma": "но́чь",
+          "grammar": "Noun, Singular, Feminine, Accusative / Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "night"
+        },
+        {
+          "key": 3,
+          "display_form": "разделя́ет,",
+          "lemma": "разделя́ть",
+          "grammar": "Verb, Present, 3rd Person, Singular",
+          "dictionary_definition": "divide, separate, part, split; share"
+        },
+        {
+          "key": 4,
+          "display_form": "люби́мая,",
+          "lemma": "люби́мый",
+          "grammar": "Adjective, Singular, Feminine, Nominative / Participle, Present, Singular, Feminine, Nominative",
+          "dictionary_definition": "favorite, favourite, beloved, loved, adored"
+        },
+        {
+          "key": 5,
+          "display_form": "на́с",
+          "lemma": "мы́",
+          "grammar": "Pronoun, 1st Person, Plural, Genitive / Pronoun, 1st Person, Plural, Accusative / Pronoun, 1st Person, Plural, Locative",
+          "dictionary_definition": "we"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 72020,
+      "end_time_ms": 81990,
+      "original_line": "И тревожная чёрная степь пролегла между нами",
+      "phonetic_line": "И трево́жная чёрная сте́пь пролегла́ ме́жду на́ми",
+      "translation": "And a disturbing black steppe lay between us.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "И",
+          "lemma": "и",
+          "grammar": "Conjunction / Particle / Interjection / Noun, Singular, Masculine, Nominative / Noun, Singular, Masculine, Genitive / Noun, Singular, Masculine, Dative / Noun, Singular, Masculine, Accusative / Noun, Singular, Masculine, Instrumental / Noun, Singular, Masculine, Locative / Noun, Plural, Masculine, Nominative / Noun, Plural, Masculine, Genitive / Noun, Plural, Masculine, Dative / Noun, Plural, Masculine, Accusative / Noun, Plural, Masculine, Instrumental / Noun, Plural, Masculine, Locative / Noun, Singular, Feminine, Nominative / Noun, Singular, Feminine, Genitive / Noun, Singular, Feminine, Dative / Noun, Singular, Feminine, Accusative / Noun, Singular, Feminine, Instrumental / Noun, Singular, Feminine, Locative",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 2,
+          "display_form": "трево́жная",
+          "lemma": "трево́жный",
+          "grammar": "Adjective, Singular, Feminine, Nominative",
+          "dictionary_definition": "alarming, disturbing; anxious; unsettling, worrisome"
+        },
+        {
+          "key": 3,
+          "display_form": "чёрная",
+          "lemma": "чёрный",
+          "grammar": "Adjective, Singular, Feminine, Nominative",
+          "dictionary_definition": "black; ferrous metal"
+        },
+        {
+          "key": 4,
+          "display_form": "сте́пь",
+          "lemma": "сте́пь",
+          "grammar": "Noun, Singular, Feminine, Accusative / Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "steppe / veld"
+        },
+        {
+          "key": 5,
+          "display_form": "пролегла́",
+          "lemma": "проле́чь",
+          "grammar": "Verb, Past, Singular, Feminine",
+          "dictionary_definition": "to lie through, run through"
+        },
+        {
+          "key": 6,
+          "display_form": "ме́жду",
+          "lemma": "ме́жду",
+          "grammar": "Preposition",
+          "dictionary_definition": "between; among; inter-"
+        },
+        {
+          "key": 7,
+          "display_form": "на́ми",
+          "lemma": "мы́",
+          "grammar": "Pronoun, 1st Person, Plural, Instrumental",
+          "dictionary_definition": "we"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 81990,
+      "end_time_ms": 88770,
+      "original_line": "Верю в тебя, в дорогую подругу мою",
+      "phonetic_line": "Ве́рю в тебя́, в дорогу́ю подру́гу мою́",
+      "translation": "I believe in you, my dear friend.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Ве́рю",
+          "lemma": "ве́рить",
+          "grammar": "Verb, Present, 1st Person, Singular",
+          "dictionary_definition": "to believe, trust; to believe in, have faith in"
+        },
+        {
+          "key": 2,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition / Noun, Singular, Masculine, Genitive / Noun, Singular, Masculine, Locative / Noun, Singular, Masculine, Nominative / Noun, Singular, Masculine, Dative / Noun, Singular, Masculine, Accusative / Noun, Singular, Masculine, Instrumental / Noun, Plural, Masculine, Nominative / Noun, Plural, Masculine, Genitive / Noun, Plural, Masculine, Dative / Noun, Plural, Masculine, Accusative / Noun, Plural, Masculine, Instrumental / Noun, Plural, Masculine, Locative",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 3,
+          "display_form": "тебя́,",
+          "lemma": "ты́",
+          "grammar": "Pronoun, 2nd Person, Singular, Accusative / Pronoun, 2nd Person, Singular, Genitive",
+          "dictionary_definition": "you"
+        },
+        {
+          "key": 4,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition / Noun, Singular, Masculine, Genitive / Noun, Singular, Masculine, Locative / Noun, Singular, Masculine, Nominative / Noun, Singular, Masculine, Dative / Noun, Singular, Masculine, Accusative / Noun, Singular, Masculine, Instrumental / Noun, Plural, Masculine, Nominative / Noun, Plural, Masculine, Genitive / Noun, Plural, Masculine, Dative / Noun, Plural, Masculine, Accusative / Noun, Plural, Masculine, Instrumental / Noun, Plural, Masculine, Locative",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 5,
+          "display_form": "дорогу́ю",
+          "lemma": "дорого́й",
+          "grammar": "Adjective, Singular, Feminine, Accusative",
+          "dictionary_definition": "expensive, costly, precious; dear, darling; important"
+        },
+        {
+          "key": 6,
+          "display_form": "подру́гу",
+          "lemma": "подру́га",
+          "grammar": "Noun, Singular, Feminine, Accusative",
+          "dictionary_definition": "friend (female); girlfriend"
+        },
+        {
+          "key": 7,
+          "display_form": "мою́",
+          "lemma": "мо́й",
+          "grammar": "Adjective, Singular, Feminine, Accusative / Verb, Present, 1st Person, Singular",
+          "dictionary_definition": "my, mine, my people"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 88770,
+      "end_time_ms": 99090,
+      "original_line": "Эта вера от пули меня тёмной ночью хранила",
+      "phonetic_line": "Э́та ве́ра от пу́ли меня́ тёмной но́чью храни́ла",
+      "translation": "That belief from a bullet kept me safe for a dark night.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Э́та",
+          "lemma": "э́тот",
+          "grammar": "Adjective, Singular, Feminine, Nominative",
+          "dictionary_definition": "this"
+        },
+        {
+          "key": 2,
+          "display_form": "ве́ра",
+          "lemma": "ве́ра",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "faith, belief, trust"
+        },
+        {
+          "key": 3,
+          "display_form": "от",
+          "lemma": "о́т",
+          "grammar": "Preposition",
+          "dictionary_definition": "from (away); from (part of a whole); from (cause); from (distance)"
+        },
+        {
+          "key": 4,
+          "display_form": "пу́ли",
+          "lemma": "пу́ля",
+          "grammar": "Noun, Plural, Feminine, Accusative / Noun, Singular, Feminine, Genitive / Noun, Plural, Feminine, Nominative",
+          "dictionary_definition": "bullet, projectile"
+        },
+        {
+          "key": 5,
+          "display_form": "меня́",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Accusative / Pronoun, 1st Person, Singular, Genitive",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 6,
+          "display_form": "тёмной",
+          "lemma": "тёмный",
+          "grammar": "Adjective, Singular, Feminine, Genitive / Adjective, Singular, Feminine, Instrumental / Adjective, Singular, Feminine, Locative / Adjective, Singular, Feminine, Dative",
+          "dictionary_definition": "dark"
+        },
+        {
+          "key": 7,
+          "display_form": "но́чью",
+          "lemma": "но́чью",
+          "grammar": "Adverb / Noun, Singular, Feminine, Instrumental",
+          "dictionary_definition": "at night, by night"
+        },
+        {
+          "key": 8,
+          "display_form": "храни́ла",
+          "lemma": "храни́ть",
+          "grammar": "Verb, Past, Singular, Feminine",
+          "dictionary_definition": "to keep, to protect, to guard, to store"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 99090,
+      "end_time_ms": 105610,
+      "original_line": "Радостно мне, я спокоен в смертельном бою",
+      "phonetic_line": "Ра́достно мне́, я споко́ен в смерте́льном бою́",
+      "translation": "I am happy, I am calm in a deadly battle.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Ра́достно",
+          "lemma": "ра́достно",
+          "grammar": "Adverb / Adj (short), Singular, Neuter",
+          "dictionary_definition": "With joy, happily"
+        },
+        {
+          "key": 2,
+          "display_form": "мне́,",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Dative / Pronoun, 1st Person, Singular, Locative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 3,
+          "display_form": "я",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 4,
+          "display_form": "споко́ен",
+          "lemma": "споко́йный",
+          "grammar": "Adj (short), Singular, Masculine",
+          "dictionary_definition": "quiet, calm, tranquil, placid, serene, easy-tempered, composed, easy; reassure"
+        },
+        {
+          "key": 5,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition / Noun, Singular, Masculine, Genitive / Noun, Singular, Masculine, Locative / Noun, Singular, Masculine, Nominative / Noun, Singular, Masculine, Dative / Noun, Singular, Masculine, Accusative / Noun, Singular, Masculine, Instrumental / Noun, Plural, Masculine, Nominative / Noun, Plural, Masculine, Genitive / Noun, Plural, Masculine, Dative / Noun, Plural, Masculine, Accusative / Noun, Plural, Masculine, Instrumental / Noun, Plural, Masculine, Locative",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 6,
+          "display_form": "смерте́льном",
+          "lemma": "смерте́льный",
+          "grammar": "Adjective, Singular, Masculine, Locative / Adjective, Singular, Neuter, Locative",
+          "dictionary_definition": "lethal, fatal, mortal, deadly"
+        },
+        {
+          "key": 7,
+          "display_form": "бою́",
+          "lemma": "бо́й",
+          "grammar": "Noun, Singular, Masculine, Prepositional / Noun, Singular, Masculine, Dative",
+          "dictionary_definition": "fight; battle, combat"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 105610,
+      "end_time_ms": 115300,
+      "original_line": "Знаю, встретишь с любовью меня, что б со мной ни случилось",
+      "phonetic_line": "Зна́ю, встре́тишь с любо́вью меня́, что б со мно́й ни случи́лось",
+      "translation": "I know you'll meet me with love, whatever happens to me.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Зна́ю,",
+          "lemma": "зна́ть",
+          "grammar": "Verb, Present, 1st Person, Singular",
+          "dictionary_definition": "nobility, noble people"
+        },
+        {
+          "key": 2,
+          "display_form": "встре́тишь",
+          "lemma": "встре́тить",
+          "grammar": "Verb, Future, 2nd Person, Singular",
+          "dictionary_definition": "meet"
+        },
+        {
+          "key": 3,
+          "display_form": "с",
+          "lemma": "с",
+          "grammar": "Preposition / Noun, Plural, Feminine, Nominative / Particle / Noun, Singular, Feminine, Nominative / Noun, Singular, Feminine, Genitive / Noun, Singular, Feminine, Dative / Noun, Singular, Feminine, Accusative / Noun, Singular, Feminine, Instrumental / Noun, Singular, Feminine, Locative / Noun, Plural, Feminine, Genitive / Noun, Plural, Feminine, Dative / Noun, Plural, Feminine, Accusative / Noun, Plural, Feminine, Instrumental / Noun, Plural, Feminine, Locative / Noun, Singular, Neuter, Nominative / Noun, Singular, Neuter, Genitive / Noun, Singular, Neuter, Dative / Noun, Singular, Neuter, Accusative / Noun, Singular, Neuter, Instrumental / Noun, Singular, Neuter, Locative / Noun, Plural, Neuter, Nominative / Noun, Plural, Neuter, Genitive / Noun, Plural, Neuter, Dative / Noun, Plural, Neuter, Accusative / Noun, Plural, Neuter, Instrumental / Noun, Plural, Neuter, Locative",
+          "dictionary_definition": "with; from, in the course of; since; off, remove from"
+        },
+        {
+          "key": 4,
+          "display_form": "любо́вью",
+          "lemma": "любо́вь",
+          "grammar": "Noun, Singular, Feminine, Instrumental",
+          "dictionary_definition": "love"
+        },
+        {
+          "key": 5,
+          "display_form": "меня́,",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Accusative / Pronoun, 1st Person, Singular, Genitive",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 6,
+          "display_form": "что",
+          "lemma": "что́",
+          "grammar": "Conjunction / Particle / Pronoun, Singular, Neuter, Accusative / Pronoun, Singular, Neuter, Nominative / Adverb",
+          "dictionary_definition": "what; that"
+        },
+        {
+          "key": 7,
+          "display_form": "б",
+          "lemma": "б",
+          "grammar": "Particle / Noun, Singular, Masculine, Nominative / Noun, Singular, Masculine, Genitive / Noun, Singular, Masculine, Dative / Noun, Singular, Masculine, Accusative / Noun, Singular, Masculine, Instrumental / Noun, Singular, Masculine, Locative / Noun, Plural, Masculine, Nominative / Noun, Plural, Masculine, Genitive / Noun, Plural, Masculine, Dative / Noun, Plural, Masculine, Accusative / Noun, Plural, Masculine, Instrumental / Noun, Plural, Masculine, Locative",
+          "dictionary_definition": "The second letter of the Russian alphabet, called бэ (bɛ) and written in the Cyrillic script.; alternative form of бы (by)"
+        },
+        {
+          "key": 8,
+          "display_form": "со",
+          "lemma": "с",
+          "grammar": "Preposition / Noun, Singular, Feminine, Nominative / Noun, Singular, Feminine, Genitive / Noun, Singular, Feminine, Dative / Noun, Singular, Feminine, Accusative / Noun, Singular, Feminine, Instrumental / Noun, Singular, Feminine, Locative / Noun, Plural, Feminine, Nominative / Noun, Plural, Feminine, Genitive / Noun, Plural, Feminine, Dative / Noun, Plural, Feminine, Accusative / Noun, Plural, Feminine, Instrumental / Noun, Plural, Feminine, Locative",
+          "dictionary_definition": "with; from, in the course of; since; off, remove from"
+        },
+        {
+          "key": 9,
+          "display_form": "мно́й",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Instrumental",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 10,
+          "display_form": "ни",
+          "lemma": "ни́",
+          "grammar": "Particle / Conjunction",
+          "dictionary_definition": "neither; no"
+        },
+        {
+          "key": 11,
+          "display_form": "случи́лось",
+          "lemma": "случи́ться",
+          "grammar": "Verb, Past, Singular, Neuter",
+          "dictionary_definition": "to happen, occur; to come about (с + instrumental)"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 115300,
+      "end_time_ms": 123930,
+      "original_line": "Смерть нестрашна, с ней встречались не раз мы в степи",
+      "phonetic_line": "Сме́рть нестрашна́, с ней встреча́лись не ра́з мы в степи́",
+      "translation": "Death is not fearful, we have met her more than once in the steppe.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Сме́рть",
+          "lemma": "сме́рть",
+          "grammar": "Noun, Singular, Feminine, Nominative / Noun, Singular, Feminine, Accusative",
+          "dictionary_definition": "death; (emphatic with как) dying for; desperately"
+        },
+        {
+          "key": 2,
+          "display_form": "нестрашна́,",
+          "lemma": "нестра́шный",
+          "grammar": "Adj (short), Singular, Feminine",
+          "dictionary_definition": "[нестрашный]"
+        },
+        {
+          "key": 3,
+          "display_form": "с",
+          "lemma": "с",
+          "grammar": "Preposition / Noun, Plural, Feminine, Nominative / Particle / Noun, Singular, Feminine, Nominative / Noun, Singular, Feminine, Genitive / Noun, Singular, Feminine, Dative / Noun, Singular, Feminine, Accusative / Noun, Singular, Feminine, Instrumental / Noun, Singular, Feminine, Locative / Noun, Plural, Feminine, Genitive / Noun, Plural, Feminine, Dative / Noun, Plural, Feminine, Accusative / Noun, Plural, Feminine, Instrumental / Noun, Plural, Feminine, Locative / Noun, Singular, Neuter, Nominative / Noun, Singular, Neuter, Genitive / Noun, Singular, Neuter, Dative / Noun, Singular, Neuter, Accusative / Noun, Singular, Neuter, Instrumental / Noun, Singular, Neuter, Locative / Noun, Plural, Neuter, Nominative / Noun, Plural, Neuter, Genitive / Noun, Plural, Neuter, Dative / Noun, Plural, Neuter, Accusative / Noun, Plural, Neuter, Instrumental / Noun, Plural, Neuter, Locative",
+          "dictionary_definition": "with; from, in the course of; since; off, remove from"
+        },
+        {
+          "key": 4,
+          "display_form": "ней",
+          "lemma": "она́",
+          "grammar": "Pronoun, 3rd Person, Singular, Feminine, Locative / Pronoun, 3rd Person, Singular, Feminine, Instrumental / Pronoun, 3rd Person, Singular, Feminine, Dative / Pronoun, 3rd Person, Singular, Feminine, Genitive",
+          "dictionary_definition": "she"
+        },
+        {
+          "key": 5,
+          "display_form": "встреча́лись",
+          "lemma": "встреча́ться",
+          "grammar": "Verb, Past, Plural",
+          "dictionary_definition": "meet, encounter, be found, be met with; rendez-vous, rendezvous; to date; to see"
+        },
+        {
+          "key": 6,
+          "display_form": "не",
+          "lemma": "не́",
+          "grammar": "Particle",
+          "dictionary_definition": "not"
+        },
+        {
+          "key": 7,
+          "display_form": "ра́з",
+          "lemma": "ра́з",
+          "grammar": "Noun, Plural, Masculine, Genitive / Adverb / Conjunction / Noun, Singular, Masculine, Accusative / Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "time; one; once; if, since"
+        },
+        {
+          "key": 8,
+          "display_form": "мы",
+          "lemma": "мы́",
+          "grammar": "Pronoun, 1st Person, Plural, Nominative",
+          "dictionary_definition": "we"
+        },
+        {
+          "key": 9,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition / Noun, Singular, Masculine, Genitive / Noun, Singular, Masculine, Locative / Noun, Singular, Masculine, Nominative / Noun, Singular, Masculine, Dative / Noun, Singular, Masculine, Accusative / Noun, Singular, Masculine, Instrumental / Noun, Plural, Masculine, Nominative / Noun, Plural, Masculine, Genitive / Noun, Plural, Masculine, Dative / Noun, Plural, Masculine, Accusative / Noun, Plural, Masculine, Instrumental / Noun, Plural, Masculine, Locative",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 10,
+          "display_form": "степи́",
+          "lemma": "сте́пь",
+          "grammar": "Noun, Singular, Feminine, Dative / Noun, Plural, Feminine, Nominative / Noun, Singular, Feminine, Genitive / Noun, Plural, Feminine, Accusative / Noun, Singular, Feminine, Locative / Noun, Singular, Feminine, Prepositional",
+          "dictionary_definition": "steppe / veld"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 123930,
+      "end_time_ms": 132300,
+      "original_line": "Вот и теперь надо мною она кружится",
+      "phonetic_line": "Во́т и тепе́рь на́до мно́ю она́ кру́жится",
+      "translation": "Now she's spinning over me.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Во́т",
+          "lemma": "во́т",
+          "grammar": "Particle",
+          "dictionary_definition": "here is, here are, this is, there, there you go"
+        },
+        {
+          "key": 2,
+          "display_form": "и",
+          "lemma": "и",
+          "grammar": "Conjunction / Particle / Interjection / Noun, Singular, Masculine, Nominative / Noun, Singular, Masculine, Genitive / Noun, Singular, Masculine, Dative / Noun, Singular, Masculine, Accusative / Noun, Singular, Masculine, Instrumental / Noun, Singular, Masculine, Locative / Noun, Plural, Masculine, Nominative / Noun, Plural, Masculine, Genitive / Noun, Plural, Masculine, Dative / Noun, Plural, Masculine, Accusative / Noun, Plural, Masculine, Instrumental / Noun, Plural, Masculine, Locative",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 3,
+          "display_form": "тепе́рь",
+          "lemma": "тепе́рь",
+          "grammar": "Adverb",
+          "dictionary_definition": "now, nowadays, today"
+        },
+        {
+          "key": 4,
+          "display_form": "на́до",
+          "lemma": "на́до",
+          "grammar": "Predicative, Present / Preposition",
+          "dictionary_definition": "need; it is necessary, have to; = над"
+        },
+        {
+          "key": 5,
+          "display_form": "мно́ю",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Instrumental",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 6,
+          "display_form": "она́",
+          "lemma": "она́",
+          "grammar": "Pronoun, 3rd Person, Singular, Feminine, Nominative",
+          "dictionary_definition": "she"
+        },
+        {
+          "key": 7,
+          "display_form": "кру́жится",
+          "lemma": "кружи́ться",
+          "grammar": "Verb, Present, 3rd Person, Singular",
+          "dictionary_definition": "whirl spin go round in circles; be dizzy"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 132300,
+      "end_time_ms": 138970,
+      "original_line": "Ты меня ждёшь, и у детской кроватки не спишь",
+      "phonetic_line": "Ты меня́ ждёшь, и у де́тской крова́тки не спи́шь",
+      "translation": "You're waiting for me, and you can't sleep at the crib.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Ты",
+          "lemma": "ты́",
+          "grammar": "Pronoun, 2nd Person, Singular, Nominative",
+          "dictionary_definition": "you"
+        },
+        {
+          "key": 2,
+          "display_form": "меня́",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Accusative / Pronoun, 1st Person, Singular, Genitive",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 3,
+          "display_form": "ждёшь,",
+          "lemma": "жда́ть",
+          "grammar": "Verb, Present, 2nd Person, Singular",
+          "dictionary_definition": "to wait, to expect, to await"
+        },
+        {
+          "key": 4,
+          "display_form": "и",
+          "lemma": "и",
+          "grammar": "Conjunction / Particle / Interjection / Noun, Singular, Masculine, Nominative / Noun, Singular, Masculine, Genitive / Noun, Singular, Masculine, Dative / Noun, Singular, Masculine, Accusative / Noun, Singular, Masculine, Instrumental / Noun, Singular, Masculine, Locative / Noun, Plural, Masculine, Nominative / Noun, Plural, Masculine, Genitive / Noun, Plural, Masculine, Dative / Noun, Plural, Masculine, Accusative / Noun, Plural, Masculine, Instrumental / Noun, Plural, Masculine, Locative",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 5,
+          "display_form": "у",
+          "lemma": "у",
+          "grammar": "Preposition / Interjection",
+          "dictionary_definition": "(possession); by, at (place); with; from (take, borrow)"
+        },
+        {
+          "key": 6,
+          "display_form": "де́тской",
+          "lemma": "де́тский",
+          "grammar": "Adjective, Singular, Feminine, Genitive / Adjective, Singular, Feminine, Locative / Adjective, Singular, Feminine, Instrumental / Noun, Singular, Feminine, Genitive / Adjective, Singular, Feminine, Dative / Noun, Singular, Feminine, Dative / Noun, Singular, Feminine, Instrumental / Noun, Singular, Feminine, Locative",
+          "dictionary_definition": "children's, childish, infantile, puerile, childlike, child; baby"
+        },
+        {
+          "key": 7,
+          "display_form": "крова́тки",
+          "lemma": "крова́тка",
+          "grammar": "Noun, Singular, Feminine, Genitive / Noun, Plural, Feminine, Nominative / Noun, Plural, Feminine, Accusative",
+          "dictionary_definition": "crib"
+        },
+        {
+          "key": 8,
+          "display_form": "не",
+          "lemma": "не́",
+          "grammar": "Particle",
+          "dictionary_definition": "not"
+        },
+        {
+          "key": 9,
+          "display_form": "спи́шь",
+          "lemma": "спа́ть",
+          "grammar": "Verb, Present, 2nd Person, Singular",
+          "dictionary_definition": "to sleep"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 138970,
+      "end_time_ms": 155820,
+      "original_line": "И поэтому, знаю, со мной ничего не случится",
+      "phonetic_line": "И поэ́тому, зна́ю, со мно́й ничего́ не случи́тся",
+      "translation": "And so, I know nothing will happen to me.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "И",
+          "lemma": "и",
+          "grammar": "Conjunction / Particle / Interjection / Noun, Singular, Masculine, Nominative / Noun, Singular, Masculine, Genitive / Noun, Singular, Masculine, Dative / Noun, Singular, Masculine, Accusative / Noun, Singular, Masculine, Instrumental / Noun, Singular, Masculine, Locative / Noun, Plural, Masculine, Nominative / Noun, Plural, Masculine, Genitive / Noun, Plural, Masculine, Dative / Noun, Plural, Masculine, Accusative / Noun, Plural, Masculine, Instrumental / Noun, Plural, Masculine, Locative / Noun, Singular, Feminine, Nominative / Noun, Singular, Feminine, Genitive / Noun, Singular, Feminine, Dative / Noun, Singular, Feminine, Accusative / Noun, Singular, Feminine, Instrumental / Noun, Singular, Feminine, Locative",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 2,
+          "display_form": "поэ́тому,",
+          "lemma": "поэ́тому",
+          "grammar": "Adverb",
+          "dictionary_definition": "that is why, therefore, so"
+        },
+        {
+          "key": 3,
+          "display_form": "зна́ю,",
+          "lemma": "зна́ть",
+          "grammar": "Verb, Present, 1st Person, Singular",
+          "dictionary_definition": "nobility, noble people"
+        },
+        {
+          "key": 4,
+          "display_form": "со",
+          "lemma": "с",
+          "grammar": "Preposition / Noun, Singular, Feminine, Nominative / Noun, Singular, Feminine, Genitive / Noun, Singular, Feminine, Dative / Noun, Singular, Feminine, Accusative / Noun, Singular, Feminine, Instrumental / Noun, Singular, Feminine, Locative / Noun, Plural, Feminine, Nominative / Noun, Plural, Feminine, Genitive / Noun, Plural, Feminine, Dative / Noun, Plural, Feminine, Accusative / Noun, Plural, Feminine, Instrumental / Noun, Plural, Feminine, Locative",
+          "dictionary_definition": "with; from, in the course of; since; off, remove from"
+        },
+        {
+          "key": 5,
+          "display_form": "мно́й",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Instrumental",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 6,
+          "display_form": "ничего́",
+          "lemma": "ничего́",
+          "grammar": "Adverb / Particle / Pronoun, Singular, Neuter, Genitive / Pronoun, Singular, Neuter, Nominative",
+          "dictionary_definition": "nothing, not anything; never mind, all right; not badly, passably, so-so, not bad"
+        },
+        {
+          "key": 7,
+          "display_form": "не",
+          "lemma": "не́",
+          "grammar": "Particle",
+          "dictionary_definition": "not"
+        },
+        {
+          "key": 8,
+          "display_form": "случи́тся",
+          "lemma": "случи́ться",
+          "grammar": "Verb, Future, 3rd Person, Singular",
+          "dictionary_definition": "to happen, occur; to come about (с + instrumental)"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 155820,
+      "end_time_ms": 159820,
+      "original_line": "И поэтому, знаю, со мной ничего не случится",
+      "phonetic_line": "И поэ́тому, зна́ю, со мно́й ничего́ не случи́тся",
+      "translation": "And so, I know nothing will happen to me.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "И",
+          "lemma": "и",
+          "grammar": "Conjunction / Particle / Interjection / Noun, Singular, Masculine, Nominative / Noun, Singular, Masculine, Genitive / Noun, Singular, Masculine, Dative / Noun, Singular, Masculine, Accusative / Noun, Singular, Masculine, Instrumental / Noun, Singular, Masculine, Locative / Noun, Plural, Masculine, Nominative / Noun, Plural, Masculine, Genitive / Noun, Plural, Masculine, Dative / Noun, Plural, Masculine, Accusative / Noun, Plural, Masculine, Instrumental / Noun, Plural, Masculine, Locative / Noun, Singular, Feminine, Nominative / Noun, Singular, Feminine, Genitive / Noun, Singular, Feminine, Dative / Noun, Singular, Feminine, Accusative / Noun, Singular, Feminine, Instrumental / Noun, Singular, Feminine, Locative",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 2,
+          "display_form": "поэ́тому,",
+          "lemma": "поэ́тому",
+          "grammar": "Adverb",
+          "dictionary_definition": "that is why, therefore, so"
+        },
+        {
+          "key": 3,
+          "display_form": "зна́ю,",
+          "lemma": "зна́ть",
+          "grammar": "Verb, Present, 1st Person, Singular",
+          "dictionary_definition": "nobility, noble people"
+        },
+        {
+          "key": 4,
+          "display_form": "со",
+          "lemma": "с",
+          "grammar": "Preposition / Noun, Singular, Feminine, Nominative / Noun, Singular, Feminine, Genitive / Noun, Singular, Feminine, Dative / Noun, Singular, Feminine, Accusative / Noun, Singular, Feminine, Instrumental / Noun, Singular, Feminine, Locative / Noun, Plural, Feminine, Nominative / Noun, Plural, Feminine, Genitive / Noun, Plural, Feminine, Dative / Noun, Plural, Feminine, Accusative / Noun, Plural, Feminine, Instrumental / Noun, Plural, Feminine, Locative",
+          "dictionary_definition": "with; from, in the course of; since; off, remove from"
+        },
+        {
+          "key": 5,
+          "display_form": "мно́й",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Instrumental",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 6,
+          "display_form": "ничего́",
+          "lemma": "ничего́",
+          "grammar": "Adverb / Particle / Pronoun, Singular, Neuter, Genitive / Pronoun, Singular, Neuter, Nominative",
+          "dictionary_definition": "nothing, not anything; never mind, all right; not badly, passably, so-so, not bad"
+        },
+        {
+          "key": 7,
+          "display_form": "не",
+          "lemma": "не́",
+          "grammar": "Particle",
+          "dictionary_definition": "not"
+        },
+        {
+          "key": 8,
+          "display_form": "случи́тся",
+          "lemma": "случи́ться",
+          "grammar": "Verb, Future, 3rd Person, Singular",
+          "dictionary_definition": "to happen, occur; to come about (с + instrumental)"
+        }
+      ]
+    }
+  ]
+}
