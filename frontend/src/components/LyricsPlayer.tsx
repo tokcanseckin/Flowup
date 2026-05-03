@@ -5,8 +5,8 @@ import rawSongData from '../data/song_data.json'
 
 interface Word {
   key: number
-  inflected_stressed: string
-  lemma_stressed: string
+  display_form: string          // annotated inflected form (stress marks, tone, etc.)
+  lemma: string                 // dictionary base form, possibly annotated
   grammar: string
   dictionary_definition: string
 }
@@ -15,31 +15,37 @@ interface LyricLine {
   start_time_ms: number
   end_time_ms: number
   original_line: string
-  stressed_line: string
+  phonetic_line: string | null  // null when the backend produces no phonetic annotation
   translation: string
   words: Word[]
+}
+
+interface LanguageMeta {
+  code: string
+  name: string
+  script: string
+  direction: 'ltr' | 'rtl'
 }
 
 interface SongData {
   spotify_uri: string
   title: string
+  language: LanguageMeta
   lines: LyricLine[]
 }
 
 interface TooltipState {
   word: Word
-  /** page-relative X center of the word element */
-  x: number
-  /** page-relative top of the word element */
-  y: number
+  x: number   // page-relative X centre of the word element
+  y: number   // page-relative top of the word element
   exiting: boolean
 }
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
 const songData = rawSongData as SongData
-const LINE_HEIGHT_PX = 88   // height reserved per lyrics row in the tape
-const VISIBLE_RADIUS  = 3   // lines above/below active that are rendered
+const LINE_HEIGHT_PX  = 88
+const VISIBLE_RADIUS  = 3
 const TOOLTIP_LINGER_MS = 2500
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -52,12 +58,11 @@ function findActiveLineIndex(lines: LyricLine[], posMs: number): number {
   return -1
 }
 
-/** Opacity/scale for lines at a given distance from center */
 function lineStyle(distance: number): { opacity: number; scale: number } {
-  if (distance === 0) return { opacity: 1,    scale: 1 }
-  if (distance === 1) return { opacity: 0.45, scale: 0.9 }
+  if (distance === 0) return { opacity: 1,    scale: 1    }
+  if (distance === 1) return { opacity: 0.45, scale: 0.9  }
   if (distance === 2) return { opacity: 0.2,  scale: 0.82 }
-  return               { opacity: 0,    scale: 0.75 }
+  return                     { opacity: 0,    scale: 0.75 }
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -67,21 +72,17 @@ interface Props {
 }
 
 export default function LyricsPlayer({ currentPositionMs }: Props) {
-  const lines = songData.lines
+  const { lines, language } = songData
+  const isRTL = language.direction === 'rtl'
 
-  const activeIndex   = findActiveLineIndex(lines, currentPositionMs)
-  const activeLine    = activeIndex >= 0 ? lines[activeIndex] : null
-  const prevActiveRef = useRef(activeIndex)
+  const activeIndex = findActiveLineIndex(lines, currentPositionMs)
+  const activeLine  = activeIndex >= 0 ? lines[activeIndex] : null
 
-  // Detect line changes to reset word refs
-  useEffect(() => { prevActiveRef.current = activeIndex }, [activeIndex])
-
-  // Word element refs for tooltip anchoring (keyed by word.key)
   const wordRefs = useRef<Map<number, HTMLSpanElement>>(new Map())
 
-  const [tooltip, setTooltip]   = useState<TooltipState | null>(null)
-  const timerRef  = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const exitRef   = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [tooltip, setTooltip] = useState<TooltipState | null>(null)
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const exitRef  = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const dismissTooltip = useCallback(() => {
     setTooltip(prev => prev ? { ...prev, exiting: true } : null)
@@ -91,7 +92,6 @@ export default function LyricsPlayer({ currentPositionMs }: Props) {
   // ── Keyboard handler ───────────────────────────────────────────────────────
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      // Ignore when typing in an input
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
 
       const num = parseInt(e.key, 10)
@@ -101,10 +101,9 @@ export default function LyricsPlayer({ currentPositionMs }: Props) {
       const word = activeLine.words.find(w => w.key === num)
       if (!word) return
 
-      const el = wordRefs.current.get(num)
+      const el   = wordRefs.current.get(num)
       const rect = el?.getBoundingClientRect()
 
-      // Clear any pending dismiss
       if (timerRef.current) clearTimeout(timerRef.current)
       if (exitRef.current)  clearTimeout(exitRef.current)
 
@@ -114,7 +113,6 @@ export default function LyricsPlayer({ currentPositionMs }: Props) {
         y: rect ? rect.top  + window.scrollY  : 200,
         exiting: false,
       })
-
       timerRef.current = setTimeout(dismissTooltip, TOOLTIP_LINGER_MS)
     }
 
@@ -122,7 +120,7 @@ export default function LyricsPlayer({ currentPositionMs }: Props) {
     return () => window.removeEventListener('keydown', onKey)
   }, [activeLine, dismissTooltip])
 
-  // Dismiss tooltip when the active line changes
+  // Dismiss and clear refs on line change
   useEffect(() => {
     if (timerRef.current) clearTimeout(timerRef.current)
     if (exitRef.current)  clearTimeout(exitRef.current)
@@ -130,14 +128,13 @@ export default function LyricsPlayer({ currentPositionMs }: Props) {
     wordRefs.current.clear()
   }, [activeIndex])
 
-  // ── Word ref callback ──────────────────────────────────────────────────────
   const setWordRef = useCallback((key: number, el: HTMLSpanElement | null) => {
     if (el) wordRefs.current.set(key, el)
     else    wordRefs.current.delete(key)
   }, [])
 
-  // ── Tape offset so active line stays vertically centred ───────────────────
-  const CONTAINER_H  = 420
+  // ── Tape geometry ──────────────────────────────────────────────────────────
+  const CONTAINER_H   = 420
   const CENTER_OFFSET = CONTAINER_H / 2 - LINE_HEIGHT_PX / 2
   const tapeY = activeIndex >= 0
     ? CENTER_OFFSET - activeIndex * LINE_HEIGHT_PX
@@ -145,8 +142,13 @@ export default function LyricsPlayer({ currentPositionMs }: Props) {
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
-    <div className="relative select-none" style={{ height: CONTAINER_H }}>
-      {/* Top/bottom fade masks */}
+    <div
+      className="relative select-none"
+      style={{ height: CONTAINER_H }}
+      dir={language.direction}
+      lang={language.code}
+    >
+      {/* Fade masks */}
       <div className="pointer-events-none absolute inset-x-0 top-0 h-24 z-10"
            style={{ background: 'linear-gradient(to bottom, #12121f, transparent)' }} />
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 z-10"
@@ -168,20 +170,15 @@ export default function LyricsPlayer({ currentPositionMs }: Props) {
             <div
               key={idx}
               className="flex flex-col items-center justify-center text-center px-8 transition-all duration-500"
-              style={{
-                height:    LINE_HEIGHT_PX,
-                opacity,
-                transform: `scale(${scale})`,
-              }}
+              style={{ height: LINE_HEIGHT_PX, opacity, transform: `scale(${scale})` }}
             >
               {isActive ? (
-                // ── Active line: individual words with number badges ──────────
                 <ActiveLineContent
                   line={line}
+                  isRTL={isRTL}
                   setWordRef={setWordRef}
                 />
               ) : (
-                // ── Surrounding lines: plain stressed text ────────────────────
                 <span className="stressed lyrics-text text-gray-400 text-lg leading-tight">
                   {line.original_line}
                 </span>
@@ -191,7 +188,7 @@ export default function LyricsPlayer({ currentPositionMs }: Props) {
         })}
       </div>
 
-      {/* No-content state */}
+      {/* Empty state */}
       {activeIndex === -1 && (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
           <p className="text-gray-600 text-sm">Waiting for playback…</p>
@@ -199,38 +196,35 @@ export default function LyricsPlayer({ currentPositionMs }: Props) {
         </div>
       )}
 
-      {/* ── Tooltip ───────────────────────────────────────────────────────── */}
-      {tooltip && (
-        <Tooltip state={tooltip} onDismiss={dismissTooltip} />
-      )}
+      {tooltip && <Tooltip state={tooltip} onDismiss={dismissTooltip} />}
     </div>
   )
 }
 
-// ── Sub-components ────────────────────────────────────────────────────────────
+// ── Active line ───────────────────────────────────────────────────────────────
 
 interface ActiveLineProps {
   line: LyricLine
+  isRTL: boolean
   setWordRef: (key: number, el: HTMLSpanElement | null) => void
 }
 
-function ActiveLineContent({ line, setWordRef }: ActiveLineProps) {
+function ActiveLineContent({ line, isRTL, setWordRef }: ActiveLineProps) {
   return (
     <div className="animate-line-pop">
-      {/* Words row */}
-      <div className="flex flex-wrap items-baseline justify-center gap-x-2 gap-y-1">
+      <div
+        className="flex flex-wrap items-baseline justify-center gap-x-2 gap-y-1"
+        style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}
+      >
         {line.words.map(word => (
           <span
             key={word.key}
             ref={el => setWordRef(word.key, el)}
             className="relative inline-flex items-start group cursor-default"
           >
-            {/* The word itself */}
             <span className="stressed lyrics-text text-white text-2xl font-semibold tracking-wide">
-              {word.inflected_stressed}
+              {word.display_form}
             </span>
-
-            {/* Key badge – superscript number */}
             <sup
               className="
                 ml-0.5 text-[10px] font-mono font-medium leading-none
@@ -249,15 +243,12 @@ function ActiveLineContent({ line, setWordRef }: ActiveLineProps) {
         {line.translation}
       </p>
 
-      {/* Hint */}
-      <p className="mt-1.5 text-gray-700 text-xs">
-        press a number key to inspect
-      </p>
+      <p className="mt-1.5 text-gray-700 text-xs">press a number key to inspect</p>
     </div>
   )
 }
 
-// ── Tooltip card ──────────────────────────────────────────────────────────────
+// ── Tooltip ───────────────────────────────────────────────────────────────────
 
 interface TooltipProps {
   state: TooltipState
@@ -269,15 +260,8 @@ function Tooltip({ state, onDismiss }: TooltipProps) {
 
   return (
     <div
-      className={`
-        fixed z-50 pointer-events-auto
-        ${exiting ? 'animate-tooltip-exit' : 'animate-tooltip-enter'}
-      `}
-      style={{
-        left: x,
-        top:  y + window.scrollY,
-        transform: 'translate(-50%, calc(-100% - 14px))',
-      }}
+      className={`fixed z-50 pointer-events-auto ${exiting ? 'animate-tooltip-exit' : 'animate-tooltip-enter'}`}
+      style={{ left: x, top: y + window.scrollY, transform: 'translate(-50%, calc(-100% - 14px))' }}
       onClick={onDismiss}
     >
       {/* Arrow */}
@@ -289,23 +273,18 @@ function Tooltip({ state, onDismiss }: TooltipProps) {
       {/* Card */}
       <div
         className="rounded-2xl border px-5 py-4 shadow-2xl min-w-[200px] max-w-[280px]"
-        style={{
-          background:   '#1e1e35',
-          borderColor:  'rgba(99,102,241,0.35)',
-          boxShadow:    '0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(99,102,241,0.1)',
-        }}
+        style={{ background: '#1e1e35', borderColor: 'rgba(99,102,241,0.35)', boxShadow: '0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(99,102,241,0.1)' }}
       >
-        {/* Inflected form */}
+        {/* Inflected / display form */}
         <p className="stressed text-2xl font-bold text-white leading-tight">
-          {word.inflected_stressed}
+          {word.display_form}
         </p>
 
-        {/* Lemma */}
+        {/* Lemma (dictionary base form) */}
         <p className="stressed text-base text-violet-300 font-medium mt-1">
-          {word.lemma_stressed}
+          {word.lemma}
         </p>
 
-        {/* Divider */}
         <div className="my-3 border-t border-indigo-900/50" />
 
         {/* Grammar */}
@@ -326,7 +305,6 @@ function Tooltip({ state, onDismiss }: TooltipProps) {
           </p>
         </div>
 
-        {/* Dismiss hint */}
         <p className="mt-3 text-gray-700 text-[10px] text-right">click to dismiss</p>
       </div>
     </div>

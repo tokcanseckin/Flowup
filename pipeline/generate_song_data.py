@@ -1,51 +1,120 @@
 #!/usr/bin/env python3
 """
-FlowUp – Russian Music Learning App
-Data Generation Pipeline
+FlowUp – Multilingual Data Generation Pipeline
 
-Steps:
-  1. Fetch time-synced lyrics (.lrc) from LRCLIB (free, no auth)
-  2. Parse LRC timestamps → start_time_ms / end_time_ms
-  3. Translate lines via DeepL API  (mocked when DEEPL_API_KEY is unset)
-  4. Add contextual stress marks with ruaccent
-  5. Tokenise + morphologically analyse with pymorphy3
-  6. Write song_data.json consumed by the React frontend
+Fetches time-synced lyrics from LRCLIB, translates via DeepL, runs
+language-specific NLP (phonetic annotation + morphological analysis),
+and writes a song_data.json file consumed by the React frontend.
+
+Supported source languages (--lang):
+  ru  Russian        (pymorphy3 + ruaccent)
+  uk  Ukrainian      (pymorphy3)
+  es  Spanish        (generic)
+  fr  French         (generic)
+  de  German         (generic)
+  it  Italian        (generic)
+  pt  Portuguese     (generic)
+  nl  Dutch          (generic)
+  pl  Polish         (generic)
+  sv  Swedish        (generic)
+  tr  Turkish        (generic)
+  ja  Japanese       (generic)
+  zh  Chinese        (generic)
+  ko  Korean         (generic)
+  ar  Arabic  [RTL]  (generic)
+  he  Hebrew  [RTL]  (generic)
+
+New language backends can be added by implementing nlp.NLPBackend and
+registering an entry in LANGUAGES below.
 
 Environment variables:
-  DEEPL_API_KEY   – DeepL free-tier key  (optional – mock used otherwise)
-  SPOTIFY_URI     – Override the default Spotify track URI
+  DEEPL_API_KEY   – DeepL free-tier key (required for real translations)
+  DEEPL_URL       – Override endpoint (default: api-free.deepl.com)
 
 Usage:
   pip install -r requirements.txt
-  DEEPL_API_KEY=your_key python generate_song_data.py
+  python generate_song_data.py \\
+      --lang ru \\
+      --artist "Кино" \\
+      --title  "Группа Крови" \\
+      --spotify-uri "spotify:track:4uLU6hMCjMI75M1A2tKUQC"
 """
 
 from __future__ import annotations
 
+import argparse
 import json
 import os
 import re
 import sys
 import time
+from dataclasses import dataclass
+from typing import Callable
 
-import pymorphy3
 import requests
-from ruaccent import RUAccent
 
+from nlp import GenericBackend, NLPBackend, PyMorphyBackend
 
-# ── Configuration ─────────────────────────────────────────────────────────────
+# ── Language registry ─────────────────────────────────────────────────────────
 
-DEEPL_API_KEY: str = os.environ.get("DEEPL_API_KEY", "")
-DEEPL_URL: str = "https://api-free.deepl.com/v2/translate"  # paid: api.deepl.com
+@dataclass
+class LanguageConfig:
+    name:         str                    # display name
+    script:       str                    # writing system family
+    direction:    str                    # 'ltr' | 'rtl'
+    deepl_code:   str                    # DeepL source_lang code
+    make_backend: Callable[[], NLPBackend]
 
-TRACK: dict = {
-    "spotify_uri": os.environ.get(
-        "SPOTIFY_URI", "spotify:track:4uLU6hMCjMI75M1A2tKUQC"
-    ),
-    "artist": "Кино",
-    "title": "Группа Крови",
-    "display_title": "Группа Крови — Кино",
+LANGUAGES: dict[str, LanguageConfig] = {
+    # ── Slavic (pymorphy3) ────────────────────────────────────────────────────
+    "ru": LanguageConfig("Russian",    "Cyrillic", "ltr", "RU",
+                         lambda: PyMorphyBackend(morph_lang="ru", use_accent=True)),
+    "uk": LanguageConfig("Ukrainian",  "Cyrillic", "ltr", "UK",
+                         lambda: PyMorphyBackend(morph_lang="uk", use_accent=False)),
+
+    # ── Latin-script European ─────────────────────────────────────────────────
+    "es": LanguageConfig("Spanish",    "Latin",    "ltr", "ES",  GenericBackend),
+    "fr": LanguageConfig("French",     "Latin",    "ltr", "FR",  GenericBackend),
+    "de": LanguageConfig("German",     "Latin",    "ltr", "DE",  GenericBackend),
+    "it": LanguageConfig("Italian",    "Latin",    "ltr", "IT",  GenericBackend),
+    "pt": LanguageConfig("Portuguese", "Latin",    "ltr", "PT",  GenericBackend),
+    "nl": LanguageConfig("Dutch",      "Latin",    "ltr", "NL",  GenericBackend),
+    "pl": LanguageConfig("Polish",     "Latin",    "ltr", "PL",  GenericBackend),
+    "sv": LanguageConfig("Swedish",    "Latin",    "ltr", "SV",  GenericBackend),
+    "tr": LanguageConfig("Turkish",    "Latin",    "ltr", "TR",  GenericBackend),
+
+    # ── East Asian ────────────────────────────────────────────────────────────
+    "ja": LanguageConfig("Japanese",   "CJK",      "ltr", "JA",  GenericBackend),
+    "zh": LanguageConfig("Chinese",    "CJK",      "ltr", "ZH",  GenericBackend),
+    "ko": LanguageConfig("Korean",     "Hangul",   "ltr", "KO",  GenericBackend),
+
+    # ── Right-to-left ─────────────────────────────────────────────────────────
+    "ar": LanguageConfig("Arabic",     "Arabic",   "rtl", "AR",  GenericBackend),
+    "he": LanguageConfig("Hebrew",     "Hebrew",   "rtl", "HE",  GenericBackend),
 }
+
+# ── CLI ───────────────────────────────────────────────────────────────────────
+
+def build_arg_parser() -> argparse.ArgumentParser:
+    p = argparse.ArgumentParser(
+        description="FlowUp multilingual data pipeline",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    p.add_argument("--lang",        required=True, choices=LANGUAGES,
+                   metavar="LANG",  help=f"Source language code. One of: {', '.join(LANGUAGES)}")
+    p.add_argument("--artist",      required=True, help="Artist name (used for LRCLIB search)")
+    p.add_argument("--title",       required=True, help="Track title (used for LRCLIB search)")
+    p.add_argument("--spotify-uri", required=True, dest="spotify_uri",
+                   help="Spotify track URI, e.g. spotify:track:4uLU6hMCjMI75M1A2tKUQC")
+    p.add_argument("--display-title", dest="display_title",
+                   help="Song title shown in the UI (defaults to --title)")
+    p.add_argument("--target-lang", dest="target_lang", default="EN-US",
+                   help="DeepL translation target language (default: EN-US)")
+    p.add_argument("--offset-ms",   dest="offset_ms", type=int, default=0,
+                   help="Add a fixed ms offset to all timestamps (positive = shift later)")
+    p.add_argument("--output",      default="song_data.json",
+                   help="Output file path (default: song_data.json)")
+    return p
 
 # ── LRC helpers ───────────────────────────────────────────────────────────────
 
@@ -53,12 +122,10 @@ _LRC_RE = re.compile(r"\[(\d{2}):(\d{2})\.(\d{2,3})\](.*)")
 
 
 def _ts_to_ms(mm: int, ss: int, frac: str) -> int:
-    """Convert [mm:ss.xx] / [mm:ss.xxx] components to milliseconds."""
     return mm * 60_000 + ss * 1_000 + int(frac.ljust(3, "0"))
 
 
-def parse_lrc(text: str) -> list[dict]:
-    """Return list of {start_ms, end_ms, text} dicts from LRC content."""
+def parse_lrc(text: str, offset_ms: int = 0) -> list[dict]:
     rows: list[dict] = []
     for raw in text.splitlines():
         m = _LRC_RE.match(raw.strip())
@@ -67,22 +134,20 @@ def parse_lrc(text: str) -> list[dict]:
         mm, ss, frac, body = m.groups()
         body = body.strip()
         if body:
-            rows.append({"start_ms": _ts_to_ms(int(mm), int(ss), frac), "text": body})
-
+            rows.append({
+                "start_ms": _ts_to_ms(int(mm), int(ss), frac) + offset_ms,
+                "text": body,
+            })
     for i in range(len(rows) - 1):
         rows[i]["end_ms"] = rows[i + 1]["start_ms"]
     if rows:
         rows[-1]["end_ms"] = rows[-1]["start_ms"] + 4_000
-
     return rows
-
 
 # ── LRCLIB ────────────────────────────────────────────────────────────────────
 
-
 def fetch_synced_lyrics(artist: str, title: str) -> str | None:
-    """Fetch time-synced LRC from lrclib.net; returns raw LRC string or None."""
-    print(f"  [LRCLIB] Searching for '{title}' by '{artist}' …")
+    print(f"  [LRCLIB] Searching '{title}' by '{artist}' …")
     try:
         r = requests.get(
             "https://lrclib.net/api/search",
@@ -92,11 +157,9 @@ def fetch_synced_lyrics(artist: str, title: str) -> str | None:
         r.raise_for_status()
         for hit in r.json():
             if hit.get("syncedLyrics"):
-                print(f"  [LRCLIB] Found synced lyrics (id={hit['id']}, "
-                      f"title={hit.get('trackName', '?')})")
+                print(f"  [LRCLIB] Found (id={hit['id']}, title={hit.get('trackName', '?')})")
                 return hit["syncedLyrics"]
 
-        # Fallback: exact-match endpoint
         r2 = requests.get(
             "https://lrclib.net/api/get",
             params={"artist_name": artist, "track_name": title},
@@ -106,29 +169,29 @@ def fetch_synced_lyrics(artist: str, title: str) -> str | None:
             print("  [LRCLIB] Found via exact-match endpoint.")
             return r2.json()["syncedLyrics"]
 
-        print("  [LRCLIB] No synced lyrics found for this track.")
+        print("  [LRCLIB] No synced lyrics found.")
     except requests.RequestException as exc:
         print(f"  [LRCLIB] Network error: {exc}")
     return None
 
-
 # ── DeepL ─────────────────────────────────────────────────────────────────────
 
-_MOCK_TAG = "[mock – set DEEPL_API_KEY] "
+_DEEPL_API_KEY = os.environ.get("DEEPL_API_KEY", "")
+_DEEPL_URL     = os.environ.get("DEEPL_URL", "https://api-free.deepl.com/v2/translate")
+_MOCK_TAG      = "[mock – set DEEPL_API_KEY] "
 
 
-def translate_batch(texts: list[str]) -> list[str]:
-    """Translate a list of Russian strings to English via DeepL."""
-    if not DEEPL_API_KEY:
-        print("  [DeepL] No API key set – returning mock translations.")
+def translate_batch(texts: list[str], source_lang: str, target_lang: str) -> list[str]:
+    if not _DEEPL_API_KEY:
+        print("  [DeepL] No API key – returning mock translations.")
         return [_MOCK_TAG + t for t in texts]
 
-    print(f"  [DeepL] Translating {len(texts)} lines …")
+    print(f"  [DeepL] Translating {len(texts)} lines ({source_lang} → {target_lang}) …")
     try:
         r = requests.post(
-            DEEPL_URL,
-            headers={"Authorization": f"DeepL-Auth-Key {DEEPL_API_KEY}"},
-            json={"text": texts, "source_lang": "RU", "target_lang": "EN-US"},
+            _DEEPL_URL,
+            headers={"Authorization": f"DeepL-Auth-Key {_DEEPL_API_KEY}"},
+            json={"text": texts, "source_lang": source_lang, "target_lang": target_lang},
             timeout=30,
         )
         r.raise_for_status()
@@ -137,86 +200,36 @@ def translate_batch(texts: list[str]) -> list[str]:
         print(f"  [DeepL] Error: {exc} – falling back to mocks.")
         return [_MOCK_TAG + t for t in texts]
 
-
-# ── Grammar humaniser ─────────────────────────────────────────────────────────
-
-_POS = {
-    "NOUN": "Noun",      "ADJF": "Adjective",       "ADJS": "Adj (short)",
-    "COMP": "Comparative","VERB": "Verb",             "INFN": "Verb (infinitive)",
-    "PRTF": "Participle", "PRTS": "Participle (short)","GRND": "Gerund",
-    "NUMR": "Numeral",    "ADVB": "Adverb",           "NPRO": "Pronoun",
-    "PRED": "Predicative","PREP": "Preposition",      "CONJ": "Conjunction",
-    "PRCL": "Particle",   "INTJ": "Interjection",
-}
-_CASE = {
-    "nomn": "Nominative", "gent": "Genitive", "datv": "Dative",
-    "accs": "Accusative", "ablt": "Ablative", "loct": "Locative",
-    "voct": "Vocative",   "gen2": "Genitive 2",
-}
-_GEND = {"masc": "Masculine", "femn": "Feminine", "neut": "Neuter"}
-_NUM  = {"sing": "Singular",  "plur": "Plural"}
-_TENS = {"pres": "Present",   "past": "Past",   "futr": "Future"}
-_PERS = {"1per": "1st Person","2per": "2nd Person","3per": "3rd Person"}
-
-
-def humanize_grammar(parse) -> str:
-    t = parse.tag
-    parts: list[str] = []
-    if t.POS:    parts.append(_POS.get(t.POS, t.POS))
-    if t.tense:  parts.append(_TENS.get(t.tense, t.tense))
-    if t.person: parts.append(_PERS.get(t.person, t.person))
-    if t.number: parts.append(_NUM.get(t.number, t.number))
-    if t.gender: parts.append(_GEND.get(t.gender, t.gender))
-    if t.case:   parts.append(_CASE.get(t.case, t.case))
-    return ", ".join(parts) or "Unknown"
-
-
 # ── Line processor ────────────────────────────────────────────────────────────
-
 
 def process_line(
     text: str,
     translation: str,
     start_ms: int,
     end_ms: int,
-    morph: pymorphy3.MorphAnalyzer,
-    accentizer: RUAccent,
+    backend: NLPBackend,
 ) -> dict:
-    """Return a fully-structured line dict matching the required JSON schema."""
+    phonetic_line = backend.annotate_line(text)  # None for languages with no annotation
 
-    # Full-line contextual stress (ruaccent uses sentence context for omographs)
-    stressed_line = accentizer.process_text(text)
-
-    # Pair original and stressed tokens by whitespace split
-    orig_tokens    = text.split()
-    stressed_tokens = stressed_line.split()
+    orig_tokens  = text.split()
+    annot_tokens = phonetic_line.split() if phonetic_line else orig_tokens
 
     words: list[dict] = []
     key = 1
 
-    for orig_tok, stress_tok in zip(orig_tokens, stressed_tokens):
-        clean = re.sub(r"[^\w]", "", orig_tok, flags=re.UNICODE)
+    for raw_tok, annot_tok in zip(orig_tokens, annot_tokens):
+        clean = re.sub(r"[^\w]", "", raw_tok, flags=re.UNICODE)
         if not clean:
             continue
 
-        parses = morph.parse(clean)
-        best   = parses[0] if parses else None
-
-        if best:
-            lemma          = best.normal_form
-            lemma_stressed = accentizer.process_text(lemma)
-            grammar        = humanize_grammar(best)
-        else:
-            lemma = lemma_stressed = clean
-            grammar = "Unknown"
+        analysis = backend.analyze_token(raw_tok, annot_tok)
 
         words.append({
-            "key": key,
-            "inflected_stressed": stress_tok,
-            "lemma_stressed": lemma_stressed,
-            "grammar": grammar,
-            # Mocked – replace with a real dictionary API call (e.g. Wiktionary)
-            "dictionary_definition": f"[{lemma}]",
+            "key":                  key,
+            "display_form":         analysis.display_form,
+            "lemma":                analysis.lemma,
+            "grammar":              analysis.grammar,
+            "dictionary_definition": f"[{re.sub(r'[^\w]', '', analysis.lemma, flags=re.UNICODE)}]",
         })
         key += 1
 
@@ -224,68 +237,74 @@ def process_line(
         "start_time_ms": start_ms,
         "end_time_ms":   end_ms,
         "original_line": text,
-        "stressed_line": stressed_line,
+        "phonetic_line": phonetic_line,   # null when backend returns None
         "translation":   translation,
         "words":         words,
     }
 
-
 # ── Main ──────────────────────────────────────────────────────────────────────
 
-
 def main() -> None:
-    sep = "─" * 60
+    args   = build_arg_parser().parse_args()
+    lang   = LANGUAGES[args.lang]
+    sep    = "─" * 60
+
     print(sep)
-    print("  FlowUp — Data Generation Pipeline")
+    print(f"  FlowUp — Data Pipeline  [{lang.name}]")
     print(sep)
 
     # ── 1. Lyrics
     print("\n[1/5] Fetching lyrics from LRCLIB …")
-    lrc = fetch_synced_lyrics(TRACK["artist"], TRACK["title"])
+    lrc = fetch_synced_lyrics(args.artist, args.title)
     if lrc is None:
         print("ERROR: Could not retrieve synced lyrics. Aborting.")
         sys.exit(1)
-
-    rows = parse_lrc(lrc)
+    rows = parse_lrc(lrc, args.offset_ms)
     print(f"       Parsed {len(rows)} lyric lines.")
 
     # ── 2. Translations
     print("\n[2/5] Translating via DeepL …")
-    translations = translate_batch([r["text"] for r in rows])
+    translations = translate_batch(
+        [r["text"] for r in rows],
+        source_lang=lang.deepl_code,
+        target_lang=args.target_lang,
+    )
 
-    # ── 3. NLP tools
-    print("\n[3/5] Loading NLP models …")
-    morph      = pymorphy3.MorphAnalyzer()
-    accentizer = RUAccent()
-    accentizer.load(omograph_model_size="turbo", use_dictionary=True)
-    print("       pymorphy3 + ruaccent ready.")
+    # ── 3. NLP backend
+    print(f"\n[3/5] Loading {lang.name} NLP backend …")
+    backend = lang.make_backend()
+    backend.load()
 
-    # ── 4. Per-line NLP
+    # ── 4. Per-line processing
     print("\n[4/5] Processing lines …")
     lines: list[dict] = []
     for i, (row, trans) in enumerate(zip(rows, translations), 1):
-        print(f"  {i:3}/{len(rows)}: {row['text'][:50]}")
-        lines.append(
-            process_line(
-                row["text"], trans,
-                row["start_ms"], row["end_ms"],
-                morph, accentizer,
-            )
-        )
-        time.sleep(0.02)  # gentle CPU pacing
+        print(f"  {i:3}/{len(rows)}: {row['text'][:55]}")
+        lines.append(process_line(
+            row["text"], trans,
+            row["start_ms"], row["end_ms"],
+            backend,
+        ))
+        time.sleep(0.02)
 
     # ── 5. Write output
-    print("\n[5/5] Writing song_data.json …")
+    print(f"\n[5/5] Writing {args.output} …")
     output = {
-        "spotify_uri": TRACK["spotify_uri"],
-        "title":       TRACK["display_title"],
-        "lines":       lines,
+        "spotify_uri": args.spotify_uri,
+        "title":       args.display_title or args.title,
+        "language": {
+            "code":      args.lang,
+            "name":      lang.name,
+            "script":    lang.script,
+            "direction": lang.direction,
+        },
+        "lines": lines,
     }
-    out_path = os.path.join(os.path.dirname(__file__), "song_data.json")
+    out_path = os.path.join(os.path.dirname(__file__), args.output)
     with open(out_path, "w", encoding="utf-8") as fh:
         json.dump(output, fh, ensure_ascii=False, indent=2)
 
-    print(f"\n✓  Done — {len(lines)} lines written to {out_path}")
+    print(f"\n✓  Done — {len(lines)} lines → {out_path}")
     print(sep)
 
 
