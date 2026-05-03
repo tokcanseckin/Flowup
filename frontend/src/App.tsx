@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { useSpotifyAuth }   from './hooks/useSpotifyAuth'
 import { useSpotifyPlayer } from './hooks/useSpotifyPlayer'
 import LyricsPlayer         from './components/LyricsPlayer'
@@ -222,6 +222,8 @@ function PlayerView({
 }) {
   const [trackUri, setTrackUri] = useState(song.spotify_uri)
   const [loading,  setLoading]  = useState(false)
+  const [infoVisible, setInfoVisible] = useState(false)
+  const autoPausedRef = useRef(false)
   const player = useSpotifyPlayer(localStorage.getItem('sp_access_token'))
 
   const handleLoadTrack = useCallback(async () => {
@@ -229,6 +231,21 @@ function PlayerView({
     await player.loadAndPlayTrack(trackUri)
     setLoading(false)
   }, [player, trackUri])
+
+  useEffect(() => {
+    if (infoVisible) {
+      if (player.isPlaying) {
+        player.pause()
+        autoPausedRef.current = true
+      }
+      return
+    }
+
+    if (autoPausedRef.current) {
+      player.resume()
+      autoPausedRef.current = false
+    }
+  }, [infoVisible, player.isPlaying, player.pause, player.resume])
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: '#0d0d14' }}>
@@ -352,6 +369,8 @@ function PlayerView({
               </div>
               <p className="text-xs text-gray-600 mt-0.5">
                 Press{' '}
+                <kbd className="font-mono bg-gray-800 text-gray-400 px-1 py-0.5 rounded text-[10px]">0</kbd>
+                {' '}for line translation,{' '}
                 <kbd className="font-mono bg-gray-800 text-gray-400 px-1 py-0.5 rounded text-[10px]">1</kbd>
                 –
                 <kbd className="font-mono bg-gray-800 text-gray-400 px-1 py-0.5 rounded text-[10px]">9</kbd>
@@ -362,7 +381,12 @@ function PlayerView({
               {formatMs(player.currentPositionMs)}
             </span>
           </div>
-          <LyricsPlayer currentPositionMs={player.currentPositionMs} songData={song} />
+          <LyricsPlayer
+            currentPositionMs={player.currentPositionMs}
+            songData={song}
+            onInfoVisibilityChange={setInfoVisible}
+            onSeek={player.seekTo}
+          />
         </section>
       </main>
     </div>
