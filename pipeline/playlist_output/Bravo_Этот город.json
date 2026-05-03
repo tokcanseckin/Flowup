@@ -1,0 +1,1581 @@
+{
+  "spotify_uri": "spotify:track:12ELzrXluYapL20Uxqb45o",
+  "title": "Этот город",
+  "artist": "Bravo",
+  "language": {
+    "code": "ru",
+    "name": "Russian",
+    "script": "Cyrillic",
+    "direction": "ltr"
+  },
+  "lines": [
+    {
+      "start_time_ms": 5340,
+      "end_time_ms": 9350,
+      "original_line": "Этот город самый лучший город на Земле",
+      "phonetic_line": "Э́тот го́род са́мый лу́чший го́род на́ Земле́",
+      "translation": "This city is the best city on earth.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Э́тот",
+          "lemma": "э́тот",
+          "grammar": "Adjective, Singular, Masculine, Accusative",
+          "dictionary_definition": "this"
+        },
+        {
+          "key": 2,
+          "display_form": "го́род",
+          "lemma": "го́род",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "city, town"
+        },
+        {
+          "key": 3,
+          "display_form": "са́мый",
+          "lemma": "са́мый",
+          "grammar": "Adjective, Singular, Masculine, Nominative",
+          "dictionary_definition": "the most; the very (same)"
+        },
+        {
+          "key": 4,
+          "display_form": "лу́чший",
+          "lemma": "хоро́ший",
+          "grammar": "Adjective, Singular, Masculine, Nominative",
+          "dictionary_definition": "good, nice"
+        },
+        {
+          "key": 5,
+          "display_form": "го́род",
+          "lemma": "го́род",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "city, town"
+        },
+        {
+          "key": 6,
+          "display_form": "на́",
+          "lemma": "на́",
+          "grammar": "Preposition",
+          "dictionary_definition": "on (place), during; on (day/week); on (means of transport); to (direction)"
+        },
+        {
+          "key": 7,
+          "display_form": "Земле́",
+          "lemma": "земля́",
+          "grammar": "Noun, Singular, Feminine, Locative",
+          "dictionary_definition": "earth; land"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 9350,
+      "end_time_ms": 13870,
+      "original_line": "Он как будто нарисован мелом на стене",
+      "phonetic_line": "О́н как бу́дто нарисо́ван ме́лом на́ стене́",
+      "translation": "It's like chalk on the wall.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "О́н",
+          "lemma": "о́н",
+          "grammar": "Pronoun, 3rd Person, Singular, Masculine, Nominative",
+          "dictionary_definition": "he"
+        },
+        {
+          "key": 2,
+          "display_form": "как",
+          "lemma": "ка́к",
+          "grammar": "Conjunction",
+          "dictionary_definition": "how; what; like, as; because"
+        },
+        {
+          "key": 3,
+          "display_form": "бу́дто",
+          "lemma": "бу́дто",
+          "grammar": "Conjunction",
+          "dictionary_definition": "as if, as though"
+        },
+        {
+          "key": 4,
+          "display_form": "нарисо́ван",
+          "lemma": "нарисова́ть",
+          "grammar": "Participle (short), Past, Singular, Masculine",
+          "dictionary_definition": "to draw; to paint"
+        },
+        {
+          "key": 5,
+          "display_form": "ме́лом",
+          "lemma": "мё́л",
+          "grammar": "Noun, Singular, Masculine, Ablative",
+          "dictionary_definition": "masculine singular past indicative imperfective of мести́ (mestí)"
+        },
+        {
+          "key": 6,
+          "display_form": "на́",
+          "lemma": "на́",
+          "grammar": "Preposition",
+          "dictionary_definition": "on (place), during; on (day/week); on (means of transport); to (direction)"
+        },
+        {
+          "key": 7,
+          "display_form": "стене́",
+          "lemma": "стена́",
+          "grammar": "Noun, Singular, Feminine, Locative",
+          "dictionary_definition": "wall"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 13870,
+      "end_time_ms": 18650,
+      "original_line": "Нарисованы бульвары, реки и мосты",
+      "phonetic_line": "Нарисо́ваны бульва́ры, ре́ки и мосты́",
+      "translation": "Painted Boulevards, Rivers and Bridges",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Нарисо́ваны",
+          "lemma": "нарисова́ть",
+          "grammar": "Participle (short), Past, Plural",
+          "dictionary_definition": "to draw; to paint"
+        },
+        {
+          "key": 2,
+          "display_form": "бульва́ры,",
+          "lemma": "бульва́р",
+          "grammar": "Noun, Plural, Masculine, Nominative",
+          "dictionary_definition": "avenue, boulevard"
+        },
+        {
+          "key": 3,
+          "display_form": "ре́ки",
+          "lemma": "река́",
+          "grammar": "Noun, Singular, Feminine, Genitive",
+          "dictionary_definition": "river, stream"
+        },
+        {
+          "key": 4,
+          "display_form": "и",
+          "lemma": "и",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 5,
+          "display_form": "мосты́",
+          "lemma": "мо́ст",
+          "grammar": "Noun, Plural, Masculine, Accusative",
+          "dictionary_definition": "bridge"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 18650,
+      "end_time_ms": 23500,
+      "original_line": "Разноцветные веснушки, белые банты",
+      "phonetic_line": "Разноцве́тные весну́шки, бе́лые ба́нты",
+      "translation": "Colorful freckles, white bows",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Разноцве́тные",
+          "lemma": "разноцве́тный",
+          "grammar": "Adjective, Plural, Accusative",
+          "dictionary_definition": "multi-coloured"
+        },
+        {
+          "key": 2,
+          "display_form": "весну́шки,",
+          "lemma": "весну́шка",
+          "grammar": "Noun, Plural, Feminine, Nominative",
+          "dictionary_definition": "freckle"
+        },
+        {
+          "key": 3,
+          "display_form": "бе́лые",
+          "lemma": "бе́лые",
+          "grammar": "Noun, Plural, Nominative",
+          "dictionary_definition": "inflection of бе́лый (bélyj):\nnominative plural\ninanimate accusative plural; nominative plural; inanimate accusative plural"
+        },
+        {
+          "key": 4,
+          "display_form": "ба́нты",
+          "lemma": "ба́нт",
+          "grammar": "Noun, Plural, Masculine, Nominative",
+          "dictionary_definition": "bow"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 23500,
+      "end_time_ms": 27980,
+      "original_line": "Этот город, просыпаясь смотрит в облака",
+      "phonetic_line": "Э́тот го́род, просыпа́ясь смо́трит в облака́",
+      "translation": "This city wakes up looking into the clouds",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Э́тот",
+          "lemma": "э́тот",
+          "grammar": "Adjective, Singular, Masculine, Accusative",
+          "dictionary_definition": "this"
+        },
+        {
+          "key": 2,
+          "display_form": "го́род,",
+          "lemma": "го́род",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "city, town"
+        },
+        {
+          "key": 3,
+          "display_form": "просыпа́ясь",
+          "lemma": "просыпа́ться",
+          "grammar": "Gerund, Present",
+          "dictionary_definition": "spill, get spilled"
+        },
+        {
+          "key": 4,
+          "display_form": "смо́трит",
+          "lemma": "смотре́ть",
+          "grammar": "Verb, Present, 3rd Person, Singular",
+          "dictionary_definition": "to look, to watch"
+        },
+        {
+          "key": 5,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 6,
+          "display_form": "облака́",
+          "lemma": "о́блако",
+          "grammar": "Noun, Plural, Neuter, Nominative",
+          "dictionary_definition": "cloud"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 27980,
+      "end_time_ms": 32430,
+      "original_line": "Где то там совсем недавно пряталась луна",
+      "phonetic_line": "Где́ то та́м совсе́м неда́вно пря́талась луна́",
+      "translation": "There was a moon hiding somewhere recently.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Где́",
+          "lemma": "где́",
+          "grammar": "Adverb",
+          "dictionary_definition": "where"
+        },
+        {
+          "key": 2,
+          "display_form": "то",
+          "lemma": "то́",
+          "grammar": "Conjunction",
+          "dictionary_definition": "then, thus"
+        },
+        {
+          "key": 3,
+          "display_form": "та́м",
+          "lemma": "та́м",
+          "grammar": "Adverb",
+          "dictionary_definition": "there, later, by and by"
+        },
+        {
+          "key": 4,
+          "display_form": "совсе́м",
+          "lemma": "совсе́м",
+          "grammar": "Adverb",
+          "dictionary_definition": "entirely, totally, completely, quite, at all"
+        },
+        {
+          "key": 5,
+          "display_form": "неда́вно",
+          "lemma": "неда́вно",
+          "grammar": "Adverb",
+          "dictionary_definition": "recently"
+        },
+        {
+          "key": 6,
+          "display_form": "пря́талась",
+          "lemma": "пря́таться",
+          "grammar": "Verb, Past, Singular, Feminine",
+          "dictionary_definition": "hide"
+        },
+        {
+          "key": 7,
+          "display_form": "луна́",
+          "lemma": "луна́",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "moon"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 32430,
+      "end_time_ms": 36770,
+      "original_line": "А теперь взрывают птицы крыльями восход",
+      "phonetic_line": "А тепе́рь взрыва́ют пти́цы кры́льями восхо́д",
+      "translation": "And now they blow up birds with their wings.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "А",
+          "lemma": "а",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and (as contrast)"
+        },
+        {
+          "key": 2,
+          "display_form": "тепе́рь",
+          "lemma": "тепе́рь",
+          "grammar": "Adverb",
+          "dictionary_definition": "now, nowadays, today"
+        },
+        {
+          "key": 3,
+          "display_form": "взрыва́ют",
+          "lemma": "взрыва́ть",
+          "grammar": "Verb, Present, 3rd Person, Plural",
+          "dictionary_definition": "blow up, blast, plough up, turn up"
+        },
+        {
+          "key": 4,
+          "display_form": "пти́цы",
+          "lemma": "пти́ца",
+          "grammar": "Noun, Plural, Feminine, Nominative",
+          "dictionary_definition": "bird"
+        },
+        {
+          "key": 5,
+          "display_form": "кры́льями",
+          "lemma": "крыло́",
+          "grammar": "Noun, Plural, Neuter, Ablative",
+          "dictionary_definition": "wing"
+        },
+        {
+          "key": 6,
+          "display_form": "восхо́д",
+          "lemma": "восхо́д",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "the appearance of a celestial body above the horizon (sunrise восход солнца); Sunrise"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 36770,
+      "end_time_ms": 42310,
+      "original_line": "И куда то уплывает белый пароход",
+      "phonetic_line": "И куда́ то уплыва́ет бе́лый парохо́д",
+      "translation": "And somewhere the white steamer goes.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "И",
+          "lemma": "и",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 2,
+          "display_form": "куда́",
+          "lemma": "куда́",
+          "grammar": "Conjunction",
+          "dictionary_definition": "where (to), whereto; wherever, whenever"
+        },
+        {
+          "key": 3,
+          "display_form": "то",
+          "lemma": "то́",
+          "grammar": "Conjunction",
+          "dictionary_definition": "then, thus"
+        },
+        {
+          "key": 4,
+          "display_form": "уплыва́ет",
+          "lemma": "уплыва́ть",
+          "grammar": "Verb, Present, 3rd Person, Singular",
+          "dictionary_definition": "swim away, float away, be spent quickly, melt away, elapse"
+        },
+        {
+          "key": 5,
+          "display_form": "бе́лый",
+          "lemma": "бе́лый",
+          "grammar": "Adjective, Singular, Masculine, Nominative",
+          "dictionary_definition": "white"
+        },
+        {
+          "key": 6,
+          "display_form": "парохо́д",
+          "lemma": "парохо́д",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "steamer"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 42310,
+      "end_time_ms": 46370,
+      "original_line": "Этот город, не похожий ни на что вокруг",
+      "phonetic_line": "Э́тот го́род, не́ похо́жий ни́ на что́ вокру́г",
+      "translation": "This is a city like no other.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Э́тот",
+          "lemma": "э́тот",
+          "grammar": "Adjective, Singular, Masculine, Accusative",
+          "dictionary_definition": "this"
+        },
+        {
+          "key": 2,
+          "display_form": "го́род,",
+          "lemma": "го́род",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "city, town"
+        },
+        {
+          "key": 3,
+          "display_form": "не́",
+          "lemma": "не́",
+          "grammar": "Particle",
+          "dictionary_definition": "not"
+        },
+        {
+          "key": 4,
+          "display_form": "похо́жий",
+          "lemma": "похо́жий",
+          "grammar": "Adjective, Singular, Masculine, Accusative",
+          "dictionary_definition": "similar, resembling, alike"
+        },
+        {
+          "key": 5,
+          "display_form": "ни́",
+          "lemma": "ни́",
+          "grammar": "Particle",
+          "dictionary_definition": "neither; no"
+        },
+        {
+          "key": 6,
+          "display_form": "на",
+          "lemma": "на́",
+          "grammar": "Preposition",
+          "dictionary_definition": "on (place), during; on (day/week); on (means of transport); to (direction)"
+        },
+        {
+          "key": 7,
+          "display_form": "что́",
+          "lemma": "что́",
+          "grammar": "Conjunction",
+          "dictionary_definition": "what; that"
+        },
+        {
+          "key": 8,
+          "display_form": "вокру́г",
+          "lemma": "вокру́г",
+          "grammar": "Preposition",
+          "dictionary_definition": "around, round, about"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 46370,
+      "end_time_ms": 50290,
+      "original_line": "Улыбается прохожий, и за пять минут",
+      "phonetic_line": "Улыба́ется прохо́жий, и за пя́ть мину́т",
+      "translation": "A passerby smiles, and in five minutes",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Улыба́ется",
+          "lemma": "улыба́ться",
+          "grammar": "Verb, Present, 3rd Person, Singular",
+          "dictionary_definition": "smile"
+        },
+        {
+          "key": 2,
+          "display_form": "прохо́жий,",
+          "lemma": "прохо́жий",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "passer-by"
+        },
+        {
+          "key": 3,
+          "display_form": "и",
+          "lemma": "и",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 4,
+          "display_form": "за",
+          "lemma": "за́",
+          "grammar": "Preposition",
+          "dictionary_definition": "behind; at (location); at (direction); for (in support of)"
+        },
+        {
+          "key": 5,
+          "display_form": "пя́ть",
+          "lemma": "пя́ть",
+          "grammar": "Numeral, Accusative",
+          "dictionary_definition": "five, 5"
+        },
+        {
+          "key": 6,
+          "display_form": "мину́т",
+          "lemma": "мину́та",
+          "grammar": "Noun, Plural, Feminine, Genitive",
+          "dictionary_definition": "minute, moment, instant"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 50290,
+      "end_time_ms": 55310,
+      "original_line": "Помогая человеку верить в чудеса",
+      "phonetic_line": "Помога́я челове́ку ве́рить в чудеса́",
+      "translation": "Helping people believe in miracles",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Помога́я",
+          "lemma": "помога́ть",
+          "grammar": "Gerund, Present",
+          "dictionary_definition": "help, assist, aid"
+        },
+        {
+          "key": 2,
+          "display_form": "челове́ку",
+          "lemma": "челове́к",
+          "grammar": "Noun, Singular, Masculine, Dative",
+          "dictionary_definition": "person, man, people; menial, servant"
+        },
+        {
+          "key": 3,
+          "display_form": "ве́рить",
+          "lemma": "ве́рить",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "to believe, trust; to believe in, have faith in"
+        },
+        {
+          "key": 4,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 5,
+          "display_form": "чудеса́",
+          "lemma": "чу́до",
+          "grammar": "Noun, Plural, Neuter, Nominative",
+          "dictionary_definition": "miracle, wonder, wonderment; wonderwork, marvel; wondrous creature"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 55310,
+      "end_time_ms": 61170,
+      "original_line": "Распускаются фонтаны прямо в небеса",
+      "phonetic_line": "Распуска́ются фонта́ны пря́мо в небеса́",
+      "translation": "Fountains open directly into the sky",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Распуска́ются",
+          "lemma": "распуска́ться",
+          "grammar": "Verb, Present, 3rd Person, Plural",
+          "dictionary_definition": "open, blossom out, become loose, unloosen, slacken, become undisciplined, let oneself go, dissolve, melt"
+        },
+        {
+          "key": 2,
+          "display_form": "фонта́ны",
+          "lemma": "фонта́н",
+          "grammar": "Noun, Plural, Masculine, Nominative",
+          "dictionary_definition": "fountain"
+        },
+        {
+          "key": 3,
+          "display_form": "пря́мо",
+          "lemma": "пря́мо",
+          "grammar": "Adverb",
+          "dictionary_definition": "straight, just; frankly, openly, bluntly; real, really, truly; exactly, downright"
+        },
+        {
+          "key": 4,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 5,
+          "display_form": "небеса́",
+          "lemma": "нё́бо",
+          "grammar": "Noun, Plural, Neuter, Nominative",
+          "dictionary_definition": "palate"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 61170,
+      "end_time_ms": 65710,
+      "original_line": "Я не знаю, где ещё на этом свете",
+      "phonetic_line": "Я не зна́ю, где́ ещё на э́том све́те",
+      "translation": "I don't know where else in the world",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Я",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 2,
+          "display_form": "не",
+          "lemma": "не́",
+          "grammar": "Particle",
+          "dictionary_definition": "not"
+        },
+        {
+          "key": 3,
+          "display_form": "зна́ю,",
+          "lemma": "зна́ть",
+          "grammar": "Verb, Present, 1st Person, Singular",
+          "dictionary_definition": "nobility, noble people"
+        },
+        {
+          "key": 4,
+          "display_form": "где́",
+          "lemma": "где́",
+          "grammar": "Adverb",
+          "dictionary_definition": "where"
+        },
+        {
+          "key": 5,
+          "display_form": "ещё",
+          "lemma": "ещё",
+          "grammar": "Adverb",
+          "dictionary_definition": "still, even, more, else; yet, as far back as, as long as ... ago"
+        },
+        {
+          "key": 6,
+          "display_form": "на",
+          "lemma": "на́",
+          "grammar": "Preposition",
+          "dictionary_definition": "on (place), during; on (day/week); on (means of transport); to (direction)"
+        },
+        {
+          "key": 7,
+          "display_form": "э́том",
+          "lemma": "э́то",
+          "grammar": "Pronoun, Singular, Neuter, Locative",
+          "dictionary_definition": "this is, that is"
+        },
+        {
+          "key": 8,
+          "display_form": "све́те",
+          "lemma": "све́т",
+          "grammar": "Noun, Singular, Masculine, Locative",
+          "dictionary_definition": "light; world; high society"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 65710,
+      "end_time_ms": 70560,
+      "original_line": "Есть такая же весна",
+      "phonetic_line": "Е́сть така́я же́ весна́",
+      "translation": "There's a spring like this.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Е́сть",
+          "lemma": "е́сть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "there is, there are, eats"
+        },
+        {
+          "key": 2,
+          "display_form": "така́я",
+          "lemma": "тако́й",
+          "grammar": "Adjective, Singular, Feminine, Nominative",
+          "dictionary_definition": "such, so, that sort of; be like this, as, be"
+        },
+        {
+          "key": 3,
+          "display_form": "же́",
+          "lemma": "же",
+          "grammar": "Particle",
+          "dictionary_definition": "same, again, already"
+        },
+        {
+          "key": 4,
+          "display_form": "весна́",
+          "lemma": "весна́",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "spring"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 70560,
+      "end_time_ms": 75050,
+      "original_line": "Я, пожалуй, отпущу попутный ветер",
+      "phonetic_line": "Я, пожа́луй, отпущу́ попу́тный ве́тер",
+      "translation": "I think I'll let the wind go.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Я,",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 2,
+          "display_form": "пожа́луй,",
+          "lemma": "пожа́луй",
+          "grammar": "Conjunction",
+          "dictionary_definition": "perhaps, very likely, maybe, I think, I suppose; arguably"
+        },
+        {
+          "key": 3,
+          "display_form": "отпущу́",
+          "lemma": "отпусти́ть",
+          "grammar": "Verb, Future, 1st Person, Singular",
+          "dictionary_definition": "let go"
+        },
+        {
+          "key": 4,
+          "display_form": "попу́тный",
+          "lemma": "попу́тный",
+          "grammar": "Adjective, Singular, Masculine, Nominative",
+          "dictionary_definition": "passing, following; passerbyers"
+        },
+        {
+          "key": 5,
+          "display_form": "ве́тер",
+          "lemma": "ве́тер",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "wind, breeze"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 75050,
+      "end_time_ms": 79860,
+      "original_line": "И останусь навсегда",
+      "phonetic_line": "И оста́нусь навсегда́",
+      "translation": "I'll stay forever.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "И",
+          "lemma": "и",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 2,
+          "display_form": "оста́нусь",
+          "lemma": "оста́ться",
+          "grammar": "Verb, Future, 1st Person, Singular",
+          "dictionary_definition": "To remain; To stay"
+        },
+        {
+          "key": 3,
+          "display_form": "навсегда́",
+          "lemma": "навсегда́",
+          "grammar": "Adverb",
+          "dictionary_definition": "forever, for good"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 79860,
+      "end_time_ms": 84370,
+      "original_line": "Голубые тротуары, синие цветы",
+      "phonetic_line": "Голубы́е тротуа́ры, си́ние цветы́",
+      "translation": "Blue sidewalks, blue flowers",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Голубы́е",
+          "lemma": "голубо́й",
+          "grammar": "Adjective, Plural, Nominative",
+          "dictionary_definition": "gay"
+        },
+        {
+          "key": 2,
+          "display_form": "тротуа́ры,",
+          "lemma": "тротуа́р",
+          "grammar": "Noun, Plural, Masculine, Nominative",
+          "dictionary_definition": "pavement sidewalk"
+        },
+        {
+          "key": 3,
+          "display_form": "си́ние",
+          "lemma": "си́ний",
+          "grammar": "Adjective, Plural, Nominative",
+          "dictionary_definition": "blue, deep blue, indigo; drunk"
+        },
+        {
+          "key": 4,
+          "display_form": "цветы́",
+          "lemma": "цвето́к",
+          "grammar": "Noun, Plural, Masculine, Accusative",
+          "dictionary_definition": "flower, blossom"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 84370,
+      "end_time_ms": 88870,
+      "original_line": "Ярко-жёлтые трамваи, розовые сны",
+      "phonetic_line": "Я́рко-жёлтые трамва́и, ро́зовые сны́",
+      "translation": "Bright yellow trams, pink dreams",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Я́рко-жёлтые",
+          "lemma": "яркожёлтый",
+          "grammar": "Adjective, Plural, Nominative",
+          "dictionary_definition": "[яркожёлтый]"
+        },
+        {
+          "key": 2,
+          "display_form": "трамва́и,",
+          "lemma": "трамва́й",
+          "grammar": "Noun, Plural, Masculine, Nominative",
+          "dictionary_definition": "tram, tramway, street railway, tram-car, street-car"
+        },
+        {
+          "key": 3,
+          "display_form": "ро́зовые",
+          "lemma": "ро́зовый",
+          "grammar": "Adjective, Plural, Nominative",
+          "dictionary_definition": "pink"
+        },
+        {
+          "key": 4,
+          "display_form": "сны́",
+          "lemma": "со́н",
+          "grammar": "Noun, Plural, Masculine, Nominative",
+          "dictionary_definition": "sleep; dream"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 88870,
+      "end_time_ms": 92840,
+      "original_line": "Он как будто нарисован мелом на стене",
+      "phonetic_line": "О́н как бу́дто нарисо́ван ме́лом на́ стене́",
+      "translation": "It's like chalk on the wall.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "О́н",
+          "lemma": "о́н",
+          "grammar": "Pronoun, 3rd Person, Singular, Masculine, Nominative",
+          "dictionary_definition": "he"
+        },
+        {
+          "key": 2,
+          "display_form": "как",
+          "lemma": "ка́к",
+          "grammar": "Conjunction",
+          "dictionary_definition": "how; what; like, as; because"
+        },
+        {
+          "key": 3,
+          "display_form": "бу́дто",
+          "lemma": "бу́дто",
+          "grammar": "Conjunction",
+          "dictionary_definition": "as if, as though"
+        },
+        {
+          "key": 4,
+          "display_form": "нарисо́ван",
+          "lemma": "нарисова́ть",
+          "grammar": "Participle (short), Past, Singular, Masculine",
+          "dictionary_definition": "to draw; to paint"
+        },
+        {
+          "key": 5,
+          "display_form": "ме́лом",
+          "lemma": "мё́л",
+          "grammar": "Noun, Singular, Masculine, Ablative",
+          "dictionary_definition": "masculine singular past indicative imperfective of мести́ (mestí)"
+        },
+        {
+          "key": 6,
+          "display_form": "на́",
+          "lemma": "на́",
+          "grammar": "Preposition",
+          "dictionary_definition": "on (place), during; on (day/week); on (means of transport); to (direction)"
+        },
+        {
+          "key": 7,
+          "display_form": "стене́",
+          "lemma": "стена́",
+          "grammar": "Noun, Singular, Feminine, Locative",
+          "dictionary_definition": "wall"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 92840,
+      "end_time_ms": 101380,
+      "original_line": "Этот город самый лучший город на Земле",
+      "phonetic_line": "Э́тот го́род са́мый лу́чший го́род на́ Земле́",
+      "translation": "This city is the best city on earth.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Э́тот",
+          "lemma": "э́тот",
+          "grammar": "Adjective, Singular, Masculine, Accusative",
+          "dictionary_definition": "this"
+        },
+        {
+          "key": 2,
+          "display_form": "го́род",
+          "lemma": "го́род",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "city, town"
+        },
+        {
+          "key": 3,
+          "display_form": "са́мый",
+          "lemma": "са́мый",
+          "grammar": "Adjective, Singular, Masculine, Nominative",
+          "dictionary_definition": "the most; the very (same)"
+        },
+        {
+          "key": 4,
+          "display_form": "лу́чший",
+          "lemma": "хоро́ший",
+          "grammar": "Adjective, Singular, Masculine, Nominative",
+          "dictionary_definition": "good, nice"
+        },
+        {
+          "key": 5,
+          "display_form": "го́род",
+          "lemma": "го́род",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "city, town"
+        },
+        {
+          "key": 6,
+          "display_form": "на́",
+          "lemma": "на́",
+          "grammar": "Preposition",
+          "dictionary_definition": "on (place), during; on (day/week); on (means of transport); to (direction)"
+        },
+        {
+          "key": 7,
+          "display_form": "Земле́",
+          "lemma": "земля́",
+          "grammar": "Noun, Singular, Feminine, Locative",
+          "dictionary_definition": "earth; land"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 101380,
+      "end_time_ms": 106180,
+      "original_line": "Я не знаю, где ещё на этом свете",
+      "phonetic_line": "Я не зна́ю, где́ ещё на э́том све́те",
+      "translation": "I don't know where else in the world",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Я",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 2,
+          "display_form": "не",
+          "lemma": "не́",
+          "grammar": "Particle",
+          "dictionary_definition": "not"
+        },
+        {
+          "key": 3,
+          "display_form": "зна́ю,",
+          "lemma": "зна́ть",
+          "grammar": "Verb, Present, 1st Person, Singular",
+          "dictionary_definition": "nobility, noble people"
+        },
+        {
+          "key": 4,
+          "display_form": "где́",
+          "lemma": "где́",
+          "grammar": "Adverb",
+          "dictionary_definition": "where"
+        },
+        {
+          "key": 5,
+          "display_form": "ещё",
+          "lemma": "ещё",
+          "grammar": "Adverb",
+          "dictionary_definition": "still, even, more, else; yet, as far back as, as long as ... ago"
+        },
+        {
+          "key": 6,
+          "display_form": "на",
+          "lemma": "на́",
+          "grammar": "Preposition",
+          "dictionary_definition": "on (place), during; on (day/week); on (means of transport); to (direction)"
+        },
+        {
+          "key": 7,
+          "display_form": "э́том",
+          "lemma": "э́то",
+          "grammar": "Pronoun, Singular, Neuter, Locative",
+          "dictionary_definition": "this is, that is"
+        },
+        {
+          "key": 8,
+          "display_form": "све́те",
+          "lemma": "све́т",
+          "grammar": "Noun, Singular, Masculine, Locative",
+          "dictionary_definition": "light; world; high society"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 106180,
+      "end_time_ms": 110990,
+      "original_line": "Есть такая же весна",
+      "phonetic_line": "Е́сть така́я же́ весна́",
+      "translation": "There's a spring like this.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Е́сть",
+          "lemma": "е́сть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "there is, there are, eats"
+        },
+        {
+          "key": 2,
+          "display_form": "така́я",
+          "lemma": "тако́й",
+          "grammar": "Adjective, Singular, Feminine, Nominative",
+          "dictionary_definition": "such, so, that sort of; be like this, as, be"
+        },
+        {
+          "key": 3,
+          "display_form": "же́",
+          "lemma": "же",
+          "grammar": "Particle",
+          "dictionary_definition": "same, again, already"
+        },
+        {
+          "key": 4,
+          "display_form": "весна́",
+          "lemma": "весна́",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "spring"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 110990,
+      "end_time_ms": 115430,
+      "original_line": "Я, пожалуй, отпущу попутный ветер",
+      "phonetic_line": "Я, пожа́луй, отпущу́ попу́тный ве́тер",
+      "translation": "I think I'll let the wind go.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Я,",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 2,
+          "display_form": "пожа́луй,",
+          "lemma": "пожа́луй",
+          "grammar": "Conjunction",
+          "dictionary_definition": "perhaps, very likely, maybe, I think, I suppose; arguably"
+        },
+        {
+          "key": 3,
+          "display_form": "отпущу́",
+          "lemma": "отпусти́ть",
+          "grammar": "Verb, Future, 1st Person, Singular",
+          "dictionary_definition": "let go"
+        },
+        {
+          "key": 4,
+          "display_form": "попу́тный",
+          "lemma": "попу́тный",
+          "grammar": "Adjective, Singular, Masculine, Nominative",
+          "dictionary_definition": "passing, following; passerbyers"
+        },
+        {
+          "key": 5,
+          "display_form": "ве́тер",
+          "lemma": "ве́тер",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "wind, breeze"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 115430,
+      "end_time_ms": 119430,
+      "original_line": "И останусь навсегда",
+      "phonetic_line": "И оста́нусь навсегда́",
+      "translation": "I'll stay forever.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "И",
+          "lemma": "и",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 2,
+          "display_form": "оста́нусь",
+          "lemma": "оста́ться",
+          "grammar": "Verb, Future, 1st Person, Singular",
+          "dictionary_definition": "To remain; To stay"
+        },
+        {
+          "key": 3,
+          "display_form": "навсегда́",
+          "lemma": "навсегда́",
+          "grammar": "Adverb",
+          "dictionary_definition": "forever, for good"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 119430,
+      "end_time_ms": 120580,
+      "original_line": "С тобою",
+      "phonetic_line": "С тобо́ю",
+      "translation": "With you.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "С",
+          "lemma": "с",
+          "grammar": "Preposition",
+          "dictionary_definition": "with; from, in the course of; since; off, remove from"
+        },
+        {
+          "key": 2,
+          "display_form": "тобо́ю",
+          "lemma": "ты́",
+          "grammar": "Pronoun, 2nd Person, Singular, Ablative",
+          "dictionary_definition": "you"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 120580,
+      "end_time_ms": 139660,
+      "original_line": "(Все вместе!)",
+      "phonetic_line": "(Всё вме́сте!)",
+      "translation": "(All together!)",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "(Всё",
+          "lemma": "всё",
+          "grammar": "Particle",
+          "dictionary_definition": "always, all the time, the whole time, still, only, all, all the same, however, nevertheless; everything, often"
+        },
+        {
+          "key": 2,
+          "display_form": "вме́сте!)",
+          "lemma": "вме́сте",
+          "grammar": "Adverb",
+          "dictionary_definition": "together"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 139660,
+      "end_time_ms": 144430,
+      "original_line": "Я (не знаю, где еще на этом свете)",
+      "phonetic_line": "Я(не зна́ю, где́ ещё́ на э́том све́те)",
+      "translation": "I (I don't know where else in the world)",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Я(не",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 2,
+          "display_form": "зна́ю,",
+          "lemma": "не́",
+          "grammar": "Particle",
+          "dictionary_definition": "not"
+        },
+        {
+          "key": 3,
+          "display_form": "где́",
+          "lemma": "зна́ть",
+          "grammar": "Verb, Present, 1st Person, Singular",
+          "dictionary_definition": "nobility, noble people"
+        },
+        {
+          "key": 4,
+          "display_form": "ещё́",
+          "lemma": "где́",
+          "grammar": "Adverb",
+          "dictionary_definition": "where"
+        },
+        {
+          "key": 5,
+          "display_form": "на",
+          "lemma": "ещё",
+          "grammar": "Adverb",
+          "dictionary_definition": "still, even, more, else; yet, as far back as, as long as ... ago"
+        },
+        {
+          "key": 6,
+          "display_form": "э́том",
+          "lemma": "на́",
+          "grammar": "Preposition",
+          "dictionary_definition": "on (place), during; on (day/week); on (means of transport); to (direction)"
+        },
+        {
+          "key": 7,
+          "display_form": "све́те)",
+          "lemma": "э́то",
+          "grammar": "Pronoun, Singular, Neuter, Locative",
+          "dictionary_definition": "this is, that is"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 144430,
+      "end_time_ms": 148970,
+      "original_line": "(Есть такая же весна)",
+      "phonetic_line": "(Е́сть така́я же́ весна́)",
+      "translation": "(There's a spring like that)",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "(Е́сть",
+          "lemma": "е́сть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "there is, there are, eats"
+        },
+        {
+          "key": 2,
+          "display_form": "така́я",
+          "lemma": "тако́й",
+          "grammar": "Adjective, Singular, Feminine, Nominative",
+          "dictionary_definition": "such, so, that sort of; be like this, as, be"
+        },
+        {
+          "key": 3,
+          "display_form": "же́",
+          "lemma": "же",
+          "grammar": "Particle",
+          "dictionary_definition": "same, again, already"
+        },
+        {
+          "key": 4,
+          "display_form": "весна́)",
+          "lemma": "весна́",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "spring"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 148970,
+      "end_time_ms": 153530,
+      "original_line": "(Я, пожалуй, отпущу попутный ветер)",
+      "phonetic_line": "(Я, пожа́луй, отпущу́ попу́тный ве́тер)",
+      "translation": "(I think I'll let go of the tailwind)",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "(Я,",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 2,
+          "display_form": "пожа́луй,",
+          "lemma": "пожа́луй",
+          "grammar": "Conjunction",
+          "dictionary_definition": "perhaps, very likely, maybe, I think, I suppose; arguably"
+        },
+        {
+          "key": 3,
+          "display_form": "отпущу́",
+          "lemma": "отпусти́ть",
+          "grammar": "Verb, Future, 1st Person, Singular",
+          "dictionary_definition": "let go"
+        },
+        {
+          "key": 4,
+          "display_form": "попу́тный",
+          "lemma": "попу́тный",
+          "grammar": "Adjective, Singular, Masculine, Nominative",
+          "dictionary_definition": "passing, following; passerbyers"
+        },
+        {
+          "key": 5,
+          "display_form": "ве́тер)",
+          "lemma": "ве́тер",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "wind, breeze"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 153530,
+      "end_time_ms": 157570,
+      "original_line": "(И останусь навсегда)",
+      "phonetic_line": "(И оста́нусь навсегда́)",
+      "translation": "(And I will forever)",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "(И",
+          "lemma": "и",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 2,
+          "display_form": "оста́нусь",
+          "lemma": "оста́ться",
+          "grammar": "Verb, Future, 1st Person, Singular",
+          "dictionary_definition": "To remain; To stay"
+        },
+        {
+          "key": 3,
+          "display_form": "навсегда́)",
+          "lemma": "навсегда́",
+          "grammar": "Adverb",
+          "dictionary_definition": "forever, for good"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 157570,
+      "end_time_ms": 158300,
+      "original_line": "С тобою",
+      "phonetic_line": "С тобо́ю",
+      "translation": "With you.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "С",
+          "lemma": "с",
+          "grammar": "Preposition",
+          "dictionary_definition": "with; from, in the course of; since; off, remove from"
+        },
+        {
+          "key": 2,
+          "display_form": "тобо́ю",
+          "lemma": "ты́",
+          "grammar": "Pronoun, 2nd Person, Singular, Ablative",
+          "dictionary_definition": "you"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 158300,
+      "end_time_ms": 162880,
+      "original_line": "Я не знаю, где еще на этом свете",
+      "phonetic_line": "Я не зна́ю, где́ ещё́ на э́том све́те",
+      "translation": "I don't know where else in the world",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Я",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 2,
+          "display_form": "не",
+          "lemma": "не́",
+          "grammar": "Particle",
+          "dictionary_definition": "not"
+        },
+        {
+          "key": 3,
+          "display_form": "зна́ю,",
+          "lemma": "зна́ть",
+          "grammar": "Verb, Present, 1st Person, Singular",
+          "dictionary_definition": "nobility, noble people"
+        },
+        {
+          "key": 4,
+          "display_form": "где́",
+          "lemma": "где́",
+          "grammar": "Adverb",
+          "dictionary_definition": "where"
+        },
+        {
+          "key": 5,
+          "display_form": "ещё́",
+          "lemma": "ещё",
+          "grammar": "Adverb",
+          "dictionary_definition": "still, even, more, else; yet, as far back as, as long as ... ago"
+        },
+        {
+          "key": 6,
+          "display_form": "на",
+          "lemma": "на́",
+          "grammar": "Preposition",
+          "dictionary_definition": "on (place), during; on (day/week); on (means of transport); to (direction)"
+        },
+        {
+          "key": 7,
+          "display_form": "э́том",
+          "lemma": "э́то",
+          "grammar": "Pronoun, Singular, Neuter, Locative",
+          "dictionary_definition": "this is, that is"
+        },
+        {
+          "key": 8,
+          "display_form": "све́те",
+          "lemma": "све́т",
+          "grammar": "Noun, Singular, Masculine, Locative",
+          "dictionary_definition": "light; world; high society"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 162880,
+      "end_time_ms": 167630,
+      "original_line": "Есть такая же весна",
+      "phonetic_line": "Е́сть така́я же́ весна́",
+      "translation": "There's a spring like this.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Е́сть",
+          "lemma": "е́сть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "there is, there are, eats"
+        },
+        {
+          "key": 2,
+          "display_form": "така́я",
+          "lemma": "тако́й",
+          "grammar": "Adjective, Singular, Feminine, Nominative",
+          "dictionary_definition": "such, so, that sort of; be like this, as, be"
+        },
+        {
+          "key": 3,
+          "display_form": "же́",
+          "lemma": "же",
+          "grammar": "Particle",
+          "dictionary_definition": "same, again, already"
+        },
+        {
+          "key": 4,
+          "display_form": "весна́",
+          "lemma": "весна́",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "spring"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 167630,
+      "end_time_ms": 171860,
+      "original_line": "Я, пожалуй, отпущу попутный ветер",
+      "phonetic_line": "Я, пожа́луй, отпущу́ попу́тный ве́тер",
+      "translation": "I think I'll let the wind go.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Я,",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 2,
+          "display_form": "пожа́луй,",
+          "lemma": "пожа́луй",
+          "grammar": "Conjunction",
+          "dictionary_definition": "perhaps, very likely, maybe, I think, I suppose; arguably"
+        },
+        {
+          "key": 3,
+          "display_form": "отпущу́",
+          "lemma": "отпусти́ть",
+          "grammar": "Verb, Future, 1st Person, Singular",
+          "dictionary_definition": "let go"
+        },
+        {
+          "key": 4,
+          "display_form": "попу́тный",
+          "lemma": "попу́тный",
+          "grammar": "Adjective, Singular, Masculine, Nominative",
+          "dictionary_definition": "passing, following; passerbyers"
+        },
+        {
+          "key": 5,
+          "display_form": "ве́тер",
+          "lemma": "ве́тер",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "wind, breeze"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 171860,
+      "end_time_ms": 175860,
+      "original_line": "И останусь навсегда",
+      "phonetic_line": "И оста́нусь навсегда́",
+      "translation": "I'll stay forever.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "И",
+          "lemma": "и",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 2,
+          "display_form": "оста́нусь",
+          "lemma": "оста́ться",
+          "grammar": "Verb, Future, 1st Person, Singular",
+          "dictionary_definition": "To remain; To stay"
+        },
+        {
+          "key": 3,
+          "display_form": "навсегда́",
+          "lemma": "навсегда́",
+          "grammar": "Adverb",
+          "dictionary_definition": "forever, for good"
+        }
+      ]
+    }
+  ]
+}

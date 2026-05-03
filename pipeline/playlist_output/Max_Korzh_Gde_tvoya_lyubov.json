@@ -1,0 +1,2643 @@
+{
+  "spotify_uri": "spotify:track:7bQHty20BhXNYgvFfp2jgW",
+  "title": "Где твоя любовь?",
+  "artist": "Max Korzh",
+  "language": {
+    "code": "ru",
+    "name": "Russian",
+    "script": "Cyrillic",
+    "direction": "ltr"
+  },
+  "lines": [
+    {
+      "start_time_ms": 9670,
+      "end_time_ms": 11360,
+      "original_line": "Гуляли под ночной луной",
+      "phonetic_line": "Гуля́ли по́д ночно́й луно́й",
+      "translation": "Walking under the night moon",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Гуля́ли",
+          "lemma": "гуля́ть",
+          "grammar": "Verb, Past, Plural",
+          "dictionary_definition": "take a walk"
+        },
+        {
+          "key": 2,
+          "display_form": "по́д",
+          "lemma": "по́д",
+          "grammar": "Preposition",
+          "dictionary_definition": "under, near; below; underneath; to go down/below"
+        },
+        {
+          "key": 3,
+          "display_form": "ночно́й",
+          "lemma": "ночно́й",
+          "grammar": "Adjective, Singular, Feminine, Genitive",
+          "dictionary_definition": "night, nightly; nocturnal"
+        },
+        {
+          "key": 4,
+          "display_form": "луно́й",
+          "lemma": "луна́",
+          "grammar": "Noun, Singular, Feminine, Ablative",
+          "dictionary_definition": "moon"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 11360,
+      "end_time_ms": 12740,
+      "original_line": "Любовались закатом и питерской зимой",
+      "phonetic_line": "Любова́лись зака́том и пи́терской зимо́й",
+      "translation": "Loved the sunset and St. Petersburg winter",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Любова́лись",
+          "lemma": "любова́ться",
+          "grammar": "Verb, Past, Plural",
+          "dictionary_definition": "to admire/marvel at"
+        },
+        {
+          "key": 2,
+          "display_form": "зака́том",
+          "lemma": "зака́т",
+          "grammar": "Noun, Singular, Masculine, Ablative",
+          "dictionary_definition": "sunset"
+        },
+        {
+          "key": 3,
+          "display_form": "и",
+          "lemma": "и",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 4,
+          "display_form": "пи́терской",
+          "lemma": "пи́терский",
+          "grammar": "Adjective, Singular, Feminine, Genitive",
+          "dictionary_definition": "(relational) Piter / (Saint-)Petersburg, belonging to St. Petersburg"
+        },
+        {
+          "key": 5,
+          "display_form": "зимо́й",
+          "lemma": "зимо́й",
+          "grammar": "Adverb",
+          "dictionary_definition": "in winter"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 12740,
+      "end_time_ms": 15160,
+      "original_line": "Слёзы радости в твоём почерке",
+      "phonetic_line": "Слёзы ра́дости в твоём по́черке",
+      "translation": "Tears of joy in your handwriting",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Слёзы",
+          "lemma": "слеза́",
+          "grammar": "Noun, Plural, Feminine, Nominative",
+          "dictionary_definition": "tear"
+        },
+        {
+          "key": 2,
+          "display_form": "ра́дости",
+          "lemma": "ра́дость",
+          "grammar": "Noun, Singular, Feminine, Genitive",
+          "dictionary_definition": "joy"
+        },
+        {
+          "key": 3,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 4,
+          "display_form": "твоём",
+          "lemma": "тво́й",
+          "grammar": "Adjective, Singular, Masculine, Locative",
+          "dictionary_definition": "your, yours"
+        },
+        {
+          "key": 5,
+          "display_form": "по́черке",
+          "lemma": "по́черк",
+          "grammar": "Noun, Singular, Masculine, Locative",
+          "dictionary_definition": "handwriting"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 15160,
+      "end_time_ms": 17410,
+      "original_line": "Глаза в глаза, твоя рука в моей руке",
+      "phonetic_line": "Глаза́ в глаза́, твоя́ рука́ в мое́й руке́",
+      "translation": "Eyes to eyes, your hand in my hand",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Глаза́",
+          "lemma": "гла́з",
+          "grammar": "Noun, Plural, Masculine, Accusative",
+          "dictionary_definition": "eye"
+        },
+        {
+          "key": 2,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 3,
+          "display_form": "глаза́,",
+          "lemma": "гла́з",
+          "grammar": "Noun, Plural, Masculine, Accusative",
+          "dictionary_definition": "eye"
+        },
+        {
+          "key": 4,
+          "display_form": "твоя́",
+          "lemma": "тво́й",
+          "grammar": "Adjective, Singular, Feminine, Nominative",
+          "dictionary_definition": "your, yours"
+        },
+        {
+          "key": 5,
+          "display_form": "рука́",
+          "lemma": "рука́",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "hand; arm; handwriting"
+        },
+        {
+          "key": 6,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 7,
+          "display_form": "мое́й",
+          "lemma": "мо́й",
+          "grammar": "Adjective, Singular, Feminine, Genitive",
+          "dictionary_definition": "my, mine, my people"
+        },
+        {
+          "key": 8,
+          "display_form": "руке́",
+          "lemma": "рука́",
+          "grammar": "Noun, Singular, Feminine, Locative",
+          "dictionary_definition": "hand; arm; handwriting"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 17410,
+      "end_time_ms": 19860,
+      "original_line": "Всё как обычно-ты родничок в пустыне",
+      "phonetic_line": "Всё как обы́чно-ты родничо́к в пусты́не",
+      "translation": "As usual, you're a fontanel in the desert.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Всё",
+          "lemma": "всё",
+          "grammar": "Particle",
+          "dictionary_definition": "always, all the time, the whole time, still, only, all, all the same, however, nevertheless; everything, often"
+        },
+        {
+          "key": 2,
+          "display_form": "как",
+          "lemma": "ка́к",
+          "grammar": "Conjunction",
+          "dictionary_definition": "how; what; like, as; because"
+        },
+        {
+          "key": 3,
+          "display_form": "обы́чно-ты",
+          "lemma": "обычнота",
+          "grammar": "Noun, Singular, Feminine, Genitive",
+          "dictionary_definition": "[обычнота]"
+        },
+        {
+          "key": 4,
+          "display_form": "родничо́к",
+          "lemma": "родничо́к",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "fontanel"
+        },
+        {
+          "key": 5,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 6,
+          "display_form": "пусты́не",
+          "lemma": "пусты́ня",
+          "grammar": "Noun, Singular, Feminine, Locative",
+          "dictionary_definition": "desert"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 19860,
+      "end_time_ms": 21680,
+      "original_line": "Хотя тогда нам казалось, что мы одни такие",
+      "phonetic_line": "Хотя́ тогда́ нам каза́лось, что мы́ одни́ таки́е",
+      "translation": "At the time, we thought we were alone.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Хотя́",
+          "lemma": "хотя́",
+          "grammar": "Conjunction",
+          "dictionary_definition": "although, though, at least, despite"
+        },
+        {
+          "key": 2,
+          "display_form": "тогда́",
+          "lemma": "тогда́",
+          "grammar": "Adverb",
+          "dictionary_definition": "then, while, at that time, at that moment"
+        },
+        {
+          "key": 3,
+          "display_form": "нам",
+          "lemma": "мы́",
+          "grammar": "Pronoun, 1st Person, Plural, Dative",
+          "dictionary_definition": "we"
+        },
+        {
+          "key": 4,
+          "display_form": "каза́лось,",
+          "lemma": "каза́ться",
+          "grammar": "Verb, Past, Singular, Neuter",
+          "dictionary_definition": "to seem; to appear, strike as, look"
+        },
+        {
+          "key": 5,
+          "display_form": "что",
+          "lemma": "что́",
+          "grammar": "Conjunction",
+          "dictionary_definition": "what; that"
+        },
+        {
+          "key": 6,
+          "display_form": "мы́",
+          "lemma": "мы́",
+          "grammar": "Pronoun, 1st Person, Plural, Nominative",
+          "dictionary_definition": "we"
+        },
+        {
+          "key": 7,
+          "display_form": "одни́",
+          "lemma": "оди́н",
+          "grammar": "Adjective, Plural, Nominative",
+          "dictionary_definition": "one"
+        },
+        {
+          "key": 8,
+          "display_form": "таки́е",
+          "lemma": "тако́й",
+          "grammar": "Adjective, Plural, Nominative",
+          "dictionary_definition": "such, so, that sort of; be like this, as, be"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 21680,
+      "end_time_ms": 23860,
+      "original_line": "Все говорили, что мы самая красивая пара",
+      "phonetic_line": "Все́ говори́ли, что мы са́мая краси́вая па́ра",
+      "translation": "Everyone said we were the most beautiful couple.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Все́",
+          "lemma": "всё",
+          "grammar": "Particle",
+          "dictionary_definition": "always, all the time, the whole time, still, only, all, all the same, however, nevertheless; everything, often"
+        },
+        {
+          "key": 2,
+          "display_form": "говори́ли,",
+          "lemma": "говори́ть",
+          "grammar": "Verb, Past, Plural",
+          "dictionary_definition": "to speak, to talk; to suggest"
+        },
+        {
+          "key": 3,
+          "display_form": "что",
+          "lemma": "что́",
+          "grammar": "Conjunction",
+          "dictionary_definition": "what; that"
+        },
+        {
+          "key": 4,
+          "display_form": "мы",
+          "lemma": "мы́",
+          "grammar": "Pronoun, 1st Person, Plural, Nominative",
+          "dictionary_definition": "we"
+        },
+        {
+          "key": 5,
+          "display_form": "са́мая",
+          "lemma": "са́мый",
+          "grammar": "Adjective, Singular, Feminine, Nominative",
+          "dictionary_definition": "the most; the very (same)"
+        },
+        {
+          "key": 6,
+          "display_form": "краси́вая",
+          "lemma": "краси́вый",
+          "grammar": "Adjective, Singular, Feminine, Nominative",
+          "dictionary_definition": "beautiful, handsome"
+        },
+        {
+          "key": 7,
+          "display_form": "па́ра",
+          "lemma": "па́ра",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "couple, match; pair; around two, few, two"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 23860,
+      "end_time_ms": 26250,
+      "original_line": "Кружилась голова, парам-па-ра-парам",
+      "phonetic_line": "Кружи́лась голова́, па́рам-па́-ра-па́рам",
+      "translation": "Head dizzy, param-pa-ra-param",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Кружи́лась",
+          "lemma": "кружи́ться",
+          "grammar": "Verb, Past, Singular, Feminine",
+          "dictionary_definition": "whirl spin go round in circles; be dizzy"
+        },
+        {
+          "key": 2,
+          "display_form": "голова́,",
+          "lemma": "голова́",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "head, mind, brains, chief, master"
+        },
+        {
+          "key": 3,
+          "display_form": "па́рам-па́-ра-па́рам",
+          "lemma": "парампарапара",
+          "grammar": "Noun, Plural, Feminine, Dative",
+          "dictionary_definition": "[парампарапара]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 26250,
+      "end_time_ms": 29230,
+      "original_line": "Don't speak, Imbruglia и K-Maro",
+      "phonetic_line": "Don't speak, Imbruglia и K-Maro",
+      "translation": "Don't speak, Imbruglia and K-Maro",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Don't",
+          "lemma": "dont",
+          "grammar": "Unknown",
+          "dictionary_definition": "[dont]"
+        },
+        {
+          "key": 2,
+          "display_form": "speak,",
+          "lemma": "speak",
+          "grammar": "Unknown",
+          "dictionary_definition": "[speak]"
+        },
+        {
+          "key": 3,
+          "display_form": "Imbruglia",
+          "lemma": "imbruglia",
+          "grammar": "Unknown",
+          "dictionary_definition": "[imbruglia]"
+        },
+        {
+          "key": 4,
+          "display_form": "и",
+          "lemma": "и",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 5,
+          "display_form": "K-Maro",
+          "lemma": "kmaro",
+          "grammar": "Unknown",
+          "dictionary_definition": "[kmaro]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 29230,
+      "end_time_ms": 30840,
+      "original_line": "Любое место в городе тебя напоминало",
+      "phonetic_line": "Любо́е ме́сто в го́роде тебя́ напомина́ло",
+      "translation": "Every place in town reminds you of you.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Любо́е",
+          "lemma": "любо́й",
+          "grammar": "Adjective, Singular, Neuter, Accusative",
+          "dictionary_definition": "any, every, anyone, either; as you like, randomly, arbitrary"
+        },
+        {
+          "key": 2,
+          "display_form": "ме́сто",
+          "lemma": "ме́сто",
+          "grammar": "Noun, Singular, Neuter, Accusative",
+          "dictionary_definition": "place, spot, site, locality, seat; region, area; site, scene; room, space"
+        },
+        {
+          "key": 3,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 4,
+          "display_form": "го́роде",
+          "lemma": "го́род",
+          "grammar": "Noun, Singular, Masculine, Locative",
+          "dictionary_definition": "city, town"
+        },
+        {
+          "key": 5,
+          "display_form": "тебя́",
+          "lemma": "ты́",
+          "grammar": "Pronoun, 2nd Person, Singular, Accusative",
+          "dictionary_definition": "you"
+        },
+        {
+          "key": 6,
+          "display_form": "напомина́ло",
+          "lemma": "напомина́ть",
+          "grammar": "Verb, Past, Singular, Neuter",
+          "dictionary_definition": "to remind"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 30840,
+      "end_time_ms": 32600,
+      "original_line": "Вот в этом месте мы целовалась под дождём",
+      "phonetic_line": "Вот в э́том ме́сте мы́ целова́лась под дождём",
+      "translation": "This is where we kissed in the rain.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Вот",
+          "lemma": "во́т",
+          "grammar": "Particle",
+          "dictionary_definition": "here is, here are, this is, there, there you go"
+        },
+        {
+          "key": 2,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 3,
+          "display_form": "э́том",
+          "lemma": "э́то",
+          "grammar": "Pronoun, Singular, Neuter, Locative",
+          "dictionary_definition": "this is, that is"
+        },
+        {
+          "key": 4,
+          "display_form": "ме́сте",
+          "lemma": "ме́сто",
+          "grammar": "Noun, Singular, Neuter, Locative",
+          "dictionary_definition": "place, spot, site, locality, seat; region, area; site, scene; room, space"
+        },
+        {
+          "key": 5,
+          "display_form": "мы́",
+          "lemma": "мы́",
+          "grammar": "Pronoun, 1st Person, Plural, Nominative",
+          "dictionary_definition": "we"
+        },
+        {
+          "key": 6,
+          "display_form": "целова́лась",
+          "lemma": "целова́ться",
+          "grammar": "Verb, Past, Singular, Feminine",
+          "dictionary_definition": "to kiss, to make out"
+        },
+        {
+          "key": 7,
+          "display_form": "под",
+          "lemma": "по́д",
+          "grammar": "Preposition",
+          "dictionary_definition": "under, near; below; underneath; to go down/below"
+        },
+        {
+          "key": 8,
+          "display_form": "дождём",
+          "lemma": "до́ждь",
+          "grammar": "Noun, Singular, Masculine, Ablative",
+          "dictionary_definition": "rain"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 32600,
+      "end_time_ms": 34280,
+      "original_line": "А в этом месте гуляли с бродячим котом",
+      "phonetic_line": "А в э́том ме́сте гуля́ли с бродя́чим кото́м",
+      "translation": "And in this place we walked with a stray cat.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "А",
+          "lemma": "а",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and (as contrast)"
+        },
+        {
+          "key": 2,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 3,
+          "display_form": "э́том",
+          "lemma": "э́то",
+          "grammar": "Pronoun, Singular, Neuter, Locative",
+          "dictionary_definition": "this is, that is"
+        },
+        {
+          "key": 4,
+          "display_form": "ме́сте",
+          "lemma": "ме́сто",
+          "grammar": "Noun, Singular, Neuter, Locative",
+          "dictionary_definition": "place, spot, site, locality, seat; region, area; site, scene; room, space"
+        },
+        {
+          "key": 5,
+          "display_form": "гуля́ли",
+          "lemma": "гуля́ть",
+          "grammar": "Verb, Past, Plural",
+          "dictionary_definition": "take a walk"
+        },
+        {
+          "key": 6,
+          "display_form": "с",
+          "lemma": "с",
+          "grammar": "Preposition",
+          "dictionary_definition": "with; from, in the course of; since; off, remove from"
+        },
+        {
+          "key": 7,
+          "display_form": "бродя́чим",
+          "lemma": "бродя́чий",
+          "grammar": "Adjective, Singular, Masculine, Ablative",
+          "dictionary_definition": "stray; vagrant"
+        },
+        {
+          "key": 8,
+          "display_form": "кото́м",
+          "lemma": "ко́т",
+          "grammar": "Noun, Singular, Masculine, Ablative",
+          "dictionary_definition": "cat"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 34280,
+      "end_time_ms": 36240,
+      "original_line": "Пока художники бросали город на полотно",
+      "phonetic_line": "Пока́ худо́жники броса́ли го́род на полотно́",
+      "translation": "While artists threw the city on the canvas",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Пока́",
+          "lemma": "пока́",
+          "grammar": "Adverb",
+          "dictionary_definition": "bye (informal); while, in the meantime; so far, for now; until, until now"
+        },
+        {
+          "key": 2,
+          "display_form": "худо́жники",
+          "lemma": "худо́жник",
+          "grammar": "Noun, Plural, Masculine, Nominative",
+          "dictionary_definition": "artist, painter"
+        },
+        {
+          "key": 3,
+          "display_form": "броса́ли",
+          "lemma": "броса́ть",
+          "grammar": "Verb, Past, Plural",
+          "dictionary_definition": "throw, hurl, fling, chuck, throw about, cast, dart, abandon, forsake, relinquish, give up, leave off"
+        },
+        {
+          "key": 4,
+          "display_form": "го́род",
+          "lemma": "го́род",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "city, town"
+        },
+        {
+          "key": 5,
+          "display_form": "на",
+          "lemma": "на́",
+          "grammar": "Preposition",
+          "dictionary_definition": "on (place), during; on (day/week); on (means of transport); to (direction)"
+        },
+        {
+          "key": 6,
+          "display_form": "полотно́",
+          "lemma": "полотно́",
+          "grammar": "Noun, Singular, Neuter, Accusative",
+          "dictionary_definition": "canvas"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 36240,
+      "end_time_ms": 38590,
+      "original_line": "Мы пили колу, собирали билеты в кино",
+      "phonetic_line": "Мы пи́ли ко́лу, собира́ли биле́ты в кино́",
+      "translation": "We drank coke, collected movie tickets.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Мы",
+          "lemma": "мы́",
+          "grammar": "Pronoun, 1st Person, Plural, Nominative",
+          "dictionary_definition": "we"
+        },
+        {
+          "key": 2,
+          "display_form": "пи́ли",
+          "lemma": "пи́ть",
+          "grammar": "Verb, Past, Plural",
+          "dictionary_definition": "to drink"
+        },
+        {
+          "key": 3,
+          "display_form": "ко́лу,",
+          "lemma": "ко́ла",
+          "grammar": "Noun, Singular, Feminine, Accusative",
+          "dictionary_definition": "Coca-Cola; cola; genitive singular of кол (kol)"
+        },
+        {
+          "key": 4,
+          "display_form": "собира́ли",
+          "lemma": "собира́ть",
+          "grammar": "Verb, Past, Plural",
+          "dictionary_definition": "gather, collect, convoke, assemble, equip, make gathers; to pick up"
+        },
+        {
+          "key": 5,
+          "display_form": "биле́ты",
+          "lemma": "биле́т",
+          "grammar": "Noun, Plural, Masculine, Accusative",
+          "dictionary_definition": "ticket, card"
+        },
+        {
+          "key": 6,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 7,
+          "display_form": "кино́",
+          "lemma": "кино́",
+          "grammar": "Noun, Singular, Neuter, Genitive",
+          "dictionary_definition": "cinema, movie"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 38590,
+      "end_time_ms": 39830,
+      "original_line": "Любили любовь на расстоянии",
+      "phonetic_line": "Люби́ли любо́вь на расстоя́нии",
+      "translation": "Loved love from a distance",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Люби́ли",
+          "lemma": "люби́ть",
+          "grammar": "Verb, Past, Plural",
+          "dictionary_definition": "love"
+        },
+        {
+          "key": 2,
+          "display_form": "любо́вь",
+          "lemma": "любо́вь",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "love"
+        },
+        {
+          "key": 3,
+          "display_form": "на",
+          "lemma": "на́",
+          "grammar": "Preposition",
+          "dictionary_definition": "on (place), during; on (day/week); on (means of transport); to (direction)"
+        },
+        {
+          "key": 4,
+          "display_form": "расстоя́нии",
+          "lemma": "расстоя́ние",
+          "grammar": "Noun, Singular, Neuter, Locative",
+          "dictionary_definition": "distance, space"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 39830,
+      "end_time_ms": 43180,
+      "original_line": "Вместе навсегда, любовь и понимание",
+      "phonetic_line": "Вме́сте навсегда́, любо́вь и понима́ние",
+      "translation": "Together forever, love and understanding",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Вме́сте",
+          "lemma": "вме́сте",
+          "grammar": "Adverb",
+          "dictionary_definition": "together"
+        },
+        {
+          "key": 2,
+          "display_form": "навсегда́,",
+          "lemma": "навсегда́",
+          "grammar": "Adverb",
+          "dictionary_definition": "forever, for good"
+        },
+        {
+          "key": 3,
+          "display_form": "любо́вь",
+          "lemma": "любо́вь",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "love"
+        },
+        {
+          "key": 4,
+          "display_form": "и",
+          "lemma": "и",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 5,
+          "display_form": "понима́ние",
+          "lemma": "понима́ние",
+          "grammar": "Noun, Singular, Neuter, Nominative",
+          "dictionary_definition": "understanding"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 43180,
+      "end_time_ms": 47210,
+      "original_line": "Съёмные квартиры, MTV, салатики, бигтейсты",
+      "phonetic_line": "Съёмные квартиры, MTV, салатики, бигтейсты",
+      "translation": "Rental apartments, MTV, salads, bigties",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Съёмные",
+          "lemma": "съёмный",
+          "grammar": "Adjective, Plural, Nominative",
+          "dictionary_definition": "removable, demountable; detachable; rented"
+        },
+        {
+          "key": 2,
+          "display_form": "квартиры,",
+          "lemma": "кварти́ра",
+          "grammar": "Noun, Singular, Feminine, Genitive",
+          "dictionary_definition": "flat, quarters; apartment"
+        },
+        {
+          "key": 3,
+          "display_form": "MTV,",
+          "lemma": "mtv",
+          "grammar": "Unknown",
+          "dictionary_definition": "[mtv]"
+        },
+        {
+          "key": 4,
+          "display_form": "салатики,",
+          "lemma": "сала́тик",
+          "grammar": "Noun, Plural, Masculine, Nominative",
+          "dictionary_definition": "[салатик]"
+        },
+        {
+          "key": 5,
+          "display_form": "бигтейсты",
+          "lemma": "бигтейст",
+          "grammar": "Noun, Plural, Masculine, Nominative",
+          "dictionary_definition": "[бигтейст]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 47210,
+      "end_time_ms": 51160,
+      "original_line": "Цветы с подземки, клятва навсегда быть вместе",
+      "phonetic_line": "Цветы́ с подзе́мки, кля́тва навсегда́ быть вме́сте",
+      "translation": "Flowers from the subway, vow to be together forever",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Цветы́",
+          "lemma": "цвето́к",
+          "grammar": "Noun, Plural, Masculine, Accusative",
+          "dictionary_definition": "flower, blossom"
+        },
+        {
+          "key": 2,
+          "display_form": "с",
+          "lemma": "с",
+          "grammar": "Preposition",
+          "dictionary_definition": "with; from, in the course of; since; off, remove from"
+        },
+        {
+          "key": 3,
+          "display_form": "подзе́мки,",
+          "lemma": "подзе́мка",
+          "grammar": "Noun, Singular, Feminine, Genitive",
+          "dictionary_definition": "tube, underground; metro"
+        },
+        {
+          "key": 4,
+          "display_form": "кля́тва",
+          "lemma": "кля́тва",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "vow/oath"
+        },
+        {
+          "key": 5,
+          "display_form": "навсегда́",
+          "lemma": "навсегда́",
+          "grammar": "Adverb",
+          "dictionary_definition": "forever, for good"
+        },
+        {
+          "key": 6,
+          "display_form": "быть",
+          "lemma": "бы́ть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "to be; (present tense) 'есть'  - there is, there are; has been"
+        },
+        {
+          "key": 7,
+          "display_form": "вме́сте",
+          "lemma": "вме́сте",
+          "grammar": "Adverb",
+          "dictionary_definition": "together"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 51160,
+      "end_time_ms": 55250,
+      "original_line": "Сука, где твоя любовь? Сука, где твоя любовь?",
+      "phonetic_line": "Су́ка, где́ твоя́ любо́вь? Су́ка, где́ твоя́ любо́вь?",
+      "translation": "Bitch, where is your love? Bitch, where is your love?",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Су́ка,",
+          "lemma": "су́ка",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "bitch"
+        },
+        {
+          "key": 2,
+          "display_form": "где́",
+          "lemma": "где́",
+          "grammar": "Adverb",
+          "dictionary_definition": "where"
+        },
+        {
+          "key": 3,
+          "display_form": "твоя́",
+          "lemma": "тво́й",
+          "grammar": "Adjective, Singular, Feminine, Nominative",
+          "dictionary_definition": "your, yours"
+        },
+        {
+          "key": 4,
+          "display_form": "любо́вь?",
+          "lemma": "любо́вь",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "love"
+        },
+        {
+          "key": 5,
+          "display_form": "Су́ка,",
+          "lemma": "су́ка",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "bitch"
+        },
+        {
+          "key": 6,
+          "display_form": "где́",
+          "lemma": "где́",
+          "grammar": "Adverb",
+          "dictionary_definition": "where"
+        },
+        {
+          "key": 7,
+          "display_form": "твоя́",
+          "lemma": "тво́й",
+          "grammar": "Adjective, Singular, Feminine, Nominative",
+          "dictionary_definition": "your, yours"
+        },
+        {
+          "key": 8,
+          "display_form": "любо́вь?",
+          "lemma": "любо́вь",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "love"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 55250,
+      "end_time_ms": 60860,
+      "original_line": "Сука, где твоя любовь? Сука, где твоя любовь? Сука",
+      "phonetic_line": "Су́ка, где́ твоя́ любо́вь? Су́ка, где́ твоя́ любо́вь? Су́ка",
+      "translation": "Bitch, where is your love? Bitch, where is your love? Bitch.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Су́ка,",
+          "lemma": "су́ка",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "bitch"
+        },
+        {
+          "key": 2,
+          "display_form": "где́",
+          "lemma": "где́",
+          "grammar": "Adverb",
+          "dictionary_definition": "where"
+        },
+        {
+          "key": 3,
+          "display_form": "твоя́",
+          "lemma": "тво́й",
+          "grammar": "Adjective, Singular, Feminine, Nominative",
+          "dictionary_definition": "your, yours"
+        },
+        {
+          "key": 4,
+          "display_form": "любо́вь?",
+          "lemma": "любо́вь",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "love"
+        },
+        {
+          "key": 5,
+          "display_form": "Су́ка,",
+          "lemma": "су́ка",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "bitch"
+        },
+        {
+          "key": 6,
+          "display_form": "где́",
+          "lemma": "где́",
+          "grammar": "Adverb",
+          "dictionary_definition": "where"
+        },
+        {
+          "key": 7,
+          "display_form": "твоя́",
+          "lemma": "тво́й",
+          "grammar": "Adjective, Singular, Feminine, Nominative",
+          "dictionary_definition": "your, yours"
+        },
+        {
+          "key": 8,
+          "display_form": "любо́вь?",
+          "lemma": "любо́вь",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "love"
+        },
+        {
+          "key": 9,
+          "display_form": "Су́ка",
+          "lemma": "су́ка",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "bitch"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 60860,
+      "end_time_ms": 63920,
+      "original_line": "Лучик в тёмном царстве, смс-ки, морожко",
+      "phonetic_line": "Лучик в тёмном царстве, смс-ки, морожко",
+      "translation": "The ray in the dark realm, texting, ice cream.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Лучик",
+          "lemma": "лу́чик",
+          "grammar": "Noun, Singular, Masculine, Accusative",
+          "dictionary_definition": "ray"
+        },
+        {
+          "key": 2,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 3,
+          "display_form": "тёмном",
+          "lemma": "тёмный",
+          "grammar": "Adjective, Singular, Masculine, Locative",
+          "dictionary_definition": "dark"
+        },
+        {
+          "key": 4,
+          "display_form": "царстве,",
+          "lemma": "ца́рство",
+          "grammar": "Noun, Singular, Neuter, Locative",
+          "dictionary_definition": "kingdom,; realm, reign,"
+        },
+        {
+          "key": 5,
+          "display_form": "смс-ки,",
+          "lemma": "смска",
+          "grammar": "Noun, Plural, Feminine, Accusative",
+          "dictionary_definition": "SMS (short message service)"
+        },
+        {
+          "key": 6,
+          "display_form": "морожко",
+          "lemma": "морожко",
+          "grammar": "Adverb",
+          "dictionary_definition": "[морожко]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 63920,
+      "end_time_ms": 67950,
+      "original_line": "Как назовём детей, звонки, смотреть друг на друга, ну просто",
+      "phonetic_line": "Ка́к назовём дете́й, звонки́, смотре́ть друг на дру́га, ну про́сто",
+      "translation": "What do we call the kids, phone calls, look at each other?",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Ка́к",
+          "lemma": "ка́к",
+          "grammar": "Conjunction",
+          "dictionary_definition": "how; what; like, as; because"
+        },
+        {
+          "key": 2,
+          "display_form": "назовём",
+          "lemma": "назва́ть",
+          "grammar": "Verb, Future, 1st Person, Plural",
+          "dictionary_definition": "to call; to name; to convene, invite (many people)"
+        },
+        {
+          "key": 3,
+          "display_form": "дете́й,",
+          "lemma": "ребёнок",
+          "grammar": "Noun, Plural, Masculine, Genitive",
+          "dictionary_definition": "child, kid"
+        },
+        {
+          "key": 4,
+          "display_form": "звонки́,",
+          "lemma": "звоно́к",
+          "grammar": "Noun, Plural, Masculine, Nominative",
+          "dictionary_definition": "(phone) call; bell"
+        },
+        {
+          "key": 5,
+          "display_form": "смотре́ть",
+          "lemma": "смотре́ть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "to look, to watch"
+        },
+        {
+          "key": 6,
+          "display_form": "друг",
+          "lemma": "дру́г",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "friend"
+        },
+        {
+          "key": 7,
+          "display_form": "на",
+          "lemma": "на́",
+          "grammar": "Preposition",
+          "dictionary_definition": "on (place), during; on (day/week); on (means of transport); to (direction)"
+        },
+        {
+          "key": 8,
+          "display_form": "дру́га,",
+          "lemma": "дру́г",
+          "grammar": "Noun, Singular, Masculine, Genitive",
+          "dictionary_definition": "friend"
+        },
+        {
+          "key": 9,
+          "display_form": "ну",
+          "lemma": "ну́",
+          "grammar": "Particle",
+          "dictionary_definition": "well"
+        },
+        {
+          "key": 10,
+          "display_form": "про́сто",
+          "lemma": "про́сто",
+          "grammar": "Particle",
+          "dictionary_definition": "it is simple, it is easy, simply; just, just only, only"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 67950,
+      "end_time_ms": 72230,
+      "original_line": "Сука, где твоя любовь? Сука, где твоя любовь?",
+      "phonetic_line": "Су́ка, где́ твоя́ любо́вь? Су́ка, где́ твоя́ любо́вь?",
+      "translation": "Bitch, where is your love? Bitch, where is your love?",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Су́ка,",
+          "lemma": "су́ка",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "bitch"
+        },
+        {
+          "key": 2,
+          "display_form": "где́",
+          "lemma": "где́",
+          "grammar": "Adverb",
+          "dictionary_definition": "where"
+        },
+        {
+          "key": 3,
+          "display_form": "твоя́",
+          "lemma": "тво́й",
+          "grammar": "Adjective, Singular, Feminine, Nominative",
+          "dictionary_definition": "your, yours"
+        },
+        {
+          "key": 4,
+          "display_form": "любо́вь?",
+          "lemma": "любо́вь",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "love"
+        },
+        {
+          "key": 5,
+          "display_form": "Су́ка,",
+          "lemma": "су́ка",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "bitch"
+        },
+        {
+          "key": 6,
+          "display_form": "где́",
+          "lemma": "где́",
+          "grammar": "Adverb",
+          "dictionary_definition": "where"
+        },
+        {
+          "key": 7,
+          "display_form": "твоя́",
+          "lemma": "тво́й",
+          "grammar": "Adjective, Singular, Feminine, Nominative",
+          "dictionary_definition": "your, yours"
+        },
+        {
+          "key": 8,
+          "display_form": "любо́вь?",
+          "lemma": "любо́вь",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "love"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 72230,
+      "end_time_ms": 79730,
+      "original_line": "Сука, где твоя любовь? Сука, где твоя любовь? Сука",
+      "phonetic_line": "Су́ка, где́ твоя́ любо́вь? Су́ка, где́ твоя́ любо́вь? Су́ка",
+      "translation": "Bitch, where is your love? Bitch, where is your love? Bitch.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Су́ка,",
+          "lemma": "су́ка",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "bitch"
+        },
+        {
+          "key": 2,
+          "display_form": "где́",
+          "lemma": "где́",
+          "grammar": "Adverb",
+          "dictionary_definition": "where"
+        },
+        {
+          "key": 3,
+          "display_form": "твоя́",
+          "lemma": "тво́й",
+          "grammar": "Adjective, Singular, Feminine, Nominative",
+          "dictionary_definition": "your, yours"
+        },
+        {
+          "key": 4,
+          "display_form": "любо́вь?",
+          "lemma": "любо́вь",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "love"
+        },
+        {
+          "key": 5,
+          "display_form": "Су́ка,",
+          "lemma": "су́ка",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "bitch"
+        },
+        {
+          "key": 6,
+          "display_form": "где́",
+          "lemma": "где́",
+          "grammar": "Adverb",
+          "dictionary_definition": "where"
+        },
+        {
+          "key": 7,
+          "display_form": "твоя́",
+          "lemma": "тво́й",
+          "grammar": "Adjective, Singular, Feminine, Nominative",
+          "dictionary_definition": "your, yours"
+        },
+        {
+          "key": 8,
+          "display_form": "любо́вь?",
+          "lemma": "любо́вь",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "love"
+        },
+        {
+          "key": 9,
+          "display_form": "Су́ка",
+          "lemma": "су́ка",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "bitch"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 79730,
+      "end_time_ms": 81440,
+      "original_line": "Обнималися, целовалися",
+      "phonetic_line": "Обнималися, целовалися",
+      "translation": "Hugging, kissing.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Обнималися,",
+          "lemma": "обнималисить",
+          "grammar": "Gerund, Present",
+          "dictionary_definition": "[обнималисить]"
+        },
+        {
+          "key": 2,
+          "display_form": "целовалися",
+          "lemma": "целовалисить",
+          "grammar": "Gerund, Present",
+          "dictionary_definition": "[целовалисить]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 81440,
+      "end_time_ms": 83400,
+      "original_line": "Теперь всем известно, что будет дальше",
+      "phonetic_line": "Тепе́рь всем изве́стно, что бу́дет да́льше",
+      "translation": "Now everyone knows what will happen next.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Тепе́рь",
+          "lemma": "тепе́рь",
+          "grammar": "Adverb",
+          "dictionary_definition": "now, nowadays, today"
+        },
+        {
+          "key": 2,
+          "display_form": "всем",
+          "lemma": "ве́сь",
+          "grammar": "Adjective, Plural, Dative",
+          "dictionary_definition": "village, village community"
+        },
+        {
+          "key": 3,
+          "display_form": "изве́стно,",
+          "lemma": "изве́стно",
+          "grammar": "Predicative, Present",
+          "dictionary_definition": "to be known, it is known, known to you"
+        },
+        {
+          "key": 4,
+          "display_form": "что",
+          "lemma": "что́",
+          "grammar": "Conjunction",
+          "dictionary_definition": "what; that"
+        },
+        {
+          "key": 5,
+          "display_form": "бу́дет",
+          "lemma": "бы́ть",
+          "grammar": "Verb, Future, 3rd Person, Singular",
+          "dictionary_definition": "to be; (present tense) 'есть'  - there is, there are; has been"
+        },
+        {
+          "key": 6,
+          "display_form": "да́льше",
+          "lemma": "далёкий",
+          "grammar": "Comparative",
+          "dictionary_definition": "far, distant"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 83400,
+      "end_time_ms": 85500,
+      "original_line": "Думали когда-нибудь куда-нибудь уедем",
+      "phonetic_line": "Ду́мали когда́-нибудь куда́-нибудь уе́дем",
+      "translation": "We thought we'd go somewhere.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Ду́мали",
+          "lemma": "ду́мать",
+          "grammar": "Verb, Past, Plural",
+          "dictionary_definition": "to think; to consider"
+        },
+        {
+          "key": 2,
+          "display_form": "когда́-нибудь",
+          "lemma": "когда́нибудь",
+          "grammar": "Adverb",
+          "dictionary_definition": "[когданибудь]"
+        },
+        {
+          "key": 3,
+          "display_form": "куда́-нибудь",
+          "lemma": "куданибу́дь",
+          "grammar": "Adverb",
+          "dictionary_definition": "[куданибудь]"
+        },
+        {
+          "key": 4,
+          "display_form": "уе́дем",
+          "lemma": "уе́хать",
+          "grammar": "Verb, Future, 1st Person, Plural",
+          "dictionary_definition": "leave, depart"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 85500,
+      "end_time_ms": 87810,
+      "original_line": "А в итоге от тебя остались письма и медведь Teddy",
+      "phonetic_line": "А в ито́ге о́т тебя́ оста́лись пи́сьма и медве́дь Teddy",
+      "translation": "And you ended up with letters and a Teddy bear.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "А",
+          "lemma": "а",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and (as contrast)"
+        },
+        {
+          "key": 2,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 3,
+          "display_form": "ито́ге",
+          "lemma": "ито́г",
+          "grammar": "Noun, Singular, Masculine, Locative",
+          "dictionary_definition": "result (sum), total; outcome"
+        },
+        {
+          "key": 4,
+          "display_form": "о́т",
+          "lemma": "о́т",
+          "grammar": "Preposition",
+          "dictionary_definition": "from (away); from (part of a whole); from (cause); from (distance)"
+        },
+        {
+          "key": 5,
+          "display_form": "тебя́",
+          "lemma": "ты́",
+          "grammar": "Pronoun, 2nd Person, Singular, Accusative",
+          "dictionary_definition": "you"
+        },
+        {
+          "key": 6,
+          "display_form": "оста́лись",
+          "lemma": "оста́ться",
+          "grammar": "Verb, Past, Plural",
+          "dictionary_definition": "To remain; To stay"
+        },
+        {
+          "key": 7,
+          "display_form": "пи́сьма",
+          "lemma": "письмо́",
+          "grammar": "Noun, Singular, Neuter, Genitive",
+          "dictionary_definition": "letter (written communication); writing (action); script, writing system"
+        },
+        {
+          "key": 8,
+          "display_form": "и",
+          "lemma": "и",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 9,
+          "display_form": "медве́дь",
+          "lemma": "медве́дь",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "bear"
+        },
+        {
+          "key": 10,
+          "display_form": "Teddy",
+          "lemma": "teddy",
+          "grammar": "Unknown",
+          "dictionary_definition": "[teddy]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 87810,
+      "end_time_ms": 89620,
+      "original_line": "Карта Питера, чтоб не потеряться",
+      "phonetic_line": "Ка́рта Пи́тера, чтоб не потеря́ться",
+      "translation": "Peter's card so you don't get lost.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Ка́рта",
+          "lemma": "ка́рта",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "card; map,"
+        },
+        {
+          "key": 2,
+          "display_form": "Пи́тера,",
+          "lemma": "пи́тер",
+          "grammar": "Noun, Singular, Masculine, Genitive",
+          "dictionary_definition": "Piter (Saint Petersburg); Peter"
+        },
+        {
+          "key": 3,
+          "display_form": "чтоб",
+          "lemma": "что́б",
+          "grammar": "Conjunction",
+          "dictionary_definition": "to, so that"
+        },
+        {
+          "key": 4,
+          "display_form": "не",
+          "lemma": "не́",
+          "grammar": "Particle",
+          "dictionary_definition": "not"
+        },
+        {
+          "key": 5,
+          "display_form": "потеря́ться",
+          "lemma": "потеря́ться",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "get lost"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 89620,
+      "end_time_ms": 91730,
+      "original_line": "Durex, пару фоток и какая-то ночнушка мятая",
+      "phonetic_line": "Durex, па́ру фо́ток и кака́я-то ночну́шка мя́тая",
+      "translation": "Durex, a couple of photos and some kind of nightclub crumpled.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Durex,",
+          "lemma": "durex",
+          "grammar": "Unknown",
+          "dictionary_definition": "[durex]"
+        },
+        {
+          "key": 2,
+          "display_form": "па́ру",
+          "lemma": "па́ра",
+          "grammar": "Noun, Singular, Feminine, Accusative",
+          "dictionary_definition": "couple, match; pair; around two, few, two"
+        },
+        {
+          "key": 3,
+          "display_form": "фо́ток",
+          "lemma": "фо́тка",
+          "grammar": "Noun, Plural, Feminine, Genitive",
+          "dictionary_definition": "photo, picture"
+        },
+        {
+          "key": 4,
+          "display_form": "и",
+          "lemma": "и",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 5,
+          "display_form": "кака́я-то",
+          "lemma": "какаять",
+          "grammar": "Participle (short), Past, Singular, Neuter",
+          "dictionary_definition": "[какаять]"
+        },
+        {
+          "key": 6,
+          "display_form": "ночну́шка",
+          "lemma": "ночнушко",
+          "grammar": "Noun, Singular, Neuter, Genitive",
+          "dictionary_definition": "[ночнушко]"
+        },
+        {
+          "key": 7,
+          "display_form": "мя́тая",
+          "lemma": "мя́тый",
+          "grammar": "Adjective, Singular, Feminine, Nominative",
+          "dictionary_definition": "wrinkled"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 91730,
+      "end_time_ms": 93990,
+      "original_line": "Я обижен-ты разбила мне сердце",
+      "phonetic_line": "Я оби́жен-ты разби́ла мне се́рдце",
+      "translation": "I'm hurt. You broke my heart.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Я",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 2,
+          "display_form": "оби́жен-ты",
+          "lemma": "обижента",
+          "grammar": "Noun, Singular, Feminine, Genitive",
+          "dictionary_definition": "[обижента]"
+        },
+        {
+          "key": 3,
+          "display_form": "разби́ла",
+          "lemma": "разби́ть",
+          "grammar": "Verb, Past, Singular, Feminine",
+          "dictionary_definition": "break, crash, smash, divide, lay out, pitch, set up, beat, defeat, hurt badly, fracture, space"
+        },
+        {
+          "key": 4,
+          "display_form": "мне",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Dative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 5,
+          "display_form": "се́рдце",
+          "lemma": "се́рдце",
+          "grammar": "Noun, Singular, Neuter, Accusative",
+          "dictionary_definition": "heart; temper, anger; love, darling, sweetheart"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 93990,
+      "end_time_ms": 96280,
+      "original_line": "Пара-па-ра-парам. Килогерцы",
+      "phonetic_line": "Па́ра-па́-ра́-па́рам. Килоге́рцы",
+      "translation": "Para-pa-ra-param. Kilohertz",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Па́ра-па́-ра́-па́рам.",
+          "lemma": "парапарапара",
+          "grammar": "Noun, Plural, Feminine, Dative",
+          "dictionary_definition": "[парапарапара]"
+        },
+        {
+          "key": 2,
+          "display_form": "Килоге́рцы",
+          "lemma": "килоге́рц",
+          "grammar": "Noun, Plural, Masculine, Nominative",
+          "dictionary_definition": "[килогерц]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 96280,
+      "end_time_ms": 98370,
+      "original_line": "Теперь твой Максик обнимается с другой",
+      "phonetic_line": "Теперь твой Максик обнимается с другой",
+      "translation": "Now your Maxick is hugging someone else.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Теперь",
+          "lemma": "тепе́рь",
+          "grammar": "Adverb",
+          "dictionary_definition": "now, nowadays, today"
+        },
+        {
+          "key": 2,
+          "display_form": "твой",
+          "lemma": "тво́й",
+          "grammar": "Adjective, Singular, Masculine, Accusative",
+          "dictionary_definition": "your, yours"
+        },
+        {
+          "key": 3,
+          "display_form": "Максик",
+          "lemma": "максик",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "[максик]"
+        },
+        {
+          "key": 4,
+          "display_form": "обнимается",
+          "lemma": "обнима́ться",
+          "grammar": "Verb, Present, 3rd Person, Singular",
+          "dictionary_definition": "to embrace one another, to hug one another"
+        },
+        {
+          "key": 5,
+          "display_form": "с",
+          "lemma": "с",
+          "grammar": "Preposition",
+          "dictionary_definition": "with; from, in the course of; since; off, remove from"
+        },
+        {
+          "key": 6,
+          "display_form": "другой",
+          "lemma": "друго́й",
+          "grammar": "Adjective, Singular, Feminine, Genitive",
+          "dictionary_definition": "other, another, another thing, something else, others, the rest"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 98370,
+      "end_time_ms": 100450,
+      "original_line": "Теперь твой Максик по сути уже и не твой",
+      "phonetic_line": "Теперь твой Максик по сути уже и не твой",
+      "translation": "Now your Maxik is not really yours anymore.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Теперь",
+          "lemma": "тепе́рь",
+          "grammar": "Adverb",
+          "dictionary_definition": "now, nowadays, today"
+        },
+        {
+          "key": 2,
+          "display_form": "твой",
+          "lemma": "тво́й",
+          "grammar": "Adjective, Singular, Masculine, Accusative",
+          "dictionary_definition": "your, yours"
+        },
+        {
+          "key": 3,
+          "display_form": "Максик",
+          "lemma": "максик",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "[максик]"
+        },
+        {
+          "key": 4,
+          "display_form": "по",
+          "lemma": "по́",
+          "grammar": "Preposition",
+          "dictionary_definition": "along, down, through, across, around; about, under, for, on; by the means of (por medio de), on; hit or punch somewhere"
+        },
+        {
+          "key": 5,
+          "display_form": "сути",
+          "lemma": "су́ть",
+          "grammar": "Noun, Singular, Feminine, Dative",
+          "dictionary_definition": "essence; point, gist, matter"
+        },
+        {
+          "key": 6,
+          "display_form": "уже",
+          "lemma": "уже́",
+          "grammar": "Adverb",
+          "dictionary_definition": "already, by this time, by now, ready, no longer"
+        },
+        {
+          "key": 7,
+          "display_form": "и",
+          "lemma": "и",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 8,
+          "display_form": "не",
+          "lemma": "не́",
+          "grammar": "Particle",
+          "dictionary_definition": "not"
+        },
+        {
+          "key": 9,
+          "display_form": "твой",
+          "lemma": "тво́й",
+          "grammar": "Adjective, Singular, Masculine, Accusative",
+          "dictionary_definition": "your, yours"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 100450,
+      "end_time_ms": 102400,
+      "original_line": "С коротко стриженной головой",
+      "phonetic_line": "С ко́ротко стри́женной голово́й",
+      "translation": "Short-cut head.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "С",
+          "lemma": "с",
+          "grammar": "Preposition",
+          "dictionary_definition": "with; from, in the course of; since; off, remove from"
+        },
+        {
+          "key": 2,
+          "display_form": "ко́ротко",
+          "lemma": "ко́ротко",
+          "grammar": "Adverb",
+          "dictionary_definition": "briefly, in brief, intimately; short, shortly"
+        },
+        {
+          "key": 3,
+          "display_form": "стри́женной",
+          "lemma": "стри́чь",
+          "grammar": "Participle, Past, Singular, Feminine, Genitive",
+          "dictionary_definition": "cut, clip, shear"
+        },
+        {
+          "key": 4,
+          "display_form": "голово́й",
+          "lemma": "голова́",
+          "grammar": "Noun, Singular, Feminine, Ablative",
+          "dictionary_definition": "head, mind, brains, chief, master"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 102400,
+      "end_time_ms": 104830,
+      "original_line": "Читает рэп параллельно с какой-то попсой",
+      "phonetic_line": "Чита́ет рэ́п паралле́льно с како́й-то попсо́й",
+      "translation": "Reading rap in parallel with some pop",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Чита́ет",
+          "lemma": "чита́ть",
+          "grammar": "Verb, Present, 3rd Person, Singular",
+          "dictionary_definition": "read"
+        },
+        {
+          "key": 2,
+          "display_form": "рэ́п",
+          "lemma": "рэ́п",
+          "grammar": "Noun, Singular, Masculine, Accusative",
+          "dictionary_definition": "rap"
+        },
+        {
+          "key": 3,
+          "display_form": "паралле́льно",
+          "lemma": "паралле́льно",
+          "grammar": "Adverb",
+          "dictionary_definition": "parallel; simultaneously, at the same time"
+        },
+        {
+          "key": 4,
+          "display_form": "с",
+          "lemma": "с",
+          "grammar": "Preposition",
+          "dictionary_definition": "with; from, in the course of; since; off, remove from"
+        },
+        {
+          "key": 5,
+          "display_form": "како́й-то",
+          "lemma": "какойтый",
+          "grammar": "Adj (short), Singular, Neuter",
+          "dictionary_definition": "[какойтый]"
+        },
+        {
+          "key": 6,
+          "display_form": "попсо́й",
+          "lemma": "попса́",
+          "grammar": "Noun, Singular, Feminine, Ablative",
+          "dictionary_definition": "pop music, mainstream pop"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 104830,
+      "end_time_ms": 106940,
+      "original_line": "Назад дороги нет - ты устала, я устал",
+      "phonetic_line": "Наза́д доро́ги не́т - ты́ уста́ла, я уста́л",
+      "translation": "No way back, you're tired, I'm tired.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Наза́д",
+          "lemma": "наза́д",
+          "grammar": "Adverb",
+          "dictionary_definition": "back, backwards; ago"
+        },
+        {
+          "key": 2,
+          "display_form": "доро́ги",
+          "lemma": "доро́га",
+          "grammar": "Noun, Singular, Feminine, Genitive",
+          "dictionary_definition": "road, way, journey"
+        },
+        {
+          "key": 3,
+          "display_form": "не́т",
+          "lemma": "не́т",
+          "grammar": "Predicative, Present",
+          "dictionary_definition": "no; not; not any, there isn't (any)"
+        },
+        {
+          "key": 4,
+          "display_form": "ты́",
+          "lemma": "ты́",
+          "grammar": "Pronoun, 2nd Person, Singular, Nominative",
+          "dictionary_definition": "you"
+        },
+        {
+          "key": 5,
+          "display_form": "уста́ла,",
+          "lemma": "уста́ть",
+          "grammar": "Verb, Past, Singular, Feminine",
+          "dictionary_definition": "get tired, be tired"
+        },
+        {
+          "key": 6,
+          "display_form": "я",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 7,
+          "display_form": "уста́л",
+          "lemma": "уста́ть",
+          "grammar": "Verb, Past, Singular, Masculine",
+          "dictionary_definition": "get tired, be tired"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 106940,
+      "end_time_ms": 109060,
+      "original_line": "Только верни, прошу мне майку \"Космостар\"",
+      "phonetic_line": "Только верни, прошу мне майку \"Космостар\"",
+      "translation": "Just give me back the Cosmostar jersey.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Только",
+          "lemma": "то́лько",
+          "grammar": "Adverb",
+          "dictionary_definition": "only; just, simply"
+        },
+        {
+          "key": 2,
+          "display_form": "верни,",
+          "lemma": "верну́ть",
+          "grammar": "Verb, Singular",
+          "dictionary_definition": "return, give back, bring back, send back; repay, pay back, reimburse, refund; recover, get back, win back"
+        },
+        {
+          "key": 3,
+          "display_form": "прошу",
+          "lemma": "проси́ть",
+          "grammar": "Verb, Present, 1st Person, Singular",
+          "dictionary_definition": "to request, ask for; to ask a favour, ask for; to beg, pray"
+        },
+        {
+          "key": 4,
+          "display_form": "мне",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Dative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 5,
+          "display_form": "майку",
+          "lemma": "ма́йка",
+          "grammar": "Noun, Singular, Feminine, Accusative",
+          "dictionary_definition": "T-shirt"
+        },
+        {
+          "key": 6,
+          "display_form": "\"Космостар\"",
+          "lemma": "космостарый",
+          "grammar": "Adj (short), Singular, Masculine",
+          "dictionary_definition": "[космостарый]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 109060,
+      "end_time_ms": 111190,
+      "original_line": "Нам и так по-любому не суждено быть вместе",
+      "phonetic_line": "На́м и та́к по-любо́му не суждено́ быть вме́сте",
+      "translation": "We're not meant to be together anyway.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "На́м",
+          "lemma": "мы́",
+          "grammar": "Pronoun, 1st Person, Plural, Dative",
+          "dictionary_definition": "we"
+        },
+        {
+          "key": 2,
+          "display_form": "и",
+          "lemma": "и",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 3,
+          "display_form": "та́к",
+          "lemma": "та́к",
+          "grammar": "Conjunction",
+          "dictionary_definition": "so, thus, like this, this way, then; exactly how"
+        },
+        {
+          "key": 4,
+          "display_form": "по-любо́му",
+          "lemma": "полюбома",
+          "grammar": "Noun, Singular, Feminine, Accusative",
+          "dictionary_definition": "[полюбома]"
+        },
+        {
+          "key": 5,
+          "display_form": "не",
+          "lemma": "не́",
+          "grammar": "Particle",
+          "dictionary_definition": "not"
+        },
+        {
+          "key": 6,
+          "display_form": "суждено́",
+          "lemma": "суждено́",
+          "grammar": "Adverb",
+          "dictionary_definition": "destined, bound, meant to"
+        },
+        {
+          "key": 7,
+          "display_form": "быть",
+          "lemma": "бы́ть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "to be; (present tense) 'есть'  - there is, there are; has been"
+        },
+        {
+          "key": 8,
+          "display_form": "вме́сте",
+          "lemma": "вме́сте",
+          "grammar": "Adverb",
+          "dictionary_definition": "together"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 111190,
+      "end_time_ms": 113880,
+      "original_line": "Ведь у тебя парадные, а у меня подъезды",
+      "phonetic_line": "Ведь у тебя́ пара́дные, а у меня́ подъе́зды",
+      "translation": "You have the front door and I have the front door.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Ведь",
+          "lemma": "ве́дь",
+          "grammar": "Particle",
+          "dictionary_definition": "in fact, after all, surely, indeed; given that, as, because; Isn't it?"
+        },
+        {
+          "key": 2,
+          "display_form": "у",
+          "lemma": "у",
+          "grammar": "Preposition",
+          "dictionary_definition": "(possession); by, at (place); with; from (take, borrow)"
+        },
+        {
+          "key": 3,
+          "display_form": "тебя́",
+          "lemma": "ты́",
+          "grammar": "Pronoun, 2nd Person, Singular, Accusative",
+          "dictionary_definition": "you"
+        },
+        {
+          "key": 4,
+          "display_form": "пара́дные,",
+          "lemma": "пара́дный",
+          "grammar": "Adjective, Plural, Accusative",
+          "dictionary_definition": "main, front door, gala, for show"
+        },
+        {
+          "key": 5,
+          "display_form": "а",
+          "lemma": "а",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and (as contrast)"
+        },
+        {
+          "key": 6,
+          "display_form": "у",
+          "lemma": "у",
+          "grammar": "Preposition",
+          "dictionary_definition": "(possession); by, at (place); with; from (take, borrow)"
+        },
+        {
+          "key": 7,
+          "display_form": "меня́",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Accusative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 8,
+          "display_form": "подъе́зды",
+          "lemma": "подъе́зд",
+          "grammar": "Noun, Plural, Masculine, Accusative",
+          "dictionary_definition": "entrance (by car); approach"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 113880,
+      "end_time_ms": 119100,
+      "original_line": "Съёмные квартиры, MTV, салатики, бигтейсти",
+      "phonetic_line": "Съёмные кварти́ры, MTV, сала́тики, бигте́йсти",
+      "translation": "Rental apartments, MTV, salads, billboards",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Съёмные",
+          "lemma": "съёмный",
+          "grammar": "Adjective, Plural, Nominative",
+          "dictionary_definition": "removable, demountable; detachable; rented"
+        },
+        {
+          "key": 2,
+          "display_form": "кварти́ры,",
+          "lemma": "кварти́ра",
+          "grammar": "Noun, Singular, Feminine, Genitive",
+          "dictionary_definition": "flat, quarters; apartment"
+        },
+        {
+          "key": 3,
+          "display_form": "MTV,",
+          "lemma": "mtv",
+          "grammar": "Unknown",
+          "dictionary_definition": "[mtv]"
+        },
+        {
+          "key": 4,
+          "display_form": "сала́тики,",
+          "lemma": "сала́тик",
+          "grammar": "Noun, Plural, Masculine, Nominative",
+          "dictionary_definition": "[салатик]"
+        },
+        {
+          "key": 5,
+          "display_form": "бигте́йсти",
+          "lemma": "бигтейсть",
+          "grammar": "Noun, Singular, Feminine, Genitive",
+          "dictionary_definition": "[бигтейсть]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 119100,
+      "end_time_ms": 123690,
+      "original_line": "Цветы с подземки, клятва навсегда быть вместе",
+      "phonetic_line": "Цветы́ с подзе́мки, кля́тва навсегда́ быть вме́сте",
+      "translation": "Flowers from the subway, vow to be together forever",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Цветы́",
+          "lemma": "цвето́к",
+          "grammar": "Noun, Plural, Masculine, Accusative",
+          "dictionary_definition": "flower, blossom"
+        },
+        {
+          "key": 2,
+          "display_form": "с",
+          "lemma": "с",
+          "grammar": "Preposition",
+          "dictionary_definition": "with; from, in the course of; since; off, remove from"
+        },
+        {
+          "key": 3,
+          "display_form": "подзе́мки,",
+          "lemma": "подзе́мка",
+          "grammar": "Noun, Singular, Feminine, Genitive",
+          "dictionary_definition": "tube, underground; metro"
+        },
+        {
+          "key": 4,
+          "display_form": "кля́тва",
+          "lemma": "кля́тва",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "vow/oath"
+        },
+        {
+          "key": 5,
+          "display_form": "навсегда́",
+          "lemma": "навсегда́",
+          "grammar": "Adverb",
+          "dictionary_definition": "forever, for good"
+        },
+        {
+          "key": 6,
+          "display_form": "быть",
+          "lemma": "бы́ть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "to be; (present tense) 'есть'  - there is, there are; has been"
+        },
+        {
+          "key": 7,
+          "display_form": "вме́сте",
+          "lemma": "вме́сте",
+          "grammar": "Adverb",
+          "dictionary_definition": "together"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 123690,
+      "end_time_ms": 127960,
+      "original_line": "Сука, где твоя любовь? Сука, где твоя любовь?",
+      "phonetic_line": "Су́ка, где́ твоя́ любо́вь? Су́ка, где́ твоя́ любо́вь?",
+      "translation": "Bitch, where is your love? Bitch, where is your love?",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Су́ка,",
+          "lemma": "су́ка",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "bitch"
+        },
+        {
+          "key": 2,
+          "display_form": "где́",
+          "lemma": "где́",
+          "grammar": "Adverb",
+          "dictionary_definition": "where"
+        },
+        {
+          "key": 3,
+          "display_form": "твоя́",
+          "lemma": "тво́й",
+          "grammar": "Adjective, Singular, Feminine, Nominative",
+          "dictionary_definition": "your, yours"
+        },
+        {
+          "key": 4,
+          "display_form": "любо́вь?",
+          "lemma": "любо́вь",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "love"
+        },
+        {
+          "key": 5,
+          "display_form": "Су́ка,",
+          "lemma": "су́ка",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "bitch"
+        },
+        {
+          "key": 6,
+          "display_form": "где́",
+          "lemma": "где́",
+          "grammar": "Adverb",
+          "dictionary_definition": "where"
+        },
+        {
+          "key": 7,
+          "display_form": "твоя́",
+          "lemma": "тво́й",
+          "grammar": "Adjective, Singular, Feminine, Nominative",
+          "dictionary_definition": "your, yours"
+        },
+        {
+          "key": 8,
+          "display_form": "любо́вь?",
+          "lemma": "любо́вь",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "love"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 127960,
+      "end_time_ms": 132340,
+      "original_line": "Сука, где твоя любовь? Сука, где твоя любовь? Сука",
+      "phonetic_line": "Су́ка, где́ твоя́ любо́вь? Су́ка, где́ твоя́ любо́вь? Су́ка",
+      "translation": "Bitch, where is your love? Bitch, where is your love? Bitch.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Су́ка,",
+          "lemma": "су́ка",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "bitch"
+        },
+        {
+          "key": 2,
+          "display_form": "где́",
+          "lemma": "где́",
+          "grammar": "Adverb",
+          "dictionary_definition": "where"
+        },
+        {
+          "key": 3,
+          "display_form": "твоя́",
+          "lemma": "тво́й",
+          "grammar": "Adjective, Singular, Feminine, Nominative",
+          "dictionary_definition": "your, yours"
+        },
+        {
+          "key": 4,
+          "display_form": "любо́вь?",
+          "lemma": "любо́вь",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "love"
+        },
+        {
+          "key": 5,
+          "display_form": "Су́ка,",
+          "lemma": "су́ка",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "bitch"
+        },
+        {
+          "key": 6,
+          "display_form": "где́",
+          "lemma": "где́",
+          "grammar": "Adverb",
+          "dictionary_definition": "where"
+        },
+        {
+          "key": 7,
+          "display_form": "твоя́",
+          "lemma": "тво́й",
+          "grammar": "Adjective, Singular, Feminine, Nominative",
+          "dictionary_definition": "your, yours"
+        },
+        {
+          "key": 8,
+          "display_form": "любо́вь?",
+          "lemma": "любо́вь",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "love"
+        },
+        {
+          "key": 9,
+          "display_form": "Су́ка",
+          "lemma": "су́ка",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "bitch"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 132340,
+      "end_time_ms": 137000,
+      "original_line": "Лучик в тёмном царстве, смс-ки, морожко",
+      "phonetic_line": "Лучик в тёмном царстве, смс-ки, морожко",
+      "translation": "The ray in the dark realm, texting, ice cream.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Лучик",
+          "lemma": "лу́чик",
+          "grammar": "Noun, Singular, Masculine, Accusative",
+          "dictionary_definition": "ray"
+        },
+        {
+          "key": 2,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 3,
+          "display_form": "тёмном",
+          "lemma": "тёмный",
+          "grammar": "Adjective, Singular, Masculine, Locative",
+          "dictionary_definition": "dark"
+        },
+        {
+          "key": 4,
+          "display_form": "царстве,",
+          "lemma": "ца́рство",
+          "grammar": "Noun, Singular, Neuter, Locative",
+          "dictionary_definition": "kingdom,; realm, reign,"
+        },
+        {
+          "key": 5,
+          "display_form": "смс-ки,",
+          "lemma": "смска",
+          "grammar": "Noun, Plural, Feminine, Accusative",
+          "dictionary_definition": "SMS (short message service)"
+        },
+        {
+          "key": 6,
+          "display_form": "морожко",
+          "lemma": "морожко",
+          "grammar": "Adverb",
+          "dictionary_definition": "[морожко]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 137000,
+      "end_time_ms": 139990,
+      "original_line": "Как назовём детей, звонки, смотреть друг на друга, ну просто",
+      "phonetic_line": "Ка́к назовём дете́й, звонки́, смотре́ть друг на дру́га, ну про́сто",
+      "translation": "What do we call the kids, phone calls, look at each other?",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Ка́к",
+          "lemma": "ка́к",
+          "grammar": "Conjunction",
+          "dictionary_definition": "how; what; like, as; because"
+        },
+        {
+          "key": 2,
+          "display_form": "назовём",
+          "lemma": "назва́ть",
+          "grammar": "Verb, Future, 1st Person, Plural",
+          "dictionary_definition": "to call; to name; to convene, invite (many people)"
+        },
+        {
+          "key": 3,
+          "display_form": "дете́й,",
+          "lemma": "ребёнок",
+          "grammar": "Noun, Plural, Masculine, Genitive",
+          "dictionary_definition": "child, kid"
+        },
+        {
+          "key": 4,
+          "display_form": "звонки́,",
+          "lemma": "звоно́к",
+          "grammar": "Noun, Plural, Masculine, Nominative",
+          "dictionary_definition": "(phone) call; bell"
+        },
+        {
+          "key": 5,
+          "display_form": "смотре́ть",
+          "lemma": "смотре́ть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "to look, to watch"
+        },
+        {
+          "key": 6,
+          "display_form": "друг",
+          "lemma": "дру́г",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "friend"
+        },
+        {
+          "key": 7,
+          "display_form": "на",
+          "lemma": "на́",
+          "grammar": "Preposition",
+          "dictionary_definition": "on (place), during; on (day/week); on (means of transport); to (direction)"
+        },
+        {
+          "key": 8,
+          "display_form": "дру́га,",
+          "lemma": "дру́г",
+          "grammar": "Noun, Singular, Masculine, Genitive",
+          "dictionary_definition": "friend"
+        },
+        {
+          "key": 9,
+          "display_form": "ну",
+          "lemma": "ну́",
+          "grammar": "Particle",
+          "dictionary_definition": "well"
+        },
+        {
+          "key": 10,
+          "display_form": "про́сто",
+          "lemma": "про́сто",
+          "grammar": "Particle",
+          "dictionary_definition": "it is simple, it is easy, simply; just, just only, only"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 139990,
+      "end_time_ms": 143830,
+      "original_line": "Сука, где твоя любовь? Сука, где твоя любовь?",
+      "phonetic_line": "Су́ка, где́ твоя́ любо́вь? Су́ка, где́ твоя́ любо́вь?",
+      "translation": "Bitch, where is your love? Bitch, where is your love?",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Су́ка,",
+          "lemma": "су́ка",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "bitch"
+        },
+        {
+          "key": 2,
+          "display_form": "где́",
+          "lemma": "где́",
+          "grammar": "Adverb",
+          "dictionary_definition": "where"
+        },
+        {
+          "key": 3,
+          "display_form": "твоя́",
+          "lemma": "тво́й",
+          "grammar": "Adjective, Singular, Feminine, Nominative",
+          "dictionary_definition": "your, yours"
+        },
+        {
+          "key": 4,
+          "display_form": "любо́вь?",
+          "lemma": "любо́вь",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "love"
+        },
+        {
+          "key": 5,
+          "display_form": "Су́ка,",
+          "lemma": "су́ка",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "bitch"
+        },
+        {
+          "key": 6,
+          "display_form": "где́",
+          "lemma": "где́",
+          "grammar": "Adverb",
+          "dictionary_definition": "where"
+        },
+        {
+          "key": 7,
+          "display_form": "твоя́",
+          "lemma": "тво́й",
+          "grammar": "Adjective, Singular, Feminine, Nominative",
+          "dictionary_definition": "your, yours"
+        },
+        {
+          "key": 8,
+          "display_form": "любо́вь?",
+          "lemma": "любо́вь",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "love"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 143830,
+      "end_time_ms": 147830,
+      "original_line": "Сука, где твоя любовь? Сука, где твоя любовь? Сука",
+      "phonetic_line": "Су́ка, где́ твоя́ любо́вь? Су́ка, где́ твоя́ любо́вь? Су́ка",
+      "translation": "Bitch, where is your love? Bitch, where is your love? Bitch.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Су́ка,",
+          "lemma": "су́ка",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "bitch"
+        },
+        {
+          "key": 2,
+          "display_form": "где́",
+          "lemma": "где́",
+          "grammar": "Adverb",
+          "dictionary_definition": "where"
+        },
+        {
+          "key": 3,
+          "display_form": "твоя́",
+          "lemma": "тво́й",
+          "grammar": "Adjective, Singular, Feminine, Nominative",
+          "dictionary_definition": "your, yours"
+        },
+        {
+          "key": 4,
+          "display_form": "любо́вь?",
+          "lemma": "любо́вь",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "love"
+        },
+        {
+          "key": 5,
+          "display_form": "Су́ка,",
+          "lemma": "су́ка",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "bitch"
+        },
+        {
+          "key": 6,
+          "display_form": "где́",
+          "lemma": "где́",
+          "grammar": "Adverb",
+          "dictionary_definition": "where"
+        },
+        {
+          "key": 7,
+          "display_form": "твоя́",
+          "lemma": "тво́й",
+          "grammar": "Adjective, Singular, Feminine, Nominative",
+          "dictionary_definition": "your, yours"
+        },
+        {
+          "key": 8,
+          "display_form": "любо́вь?",
+          "lemma": "любо́вь",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "love"
+        },
+        {
+          "key": 9,
+          "display_form": "Су́ка",
+          "lemma": "су́ка",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "bitch"
+        }
+      ]
+    }
+  ]
+}

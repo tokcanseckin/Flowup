@@ -1,0 +1,2731 @@
+{
+  "spotify_uri": "spotify:track:2mo4W9RlL9I7fhFuvDRdP3",
+  "title": "Ты рядом",
+  "artist": "Geegun",
+  "language": {
+    "code": "ru",
+    "name": "Russian",
+    "script": "Cyrillic",
+    "direction": "ltr"
+  },
+  "lines": [
+    {
+      "start_time_ms": 7770,
+      "end_time_ms": 9390,
+      "original_line": "Ты, шепот в полночь, виски",
+      "phonetic_line": "Ты, шё́пот в по́лночь, виски́",
+      "translation": "You whisper at midnight, whiskey.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Ты,",
+          "lemma": "ты́",
+          "grammar": "Pronoun, 2nd Person, Singular, Nominative",
+          "dictionary_definition": "you"
+        },
+        {
+          "key": 2,
+          "display_form": "шё́пот",
+          "lemma": "шёпот",
+          "grammar": "Noun, Singular, Masculine, Accusative",
+          "dictionary_definition": "whisper"
+        },
+        {
+          "key": 3,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 4,
+          "display_form": "по́лночь,",
+          "lemma": "по́лночь",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "midnight"
+        },
+        {
+          "key": 5,
+          "display_form": "виски́",
+          "lemma": "ви́ски",
+          "grammar": "Noun, Singular, Masculine, Genitive",
+          "dictionary_definition": "whisky"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 9390,
+      "end_time_ms": 11600,
+      "original_line": "Ты так близко, в зоне риска",
+      "phonetic_line": "Ты́ так бли́зко, в зо́не ри́ска",
+      "translation": "You're so close, at risk.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Ты́",
+          "lemma": "ты́",
+          "grammar": "Pronoun, 2nd Person, Singular, Nominative",
+          "dictionary_definition": "you"
+        },
+        {
+          "key": 2,
+          "display_form": "так",
+          "lemma": "та́к",
+          "grammar": "Conjunction",
+          "dictionary_definition": "so, thus, like this, this way, then; exactly how"
+        },
+        {
+          "key": 3,
+          "display_form": "бли́зко,",
+          "lemma": "бли́зко",
+          "grammar": "Adverb",
+          "dictionary_definition": "nearby, close by"
+        },
+        {
+          "key": 4,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 5,
+          "display_form": "зо́не",
+          "lemma": "зо́на",
+          "grammar": "Noun, Singular, Feminine, Locative",
+          "dictionary_definition": "zone"
+        },
+        {
+          "key": 6,
+          "display_form": "ри́ска",
+          "lemma": "ри́ск",
+          "grammar": "Noun, Singular, Masculine, Genitive",
+          "dictionary_definition": "risk"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 11600,
+      "end_time_ms": 14210,
+      "original_line": "Мне так нужна классика жанра",
+      "phonetic_line": "Мне́ та́к нужна́ кла́ссика жа́нра",
+      "translation": "I really need a genre classic.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Мне́",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Dative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 2,
+          "display_form": "та́к",
+          "lemma": "та́к",
+          "grammar": "Conjunction",
+          "dictionary_definition": "so, thus, like this, this way, then; exactly how"
+        },
+        {
+          "key": 3,
+          "display_form": "нужна́",
+          "lemma": "ну́жный",
+          "grammar": "Adj (short), Singular, Feminine",
+          "dictionary_definition": "necessary, needed, the right, the correct; need"
+        },
+        {
+          "key": 4,
+          "display_form": "кла́ссика",
+          "lemma": "кла́ссика",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "classic, the classics, classical literature, classical music"
+        },
+        {
+          "key": 5,
+          "display_form": "жа́нра",
+          "lemma": "жа́нр",
+          "grammar": "Noun, Singular, Masculine, Genitive",
+          "dictionary_definition": "genre"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 14210,
+      "end_time_ms": 16120,
+      "original_line": "Всего одна искра до пожара",
+      "phonetic_line": "Всего́ одна́ и́скра до пожа́ра",
+      "translation": "Just one spark before the fire.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Всего́",
+          "lemma": "ве́сь",
+          "grammar": "Adjective, Singular, Neuter, Genitive",
+          "dictionary_definition": "village, village community"
+        },
+        {
+          "key": 2,
+          "display_form": "одна́",
+          "lemma": "оди́н",
+          "grammar": "Adjective, Singular, Feminine, Nominative",
+          "dictionary_definition": "one"
+        },
+        {
+          "key": 3,
+          "display_form": "и́скра",
+          "lemma": "и́скра",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "spark"
+        },
+        {
+          "key": 4,
+          "display_form": "до",
+          "lemma": "до́",
+          "grammar": "Preposition",
+          "dictionary_definition": "to (direction); to (distance); before; until"
+        },
+        {
+          "key": 5,
+          "display_form": "пожа́ра",
+          "lemma": "пожа́р",
+          "grammar": "Noun, Singular, Masculine, Genitive",
+          "dictionary_definition": "a fire"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 16120,
+      "end_time_ms": 18220,
+      "original_line": "Я несусь по главной, love you",
+      "phonetic_line": "Я несу́сь по гла́вной, love you",
+      "translation": "I'm on my way, love you.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Я",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 2,
+          "display_form": "несу́сь",
+          "lemma": "нести́сь",
+          "grammar": "Verb, Present, 1st Person, Singular",
+          "dictionary_definition": "to move flow or pass quickly; to lay eggs; to be spread or carried"
+        },
+        {
+          "key": 3,
+          "display_form": "по",
+          "lemma": "по́",
+          "grammar": "Preposition",
+          "dictionary_definition": "along, down, through, across, around; about, under, for, on; by the means of (por medio de), on; hit or punch somewhere"
+        },
+        {
+          "key": 4,
+          "display_form": "гла́вной,",
+          "lemma": "гла́вный",
+          "grammar": "Adjective, Singular, Feminine, Ablative",
+          "dictionary_definition": "main, important; chief, head"
+        },
+        {
+          "key": 5,
+          "display_form": "love",
+          "lemma": "love",
+          "grammar": "Unknown",
+          "dictionary_definition": "[love]"
+        },
+        {
+          "key": 6,
+          "display_form": "you",
+          "lemma": "you",
+          "grammar": "Unknown",
+          "dictionary_definition": "[you]"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 18220,
+      "end_time_ms": 20500,
+      "original_line": "Только набираю и не сбавлю",
+      "phonetic_line": "То́лько набира́ю и не сба́влю",
+      "translation": "I'm just dialing and I won't.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "То́лько",
+          "lemma": "то́лько",
+          "grammar": "Adverb",
+          "dictionary_definition": "only; just, simply"
+        },
+        {
+          "key": 2,
+          "display_form": "набира́ю",
+          "lemma": "набира́ть",
+          "grammar": "Verb, Present, 1st Person, Singular",
+          "dictionary_definition": "to gain, accumulate, put on, rack up, score (points, votes); to type (on a computer), dial (on a phone)"
+        },
+        {
+          "key": 3,
+          "display_form": "и",
+          "lemma": "и",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 4,
+          "display_form": "не",
+          "lemma": "не́",
+          "grammar": "Particle",
+          "dictionary_definition": "not"
+        },
+        {
+          "key": 5,
+          "display_form": "сба́влю",
+          "lemma": "сба́вить",
+          "grammar": "Verb, Future, 1st Person, Singular",
+          "dictionary_definition": "take off or take away from part of something"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 20500,
+      "end_time_ms": 23190,
+      "original_line": "Я такой как есть, иду на принцип",
+      "phonetic_line": "Я тако́й как е́сть, иду́ на при́нцип",
+      "translation": "I'm the way I am, I'm on principle.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Я",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 2,
+          "display_form": "тако́й",
+          "lemma": "тако́й",
+          "grammar": "Adjective, Singular, Feminine, Genitive",
+          "dictionary_definition": "such, so, that sort of; be like this, as, be"
+        },
+        {
+          "key": 3,
+          "display_form": "как",
+          "lemma": "ка́к",
+          "grammar": "Conjunction",
+          "dictionary_definition": "how; what; like, as; because"
+        },
+        {
+          "key": 4,
+          "display_form": "е́сть,",
+          "lemma": "е́сть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "there is, there are, eats"
+        },
+        {
+          "key": 5,
+          "display_form": "иду́",
+          "lemma": "идти́",
+          "grammar": "Verb, Present, 1st Person, Singular",
+          "dictionary_definition": "to go; to walk; suit"
+        },
+        {
+          "key": 6,
+          "display_form": "на",
+          "lemma": "на́",
+          "grammar": "Preposition",
+          "dictionary_definition": "on (place), during; on (day/week); on (means of transport); to (direction)"
+        },
+        {
+          "key": 7,
+          "display_form": "при́нцип",
+          "lemma": "при́нцип",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "principle"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 23190,
+      "end_time_ms": 25560,
+      "original_line": "Это моя жизнь. Новая страница",
+      "phonetic_line": "Э́то мо́я жи́знь. Но́вая страни́ца",
+      "translation": "This is my life. New page page",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Э́то",
+          "lemma": "э́то",
+          "grammar": "Particle",
+          "dictionary_definition": "this is, that is"
+        },
+        {
+          "key": 2,
+          "display_form": "мо́я",
+          "lemma": "мо́й",
+          "grammar": "Adjective, Singular, Feminine, Nominative",
+          "dictionary_definition": "my, mine, my people"
+        },
+        {
+          "key": 3,
+          "display_form": "жи́знь.",
+          "lemma": "жи́знь",
+          "grammar": "Noun, Singular, Feminine, Accusative",
+          "dictionary_definition": "life, existence"
+        },
+        {
+          "key": 4,
+          "display_form": "Но́вая",
+          "lemma": "но́вый",
+          "grammar": "Adjective, Singular, Feminine, Nominative",
+          "dictionary_definition": "new"
+        },
+        {
+          "key": 5,
+          "display_form": "страни́ца",
+          "lemma": "страни́ца",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "page"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 25560,
+      "end_time_ms": 27860,
+      "original_line": "Ты со мной все это время спина к спине",
+      "phonetic_line": "Ты́ со мно́й всё э́то вре́мя спина́ к спине́",
+      "translation": "You've been with me this whole time, back to back.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Ты́",
+          "lemma": "ты́",
+          "grammar": "Pronoun, 2nd Person, Singular, Nominative",
+          "dictionary_definition": "you"
+        },
+        {
+          "key": 2,
+          "display_form": "со",
+          "lemma": "с",
+          "grammar": "Preposition",
+          "dictionary_definition": "with; from, in the course of; since; off, remove from"
+        },
+        {
+          "key": 3,
+          "display_form": "мно́й",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Ablative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 4,
+          "display_form": "всё",
+          "lemma": "всё",
+          "grammar": "Particle",
+          "dictionary_definition": "always, all the time, the whole time, still, only, all, all the same, however, nevertheless; everything, often"
+        },
+        {
+          "key": 5,
+          "display_form": "э́то",
+          "lemma": "э́то",
+          "grammar": "Particle",
+          "dictionary_definition": "this is, that is"
+        },
+        {
+          "key": 6,
+          "display_form": "вре́мя",
+          "lemma": "вре́мя",
+          "grammar": "Noun, Singular, Neuter, Accusative",
+          "dictionary_definition": "time, times, tense, weather"
+        },
+        {
+          "key": 7,
+          "display_form": "спина́",
+          "lemma": "спина́",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "back"
+        },
+        {
+          "key": 8,
+          "display_form": "к",
+          "lemma": "к",
+          "grammar": "Preposition",
+          "dictionary_definition": "towards; to; by (time); for the purpose of"
+        },
+        {
+          "key": 9,
+          "display_form": "спине́",
+          "lemma": "спина́",
+          "grammar": "Noun, Singular, Feminine, Locative",
+          "dictionary_definition": "back"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 27860,
+      "end_time_ms": 30140,
+      "original_line": "С каждым днем мы все ближе к нашей мечте",
+      "phonetic_line": "С каждым днё́м мы всё бли́же к на́шей мечте́",
+      "translation": "Every day we get closer to our dream.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "С",
+          "lemma": "с",
+          "grammar": "Preposition",
+          "dictionary_definition": "with; from, in the course of; since; off, remove from"
+        },
+        {
+          "key": 2,
+          "display_form": "каждым",
+          "lemma": "ка́ждый",
+          "grammar": "Adjective, Singular, Masculine, Ablative",
+          "dictionary_definition": "each, every, everyone"
+        },
+        {
+          "key": 3,
+          "display_form": "днё́м",
+          "lemma": "де́нь",
+          "grammar": "Noun, Singular, Masculine, Ablative",
+          "dictionary_definition": "day, daytime; afternoon, early evening"
+        },
+        {
+          "key": 4,
+          "display_form": "мы",
+          "lemma": "мы́",
+          "grammar": "Pronoun, 1st Person, Plural, Nominative",
+          "dictionary_definition": "we"
+        },
+        {
+          "key": 5,
+          "display_form": "всё",
+          "lemma": "всё",
+          "grammar": "Particle",
+          "dictionary_definition": "always, all the time, the whole time, still, only, all, all the same, however, nevertheless; everything, often"
+        },
+        {
+          "key": 6,
+          "display_form": "бли́же",
+          "lemma": "бли́зкий",
+          "grammar": "Comparative",
+          "dictionary_definition": "close/near"
+        },
+        {
+          "key": 7,
+          "display_form": "к",
+          "lemma": "к",
+          "grammar": "Preposition",
+          "dictionary_definition": "towards; to; by (time); for the purpose of"
+        },
+        {
+          "key": 8,
+          "display_form": "на́шей",
+          "lemma": "на́ш",
+          "grammar": "Adjective, Singular, Feminine, Genitive",
+          "dictionary_definition": "our"
+        },
+        {
+          "key": 9,
+          "display_form": "мечте́",
+          "lemma": "мечта́",
+          "grammar": "Noun, Singular, Feminine, Dative",
+          "dictionary_definition": "dream, desire, ambition, vision"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 30140,
+      "end_time_ms": 32210,
+      "original_line": "Ты же знаешь, вдвоем преодолеем планку",
+      "phonetic_line": "Ты же зна́ешь, вдвоё́м преодоле́ем пла́нку",
+      "translation": "You know, we'll get past the bar together.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Ты",
+          "lemma": "ты́",
+          "grammar": "Pronoun, 2nd Person, Singular, Nominative",
+          "dictionary_definition": "you"
+        },
+        {
+          "key": 2,
+          "display_form": "же",
+          "lemma": "же",
+          "grammar": "Particle",
+          "dictionary_definition": "same, again, already"
+        },
+        {
+          "key": 3,
+          "display_form": "зна́ешь,",
+          "lemma": "зна́ть",
+          "grammar": "Verb, Present, 2nd Person, Singular",
+          "dictionary_definition": "nobility, noble people"
+        },
+        {
+          "key": 4,
+          "display_form": "вдвоё́м",
+          "lemma": "вдвоём",
+          "grammar": "Adverb",
+          "dictionary_definition": "you and me, together"
+        },
+        {
+          "key": 5,
+          "display_form": "преодоле́ем",
+          "lemma": "преодоле́ть",
+          "grammar": "Verb, Future, 1st Person, Plural",
+          "dictionary_definition": "to overcome, get over"
+        },
+        {
+          "key": 6,
+          "display_form": "пла́нку",
+          "lemma": "пла́нка",
+          "grammar": "Noun, Singular, Feminine, Accusative",
+          "dictionary_definition": "slat, lath; plank"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 32210,
+      "end_time_ms": 34680,
+      "original_line": "Для тебя я этот мир выверну наизнанку",
+      "phonetic_line": "Для́ тебя́ я э́тот ми́р вы́верну наизна́нку",
+      "translation": "I'll turn this world inside out for you.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Для́",
+          "lemma": "для́",
+          "grammar": "Preposition",
+          "dictionary_definition": "for (the benefit of); to"
+        },
+        {
+          "key": 2,
+          "display_form": "тебя́",
+          "lemma": "ты́",
+          "grammar": "Pronoun, 2nd Person, Singular, Accusative",
+          "dictionary_definition": "you"
+        },
+        {
+          "key": 3,
+          "display_form": "я",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 4,
+          "display_form": "э́тот",
+          "lemma": "э́тот",
+          "grammar": "Adjective, Singular, Masculine, Accusative",
+          "dictionary_definition": "this"
+        },
+        {
+          "key": 5,
+          "display_form": "ми́р",
+          "lemma": "ми́р",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "world; peace"
+        },
+        {
+          "key": 6,
+          "display_form": "вы́верну",
+          "lemma": "вы́вернуть",
+          "grammar": "Verb, Future, 1st Person, Singular",
+          "dictionary_definition": "to turn inside out; to sprain, to twist, to dislocate; to wrench out, to pull out; to throw up, to vomit"
+        },
+        {
+          "key": 7,
+          "display_form": "наизна́нку",
+          "lemma": "наизна́нку",
+          "grammar": "Adverb",
+          "dictionary_definition": "inside out, on the wrong side"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 34680,
+      "end_time_ms": 37210,
+      "original_line": "Без тебя меня не будет ровно в половину",
+      "phonetic_line": "Бе́з тебя́ меня́ не бу́дет ро́вно в полови́ну",
+      "translation": "Without you, I won't be halfway there.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Бе́з",
+          "lemma": "бе́з",
+          "grammar": "Preposition",
+          "dictionary_definition": "without; to (time)"
+        },
+        {
+          "key": 2,
+          "display_form": "тебя́",
+          "lemma": "ты́",
+          "grammar": "Pronoun, 2nd Person, Singular, Accusative",
+          "dictionary_definition": "you"
+        },
+        {
+          "key": 3,
+          "display_form": "меня́",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Accusative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 4,
+          "display_form": "не",
+          "lemma": "не́",
+          "grammar": "Particle",
+          "dictionary_definition": "not"
+        },
+        {
+          "key": 5,
+          "display_form": "бу́дет",
+          "lemma": "бы́ть",
+          "grammar": "Verb, Future, 3rd Person, Singular",
+          "dictionary_definition": "to be; (present tense) 'есть'  - there is, there are; has been"
+        },
+        {
+          "key": 6,
+          "display_form": "ро́вно",
+          "lemma": "ро́вно",
+          "grammar": "Adverb",
+          "dictionary_definition": "evenly; exactly; absolutely"
+        },
+        {
+          "key": 7,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 8,
+          "display_form": "полови́ну",
+          "lemma": "полови́на",
+          "grammar": "Noun, Singular, Feminine, Accusative",
+          "dictionary_definition": "half"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 37210,
+      "end_time_ms": 39220,
+      "original_line": "Без твоей любви просто я погибну",
+      "phonetic_line": "Бе́з твое́й любви́ про́сто я поги́бну",
+      "translation": "Without your love, I'll just die.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Бе́з",
+          "lemma": "бе́з",
+          "grammar": "Preposition",
+          "dictionary_definition": "without; to (time)"
+        },
+        {
+          "key": 2,
+          "display_form": "твое́й",
+          "lemma": "тво́й",
+          "grammar": "Adjective, Singular, Feminine, Genitive",
+          "dictionary_definition": "your, yours"
+        },
+        {
+          "key": 3,
+          "display_form": "любви́",
+          "lemma": "любо́вь",
+          "grammar": "Noun, Singular, Feminine, Genitive",
+          "dictionary_definition": "love"
+        },
+        {
+          "key": 4,
+          "display_form": "про́сто",
+          "lemma": "про́сто",
+          "grammar": "Particle",
+          "dictionary_definition": "it is simple, it is easy, simply; just, just only, only"
+        },
+        {
+          "key": 5,
+          "display_form": "я",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 6,
+          "display_form": "поги́бну",
+          "lemma": "поги́бнуть",
+          "grammar": "Verb, Future, 1st Person, Singular",
+          "dictionary_definition": "get killed, die"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 39220,
+      "end_time_ms": 41440,
+      "original_line": "Весь это мир бы для меня невыносимым",
+      "phonetic_line": "Весь э́то ми́р бы для́ меня́ невыноси́мым",
+      "translation": "The whole world would be intolerable to me.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Весь",
+          "lemma": "ве́сь",
+          "grammar": "Adjective, Singular, Masculine, Accusative",
+          "dictionary_definition": "village, village community"
+        },
+        {
+          "key": 2,
+          "display_form": "э́то",
+          "lemma": "э́то",
+          "grammar": "Particle",
+          "dictionary_definition": "this is, that is"
+        },
+        {
+          "key": 3,
+          "display_form": "ми́р",
+          "lemma": "ми́р",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "world; peace"
+        },
+        {
+          "key": 4,
+          "display_form": "бы",
+          "lemma": "бы",
+          "grammar": "Particle",
+          "dictionary_definition": "would (be able to)"
+        },
+        {
+          "key": 5,
+          "display_form": "для́",
+          "lemma": "для́",
+          "grammar": "Preposition",
+          "dictionary_definition": "for (the benefit of); to"
+        },
+        {
+          "key": 6,
+          "display_form": "меня́",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Accusative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 7,
+          "display_form": "невыноси́мым",
+          "lemma": "невыноси́мый",
+          "grammar": "Adjective, Singular, Masculine, Ablative",
+          "dictionary_definition": "intolerable, unbearable, unsufferable"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 41440,
+      "end_time_ms": 43540,
+      "original_line": "Ты мне нужна одна так сильно",
+      "phonetic_line": "Ты мне́ нужна́ одна́ так си́льно",
+      "translation": "I need you alone so much.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Ты",
+          "lemma": "ты́",
+          "grammar": "Pronoun, 2nd Person, Singular, Nominative",
+          "dictionary_definition": "you"
+        },
+        {
+          "key": 2,
+          "display_form": "мне́",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Dative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 3,
+          "display_form": "нужна́",
+          "lemma": "ну́жный",
+          "grammar": "Adj (short), Singular, Feminine",
+          "dictionary_definition": "necessary, needed, the right, the correct; need"
+        },
+        {
+          "key": 4,
+          "display_form": "одна́",
+          "lemma": "оди́н",
+          "grammar": "Adjective, Singular, Feminine, Nominative",
+          "dictionary_definition": "one"
+        },
+        {
+          "key": 5,
+          "display_form": "так",
+          "lemma": "та́к",
+          "grammar": "Conjunction",
+          "dictionary_definition": "so, thus, like this, this way, then; exactly how"
+        },
+        {
+          "key": 6,
+          "display_form": "си́льно",
+          "lemma": "си́льно",
+          "grammar": "Adverb",
+          "dictionary_definition": "strongly, violently, heavily, greatly, badly, vastly"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 43540,
+      "end_time_ms": 45610,
+      "original_line": "Исчезает лунный свет",
+      "phonetic_line": "Исчеза́ет лу́нный све́т",
+      "translation": "Moonlight disappears",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Исчеза́ет",
+          "lemma": "исчеза́ть",
+          "grammar": "Verb, Present, 3rd Person, Singular",
+          "dictionary_definition": "disappear, vanish, wear off"
+        },
+        {
+          "key": 2,
+          "display_form": "лу́нный",
+          "lemma": "лу́нный",
+          "grammar": "Adjective, Singular, Masculine, Nominative",
+          "dictionary_definition": "lunar, moon"
+        },
+        {
+          "key": 3,
+          "display_form": "све́т",
+          "lemma": "све́т",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "light; world; high society"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 45610,
+      "end_time_ms": 47950,
+      "original_line": "Через полчаса рассвет",
+      "phonetic_line": "Че́рез полчаса́ рассве́т",
+      "translation": "Half an hour before dawn",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Че́рез",
+          "lemma": "че́рез",
+          "grammar": "Preposition",
+          "dictionary_definition": "across, over, at; through; through, using; in (time) (no more than)"
+        },
+        {
+          "key": 2,
+          "display_form": "полчаса́",
+          "lemma": "полчаса́",
+          "grammar": "Noun, Singular, Neuter, Accusative",
+          "dictionary_definition": "half an hour"
+        },
+        {
+          "key": 3,
+          "display_form": "рассве́т",
+          "lemma": "рассве́т",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "dawn"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 47950,
+      "end_time_ms": 52380,
+      "original_line": "Провожает он тебя своим взглядом",
+      "phonetic_line": "Провожа́ет о́н тебя́ свои́м взгля́дом",
+      "translation": "He sees you off with his eyes.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Провожа́ет",
+          "lemma": "провожа́ть",
+          "grammar": "Verb, Present, 3rd Person, Singular",
+          "dictionary_definition": "to escort, to accompany; see off; say goodbye"
+        },
+        {
+          "key": 2,
+          "display_form": "о́н",
+          "lemma": "о́н",
+          "grammar": "Pronoun, 3rd Person, Singular, Masculine, Nominative",
+          "dictionary_definition": "he"
+        },
+        {
+          "key": 3,
+          "display_form": "тебя́",
+          "lemma": "ты́",
+          "grammar": "Pronoun, 2nd Person, Singular, Accusative",
+          "dictionary_definition": "you"
+        },
+        {
+          "key": 4,
+          "display_form": "свои́м",
+          "lemma": "сво́й",
+          "grammar": "Adjective, Plural, Dative",
+          "dictionary_definition": "one's own (reflexive)"
+        },
+        {
+          "key": 5,
+          "display_form": "взгля́дом",
+          "lemma": "взгля́д",
+          "grammar": "Noun, Singular, Masculine, Ablative",
+          "dictionary_definition": "look, gaze, stare; glance, glare; view, opinion"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 52380,
+      "end_time_ms": 55030,
+      "original_line": "И не нужно лишних слов",
+      "phonetic_line": "И не ну́жно ли́шних сло́в",
+      "translation": "And don't say too much.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "И",
+          "lemma": "и",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 2,
+          "display_form": "не",
+          "lemma": "не́",
+          "grammar": "Particle",
+          "dictionary_definition": "not"
+        },
+        {
+          "key": 3,
+          "display_form": "ну́жно",
+          "lemma": "ну́жно",
+          "grammar": "Predicative, Present",
+          "dictionary_definition": "it is necessary, must, one should, one ought, you should, you ought, should"
+        },
+        {
+          "key": 4,
+          "display_form": "ли́шних",
+          "lemma": "ли́шний",
+          "grammar": "Adjective, Plural, Genitive",
+          "dictionary_definition": "extra; superfluous; unnecessary; spare"
+        },
+        {
+          "key": 5,
+          "display_form": "сло́в",
+          "lemma": "сло́во",
+          "grammar": "Noun, Plural, Neuter, Genitive",
+          "dictionary_definition": "word; speech; promise, word"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 55030,
+      "end_time_ms": 56360,
+      "original_line": "В нашей жизни есть любовь",
+      "phonetic_line": "В на́шей жи́зни е́сть любо́вь",
+      "translation": "There is love in our lives.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "В",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 2,
+          "display_form": "на́шей",
+          "lemma": "на́ш",
+          "grammar": "Adjective, Singular, Feminine, Genitive",
+          "dictionary_definition": "our"
+        },
+        {
+          "key": 3,
+          "display_form": "жи́зни",
+          "lemma": "жи́знь",
+          "grammar": "Noun, Singular, Feminine, Genitive",
+          "dictionary_definition": "life, existence"
+        },
+        {
+          "key": 4,
+          "display_form": "е́сть",
+          "lemma": "е́сть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "there is, there are, eats"
+        },
+        {
+          "key": 5,
+          "display_form": "любо́вь",
+          "lemma": "любо́вь",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "love"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 56360,
+      "end_time_ms": 72550,
+      "original_line": "Мне так хорошо, что ты со мной рядом",
+      "phonetic_line": "Мне́ так хорошо́, что ты́ со́ мной ря́дом",
+      "translation": "I'm so happy you're with me.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Мне́",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Dative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 2,
+          "display_form": "так",
+          "lemma": "та́к",
+          "grammar": "Conjunction",
+          "dictionary_definition": "so, thus, like this, this way, then; exactly how"
+        },
+        {
+          "key": 3,
+          "display_form": "хорошо́,",
+          "lemma": "хорошо́",
+          "grammar": "Adverb",
+          "dictionary_definition": "it is good, it is pleasant, well, good"
+        },
+        {
+          "key": 4,
+          "display_form": "что",
+          "lemma": "что́",
+          "grammar": "Conjunction",
+          "dictionary_definition": "what; that"
+        },
+        {
+          "key": 5,
+          "display_form": "ты́",
+          "lemma": "ты́",
+          "grammar": "Pronoun, 2nd Person, Singular, Nominative",
+          "dictionary_definition": "you"
+        },
+        {
+          "key": 6,
+          "display_form": "со́",
+          "lemma": "с",
+          "grammar": "Preposition",
+          "dictionary_definition": "with; from, in the course of; since; off, remove from"
+        },
+        {
+          "key": 7,
+          "display_form": "мной",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Ablative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 8,
+          "display_form": "ря́дом",
+          "lemma": "ря́дом",
+          "grammar": "Adverb",
+          "dictionary_definition": "near, next to, side by side, beside, by, next, next door; Next to"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 72550,
+      "end_time_ms": 75000,
+      "original_line": "Снова жду так, ночное время суток",
+      "phonetic_line": "Сно́ва жду та́к, ночно́е вре́мя су́ток",
+      "translation": "I'm waiting again, night time.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Сно́ва",
+          "lemma": "сно́ва",
+          "grammar": "Adverb",
+          "dictionary_definition": "again (anew)"
+        },
+        {
+          "key": 2,
+          "display_form": "жду",
+          "lemma": "жда́ть",
+          "grammar": "Verb, Present, 1st Person, Singular",
+          "dictionary_definition": "to wait, to expect, to await"
+        },
+        {
+          "key": 3,
+          "display_form": "та́к,",
+          "lemma": "та́к",
+          "grammar": "Conjunction",
+          "dictionary_definition": "so, thus, like this, this way, then; exactly how"
+        },
+        {
+          "key": 4,
+          "display_form": "ночно́е",
+          "lemma": "ночно́й",
+          "grammar": "Adjective, Singular, Neuter, Accusative",
+          "dictionary_definition": "night, nightly; nocturnal"
+        },
+        {
+          "key": 5,
+          "display_form": "вре́мя",
+          "lemma": "вре́мя",
+          "grammar": "Noun, Singular, Neuter, Accusative",
+          "dictionary_definition": "time, times, tense, weather"
+        },
+        {
+          "key": 6,
+          "display_form": "су́ток",
+          "lemma": "су́тки",
+          "grammar": "Noun, Plural, Genitive",
+          "dictionary_definition": "twenty-four hours, day, nychthemeron"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 75000,
+      "end_time_ms": 76930,
+      "original_line": "Хочу с тобой разделить наши минуты",
+      "phonetic_line": "Хочу́ с тобо́й раздели́ть на́ши мину́ты",
+      "translation": "I want to share our minutes with you.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Хочу́",
+          "lemma": "хоте́ть",
+          "grammar": "Verb, Present, 1st Person, Singular",
+          "dictionary_definition": "to want; to feel like; to mean"
+        },
+        {
+          "key": 2,
+          "display_form": "с",
+          "lemma": "с",
+          "grammar": "Preposition",
+          "dictionary_definition": "with; from, in the course of; since; off, remove from"
+        },
+        {
+          "key": 3,
+          "display_form": "тобо́й",
+          "lemma": "ты́",
+          "grammar": "Pronoun, 2nd Person, Singular, Ablative",
+          "dictionary_definition": "you"
+        },
+        {
+          "key": 4,
+          "display_form": "раздели́ть",
+          "lemma": "раздели́ть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "divide, split, share"
+        },
+        {
+          "key": 5,
+          "display_form": "на́ши",
+          "lemma": "на́ш",
+          "grammar": "Adjective, Plural, Nominative",
+          "dictionary_definition": "our"
+        },
+        {
+          "key": 6,
+          "display_form": "мину́ты",
+          "lemma": "мину́та",
+          "grammar": "Noun, Singular, Feminine, Genitive",
+          "dictionary_definition": "minute, moment, instant"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 76930,
+      "end_time_ms": 79060,
+      "original_line": "Я только твой, тебе я отдаюсь по полной",
+      "phonetic_line": "Я то́лько тво́й, тебе́ я отдаю́сь по по́лной",
+      "translation": "I'm only yours, I give myself to you.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Я",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 2,
+          "display_form": "то́лько",
+          "lemma": "то́лько",
+          "grammar": "Adverb",
+          "dictionary_definition": "only; just, simply"
+        },
+        {
+          "key": 3,
+          "display_form": "тво́й,",
+          "lemma": "тво́й",
+          "grammar": "Adjective, Singular, Masculine, Accusative",
+          "dictionary_definition": "your, yours"
+        },
+        {
+          "key": 4,
+          "display_form": "тебе́",
+          "lemma": "ты́",
+          "grammar": "Pronoun, 2nd Person, Singular, Dative",
+          "dictionary_definition": "you"
+        },
+        {
+          "key": 5,
+          "display_form": "я",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 6,
+          "display_form": "отдаю́сь",
+          "lemma": "отдава́ться",
+          "grammar": "Verb, Present, 1st Person, Singular",
+          "dictionary_definition": "give oneself up, resound, reverberate, ring"
+        },
+        {
+          "key": 7,
+          "display_form": "по",
+          "lemma": "по́",
+          "grammar": "Preposition",
+          "dictionary_definition": "along, down, through, across, around; about, under, for, on; by the means of (por medio de), on; hit or punch somewhere"
+        },
+        {
+          "key": 8,
+          "display_form": "по́лной",
+          "lemma": "по́лный",
+          "grammar": "Adjective, Singular, Feminine, Locative",
+          "dictionary_definition": "full, complete; absolute, perfect; exhaustive, comprehensive; stout, plump"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 79060,
+      "end_time_ms": 81470,
+      "original_line": "Моя задача - оставить тебя довольной",
+      "phonetic_line": "Моя́ зада́ча - оста́вить тебя́ дово́льной",
+      "translation": "My job is to keep you happy.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Моя́",
+          "lemma": "мо́й",
+          "grammar": "Adjective, Singular, Feminine, Nominative",
+          "dictionary_definition": "my, mine, my people"
+        },
+        {
+          "key": 2,
+          "display_form": "зада́ча",
+          "lemma": "зада́ча",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "task, exercise, problem"
+        },
+        {
+          "key": 3,
+          "display_form": "оста́вить",
+          "lemma": "оста́вить",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "to leave, to leave alone; to abandon, to give up; to drop, to stop; to keep, to reserve, to leave in the care of"
+        },
+        {
+          "key": 4,
+          "display_form": "тебя́",
+          "lemma": "ты́",
+          "grammar": "Pronoun, 2nd Person, Singular, Accusative",
+          "dictionary_definition": "you"
+        },
+        {
+          "key": 5,
+          "display_form": "дово́льной",
+          "lemma": "дово́льный",
+          "grammar": "Adjective, Singular, Feminine, Genitive",
+          "dictionary_definition": "satisfied, delighted; content; pleased"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 81470,
+      "end_time_ms": 83450,
+      "original_line": "Так идеально совпадают знаки зодиака",
+      "phonetic_line": "Та́к идеа́льно совпада́ют зна́ки зодиа́ка",
+      "translation": "So perfectly match the signs of the zodiac",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Та́к",
+          "lemma": "та́к",
+          "grammar": "Conjunction",
+          "dictionary_definition": "so, thus, like this, this way, then; exactly how"
+        },
+        {
+          "key": 2,
+          "display_form": "идеа́льно",
+          "lemma": "идеа́льно",
+          "grammar": "Adverb",
+          "dictionary_definition": "ideally perfectly"
+        },
+        {
+          "key": 3,
+          "display_form": "совпада́ют",
+          "lemma": "совпада́ть",
+          "grammar": "Verb, Present, 3rd Person, Plural",
+          "dictionary_definition": "coincide"
+        },
+        {
+          "key": 4,
+          "display_form": "зна́ки",
+          "lemma": "зна́к",
+          "grammar": "Noun, Plural, Masculine, Nominative",
+          "dictionary_definition": "sign, token, symbol, mark, omen, signal"
+        },
+        {
+          "key": 5,
+          "display_form": "зодиа́ка",
+          "lemma": "зодиа́к",
+          "grammar": "Noun, Singular, Masculine, Genitive",
+          "dictionary_definition": "zodiac"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 83450,
+      "end_time_ms": 86160,
+      "original_line": "Мы уже семья - завели собаку",
+      "phonetic_line": "Мы́ уже́ семья́ - завели́ соба́ку",
+      "translation": "We're a family. We got a dog.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Мы́",
+          "lemma": "мы́",
+          "grammar": "Pronoun, 1st Person, Plural, Nominative",
+          "dictionary_definition": "we"
+        },
+        {
+          "key": 2,
+          "display_form": "уже́",
+          "lemma": "уже́",
+          "grammar": "Adverb",
+          "dictionary_definition": "already, by this time, by now, ready, no longer"
+        },
+        {
+          "key": 3,
+          "display_form": "семья́",
+          "lemma": "семья́",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "family"
+        },
+        {
+          "key": 4,
+          "display_form": "завели́",
+          "lemma": "завести́",
+          "grammar": "Verb, Past, Plural",
+          "dictionary_definition": "to get, acquire, have ( relationship); start, wind up, to set; establish"
+        },
+        {
+          "key": 5,
+          "display_form": "соба́ку",
+          "lemma": "соба́ка",
+          "grammar": "Noun, Singular, Feminine, Accusative",
+          "dictionary_definition": "dog; the at (@) sign"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 86160,
+      "end_time_ms": 88400,
+      "original_line": "Обещаю, не будет никакого быта",
+      "phonetic_line": "Обеща́ю, не бу́дет никако́го бы́та",
+      "translation": "I promise there won't be any life.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Обеща́ю,",
+          "lemma": "обеща́ть",
+          "grammar": "Verb, Present, 1st Person, Singular",
+          "dictionary_definition": "to promise, be predicted"
+        },
+        {
+          "key": 2,
+          "display_form": "не",
+          "lemma": "не́",
+          "grammar": "Particle",
+          "dictionary_definition": "not"
+        },
+        {
+          "key": 3,
+          "display_form": "бу́дет",
+          "lemma": "бы́ть",
+          "grammar": "Verb, Future, 3rd Person, Singular",
+          "dictionary_definition": "to be; (present tense) 'есть'  - there is, there are; has been"
+        },
+        {
+          "key": 4,
+          "display_form": "никако́го",
+          "lemma": "никако́й",
+          "grammar": "Adjective, Singular, Neuter, Genitive",
+          "dictionary_definition": "no...at all, no...whatsoever, none"
+        },
+        {
+          "key": 5,
+          "display_form": "бы́та",
+          "lemma": "бы́т",
+          "grammar": "Noun, Singular, Masculine, Genitive",
+          "dictionary_definition": "daily life"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 88400,
+      "end_time_ms": 90870,
+      "original_line": "Будет много событий, дорога открыта",
+      "phonetic_line": "Будет мно́го собы́тий, доро́га откры́та",
+      "translation": "There will be a lot of events, the road is open.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Будет",
+          "lemma": "бы́ть",
+          "grammar": "Verb, Future, 3rd Person, Singular",
+          "dictionary_definition": "to be; (present tense) 'есть'  - there is, there are; has been"
+        },
+        {
+          "key": 2,
+          "display_form": "мно́го",
+          "lemma": "мно́го",
+          "grammar": "Adverb",
+          "dictionary_definition": "much; many; a lot of, plenty of"
+        },
+        {
+          "key": 3,
+          "display_form": "собы́тий,",
+          "lemma": "собы́тие",
+          "grammar": "Noun, Plural, Neuter, Genitive",
+          "dictionary_definition": "event; happening"
+        },
+        {
+          "key": 4,
+          "display_form": "доро́га",
+          "lemma": "доро́га",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "road, way, journey"
+        },
+        {
+          "key": 5,
+          "display_form": "откры́та",
+          "lemma": "откры́ть",
+          "grammar": "Participle (short), Past, Singular, Feminine",
+          "dictionary_definition": "to open"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 90870,
+      "end_time_ms": 93430,
+      "original_line": "Наши отношения все крепче",
+      "phonetic_line": "На́ши отноше́ния всё кре́пче",
+      "translation": "Our relationship is getting stronger.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "На́ши",
+          "lemma": "на́ш",
+          "grammar": "Adjective, Plural, Nominative",
+          "dictionary_definition": "our"
+        },
+        {
+          "key": 2,
+          "display_form": "отноше́ния",
+          "lemma": "отноше́ние",
+          "grammar": "Noun, Plural, Neuter, Nominative",
+          "dictionary_definition": "relationship; attitude; regard, respect; ratio"
+        },
+        {
+          "key": 3,
+          "display_form": "всё",
+          "lemma": "всё",
+          "grammar": "Particle",
+          "dictionary_definition": "always, all the time, the whole time, still, only, all, all the same, however, nevertheless; everything, often"
+        },
+        {
+          "key": 4,
+          "display_form": "кре́пче",
+          "lemma": "кре́пкий",
+          "grammar": "Comparative",
+          "dictionary_definition": "strong, durable, sturdy"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 93430,
+      "end_time_ms": 95500,
+      "original_line": "Твоя улыбка лечит - мне легче",
+      "phonetic_line": "Твоя́ улы́бка ле́чит - мне ле́гче",
+      "translation": "Your smile heals, I feel better.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Твоя́",
+          "lemma": "тво́й",
+          "grammar": "Adjective, Singular, Feminine, Nominative",
+          "dictionary_definition": "your, yours"
+        },
+        {
+          "key": 2,
+          "display_form": "улы́бка",
+          "lemma": "улы́бка",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "smile"
+        },
+        {
+          "key": 3,
+          "display_form": "ле́чит",
+          "lemma": "лечи́ть",
+          "grammar": "Verb, Present, 3rd Person, Singular",
+          "dictionary_definition": "heal, treat, cure"
+        },
+        {
+          "key": 4,
+          "display_form": "мне",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Dative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 5,
+          "display_form": "ле́гче",
+          "lemma": "лёгкий",
+          "grammar": "Comparative",
+          "dictionary_definition": "light, slight; easy"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 95500,
+      "end_time_ms": 97870,
+      "original_line": "Судьба приготовила для нас подарок",
+      "phonetic_line": "Судьба́ пригото́вила для на́с пода́рок",
+      "translation": "Fate has prepared a gift for us.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Судьба́",
+          "lemma": "судьба́",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "fate, fortune, destiny"
+        },
+        {
+          "key": 2,
+          "display_form": "пригото́вила",
+          "lemma": "пригото́вить",
+          "grammar": "Verb, Past, Singular, Feminine",
+          "dictionary_definition": "to cook; to prepare, to make ready"
+        },
+        {
+          "key": 3,
+          "display_form": "для",
+          "lemma": "для́",
+          "grammar": "Preposition",
+          "dictionary_definition": "for (the benefit of); to"
+        },
+        {
+          "key": 4,
+          "display_form": "на́с",
+          "lemma": "мы́",
+          "grammar": "Pronoun, 1st Person, Plural, Genitive",
+          "dictionary_definition": "we"
+        },
+        {
+          "key": 5,
+          "display_form": "пода́рок",
+          "lemma": "пода́рок",
+          "grammar": "Noun, Singular, Masculine, Accusative",
+          "dictionary_definition": "present, gift"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 97870,
+      "end_time_ms": 100250,
+      "original_line": "Я стану отцом, а ты будешь мамой",
+      "phonetic_line": "Я ста́ну отцо́м, а ты́ бу́дешь ма́мой",
+      "translation": "I'll be a father and you'll be a mother.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Я",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 2,
+          "display_form": "ста́ну",
+          "lemma": "ста́ть",
+          "grammar": "Verb, Future, 1st Person, Singular",
+          "dictionary_definition": "to become; to begin to, be; to stand; to become, get, grow"
+        },
+        {
+          "key": 3,
+          "display_form": "отцо́м,",
+          "lemma": "оте́ц",
+          "grammar": "Noun, Singular, Masculine, Ablative",
+          "dictionary_definition": "father"
+        },
+        {
+          "key": 4,
+          "display_form": "а",
+          "lemma": "а",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and (as contrast)"
+        },
+        {
+          "key": 5,
+          "display_form": "ты́",
+          "lemma": "ты́",
+          "grammar": "Pronoun, 2nd Person, Singular, Nominative",
+          "dictionary_definition": "you"
+        },
+        {
+          "key": 6,
+          "display_form": "бу́дешь",
+          "lemma": "бы́ть",
+          "grammar": "Verb, Future, 2nd Person, Singular",
+          "dictionary_definition": "to be; (present tense) 'есть'  - there is, there are; has been"
+        },
+        {
+          "key": 7,
+          "display_form": "ма́мой",
+          "lemma": "ма́ма",
+          "grammar": "Noun, Singular, Feminine, Ablative",
+          "dictionary_definition": "mom, mama, mommy, mummy"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 100250,
+      "end_time_ms": 102020,
+      "original_line": "Без тебя меня не будет ровно в половину",
+      "phonetic_line": "Бе́з тебя́ меня́ не бу́дет ро́вно в полови́ну",
+      "translation": "Without you, I won't be halfway there.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Бе́з",
+          "lemma": "бе́з",
+          "grammar": "Preposition",
+          "dictionary_definition": "without; to (time)"
+        },
+        {
+          "key": 2,
+          "display_form": "тебя́",
+          "lemma": "ты́",
+          "grammar": "Pronoun, 2nd Person, Singular, Accusative",
+          "dictionary_definition": "you"
+        },
+        {
+          "key": 3,
+          "display_form": "меня́",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Accusative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 4,
+          "display_form": "не",
+          "lemma": "не́",
+          "grammar": "Particle",
+          "dictionary_definition": "not"
+        },
+        {
+          "key": 5,
+          "display_form": "бу́дет",
+          "lemma": "бы́ть",
+          "grammar": "Verb, Future, 3rd Person, Singular",
+          "dictionary_definition": "to be; (present tense) 'есть'  - there is, there are; has been"
+        },
+        {
+          "key": 6,
+          "display_form": "ро́вно",
+          "lemma": "ро́вно",
+          "grammar": "Adverb",
+          "dictionary_definition": "evenly; exactly; absolutely"
+        },
+        {
+          "key": 7,
+          "display_form": "в",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 8,
+          "display_form": "полови́ну",
+          "lemma": "полови́на",
+          "grammar": "Noun, Singular, Feminine, Accusative",
+          "dictionary_definition": "half"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 102020,
+      "end_time_ms": 104900,
+      "original_line": "Без твоей любви просто я погибну",
+      "phonetic_line": "Бе́з твое́й любви́ про́сто я поги́бну",
+      "translation": "Without your love, I'll just die.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Бе́з",
+          "lemma": "бе́з",
+          "grammar": "Preposition",
+          "dictionary_definition": "without; to (time)"
+        },
+        {
+          "key": 2,
+          "display_form": "твое́й",
+          "lemma": "тво́й",
+          "grammar": "Adjective, Singular, Feminine, Genitive",
+          "dictionary_definition": "your, yours"
+        },
+        {
+          "key": 3,
+          "display_form": "любви́",
+          "lemma": "любо́вь",
+          "grammar": "Noun, Singular, Feminine, Genitive",
+          "dictionary_definition": "love"
+        },
+        {
+          "key": 4,
+          "display_form": "про́сто",
+          "lemma": "про́сто",
+          "grammar": "Particle",
+          "dictionary_definition": "it is simple, it is easy, simply; just, just only, only"
+        },
+        {
+          "key": 5,
+          "display_form": "я",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Nominative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 6,
+          "display_form": "поги́бну",
+          "lemma": "поги́бнуть",
+          "grammar": "Verb, Future, 1st Person, Singular",
+          "dictionary_definition": "get killed, die"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 104900,
+      "end_time_ms": 107050,
+      "original_line": "Весь это мир бы для меня невыносимым",
+      "phonetic_line": "Весь э́то ми́р бы для́ меня́ невыноси́мым",
+      "translation": "The whole world would be intolerable to me.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Весь",
+          "lemma": "ве́сь",
+          "grammar": "Adjective, Singular, Masculine, Accusative",
+          "dictionary_definition": "village, village community"
+        },
+        {
+          "key": 2,
+          "display_form": "э́то",
+          "lemma": "э́то",
+          "grammar": "Particle",
+          "dictionary_definition": "this is, that is"
+        },
+        {
+          "key": 3,
+          "display_form": "ми́р",
+          "lemma": "ми́р",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "world; peace"
+        },
+        {
+          "key": 4,
+          "display_form": "бы",
+          "lemma": "бы",
+          "grammar": "Particle",
+          "dictionary_definition": "would (be able to)"
+        },
+        {
+          "key": 5,
+          "display_form": "для́",
+          "lemma": "для́",
+          "grammar": "Preposition",
+          "dictionary_definition": "for (the benefit of); to"
+        },
+        {
+          "key": 6,
+          "display_form": "меня́",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Accusative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 7,
+          "display_form": "невыноси́мым",
+          "lemma": "невыноси́мый",
+          "grammar": "Adjective, Singular, Masculine, Ablative",
+          "dictionary_definition": "intolerable, unbearable, unsufferable"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 107050,
+      "end_time_ms": 109310,
+      "original_line": "Ты мне нужна одна так сильно",
+      "phonetic_line": "Ты мне́ нужна́ одна́ так си́льно",
+      "translation": "I need you alone so much.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Ты",
+          "lemma": "ты́",
+          "grammar": "Pronoun, 2nd Person, Singular, Nominative",
+          "dictionary_definition": "you"
+        },
+        {
+          "key": 2,
+          "display_form": "мне́",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Dative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 3,
+          "display_form": "нужна́",
+          "lemma": "ну́жный",
+          "grammar": "Adj (short), Singular, Feminine",
+          "dictionary_definition": "necessary, needed, the right, the correct; need"
+        },
+        {
+          "key": 4,
+          "display_form": "одна́",
+          "lemma": "оди́н",
+          "grammar": "Adjective, Singular, Feminine, Nominative",
+          "dictionary_definition": "one"
+        },
+        {
+          "key": 5,
+          "display_form": "так",
+          "lemma": "та́к",
+          "grammar": "Conjunction",
+          "dictionary_definition": "so, thus, like this, this way, then; exactly how"
+        },
+        {
+          "key": 6,
+          "display_form": "си́льно",
+          "lemma": "си́льно",
+          "grammar": "Adverb",
+          "dictionary_definition": "strongly, violently, heavily, greatly, badly, vastly"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 109310,
+      "end_time_ms": 111170,
+      "original_line": "Исчезает лунный свет",
+      "phonetic_line": "Исчеза́ет лу́нный све́т",
+      "translation": "Moonlight disappears",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Исчеза́ет",
+          "lemma": "исчеза́ть",
+          "grammar": "Verb, Present, 3rd Person, Singular",
+          "dictionary_definition": "disappear, vanish, wear off"
+        },
+        {
+          "key": 2,
+          "display_form": "лу́нный",
+          "lemma": "лу́нный",
+          "grammar": "Adjective, Singular, Masculine, Nominative",
+          "dictionary_definition": "lunar, moon"
+        },
+        {
+          "key": 3,
+          "display_form": "све́т",
+          "lemma": "све́т",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "light; world; high society"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 111170,
+      "end_time_ms": 113210,
+      "original_line": "Через полчаса рассвет",
+      "phonetic_line": "Че́рез полчаса́ рассве́т",
+      "translation": "Half an hour before dawn",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Че́рез",
+          "lemma": "че́рез",
+          "grammar": "Preposition",
+          "dictionary_definition": "across, over, at; through; through, using; in (time) (no more than)"
+        },
+        {
+          "key": 2,
+          "display_form": "полчаса́",
+          "lemma": "полчаса́",
+          "grammar": "Noun, Singular, Neuter, Accusative",
+          "dictionary_definition": "half an hour"
+        },
+        {
+          "key": 3,
+          "display_form": "рассве́т",
+          "lemma": "рассве́т",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "dawn"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 113210,
+      "end_time_ms": 117960,
+      "original_line": "Провожает он тебя своим взглядом",
+      "phonetic_line": "Провожа́ет о́н тебя́ свои́м взгля́дом",
+      "translation": "He sees you off with his eyes.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Провожа́ет",
+          "lemma": "провожа́ть",
+          "grammar": "Verb, Present, 3rd Person, Singular",
+          "dictionary_definition": "to escort, to accompany; see off; say goodbye"
+        },
+        {
+          "key": 2,
+          "display_form": "о́н",
+          "lemma": "о́н",
+          "grammar": "Pronoun, 3rd Person, Singular, Masculine, Nominative",
+          "dictionary_definition": "he"
+        },
+        {
+          "key": 3,
+          "display_form": "тебя́",
+          "lemma": "ты́",
+          "grammar": "Pronoun, 2nd Person, Singular, Accusative",
+          "dictionary_definition": "you"
+        },
+        {
+          "key": 4,
+          "display_form": "свои́м",
+          "lemma": "сво́й",
+          "grammar": "Adjective, Plural, Dative",
+          "dictionary_definition": "one's own (reflexive)"
+        },
+        {
+          "key": 5,
+          "display_form": "взгля́дом",
+          "lemma": "взгля́д",
+          "grammar": "Noun, Singular, Masculine, Ablative",
+          "dictionary_definition": "look, gaze, stare; glance, glare; view, opinion"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 117960,
+      "end_time_ms": 120080,
+      "original_line": "И не нужно лишних слов",
+      "phonetic_line": "И не ну́жно ли́шних сло́в",
+      "translation": "And don't say too much.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "И",
+          "lemma": "и",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 2,
+          "display_form": "не",
+          "lemma": "не́",
+          "grammar": "Particle",
+          "dictionary_definition": "not"
+        },
+        {
+          "key": 3,
+          "display_form": "ну́жно",
+          "lemma": "ну́жно",
+          "grammar": "Predicative, Present",
+          "dictionary_definition": "it is necessary, must, one should, one ought, you should, you ought, should"
+        },
+        {
+          "key": 4,
+          "display_form": "ли́шних",
+          "lemma": "ли́шний",
+          "grammar": "Adjective, Plural, Genitive",
+          "dictionary_definition": "extra; superfluous; unnecessary; spare"
+        },
+        {
+          "key": 5,
+          "display_form": "сло́в",
+          "lemma": "сло́во",
+          "grammar": "Noun, Plural, Neuter, Genitive",
+          "dictionary_definition": "word; speech; promise, word"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 120080,
+      "end_time_ms": 122490,
+      "original_line": "В нашей жизни есть любовь",
+      "phonetic_line": "В на́шей жи́зни е́сть любо́вь",
+      "translation": "There is love in our lives.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "В",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 2,
+          "display_form": "на́шей",
+          "lemma": "на́ш",
+          "grammar": "Adjective, Singular, Feminine, Genitive",
+          "dictionary_definition": "our"
+        },
+        {
+          "key": 3,
+          "display_form": "жи́зни",
+          "lemma": "жи́знь",
+          "grammar": "Noun, Singular, Feminine, Genitive",
+          "dictionary_definition": "life, existence"
+        },
+        {
+          "key": 4,
+          "display_form": "е́сть",
+          "lemma": "е́сть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "there is, there are, eats"
+        },
+        {
+          "key": 5,
+          "display_form": "любо́вь",
+          "lemma": "любо́вь",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "love"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 122490,
+      "end_time_ms": 127170,
+      "original_line": "Мне так хорошо, что ты со мной рядом",
+      "phonetic_line": "Мне́ так хорошо́, что ты́ со́ мной ря́дом",
+      "translation": "I'm so happy you're with me.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Мне́",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Dative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 2,
+          "display_form": "так",
+          "lemma": "та́к",
+          "grammar": "Conjunction",
+          "dictionary_definition": "so, thus, like this, this way, then; exactly how"
+        },
+        {
+          "key": 3,
+          "display_form": "хорошо́,",
+          "lemma": "хорошо́",
+          "grammar": "Adverb",
+          "dictionary_definition": "it is good, it is pleasant, well, good"
+        },
+        {
+          "key": 4,
+          "display_form": "что",
+          "lemma": "что́",
+          "grammar": "Conjunction",
+          "dictionary_definition": "what; that"
+        },
+        {
+          "key": 5,
+          "display_form": "ты́",
+          "lemma": "ты́",
+          "grammar": "Pronoun, 2nd Person, Singular, Nominative",
+          "dictionary_definition": "you"
+        },
+        {
+          "key": 6,
+          "display_form": "со́",
+          "lemma": "с",
+          "grammar": "Preposition",
+          "dictionary_definition": "with; from, in the course of; since; off, remove from"
+        },
+        {
+          "key": 7,
+          "display_form": "мной",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Ablative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 8,
+          "display_form": "ря́дом",
+          "lemma": "ря́дом",
+          "grammar": "Adverb",
+          "dictionary_definition": "near, next to, side by side, beside, by, next, next door; Next to"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 127170,
+      "end_time_ms": 129700,
+      "original_line": "Исчезает лунный свет",
+      "phonetic_line": "Исчеза́ет лу́нный све́т",
+      "translation": "Moonlight disappears",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Исчеза́ет",
+          "lemma": "исчеза́ть",
+          "grammar": "Verb, Present, 3rd Person, Singular",
+          "dictionary_definition": "disappear, vanish, wear off"
+        },
+        {
+          "key": 2,
+          "display_form": "лу́нный",
+          "lemma": "лу́нный",
+          "grammar": "Adjective, Singular, Masculine, Nominative",
+          "dictionary_definition": "lunar, moon"
+        },
+        {
+          "key": 3,
+          "display_form": "све́т",
+          "lemma": "све́т",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "light; world; high society"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 129700,
+      "end_time_ms": 132330,
+      "original_line": "Через полчаса рассвет",
+      "phonetic_line": "Че́рез полчаса́ рассве́т",
+      "translation": "Half an hour before dawn",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Че́рез",
+          "lemma": "че́рез",
+          "grammar": "Preposition",
+          "dictionary_definition": "across, over, at; through; through, using; in (time) (no more than)"
+        },
+        {
+          "key": 2,
+          "display_form": "полчаса́",
+          "lemma": "полчаса́",
+          "grammar": "Noun, Singular, Neuter, Accusative",
+          "dictionary_definition": "half an hour"
+        },
+        {
+          "key": 3,
+          "display_form": "рассве́т",
+          "lemma": "рассве́т",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "dawn"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 132330,
+      "end_time_ms": 136510,
+      "original_line": "Провожает он тебя своим взглядом",
+      "phonetic_line": "Провожа́ет о́н тебя́ свои́м взгля́дом",
+      "translation": "He sees you off with his eyes.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Провожа́ет",
+          "lemma": "провожа́ть",
+          "grammar": "Verb, Present, 3rd Person, Singular",
+          "dictionary_definition": "to escort, to accompany; see off; say goodbye"
+        },
+        {
+          "key": 2,
+          "display_form": "о́н",
+          "lemma": "о́н",
+          "grammar": "Pronoun, 3rd Person, Singular, Masculine, Nominative",
+          "dictionary_definition": "he"
+        },
+        {
+          "key": 3,
+          "display_form": "тебя́",
+          "lemma": "ты́",
+          "grammar": "Pronoun, 2nd Person, Singular, Accusative",
+          "dictionary_definition": "you"
+        },
+        {
+          "key": 4,
+          "display_form": "свои́м",
+          "lemma": "сво́й",
+          "grammar": "Adjective, Plural, Dative",
+          "dictionary_definition": "one's own (reflexive)"
+        },
+        {
+          "key": 5,
+          "display_form": "взгля́дом",
+          "lemma": "взгля́д",
+          "grammar": "Noun, Singular, Masculine, Ablative",
+          "dictionary_definition": "look, gaze, stare; glance, glare; view, opinion"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 136510,
+      "end_time_ms": 139110,
+      "original_line": "И не нужно лишних слов",
+      "phonetic_line": "И не ну́жно ли́шних сло́в",
+      "translation": "And don't say too much.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "И",
+          "lemma": "и",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 2,
+          "display_form": "не",
+          "lemma": "не́",
+          "grammar": "Particle",
+          "dictionary_definition": "not"
+        },
+        {
+          "key": 3,
+          "display_form": "ну́жно",
+          "lemma": "ну́жно",
+          "grammar": "Predicative, Present",
+          "dictionary_definition": "it is necessary, must, one should, one ought, you should, you ought, should"
+        },
+        {
+          "key": 4,
+          "display_form": "ли́шних",
+          "lemma": "ли́шний",
+          "grammar": "Adjective, Plural, Genitive",
+          "dictionary_definition": "extra; superfluous; unnecessary; spare"
+        },
+        {
+          "key": 5,
+          "display_form": "сло́в",
+          "lemma": "сло́во",
+          "grammar": "Noun, Plural, Neuter, Genitive",
+          "dictionary_definition": "word; speech; promise, word"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 139110,
+      "end_time_ms": 141280,
+      "original_line": "В нашей жизни есть любовь",
+      "phonetic_line": "В на́шей жи́зни е́сть любо́вь",
+      "translation": "There is love in our lives.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "В",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 2,
+          "display_form": "на́шей",
+          "lemma": "на́ш",
+          "grammar": "Adjective, Singular, Feminine, Genitive",
+          "dictionary_definition": "our"
+        },
+        {
+          "key": 3,
+          "display_form": "жи́зни",
+          "lemma": "жи́знь",
+          "grammar": "Noun, Singular, Feminine, Genitive",
+          "dictionary_definition": "life, existence"
+        },
+        {
+          "key": 4,
+          "display_form": "е́сть",
+          "lemma": "е́сть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "there is, there are, eats"
+        },
+        {
+          "key": 5,
+          "display_form": "любо́вь",
+          "lemma": "любо́вь",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "love"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 141280,
+      "end_time_ms": 161400,
+      "original_line": "Мне так хорошо, что ты со мной рядом",
+      "phonetic_line": "Мне́ так хорошо́, что ты́ со́ мной ря́дом",
+      "translation": "I'm so happy you're with me.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Мне́",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Dative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 2,
+          "display_form": "так",
+          "lemma": "та́к",
+          "grammar": "Conjunction",
+          "dictionary_definition": "so, thus, like this, this way, then; exactly how"
+        },
+        {
+          "key": 3,
+          "display_form": "хорошо́,",
+          "lemma": "хорошо́",
+          "grammar": "Adverb",
+          "dictionary_definition": "it is good, it is pleasant, well, good"
+        },
+        {
+          "key": 4,
+          "display_form": "что",
+          "lemma": "что́",
+          "grammar": "Conjunction",
+          "dictionary_definition": "what; that"
+        },
+        {
+          "key": 5,
+          "display_form": "ты́",
+          "lemma": "ты́",
+          "grammar": "Pronoun, 2nd Person, Singular, Nominative",
+          "dictionary_definition": "you"
+        },
+        {
+          "key": 6,
+          "display_form": "со́",
+          "lemma": "с",
+          "grammar": "Preposition",
+          "dictionary_definition": "with; from, in the course of; since; off, remove from"
+        },
+        {
+          "key": 7,
+          "display_form": "мной",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Ablative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 8,
+          "display_form": "ря́дом",
+          "lemma": "ря́дом",
+          "grammar": "Adverb",
+          "dictionary_definition": "near, next to, side by side, beside, by, next, next door; Next to"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 161400,
+      "end_time_ms": 164550,
+      "original_line": "Ты со мной рядом",
+      "phonetic_line": "Ты́ со мно́й ря́дом",
+      "translation": "You're with me.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Ты́",
+          "lemma": "ты́",
+          "grammar": "Pronoun, 2nd Person, Singular, Nominative",
+          "dictionary_definition": "you"
+        },
+        {
+          "key": 2,
+          "display_form": "со",
+          "lemma": "с",
+          "grammar": "Preposition",
+          "dictionary_definition": "with; from, in the course of; since; off, remove from"
+        },
+        {
+          "key": 3,
+          "display_form": "мно́й",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Ablative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 4,
+          "display_form": "ря́дом",
+          "lemma": "ря́дом",
+          "grammar": "Adverb",
+          "dictionary_definition": "near, next to, side by side, beside, by, next, next door; Next to"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 164550,
+      "end_time_ms": 166650,
+      "original_line": "Исчезает лунный свет",
+      "phonetic_line": "Исчеза́ет лу́нный све́т",
+      "translation": "Moonlight disappears",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Исчеза́ет",
+          "lemma": "исчеза́ть",
+          "grammar": "Verb, Present, 3rd Person, Singular",
+          "dictionary_definition": "disappear, vanish, wear off"
+        },
+        {
+          "key": 2,
+          "display_form": "лу́нный",
+          "lemma": "лу́нный",
+          "grammar": "Adjective, Singular, Masculine, Nominative",
+          "dictionary_definition": "lunar, moon"
+        },
+        {
+          "key": 3,
+          "display_form": "све́т",
+          "lemma": "све́т",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "light; world; high society"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 166650,
+      "end_time_ms": 168950,
+      "original_line": "Через полчаса рассвет",
+      "phonetic_line": "Че́рез полчаса́ рассве́т",
+      "translation": "Half an hour before dawn",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Че́рез",
+          "lemma": "че́рез",
+          "grammar": "Preposition",
+          "dictionary_definition": "across, over, at; through; through, using; in (time) (no more than)"
+        },
+        {
+          "key": 2,
+          "display_form": "полчаса́",
+          "lemma": "полчаса́",
+          "grammar": "Noun, Singular, Neuter, Accusative",
+          "dictionary_definition": "half an hour"
+        },
+        {
+          "key": 3,
+          "display_form": "рассве́т",
+          "lemma": "рассве́т",
+          "grammar": "Noun, Singular, Masculine, Nominative",
+          "dictionary_definition": "dawn"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 168950,
+      "end_time_ms": 173850,
+      "original_line": "Провожает он тебя своим взглядом",
+      "phonetic_line": "Провожа́ет о́н тебя́ свои́м взгля́дом",
+      "translation": "He sees you off with his eyes.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Провожа́ет",
+          "lemma": "провожа́ть",
+          "grammar": "Verb, Present, 3rd Person, Singular",
+          "dictionary_definition": "to escort, to accompany; see off; say goodbye"
+        },
+        {
+          "key": 2,
+          "display_form": "о́н",
+          "lemma": "о́н",
+          "grammar": "Pronoun, 3rd Person, Singular, Masculine, Nominative",
+          "dictionary_definition": "he"
+        },
+        {
+          "key": 3,
+          "display_form": "тебя́",
+          "lemma": "ты́",
+          "grammar": "Pronoun, 2nd Person, Singular, Accusative",
+          "dictionary_definition": "you"
+        },
+        {
+          "key": 4,
+          "display_form": "свои́м",
+          "lemma": "сво́й",
+          "grammar": "Adjective, Plural, Dative",
+          "dictionary_definition": "one's own (reflexive)"
+        },
+        {
+          "key": 5,
+          "display_form": "взгля́дом",
+          "lemma": "взгля́д",
+          "grammar": "Noun, Singular, Masculine, Ablative",
+          "dictionary_definition": "look, gaze, stare; glance, glare; view, opinion"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 173850,
+      "end_time_ms": 175980,
+      "original_line": "И не нужно лишних слов",
+      "phonetic_line": "И не ну́жно ли́шних сло́в",
+      "translation": "And don't say too much.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "И",
+          "lemma": "и",
+          "grammar": "Conjunction",
+          "dictionary_definition": "and; also, too"
+        },
+        {
+          "key": 2,
+          "display_form": "не",
+          "lemma": "не́",
+          "grammar": "Particle",
+          "dictionary_definition": "not"
+        },
+        {
+          "key": 3,
+          "display_form": "ну́жно",
+          "lemma": "ну́жно",
+          "grammar": "Predicative, Present",
+          "dictionary_definition": "it is necessary, must, one should, one ought, you should, you ought, should"
+        },
+        {
+          "key": 4,
+          "display_form": "ли́шних",
+          "lemma": "ли́шний",
+          "grammar": "Adjective, Plural, Genitive",
+          "dictionary_definition": "extra; superfluous; unnecessary; spare"
+        },
+        {
+          "key": 5,
+          "display_form": "сло́в",
+          "lemma": "сло́во",
+          "grammar": "Noun, Plural, Neuter, Genitive",
+          "dictionary_definition": "word; speech; promise, word"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 175980,
+      "end_time_ms": 178220,
+      "original_line": "В нашей жизни есть любовь",
+      "phonetic_line": "В на́шей жи́зни е́сть любо́вь",
+      "translation": "There is love in our lives.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "В",
+          "lemma": "в",
+          "grammar": "Preposition",
+          "dictionary_definition": "in, at, on, within; to, into, for"
+        },
+        {
+          "key": 2,
+          "display_form": "на́шей",
+          "lemma": "на́ш",
+          "grammar": "Adjective, Singular, Feminine, Genitive",
+          "dictionary_definition": "our"
+        },
+        {
+          "key": 3,
+          "display_form": "жи́зни",
+          "lemma": "жи́знь",
+          "grammar": "Noun, Singular, Feminine, Genitive",
+          "dictionary_definition": "life, existence"
+        },
+        {
+          "key": 4,
+          "display_form": "е́сть",
+          "lemma": "е́сть",
+          "grammar": "Verb (infinitive)",
+          "dictionary_definition": "there is, there are, eats"
+        },
+        {
+          "key": 5,
+          "display_form": "любо́вь",
+          "lemma": "любо́вь",
+          "grammar": "Noun, Singular, Feminine, Nominative",
+          "dictionary_definition": "love"
+        }
+      ]
+    },
+    {
+      "start_time_ms": 178220,
+      "end_time_ms": 182220,
+      "original_line": "Мне так хорошо, что ты со мной рядом",
+      "phonetic_line": "Мне́ так хорошо́, что ты́ со́ мной ря́дом",
+      "translation": "I'm so happy you're with me.",
+      "words": [
+        {
+          "key": 1,
+          "display_form": "Мне́",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Dative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 2,
+          "display_form": "так",
+          "lemma": "та́к",
+          "grammar": "Conjunction",
+          "dictionary_definition": "so, thus, like this, this way, then; exactly how"
+        },
+        {
+          "key": 3,
+          "display_form": "хорошо́,",
+          "lemma": "хорошо́",
+          "grammar": "Adverb",
+          "dictionary_definition": "it is good, it is pleasant, well, good"
+        },
+        {
+          "key": 4,
+          "display_form": "что",
+          "lemma": "что́",
+          "grammar": "Conjunction",
+          "dictionary_definition": "what; that"
+        },
+        {
+          "key": 5,
+          "display_form": "ты́",
+          "lemma": "ты́",
+          "grammar": "Pronoun, 2nd Person, Singular, Nominative",
+          "dictionary_definition": "you"
+        },
+        {
+          "key": 6,
+          "display_form": "со́",
+          "lemma": "с",
+          "grammar": "Preposition",
+          "dictionary_definition": "with; from, in the course of; since; off, remove from"
+        },
+        {
+          "key": 7,
+          "display_form": "мной",
+          "lemma": "я",
+          "grammar": "Pronoun, 1st Person, Singular, Ablative",
+          "dictionary_definition": "I, me, myself"
+        },
+        {
+          "key": 8,
+          "display_form": "ря́дом",
+          "lemma": "ря́дом",
+          "grammar": "Adverb",
+          "dictionary_definition": "near, next to, side by side, beside, by, next, next door; Next to"
+        }
+      ]
+    }
+  ]
+}
