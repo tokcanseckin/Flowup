@@ -6,7 +6,7 @@ import os
 import time
 from collections.abc import Generator
 
-from sqlalchemy import Column, ForeignKey, Integer, String, Text, UniqueConstraint, create_engine
+from sqlalchemy import Column, ForeignKey, Integer, String, Text, UniqueConstraint, create_engine, text
 from sqlalchemy.orm import DeclarativeBase, Session, relationship, sessionmaker
 
 DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///./flowup.db")
@@ -34,6 +34,9 @@ class User(Base):
     access_token     = Column(Text,        nullable=True)
     refresh_token    = Column(Text,        nullable=True)
     token_expires_at = Column(Integer,     nullable=True)  # Unix seconds
+    password_hash    = Column(Text,        nullable=True)
+    settings_json    = Column(Text,        nullable=True)
+    is_admin         = Column(Integer,     nullable=False, default=0)
     created_at       = Column(Integer,     default=lambda: int(time.time()))
 
 
@@ -48,6 +51,8 @@ class Song(Base):
     language_name      = Column(String(64),  nullable=False)
     language_script    = Column(String(32),  nullable=False, default="Latin")
     language_direction = Column(String(3),   nullable=False, default="ltr")
+    youtube_url        = Column(Text,        nullable=True)
+    apple_music_url    = Column(Text,        nullable=True)
     created_at         = Column(Integer,     default=lambda: int(time.time()))
 
     lines = relationship(
@@ -136,6 +141,30 @@ class PlaylistSong(Base):
 
 def create_tables() -> None:
     Base.metadata.create_all(bind=engine)
+    _migrate_users_table()
+
+
+def _migrate_users_table() -> None:
+    """Best-effort migration for SQLite users and songs table columns."""
+    if not DATABASE_URL.startswith("sqlite"):
+        return
+
+    with engine.begin() as conn:
+        # users table
+        user_cols = {str(row[1]) for row in conn.execute(text("PRAGMA table_info(users)")).fetchall()}
+        if "password_hash" not in user_cols:
+            conn.execute(text("ALTER TABLE users ADD COLUMN password_hash TEXT"))
+        if "settings_json" not in user_cols:
+            conn.execute(text("ALTER TABLE users ADD COLUMN settings_json TEXT"))
+        if "is_admin" not in user_cols:
+            conn.execute(text("ALTER TABLE users ADD COLUMN is_admin INTEGER NOT NULL DEFAULT 0"))
+
+        # songs table
+        song_cols = {str(row[1]) for row in conn.execute(text("PRAGMA table_info(songs)")).fetchall()}
+        if "youtube_url" not in song_cols:
+            conn.execute(text("ALTER TABLE songs ADD COLUMN youtube_url TEXT"))
+        if "apple_music_url" not in song_cols:
+            conn.execute(text("ALTER TABLE songs ADD COLUMN apple_music_url TEXT"))
 
 
 def get_db() -> Generator[Session, None, None]:

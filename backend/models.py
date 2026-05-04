@@ -20,6 +20,8 @@ class WordResponse(BaseModel):
 
 
 class LineResponse(BaseModel):
+    id: int
+    position: int
     start_time_ms: int
     end_time_ms: int
     original_line: str
@@ -44,6 +46,8 @@ class SongSummaryResponse(BaseModel):
     artist: Optional[str]
     language_code: str
     language_name: str
+    youtube_url: Optional[str] = None
+    apple_music_url: Optional[str] = None
 
 
 class SongDetailResponse(BaseModel):
@@ -53,6 +57,8 @@ class SongDetailResponse(BaseModel):
     artist: Optional[str]
     language: LanguageResponse
     lines: list[LineResponse]
+    youtube_url: Optional[str] = None
+    apple_music_url: Optional[str] = None
 
 
 # ── Playlist models ────────────────────────────────────────────────────────────
@@ -119,8 +125,28 @@ class UserResponse(BaseModel):
     spotify_id: str
     display_name: Optional[str]
     email: Optional[str]
+    has_password: bool
+    needs_onboarding: bool
+    is_admin: bool
 
     model_config = {"from_attributes": True}
+
+
+class AdminUserResponse(BaseModel):
+    id: int
+    spotify_id: str
+    display_name: Optional[str]
+    email: Optional[str]
+    has_password: bool
+    is_admin: bool
+    created_at: int
+
+
+class AdminUserUpdate(BaseModel):
+    display_name: Optional[str] = None
+    email: Optional[str] = None
+    is_admin: Optional[bool] = None
+    password: Optional[str] = None
 
 
 # ── Request models ─────────────────────────────────────────────────────────────
@@ -132,6 +158,33 @@ class UserSyncRequest(BaseModel):
     access_token: str
     refresh_token: str
     expires_in: int  # seconds until expiry
+
+
+class CredentialLoginRequest(BaseModel):
+    email: str
+    password: str
+
+
+class CompleteOnboardingRequest(BaseModel):
+    spotify_id: str
+    email: str
+    password: str
+
+
+class UserSettings(BaseModel):
+    exclude_stop_words_from_shortcuts: bool = True
+    pause_on_inspect: bool = True
+    last_playlist_id: Optional[int] = None
+    last_song_id: Optional[int] = None
+    preferred_source: str = "spotify"  # "spotify" | "youtube" | "apple_music"
+
+
+class UserSettingsUpdate(BaseModel):
+    exclude_stop_words_from_shortcuts: Optional[bool] = None
+    pause_on_inspect: Optional[bool] = None
+    last_playlist_id: Optional[int] = None
+    last_song_id: Optional[int] = None
+    preferred_source: Optional[str] = None
 
 
 class WordIngest(BaseModel):
@@ -165,3 +218,48 @@ class SongIngest(BaseModel):
     artist: Optional[str] = None
     language: LanguageIngest
     lines: list[LineIngest]
+    youtube_url: Optional[str] = None
+    apple_music_url: Optional[str] = None
+
+
+class SongSourcesUpdate(BaseModel):
+    """PATCH body to update alternative source URLs for a song."""
+    youtube_url: Optional[str] = None
+    apple_music_url: Optional[str] = None
+
+
+class BulkSongSourcesEntry(BaseModel):
+    spotify_id: str  # bare track ID (without 'spotify:track:' prefix)
+    youtube_url: Optional[str] = None
+    apple_music_url: Optional[str] = None
+
+
+class BulkSongSourcesUpdate(BaseModel):
+    songs: list[BulkSongSourcesEntry]
+
+
+class AdminSongUpdate(BaseModel):
+    title: Optional[str] = None
+    artist: Optional[str] = None
+    spotify_uri: Optional[str] = None
+    youtube_url: Optional[str] = None
+    apple_music_url: Optional[str] = None
+    playlist_ids: Optional[list[int]] = None
+
+
+class AdminLineUpdate(BaseModel):
+    id: int
+    position: int
+    start_time_ms: int
+    end_time_ms: int
+    original_line: str
+    phonetic_line: Optional[str] = None
+    translation: str
+
+
+class AdminLyricsUpdate(BaseModel):
+    lines: list[AdminLineUpdate]
+
+
+class AdminSongDetailResponse(SongDetailResponse):
+    playlist_ids: list[int]
