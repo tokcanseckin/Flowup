@@ -43,10 +43,10 @@ function isStopWord(lemma: string, langCode: string): boolean {
 }
 
 /** Returns the word.key values of the indexable (non-stop) words in a line, max 9. */
-function computeIndexedKeys(words: WordType[], langCode: string): number[] {
+function computeIndexedKeys(words: WordType[], langCode: string, filterStopWords: boolean): number[] {
   const result: number[] = []
   for (const w of words) {
-    if (!isStopWord(w.lemma, langCode)) result.push(w.key)
+    if (!filterStopWords || !isStopWord(w.lemma, langCode)) result.push(w.key)
     if (result.length === 9) break
   }
   return result
@@ -104,11 +104,18 @@ function resolveInspectInfo(lines: SongDetail['lines'], state: InspectState | nu
 interface Props {
   currentPositionMs: number
   songData: SongDetail
+  filterStopWordsForIndexing?: boolean
   onInfoVisibilityChange?: (visible: boolean) => void
   onSeek?: (ms: number) => void
 }
 
-export default function LyricsPlayer({ currentPositionMs, songData, onInfoVisibilityChange, onSeek }: Props) {
+export default function LyricsPlayer({
+  currentPositionMs,
+  songData,
+  filterStopWordsForIndexing = true,
+  onInfoVisibilityChange,
+  onSeek,
+}: Props) {
   const { lines, language } = songData
   const isRTL = language.direction === 'rtl'
   const langCode = language.code
@@ -118,8 +125,8 @@ export default function LyricsPlayer({ currentPositionMs, songData, onInfoVisibi
 
   // Pre-compute indexed (non-stop) word keys for the active line
   const indexedWordKeys = useMemo(
-    () => activeLine ? computeIndexedKeys(activeLine.words, langCode) : [],
-    [activeLine, langCode]
+    () => activeLine ? computeIndexedKeys(activeLine.words, langCode, filterStopWordsForIndexing) : [],
+    [activeLine, langCode, filterStopWordsForIndexing]
   )
 
   const [isPhone, setIsPhone] = useState(false)

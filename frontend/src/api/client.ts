@@ -23,6 +23,8 @@ export interface SongWord {
 }
 
 export interface SongLine {
+  id: number
+  position: number
   start_time_ms: number
   end_time_ms: number
   original_line: string
@@ -38,6 +40,8 @@ export interface SongSummary {
   artist: string | null
   language_code: string
   language_name: string
+  youtube_url: string | null
+  apple_music_url: string | null
 }
 
 export interface SongDetail {
@@ -47,6 +51,8 @@ export interface SongDetail {
   artist: string | null
   language: SongLanguage
   lines: SongLine[]
+  youtube_url: string | null
+  apple_music_url: string | null
 }
 
 export interface PlaylistSongEntry {
@@ -76,6 +82,49 @@ export interface BackendUser {
   spotify_id: string
   display_name: string | null
   email: string | null
+  has_password: boolean
+  needs_onboarding: boolean
+  is_admin: boolean
+}
+
+export interface AdminUser {
+  id: number
+  spotify_id: string
+  display_name: string | null
+  email: string | null
+  has_password: boolean
+  is_admin: boolean
+  created_at: number
+}
+
+export interface AdminSongDetail extends SongDetail {
+  playlist_ids: number[]
+}
+
+export interface UserSettings {
+  exclude_stop_words_from_shortcuts: boolean
+  pause_on_inspect: boolean
+  last_playlist_id: number | null
+  last_song_id: number | null
+  preferred_source: 'spotify' | 'youtube' | 'apple_music'
+}
+
+const ADMIN_SESSION_KEY = 'flowup.admin.basic.v1'
+
+function getAdminHeaders(): HeadersInit {
+  if (typeof window === 'undefined') return {}
+  const encoded = window.sessionStorage.getItem(ADMIN_SESSION_KEY)
+  return encoded ? { Authorization: `Basic ${encoded}` } : {}
+}
+
+export function setAdminSession(email: string, password: string) {
+  if (typeof window === 'undefined') return
+  window.sessionStorage.setItem(ADMIN_SESSION_KEY, btoa(`${email}:${password}`))
+}
+
+export function clearAdminSession() {
+  if (typeof window === 'undefined') return
+  window.sessionStorage.removeItem(ADMIN_SESSION_KEY)
 }
 
 // ── Client ────────────────────────────────────────────────────────────────────
@@ -111,6 +160,40 @@ export const api = {
   getPlaylist: (id: number): Promise<PlaylistDetail> =>
     apiFetch(`/playlists/${id}`),
 
+  createPlaylist: (body: {
+    spotify_playlist_id?: string | null
+    name: string
+    description?: string | null
+    difficulty_level?: string | null
+    language_code?: string | null
+    song_ids?: number[]
+  }): Promise<PlaylistDetail> =>
+    apiFetch('/playlists', {
+      method: 'POST',
+      body: JSON.stringify(body),
+      headers: getAdminHeaders(),
+    }),
+
+  updatePlaylist: (playlistId: number, body: {
+    name?: string
+    description?: string | null
+    difficulty_level?: string | null
+    language_code?: string | null
+  }): Promise<PlaylistDetail> =>
+    apiFetch(`/playlists/${playlistId}`, {
+      method: 'PATCH',
+      body: JSON.stringify(body),
+      headers: getAdminHeaders(),
+    }),
+
+  deletePlaylist: (playlistId: number): Promise<void> =>
+    fetch(`/api/playlists/${playlistId}`, { method: 'DELETE', headers: getAdminHeaders() }).then(async r => {
+      if (!r.ok) {
+        const body = await r.json().catch(() => ({ detail: r.statusText })) as { detail?: string }
+        throw new Error(body.detail ?? `API error ${r.status}`)
+      }
+    }),
+
   syncUser: (body: {
     spotify_id: string
     display_name: string | null
@@ -123,4 +206,122 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(body),
     }),
+
+  loginWithEmailPassword: (body: {
+    email: string
+    password: string
+  }): Promise<BackendUser> =>
+    apiFetch('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    }),
+
+  completeOnboarding: (body: {
+    spotify_id: string
+    email: string
+    password: string
+  }): Promise<BackendUser> =>
+    apiFetch('/auth/complete-onboarding', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    }),
+
+  getUserSettings: (spotifyId: string): Promise<UserSettings> =>
+    apiFetch(`/users/${encodeURIComponent(spotifyId)}/settings`),
+
+  updateUserSettings: (
+    spotifyId: string,
+    patch: Partial<UserSettings>,
+  ): Promise<UserSettings> =>
+    apiFetch(`/users/${encodeURIComponent(spotifyId)}/settings`, {
+      method: 'PUT',
+      body: JSON.stringify(patch),
+    }),
+
+  updateSongSources: (
+    songId: number,
+    body: { youtube_url?: string | null; apple_music_url?: string | null },
+  ): Promise<SongSummary> =>
+    apiFetch(`/songs/${songId}/sources`, {
+      method: 'PATCH',
+      body: JSON.stringify(body),
+    }),
+
+  bulkUpdateSongSources: (songs: Array<{
+    spotify_id: string
+    youtube_url?: string | null
+    apple_music_url?: string | null
+  }>): Promise<{ updated: number; not_found: string[] }> =>
+    apiFetch('/songs/bulk-sources', {
+      method: 'POST',
+      body: JSON.stringify({ songs }),
+    }),
+
+  getAdminSong: (songId: number): Promise<AdminSongDetail> =>
+    apiFetch(`/admin/songs/${songId}`, { headers: getAdminHeaders() }),
+
+  updateAdminSong: (songId: number, body: {
+    title?: string
+    artist?: string | null
+    spotify_uri?: string
+    youtube_url?: string | null
+    apple_music_url?: string | null
+    playlist_ids?: number[]
+  }): Promise<AdminSongDetail> =>
+    apiFetch(`/admin/songs/${songId}`, {
+      method: 'PATCH',
+      body: JSON.stringify(body),
+      headers: getAdminHeaders(),
+    }),
+
+  updateAdminLyrics: (songId: number, body: {
+    lines: Array<{
+      id: number
+      position: number
+      start_time_ms: number
+      end_time_ms: number
+      original_line: string
+      phonetic_line: string | null
+      translation: string
+    }>
+  }): Promise<AdminSongDetail> =>
+    apiFetch(`/admin/songs/${songId}/lyrics`, {
+      method: 'PUT',
+      body: JSON.stringify(body),
+      headers: getAdminHeaders(),
+    }),
+
+  listAdminUsers: (): Promise<AdminUser[]> =>
+    apiFetch('/admin/users', { headers: getAdminHeaders() }),
+
+  getAdminUser: (userId: number): Promise<AdminUser> =>
+    apiFetch(`/admin/users/${userId}`, { headers: getAdminHeaders() }),
+
+  updateAdminUser: (userId: number, body: {
+    display_name?: string | null
+    email?: string | null
+    is_admin?: boolean
+    password?: string | null
+  }): Promise<AdminUser> =>
+    apiFetch(`/admin/users/${userId}`, {
+      method: 'PATCH',
+      body: JSON.stringify(body),
+      headers: getAdminHeaders(),
+    }),
+
+  addSongToPlaylist: (playlistId: number, body: { song_id: number; position?: number | null }): Promise<PlaylistDetail> =>
+    apiFetch(`/playlists/${playlistId}/songs`, {
+      method: 'POST',
+      body: JSON.stringify(body),
+      headers: getAdminHeaders(),
+    }),
+
+  removeSongFromPlaylist: (playlistId: number, songId: number): Promise<PlaylistDetail> =>
+    apiFetch(`/playlists/${playlistId}/songs/${songId}`, {
+      method: 'DELETE',
+      headers: getAdminHeaders(),
+    }),
+
+  getAppleMusicToken: (): Promise<{ token: string }> =>
+    apiFetch('/apple-music/token'),
 }

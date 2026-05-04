@@ -20,23 +20,36 @@ Start:
 from __future__ import annotations
 
 import asyncio
+import base64
 import json
+import os
+import secrets
 import time
 from contextlib import asynccontextmanager
+from hashlib import pbkdf2_hmac
 from pathlib import Path
 from typing import Optional
 
+import jwt as pyjwt
 from dotenv import load_dotenv
 
 load_dotenv()
 
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
 from database import Line, Playlist, PlaylistSong, Song, User, Word, create_tables, get_db
 from models import (
+    AdminLyricsUpdate,
+    AdminSongDetailResponse,
+    AdminUserResponse,
+    AdminUserUpdate,
+    AdminSongUpdate,
+    BulkSongSourcesUpdate,
+    CompleteOnboardingRequest,
+    CredentialLoginRequest,
     LanguageIngest,
     LanguageResponse,
     LineResponse,
@@ -48,8 +61,11 @@ from models import (
     PlaylistUpdate,
     SongDetailResponse,
     SongIngest,
+    SongSourcesUpdate,
     SongSummaryResponse,
     UserResponse,
+    UserSettings,
+    UserSettingsUpdate,
     UserSyncRequest,
     WordResponse,
 )
@@ -63,6 +79,7 @@ from spotify_auth import fetch_spotify_user, refresh_access_token
 async def lifespan(app: FastAPI):
     create_tables()
     _seed_sample_data()
+    _ensure_admin_user()
     # Pre-load OpenRussian index in a thread. If it fails, keep API alive.
     loop = asyncio.get_event_loop()
     try:
@@ -88,6 +105,36 @@ def _seed_sample_data() -> None:
         print("[DB] Sample song seeded.")
     except Exception as exc:
         print(f"[DB] Seed failed (non-fatal): {exc}")
+    finally:
+        db.close()
+
+
+def _ensure_admin_user() -> None:
+    admin_email = os.environ.get("FLOWUP_ADMIN_EMAIL", "admin@flowup.local").strip().lower()
+    admin_password = os.environ.get("FLOWUP_ADMIN_PASSWORD", "flowup-admin")
+    admin_spotify_id = os.environ.get("FLOWUP_ADMIN_SPOTIFY_ID", "admin:local")
+    if not admin_email or not admin_password:
+        return
+
+    db = next(get_db())
+    try:
+        user = db.query(User).filter(User.email == admin_email).first()
+        if not user:
+            user = User(
+                spotify_id=admin_spotify_id,
+                display_name="FlowUp Admin",
+                email=admin_email,
+                is_admin=1,
+            )
+            db.add(user)
+
+        user.display_name = user.display_name or "FlowUp Admin"
+        user.email = admin_email
+        user.is_admin = 1
+        if not user.password_hash:
+            user.password_hash = _hash_password(admin_password)
+
+        db.commit()
     finally:
         db.close()
 
@@ -125,6 +172,8 @@ def _word_response(word: Word) -> WordResponse:
 
 def _line_response(line: Line) -> LineResponse:
     return LineResponse(
+        id=line.id,
+        position=line.position,
         start_time_ms=line.start_time_ms,
         end_time_ms=line.end_time_ms,
         original_line=line.original_line,
@@ -147,6 +196,28 @@ def _song_detail(song: Song) -> SongDetailResponse:
             direction=song.language_direction,
         ),
         lines=[_line_response(ln) for ln in song.lines],
+        youtube_url=song.youtube_url,
+        apple_music_url=song.apple_music_url,
+    )
+
+
+def _admin_song_detail(song: Song, db: Session) -> AdminSongDetailResponse:
+    playlist_ids = [
+        playlist_id
+        for (playlist_id,) in db.query(PlaylistSong.playlist_id).filter(PlaylistSong.song_id == song.id).all()
+    ]
+    return AdminSongDetailResponse(**_song_detail(song).model_dump(), playlist_ids=playlist_ids)
+
+
+def _admin_user_response(user: User) -> AdminUserResponse:
+    return AdminUserResponse(
+        id=user.id,
+        spotify_id=user.spotify_id,
+        display_name=user.display_name,
+        email=user.email,
+        has_password=bool(user.password_hash),
+        is_admin=bool(user.is_admin),
+        created_at=user.created_at,
     )
 
 
@@ -165,6 +236,8 @@ def _ingest_song(body: SongIngest, db: Session) -> Song:
         language_name=body.language.name,
         language_script=body.language.script,
         language_direction=body.language.direction,
+        youtube_url=body.youtube_url,
+        apple_music_url=body.apple_music_url,
     )
     db.add(song)
     db.flush()  # get song.id
@@ -197,6 +270,82 @@ def _ingest_song(body: SongIngest, db: Session) -> Song:
     return song
 
 
+def _parse_user_settings(raw: Optional[str]) -> UserSettings:
+    if not raw:
+        return UserSettings()
+    try:
+        data = json.loads(raw)
+        return UserSettings(**data)
+    except Exception:
+        return UserSettings()
+
+
+def _hash_password(password: str, salt: bytes | None = None) -> str:
+    actual_salt = salt or secrets.token_bytes(16)
+    digest = pbkdf2_hmac("sha256", password.encode("utf-8"), actual_salt, 120_000)
+    return f"pbkdf2_sha256$120000${base64.b64encode(actual_salt).decode()}${base64.b64encode(digest).decode()}"
+
+
+def _verify_password(password: str, stored_hash: str | None) -> bool:
+    if not stored_hash:
+        return False
+    try:
+        algo, iters, salt_b64, digest_b64 = stored_hash.split("$", 3)
+        if algo != "pbkdf2_sha256":
+            return False
+        salt = base64.b64decode(salt_b64)
+        expected = base64.b64decode(digest_b64)
+        actual = pbkdf2_hmac("sha256", password.encode("utf-8"), salt, int(iters))
+        return secrets.compare_digest(actual, expected)
+    except Exception:
+        return False
+
+
+def _is_onboarding_required(user: User) -> bool:
+    return not bool(user.email and user.password_hash)
+
+
+def _require_admin(
+    authorization: str | None = Header(default=None),
+    db: Session = Depends(get_db),
+) -> User:
+    if not authorization:
+        raise HTTPException(
+            status_code=401,
+            detail="Admin authentication required",
+            headers={"WWW-Authenticate": "Basic"},
+        )
+
+    try:
+        scheme, encoded = authorization.split(" ", 1)
+    except ValueError as exc:
+        raise HTTPException(status_code=401, detail="Invalid Authorization header") from exc
+
+    if scheme.lower() != "basic":
+        raise HTTPException(
+            status_code=401,
+            detail="Basic authentication required",
+            headers={"WWW-Authenticate": "Basic"},
+        )
+
+    try:
+        decoded = base64.b64decode(encoded).decode("utf-8")
+        email, password = decoded.split(":", 1)
+    except Exception as exc:
+        raise HTTPException(status_code=401, detail="Invalid basic auth credentials") from exc
+
+    user = db.query(User).filter(User.email == email.strip().lower()).first()
+    if not user or not _verify_password(password, user.password_hash):
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid admin credentials",
+            headers={"WWW-Authenticate": "Basic"},
+        )
+    if not user.is_admin:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    return user
+
+
 # ── Health ─────────────────────────────────────────────────────────────────────
 
 @app.get("/api/health")
@@ -217,6 +366,8 @@ def list_songs(db: Session = Depends(get_db)):
             artist=s.artist,
             language_code=s.language_code,
             language_name=s.language_name,
+            youtube_url=s.youtube_url,
+            apple_music_url=s.apple_music_url,
         )
         for s in songs
     ]
@@ -257,6 +408,177 @@ def export_song(song_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Song not found")
     detail = _song_detail(song)
     return JSONResponse(content=detail.model_dump())
+
+
+@app.patch("/api/songs/{song_id}/sources", response_model=SongSummaryResponse)
+def update_song_sources(song_id: int, body: SongSourcesUpdate, db: Session = Depends(get_db)):
+    """Update YouTube / Apple Music URLs for a single song."""
+    song = db.get(Song, song_id)
+    if not song:
+        raise HTTPException(status_code=404, detail="Song not found")
+    # Support explicit nulls so clients can clear a stored source URL.
+    if "youtube_url" in body.model_fields_set:
+        song.youtube_url = body.youtube_url or None
+    if "apple_music_url" in body.model_fields_set:
+        song.apple_music_url = body.apple_music_url or None
+    db.commit()
+    db.refresh(song)
+    return SongSummaryResponse(
+        id=song.id,
+        spotify_uri=song.spotify_uri,
+        title=song.title,
+        artist=song.artist,
+        language_code=song.language_code,
+        language_name=song.language_name,
+        youtube_url=song.youtube_url,
+        apple_music_url=song.apple_music_url,
+    )
+
+
+@app.post("/api/songs/bulk-sources")
+def bulk_update_song_sources(body: BulkSongSourcesUpdate, db: Session = Depends(get_db)):
+    """
+    Bulk-update YouTube / Apple Music URLs from a CSV upload.
+    Each entry maps a bare Spotify track ID to source URLs.
+    Returns counts of updated and not-found songs.
+    """
+    updated = 0
+    not_found = []
+    for entry in body.songs:
+        spotify_uri = f"spotify:track:{entry.spotify_id}"
+        song = db.query(Song).filter(Song.spotify_uri == spotify_uri).first()
+        if not song:
+            not_found.append(entry.spotify_id)
+            continue
+        # Support explicit nulls so bulk updates can clear bad URLs.
+        if "youtube_url" in entry.model_fields_set:
+            song.youtube_url = entry.youtube_url or None
+        if "apple_music_url" in entry.model_fields_set:
+            song.apple_music_url = entry.apple_music_url or None
+        updated += 1
+    db.commit()
+    return {"updated": updated, "not_found": not_found}
+
+
+@app.get("/api/admin/songs/{song_id}", response_model=AdminSongDetailResponse)
+def get_admin_song(song_id: int, db: Session = Depends(get_db), _: User = Depends(_require_admin)):
+    song = db.get(Song, song_id)
+    if not song:
+        raise HTTPException(status_code=404, detail="Song not found")
+    return _admin_song_detail(song, db)
+
+
+@app.patch("/api/admin/songs/{song_id}", response_model=AdminSongDetailResponse)
+def update_admin_song(song_id: int, body: AdminSongUpdate, db: Session = Depends(get_db), _: User = Depends(_require_admin)):
+    song = db.get(Song, song_id)
+    if not song:
+        raise HTTPException(status_code=404, detail="Song not found")
+
+    if "spotify_uri" in body.model_fields_set and body.spotify_uri:
+        duplicate = db.query(Song).filter(Song.spotify_uri == body.spotify_uri, Song.id != song_id).first()
+        if duplicate:
+            raise HTTPException(status_code=409, detail="spotify_uri is already used by another song")
+        song.spotify_uri = body.spotify_uri
+    if "title" in body.model_fields_set and body.title is not None:
+        song.title = body.title
+    if "artist" in body.model_fields_set:
+        song.artist = body.artist or None
+    if "youtube_url" in body.model_fields_set:
+        song.youtube_url = body.youtube_url or None
+    if "apple_music_url" in body.model_fields_set:
+        song.apple_music_url = body.apple_music_url or None
+
+    if body.playlist_ids is not None:
+        requested_ids = set(body.playlist_ids)
+        existing_links = db.query(PlaylistSong).filter(PlaylistSong.song_id == song_id).all()
+        existing_ids = {link.playlist_id for link in existing_links}
+
+        for link in existing_links:
+            if link.playlist_id not in requested_ids:
+                db.delete(link)
+
+        for playlist_id in requested_ids - existing_ids:
+            playlist = db.get(Playlist, playlist_id)
+            if not playlist:
+                raise HTTPException(status_code=404, detail=f"Playlist {playlist_id} not found")
+            db.add(PlaylistSong(
+                playlist_id=playlist_id,
+                song_id=song_id,
+                position=len(playlist.playlist_songs),
+            ))
+
+    db.commit()
+    db.refresh(song)
+    return _admin_song_detail(song, db)
+
+
+@app.put("/api/admin/songs/{song_id}/lyrics", response_model=AdminSongDetailResponse)
+def update_admin_song_lyrics(song_id: int, body: AdminLyricsUpdate, db: Session = Depends(get_db), _: User = Depends(_require_admin)):
+    song = db.get(Song, song_id)
+    if not song:
+        raise HTTPException(status_code=404, detail="Song not found")
+
+    existing_lines = {line.id: line for line in song.lines}
+    incoming_ids = [line.id for line in body.lines]
+    if set(existing_lines.keys()) != set(incoming_ids) or len(incoming_ids) != len(set(incoming_ids)):
+        raise HTTPException(status_code=400, detail="Lyrics update must include every existing line exactly once")
+
+    for line_data in body.lines:
+        line = existing_lines[line_data.id]
+        line.position = line_data.position
+        line.start_time_ms = line_data.start_time_ms
+        line.end_time_ms = line_data.end_time_ms
+        line.original_line = line_data.original_line
+        line.phonetic_line = line_data.phonetic_line
+        line.translation = line_data.translation
+
+    db.commit()
+    db.refresh(song)
+    return _admin_song_detail(song, db)
+
+
+@app.get("/api/admin/users", response_model=list[AdminUserResponse])
+def list_admin_users(db: Session = Depends(get_db), _: User = Depends(_require_admin)):
+    users = db.query(User).order_by(User.created_at.desc(), User.id.desc()).all()
+    return [_admin_user_response(user) for user in users]
+
+
+@app.get("/api/admin/users/{user_id}", response_model=AdminUserResponse)
+def get_admin_user(user_id: int, db: Session = Depends(get_db), _: User = Depends(_require_admin)):
+    user = db.get(User, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return _admin_user_response(user)
+
+
+@app.patch("/api/admin/users/{user_id}", response_model=AdminUserResponse)
+def update_admin_user(user_id: int, body: AdminUserUpdate, db: Session = Depends(get_db), _: User = Depends(_require_admin)):
+    user = db.get(User, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    if "display_name" in body.model_fields_set:
+        user.display_name = body.display_name or None
+
+    if "email" in body.model_fields_set:
+        next_email = (body.email or "").strip().lower() or None
+        if next_email:
+            existing = db.query(User).filter(User.email == next_email, User.id != user_id).first()
+            if existing:
+                raise HTTPException(status_code=409, detail="Email is already used by another account")
+        user.email = next_email
+
+    if "is_admin" in body.model_fields_set and body.is_admin is not None:
+        user.is_admin = 1 if body.is_admin else 0
+
+    if body.password is not None:
+        if len(body.password) < 8:
+            raise HTTPException(status_code=400, detail="Password must be at least 8 characters")
+        user.password_hash = _hash_password(body.password)
+
+    db.commit()
+    db.refresh(user)
+    return _admin_user_response(user)
 
 
 # ── Playlists ──────────────────────────────────────────────────────────────────
@@ -306,7 +628,7 @@ def list_playlists(db: Session = Depends(get_db)):
 
 
 @app.post("/api/playlists", response_model=PlaylistResponse, status_code=201)
-def create_playlist(body: PlaylistCreate, db: Session = Depends(get_db)):
+def create_playlist(body: PlaylistCreate, db: Session = Depends(get_db), _: User = Depends(_require_admin)):
     pl = Playlist(
         spotify_playlist_id=body.spotify_playlist_id,
         name=body.name,
@@ -337,7 +659,7 @@ def get_playlist(playlist_id: int, db: Session = Depends(get_db)):
 
 
 @app.patch("/api/playlists/{playlist_id}", response_model=PlaylistResponse)
-def update_playlist(playlist_id: int, body: PlaylistUpdate, db: Session = Depends(get_db)):
+def update_playlist(playlist_id: int, body: PlaylistUpdate, db: Session = Depends(get_db), _: User = Depends(_require_admin)):
     pl = db.get(Playlist, playlist_id)
     if not pl:
         raise HTTPException(status_code=404, detail="Playlist not found")
@@ -355,7 +677,7 @@ def update_playlist(playlist_id: int, body: PlaylistUpdate, db: Session = Depend
 
 
 @app.delete("/api/playlists/{playlist_id}", status_code=204)
-def delete_playlist(playlist_id: int, db: Session = Depends(get_db)):
+def delete_playlist(playlist_id: int, db: Session = Depends(get_db), _: User = Depends(_require_admin)):
     pl = db.get(Playlist, playlist_id)
     if not pl:
         raise HTTPException(status_code=404, detail="Playlist not found")
@@ -364,7 +686,7 @@ def delete_playlist(playlist_id: int, db: Session = Depends(get_db)):
 
 
 @app.post("/api/playlists/{playlist_id}/songs", response_model=PlaylistResponse, status_code=201)
-def add_song_to_playlist(playlist_id: int, body: PlaylistAddSong, db: Session = Depends(get_db)):
+def add_song_to_playlist(playlist_id: int, body: PlaylistAddSong, db: Session = Depends(get_db), _: User = Depends(_require_admin)):
     pl = db.get(Playlist, playlist_id)
     if not pl:
         raise HTTPException(status_code=404, detail="Playlist not found")
@@ -383,7 +705,7 @@ def add_song_to_playlist(playlist_id: int, body: PlaylistAddSong, db: Session = 
 
 
 @app.delete("/api/playlists/{playlist_id}/songs/{song_id}", response_model=PlaylistResponse)
-def remove_song_from_playlist(playlist_id: int, song_id: int, db: Session = Depends(get_db)):
+def remove_song_from_playlist(playlist_id: int, song_id: int, db: Session = Depends(get_db), _: User = Depends(_require_admin)):
     pl = db.get(Playlist, playlist_id)
     if not pl:
         raise HTTPException(status_code=404, detail="Playlist not found")
@@ -407,7 +729,8 @@ async def sync_user(body: UserSyncRequest, db: Session = Depends(get_db)):
         db.add(user)
 
     user.display_name     = body.display_name
-    user.email            = body.email
+    if body.email is not None:
+        user.email = body.email
     user.access_token     = body.access_token
     user.refresh_token    = body.refresh_token
     user.token_expires_at = int(time.time()) + body.expires_in - 60
@@ -419,7 +742,102 @@ async def sync_user(body: UserSyncRequest, db: Session = Depends(get_db)):
         spotify_id=user.spotify_id,
         display_name=user.display_name,
         email=user.email,
+        has_password=bool(user.password_hash),
+        needs_onboarding=_is_onboarding_required(user),
+        is_admin=bool(user.is_admin),
     )
+
+
+@app.post("/api/auth/login", response_model=UserResponse)
+async def login_with_credentials(body: CredentialLoginRequest, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.email == body.email.strip().lower()).first()
+    if not user or not _verify_password(body.password, user.password_hash):
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+
+    return UserResponse(
+        id=user.id,
+        spotify_id=user.spotify_id,
+        display_name=user.display_name,
+        email=user.email,
+        has_password=bool(user.password_hash),
+        needs_onboarding=_is_onboarding_required(user),
+        is_admin=bool(user.is_admin),
+    )
+
+
+@app.post("/api/auth/complete-onboarding", response_model=UserResponse)
+async def complete_onboarding(body: CompleteOnboardingRequest, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.spotify_id == body.spotify_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    email = body.email.strip().lower()
+    if not email:
+        raise HTTPException(status_code=400, detail="Email is required")
+    if len(body.password) < 8:
+        raise HTTPException(status_code=400, detail="Password must be at least 8 characters")
+
+    existing_email = db.query(User).filter(User.email == email, User.id != user.id).first()
+    if existing_email:
+        raise HTTPException(status_code=409, detail="Email is already used by another account")
+
+    user.email = email
+    user.password_hash = _hash_password(body.password)
+    db.commit()
+    db.refresh(user)
+
+    return UserResponse(
+        id=user.id,
+        spotify_id=user.spotify_id,
+        display_name=user.display_name,
+        email=user.email,
+        has_password=bool(user.password_hash),
+        needs_onboarding=_is_onboarding_required(user),
+        is_admin=bool(user.is_admin),
+    )
+
+
+@app.get("/api/users/{spotify_id}/settings", response_model=UserSettings)
+async def get_user_settings(spotify_id: str, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.spotify_id == spotify_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return _parse_user_settings(user.settings_json)
+
+
+@app.put("/api/users/{spotify_id}/settings", response_model=UserSettings)
+async def update_user_settings(spotify_id: str, body: UserSettingsUpdate, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.spotify_id == spotify_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    current = _parse_user_settings(user.settings_json)
+    patch = body.model_dump(exclude_unset=True)
+    merged = UserSettings(
+        exclude_stop_words_from_shortcuts=patch.get(
+            "exclude_stop_words_from_shortcuts",
+            current.exclude_stop_words_from_shortcuts,
+        ),
+        pause_on_inspect=patch.get(
+            "pause_on_inspect",
+            current.pause_on_inspect,
+        ),
+        last_playlist_id=patch.get(
+            "last_playlist_id",
+            current.last_playlist_id,
+        ),
+        last_song_id=patch.get(
+            "last_song_id",
+            current.last_song_id,
+        ),
+        preferred_source=patch.get(
+            "preferred_source",
+            current.preferred_source,
+        ),
+    )
+    user.settings_json = merged.model_dump_json()
+    db.commit()
+    return merged
 
 
 # ── Auth ───────────────────────────────────────────────────────────────────────
@@ -435,3 +853,43 @@ async def refresh_token_endpoint(body: dict):
         return tokens
     except ValueError as exc:
         raise HTTPException(status_code=502, detail=str(exc))
+
+
+# ── Apple Music ─────────────────────────────────────────────────────────────────
+
+# Cache: (token_str, expiry_unix_ts)
+_apple_token_cache: tuple[str, int] | None = None
+
+
+def _generate_apple_music_token() -> str:
+    team_id     = os.environ.get("APPLE_MUSIC_TEAM_ID", "")
+    key_id      = os.environ.get("APPLE_MUSIC_KEY_ID", "")
+    private_key = os.environ.get("APPLE_MUSIC_PRIVATE_KEY", "").replace("\\n", "\n")
+
+    if not (team_id and key_id and private_key):
+        raise ValueError("Apple Music credentials not configured (APPLE_MUSIC_TEAM_ID / KEY_ID / PRIVATE_KEY)")
+
+    now = int(time.time())
+    exp = now + 15_552_000  # 180 days
+    payload = {"iss": team_id, "iat": now, "exp": exp}
+    token = pyjwt.encode(
+        payload,
+        private_key,
+        algorithm="ES256",
+        headers={"kid": key_id},
+    )
+    return token, exp  # type: ignore[return-value]
+
+
+@app.get("/api/apple-music/token")
+def get_apple_music_token():
+    """Return a short-lived MusicKit developer token (cached until near expiry)."""
+    global _apple_token_cache
+    now = int(time.time())
+    if _apple_token_cache is None or _apple_token_cache[1] < now + 3600:
+        try:
+            token, exp = _generate_apple_music_token()
+            _apple_token_cache = (token, exp)
+        except ValueError as exc:
+            raise HTTPException(status_code=503, detail=str(exc))
+    return {"token": _apple_token_cache[0]}
