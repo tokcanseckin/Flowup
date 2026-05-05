@@ -1,5 +1,5 @@
 /**
- * FlowUp backend API client.
+ * SingoLing backend API client.
  *
  * All requests go to /api (proxied to http://localhost:8000 by Vite).
  * Uses typed interfaces that mirror the backend Pydantic response models.

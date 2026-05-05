@@ -21,7 +21,7 @@ export interface PlayerControls {
 }
 
 const SPOTIFY_SDK_ID = 'spotify-web-playback-sdk'
-const PLAYER_NAME = 'FlowUp - Russian Music Learner'
+const PLAYER_NAME = 'SingoLing - Language Learning'
 
 /**
  * Injects the Spotify Web Playback SDK, initialises a Player instance with the

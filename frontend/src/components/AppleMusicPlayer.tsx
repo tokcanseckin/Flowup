@@ -73,10 +73,10 @@ function shouldLogAppleMusicDebug(): boolean {
 function logAppleMusicDebug(message: string, data?: unknown) {
   if (!shouldLogAppleMusicDebug()) return
   if (data === undefined) {
-    console.debug('[FlowUp][AppleMusic]', message)
+    console.debug('[SingoLing][AppleMusic]', message)
     return
   }
-  console.debug('[FlowUp][AppleMusic]', message, data)
+  console.debug('[SingoLing][AppleMusic]', message, data)
 }
 
 function loadMusickitScript(): Promise<void> {
@@ -190,7 +190,7 @@ const AppleMusicPlayer = forwardRef<AppleMusicPlayerHandle, Props>(function Appl
         const devToken = await fetchDeveloperToken()
         _mkInstance = await MK.configure({
           developerToken: devToken,
-          app: { name: 'FlowUp', build: '1.0' },
+          app: { name: 'SingoLing', build: '1.0' },
         })
         logAppleMusicDebug('MusicKit configured')
       } else {

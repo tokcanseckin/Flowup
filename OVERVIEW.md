@@ -1,8 +1,8 @@
-# FlowUp — Project Overview
+# SingoLing — Project Overview
 
 ## Intent
 
-FlowUp is a cross-platform language learning application that teaches Russian through music. Instead of flashcards or isolated grammar drills, the learner engages with real songs: they hear the music, read the synchronized lyrics with stress marks, and inspect any unfamiliar word on demand by pressing a number key. The goal is immersion-first vocabulary acquisition with zero friction between listening and understanding.
+SingoLing is a cross-platform language learning application that teaches Russian through music. Instead of flashcards or isolated grammar drills, the learner engages with real songs: they hear the music, read the synchronized lyrics with stress marks, and inspect any unfamiliar word on demand by pressing a number key. The goal is immersion-first vocabulary acquisition with zero friction between listening and understanding.
 
 The long-term target is a **Progressive Web App (PWA) wrapped in Tauri** for desktop distribution. The current deliverable is a **React web prototype** that proves the core interaction loop end-to-end.
 
