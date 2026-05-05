@@ -24,6 +24,8 @@ import base64
 import json
 import os
 import secrets
+import subprocess
+import tempfile
 import time
 import uuid
 from contextlib import asynccontextmanager
@@ -322,6 +324,89 @@ def _ingest_song(body: SongIngest, db: Session) -> Song:
     return song
 
 
+def _populate_source_lines(song: Song, db: Session) -> None:
+    """Mirror default lyrics into source-specific rows for supported players."""
+    default_lines = sorted([line for line in song.lines if line.source is None], key=lambda line: line.position)
+    if not default_lines:
+        return
+
+    for source in ("youtube", "apple_music"):
+        for existing in [line for line in song.lines if line.source == source]:
+            db.delete(existing)
+        db.flush()
+
+        for line in default_lines:
+            db.add(Line(
+                song_id=song.id,
+                source=source,
+                position=line.position,
+                start_time_ms=line.start_time_ms,
+                end_time_ms=line.end_time_ms,
+                original_line=line.original_line,
+                phonetic_line=line.phonetic_line,
+                translation=line.translation,
+            ))
+
+
+def _generate_song_with_pipeline(body: AdminSongCreate) -> SongIngest:
+    """Run the pipeline script for a single song and return its ingest payload."""
+    pipeline_script = Path(__file__).parent.parent / "pipeline" / "generate_song_data.py"
+    if not pipeline_script.exists():
+        raise HTTPException(status_code=500, detail="Pipeline script not found")
+
+    spotify_uri = (body.spotify_uri or "").strip() or f"local:{uuid.uuid4().hex}"
+    lang_code = body.language_code.strip() or "ru"
+    artist = body.artist.strip() if body.artist else "Unknown Artist"
+    title = body.title.strip()
+    if not title:
+        raise HTTPException(status_code=400, detail="title is required")
+
+    with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as tmp:
+        output_path = Path(tmp.name)
+
+    command = [
+        os.environ.get("PYTHON_EXECUTABLE", "python3"),
+        str(pipeline_script),
+        "--lang",
+        lang_code,
+        "--artist",
+        artist,
+        "--title",
+        title,
+        "--display-title",
+        title,
+        "--spotify-uri",
+        spotify_uri,
+        "--output",
+        str(output_path),
+    ]
+
+    try:
+        run = subprocess.run(
+            command,
+            capture_output=True,
+            text=True,
+            timeout=180,
+            cwd=str(pipeline_script.parent),
+            env=os.environ.copy(),
+            check=False,
+        )
+        if run.returncode != 0:
+            message = (run.stderr or run.stdout or "pipeline failed").strip()
+            raise HTTPException(status_code=502, detail=f"Lyrics generation failed: {message[:500]}")
+
+        payload = json.loads(output_path.read_text(encoding="utf-8"))
+        payload["youtube_url"] = body.youtube_url or None
+        payload["apple_music_url"] = body.apple_music_url or None
+        return SongIngest(**payload)
+    except subprocess.TimeoutExpired as exc:
+        raise HTTPException(status_code=504, detail="Lyrics generation timed out") from exc
+    except json.JSONDecodeError as exc:
+        raise HTTPException(status_code=502, detail="Lyrics generator produced invalid JSON") from exc
+    finally:
+        output_path.unlink(missing_ok=True)
+
+
 def _parse_user_settings(raw: Optional[str]) -> UserSettings:
     if not raw:
         return UserSettings()
@@ -514,30 +599,17 @@ def bulk_update_song_sources(body: BulkSongSourcesUpdate, db: Session = Depends(
 
 @app.post("/api/admin/songs", response_model=AdminSongDetailResponse, status_code=201)
 def create_admin_song(body: AdminSongCreate, db: Session = Depends(get_db), _: User = Depends(_require_admin)):
-    """Create a new song stub without lyrics (admin-only)."""
-    spotify_uri = (body.spotify_uri or '').strip() or f"local:{uuid.uuid4().hex}"
-    existing = db.query(Song).filter(Song.spotify_uri == spotify_uri).first()
-    if existing:
-        raise HTTPException(status_code=409, detail="spotify_uri already exists")
-    song = Song(
-        spotify_uri=spotify_uri,
-        title=body.title.strip(),
-        artist=body.artist.strip() if body.artist else None,
-        language_code=body.language_code.strip() or "ru",
-        language_name=body.language_name.strip() or "Russian",
-        language_script=body.language_script,
-        language_direction=body.language_direction,
-        youtube_url=body.youtube_url or None,
-        apple_music_url=body.apple_music_url or None,
-    )
-    db.add(song)
-    db.flush()
+    ingest_payload = _generate_song_with_pipeline(body)
+    song = _ingest_song(ingest_payload, db)
+
     for pos, playlist_id in enumerate(body.playlist_ids):
         pl = db.get(Playlist, playlist_id)
         if pl:
             clash = db.query(PlaylistSong).filter_by(playlist_id=playlist_id, song_id=song.id).first()
             if not clash:
                 db.add(PlaylistSong(playlist_id=playlist_id, song_id=song.id, position=pos))
+
+    _populate_source_lines(song, db)
     db.commit()
     db.refresh(song)
     return _admin_song_detail(song, db)
