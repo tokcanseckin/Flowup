@@ -393,7 +393,38 @@ def _generate_song_with_pipeline(body: AdminSongCreate) -> SongIngest:
         )
         if run.returncode != 0:
             message = (run.stderr or run.stdout or "pipeline failed").strip()
-            raise HTTPException(status_code=502, detail=f"Lyrics generation failed: {message[:500]}")
+            lower_message = message.lower()
+            lyrics_not_found = (
+                "could not retrieve synced lyrics" in lower_message
+                or "no synced lyrics found" in lower_message
+            )
+            if not lyrics_not_found:
+                raise HTTPException(status_code=502, detail=f"Lyrics generation failed: {message[:500]}")
+
+            # Graceful fallback: still create a song so admins can edit/add lyrics manually.
+            return SongIngest(
+                spotify_uri=spotify_uri,
+                title=title,
+                artist=artist,
+                language=LanguageIngest(
+                    code=lang_code,
+                    name=(body.language_name.strip() or "Unknown") if body.language_name else "Unknown",
+                    script=body.language_script,
+                    direction=body.language_direction,
+                ),
+                lines=[
+                    {
+                        "start_time_ms": 0,
+                        "end_time_ms": 4000,
+                        "original_line": "[Lyrics not found - add manually in Admin]",
+                        "phonetic_line": None,
+                        "translation": "[Lyrics not found - add manually in Admin]",
+                        "words": [],
+                    }
+                ],
+                youtube_url=body.youtube_url or None,
+                apple_music_url=body.apple_music_url or None,
+            )
 
         payload = json.loads(output_path.read_text(encoding="utf-8"))
         payload["youtube_url"] = body.youtube_url or None
