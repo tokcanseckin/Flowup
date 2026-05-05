@@ -380,13 +380,15 @@ def _generate_song_with_pipeline(body: AdminSongCreate) -> SongIngest:
         "--output",
         str(output_path),
     ]
+    if body.youtube_url:
+        command.extend(["--youtube-url", body.youtube_url])
 
     try:
         run = subprocess.run(
             command,
             capture_output=True,
             text=True,
-            timeout=180,
+            timeout=600,
             cwd=str(pipeline_script.parent),
             env=os.environ.copy(),
             check=False,
