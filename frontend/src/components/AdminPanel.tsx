@@ -34,6 +34,17 @@ type SongDraft = {
   playlist_ids: number[]
 }
 
+type NewSongDraft = {
+  title: string
+  artist: string
+  spotify_uri: string
+  language_code: string
+  language_name: string
+  youtube_url: string
+  apple_music_url: string
+  playlist_ids: number[]
+}
+
 type UserDraft = {
   display_name: string
   email: string
@@ -47,6 +58,38 @@ function emptyPlaylistDraft(): PlaylistDraft {
     description: '',
     difficulty_level: '',
     language_code: '',
+  }
+}
+
+const LANGUAGE_PRESETS: { code: string; name: string; script: string; direction: string }[] = [
+  { code: 'ru', name: 'Russian',     script: 'Cyrillic', direction: 'ltr' },
+  { code: 'uk', name: 'Ukrainian',   script: 'Cyrillic', direction: 'ltr' },
+  { code: 'de', name: 'German',      script: 'Latin',    direction: 'ltr' },
+  { code: 'es', name: 'Spanish',     script: 'Latin',    direction: 'ltr' },
+  { code: 'fr', name: 'French',      script: 'Latin',    direction: 'ltr' },
+  { code: 'it', name: 'Italian',     script: 'Latin',    direction: 'ltr' },
+  { code: 'pt', name: 'Portuguese',  script: 'Latin',    direction: 'ltr' },
+  { code: 'nl', name: 'Dutch',       script: 'Latin',    direction: 'ltr' },
+  { code: 'pl', name: 'Polish',      script: 'Latin',    direction: 'ltr' },
+  { code: 'sv', name: 'Swedish',     script: 'Latin',    direction: 'ltr' },
+  { code: 'ja', name: 'Japanese',    script: 'CJK',      direction: 'ltr' },
+  { code: 'zh', name: 'Chinese',     script: 'CJK',      direction: 'ltr' },
+  { code: 'ko', name: 'Korean',      script: 'Hangul',   direction: 'ltr' },
+  { code: 'tr', name: 'Turkish',     script: 'Latin',    direction: 'ltr' },
+  { code: 'ar', name: 'Arabic',      script: 'Arabic',   direction: 'rtl' },
+  { code: 'he', name: 'Hebrew',      script: 'Hebrew',   direction: 'rtl' },
+]
+
+function emptyNewSongDraft(): NewSongDraft {
+  return {
+    title: '',
+    artist: '',
+    spotify_uri: '',
+    language_code: 'ru',
+    language_name: 'Russian',
+    youtube_url: '',
+    apple_music_url: '',
+    playlist_ids: [],
   }
 }
 
@@ -83,6 +126,10 @@ export default function AdminPanel({
   const [songSaving, setSongSaving] = useState(false)
   const [lyricsSaving, setLyricsSaving] = useState(false)
   const [songError, setSongError] = useState<string | null>(null)
+
+  const [newSongDraft, setNewSongDraft] = useState<NewSongDraft>(emptyNewSongDraft())
+  const [newSongSaving, setNewSongSaving] = useState(false)
+  const [newSongError, setNewSongError] = useState<string | null>(null)
 
   const [playlistDetail, setPlaylistDetail] = useState<PlaylistDetail | null>(null)
   const [playlistDraft, setPlaylistDraft] = useState<PlaylistDraft>(emptyPlaylistDraft())
@@ -322,6 +369,57 @@ export default function AdminPanel({
       setLyricsDraft((sourceLinesEntry?.lines ?? adminSong.lines).map(line => ({ ...line })))
     }
   }, [adminSong, lyricsSource])
+
+  const handleCreateSong = useCallback(async () => {
+    if (!newSongDraft.title.trim()) {
+      setNewSongError('Title is required')
+      return
+    }
+    setNewSongSaving(true)
+    setNewSongError(null)
+    try {
+      const preset = LANGUAGE_PRESETS.find(p => p.code === newSongDraft.language_code)
+      const created = await api.createAdminSong({
+        title: newSongDraft.title.trim(),
+        artist: newSongDraft.artist.trim() || null,
+        spotify_uri: newSongDraft.spotify_uri.trim() || null,
+        language_code: newSongDraft.language_code,
+        language_name: newSongDraft.language_name.trim() || (preset?.name ?? 'Unknown'),
+        language_script: preset?.script ?? 'Latin',
+        language_direction: preset?.direction ?? 'ltr',
+        youtube_url: newSongDraft.youtube_url.trim() || null,
+        apple_music_url: newSongDraft.apple_music_url.trim() || null,
+        playlist_ids: newSongDraft.playlist_ids,
+      })
+      await Promise.all([onRefreshSongs(), onRefreshPlaylists()])
+      setSelectedSongId(created.id)
+      setNewSongDraft(emptyNewSongDraft())
+      setTab('songs')
+      onNavigateRoute?.('songs', created.id)
+    } catch (error) {
+      setNewSongError(error instanceof Error ? error.message : 'Failed to create song')
+    } finally {
+      setNewSongSaving(false)
+    }
+  }, [newSongDraft, onNavigateRoute, onRefreshPlaylists, onRefreshSongs])
+
+  const handleDeleteSong = useCallback(async () => {
+    if (!selectedSongId) return
+    if (!window.confirm('Delete this song permanently? This cannot be undone.')) return
+    setSongSaving(true)
+    setSongError(null)
+    try {
+      await api.deleteAdminSong(selectedSongId)
+      await Promise.all([onRefreshSongs(), onRefreshPlaylists()])
+      const nextSongId = songs.find(s => s.id !== selectedSongId)?.id ?? null
+      setSelectedSongId(nextSongId)
+      onNavigateRoute?.('songs', nextSongId)
+    } catch (error) {
+      setSongError(error instanceof Error ? error.message : 'Failed to delete song')
+    } finally {
+      setSongSaving(false)
+    }
+  }, [onNavigateRoute, onRefreshPlaylists, onRefreshSongs, selectedSongId, songs])
 
   const handleSaveSong = useCallback(async () => {
     if (!selectedSongId || !songDraft) return
@@ -683,7 +781,10 @@ export default function AdminPanel({
                       <p className="text-white font-semibold">Song Details</p>
                       <p className="text-xs text-gray-500">Metadata, source URLs, and playlist membership.</p>
                     </div>
-                    <button type="button" onClick={() => void handleSaveSong()} disabled={!selectedSongId || !songDraft || songSaving} className="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:bg-gray-800 disabled:text-gray-500">{songSaving ? 'Saving...' : 'Save Song'}</button>
+                    <div className="flex gap-2">
+                      <button type="button" onClick={() => void handleSaveSong()} disabled={!selectedSongId || !songDraft || songSaving} className="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:bg-gray-800 disabled:text-gray-500">{songSaving ? 'Saving...' : 'Save Song'}</button>
+                      <button type="button" onClick={() => void handleDeleteSong()} disabled={!selectedSongId || songSaving} className="rounded-xl border border-red-900/60 px-4 py-2 text-sm font-semibold text-red-300 hover:bg-red-950/30 disabled:border-gray-800 disabled:text-gray-600">Delete</button>
+                    </div>
                   </div>
                   {songError && <div className="mb-4 rounded-xl border border-red-900/50 bg-red-950/20 px-4 py-3 text-sm text-red-400">{songError}</div>}
                   {songLoading || !songDraft ? (
@@ -771,6 +872,57 @@ export default function AdminPanel({
                   </div>
                 </div>
               </>
+            )}
+
+            {tab === 'songs' && (
+              <div className="rounded-3xl border border-gray-800/80 p-5" style={{ background: '#12121f' }}>
+                <p className="text-white font-semibold mb-3">Create Song</p>
+                {newSongError && <div className="mb-3 rounded-xl border border-red-900/50 bg-red-950/20 px-4 py-3 text-sm text-red-400">{newSongError}</div>}
+                <div className="space-y-3">
+                  <div className="grid gap-3 md:grid-cols-2">
+                    <label className="block text-xs text-gray-500">Title *<input value={newSongDraft.title} onChange={e => setNewSongDraft(prev => ({ ...prev, title: e.target.value }))} placeholder="Song title" className="mt-1 w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" /></label>
+                    <label className="block text-xs text-gray-500">Artist<input value={newSongDraft.artist} onChange={e => setNewSongDraft(prev => ({ ...prev, artist: e.target.value }))} placeholder="Artist name" className="mt-1 w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" /></label>
+                  </div>
+                  <label className="block text-xs text-gray-500">Spotify URI <span className="text-gray-600">(leave blank to auto-generate)</span><input value={newSongDraft.spotify_uri} onChange={e => setNewSongDraft(prev => ({ ...prev, spotify_uri: e.target.value }))} placeholder="spotify:track:... or leave blank" className="mt-1 w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500" /></label>
+                  <div className="grid gap-3 md:grid-cols-2">
+                    <label className="block text-xs text-gray-500">Language
+                      <select
+                        value={newSongDraft.language_code}
+                        onChange={e => {
+                          const preset = LANGUAGE_PRESETS.find(p => p.code === e.target.value)
+                          setNewSongDraft(prev => ({
+                            ...prev,
+                            language_code: e.target.value,
+                            language_name: preset?.name ?? prev.language_name,
+                          }))
+                        }}
+                        className="mt-1 w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
+                      >
+                        {LANGUAGE_PRESETS.map(p => (
+                          <option key={p.code} value={p.code}>{p.name} ({p.code})</option>
+                        ))}
+                      </select>
+                    </label>
+                    <label className="block text-xs text-gray-500">Language name<input value={newSongDraft.language_name} onChange={e => setNewSongDraft(prev => ({ ...prev, language_name: e.target.value }))} placeholder="e.g. Russian" className="mt-1 w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" /></label>
+                  </div>
+                  <div className="grid gap-3 md:grid-cols-2">
+                    <label className="block text-xs text-gray-500">YouTube URL<input value={newSongDraft.youtube_url} onChange={e => setNewSongDraft(prev => ({ ...prev, youtube_url: e.target.value }))} placeholder="https://youtube.com/watch?v=..." className="mt-1 w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500" /></label>
+                    <label className="block text-xs text-gray-500">Apple Music URL<input value={newSongDraft.apple_music_url} onChange={e => setNewSongDraft(prev => ({ ...prev, apple_music_url: e.target.value }))} placeholder="https://music.apple.com/..." className="mt-1 w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500" /></label>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-2">Add to playlists</p>
+                    <div className="grid gap-2 md:grid-cols-2">
+                      {playlists.map(playlist => (
+                        <label key={playlist.id} className="flex items-center gap-3 rounded-xl border border-gray-800 bg-gray-950/30 px-3 py-2 text-sm text-gray-200">
+                          <input type="checkbox" checked={newSongDraft.playlist_ids.includes(playlist.id)} onChange={() => setNewSongDraft(prev => ({ ...prev, playlist_ids: prev.playlist_ids.includes(playlist.id) ? prev.playlist_ids.filter(id => id !== playlist.id) : [...prev.playlist_ids, playlist.id] }))} className="rounded border-gray-600 bg-gray-900 text-indigo-500 focus:ring-indigo-500" />
+                          <span>{playlist.name}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                  <button type="button" onClick={() => void handleCreateSong()} disabled={newSongSaving} className="w-full rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-500 disabled:bg-gray-800 disabled:text-gray-500">{newSongSaving ? 'Creating...' : 'Create Song'}</button>
+                </div>
+              </div>
             )}
 
             {tab === 'playlists' && (
