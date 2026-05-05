@@ -37,6 +37,7 @@ class User(Base):
     password_hash    = Column(Text,        nullable=True)
     settings_json    = Column(Text,        nullable=True)
     is_admin         = Column(Integer,     nullable=False, default=0)
+    spotify_enabled  = Column(Integer,     nullable=False, default=0)
     created_at       = Column(Integer,     default=lambda: int(time.time()))
 
 
@@ -69,6 +70,8 @@ class Line(Base):
 
     id            = Column(Integer, primary_key=True)
     song_id       = Column(Integer, ForeignKey("songs.id", ondelete="CASCADE"), nullable=False)
+    # NULL = default / Spotify timing; 'youtube' | 'apple_music' = source-specific timing
+    source        = Column(String(32), nullable=True, default=None)
     position      = Column(Integer, nullable=False)
     start_time_ms = Column(Integer, nullable=False)
     end_time_ms   = Column(Integer, nullable=False)
@@ -158,6 +161,8 @@ def _migrate_users_table() -> None:
             conn.execute(text("ALTER TABLE users ADD COLUMN settings_json TEXT"))
         if "is_admin" not in user_cols:
             conn.execute(text("ALTER TABLE users ADD COLUMN is_admin INTEGER NOT NULL DEFAULT 0"))
+        if "spotify_enabled" not in user_cols:
+            conn.execute(text("ALTER TABLE users ADD COLUMN spotify_enabled INTEGER NOT NULL DEFAULT 0"))
 
         # songs table
         song_cols = {str(row[1]) for row in conn.execute(text("PRAGMA table_info(songs)")).fetchall()}
@@ -165,6 +170,11 @@ def _migrate_users_table() -> None:
             conn.execute(text("ALTER TABLE songs ADD COLUMN youtube_url TEXT"))
         if "apple_music_url" not in song_cols:
             conn.execute(text("ALTER TABLE songs ADD COLUMN apple_music_url TEXT"))
+
+        # lines table
+        line_cols = {str(row[1]) for row in conn.execute(text("PRAGMA table_info(lines)")).fetchall()}
+        if "source" not in line_cols:
+            conn.execute(text("ALTER TABLE lines ADD COLUMN source VARCHAR(32)"))
 
 
 def get_db() -> Generator[Session, None, None]:

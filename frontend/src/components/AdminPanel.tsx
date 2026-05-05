@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { AdminSongDetail, AdminUser, PlaylistDetail, PlaylistSummary, SongSummary, api } from '../api/client'
+import SyncCalibrator from './SyncCalibrator'
 
 interface Props {
   songs: SongSummary[]
@@ -10,6 +11,9 @@ interface Props {
   onRefreshSongs: () => Promise<void>
   onRefreshPlaylists: () => Promise<void>
   user: { display_name: string | null } | null
+  routeTab?: TabKey
+  routeObjectId?: number | null
+  onNavigateRoute?: (tab: TabKey, id: number | null) => void
 }
 
 type TabKey = 'songs' | 'playlists' | 'users'
@@ -60,6 +64,9 @@ export default function AdminPanel({
   onRefreshSongs,
   onRefreshPlaylists,
   user,
+  routeTab,
+  routeObjectId,
+  onNavigateRoute,
 }: Props) {
   const [tab, setTab] = useState<TabKey>('songs')
   const [searchQuery, setSearchQuery] = useState('')
@@ -69,6 +76,8 @@ export default function AdminPanel({
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null)
 
   const [songDraft, setSongDraft] = useState<SongDraft | null>(null)
+  const [adminSong, setAdminSong] = useState<AdminSongDetail | null>(null)
+  const [lyricsSource, setLyricsSource] = useState<'default' | 'youtube' | 'apple_music'>('default')
   const [lyricsDraft, setLyricsDraft] = useState<AdminSongDetail['lines']>([])
   const [songLoading, setSongLoading] = useState(false)
   const [songSaving, setSongSaving] = useState(false)
@@ -90,6 +99,32 @@ export default function AdminPanel({
   const [usersLoading, setUsersLoading] = useState(false)
   const [userSaving, setUserSaving] = useState(false)
   const [userError, setUserError] = useState<string | null>(null)
+
+  const getIdForTab = useCallback((tabKey: TabKey): number | null => {
+    if (tabKey === 'songs') return selectedSongId
+    if (tabKey === 'playlists') return selectedPlaylistId
+    return selectedUserId
+  }, [selectedPlaylistId, selectedSongId, selectedUserId])
+
+  const openTab = useCallback((nextTab: TabKey) => {
+    setTab(nextTab)
+    setSearchQuery('')
+
+    if (nextTab === 'songs' && !selectedSongId && songs[0]) {
+      setSelectedSongId(songs[0].id)
+      onNavigateRoute?.('songs', songs[0].id)
+      return
+    }
+
+    if (nextTab === 'playlists' && !selectedPlaylistId && playlists[0]) {
+      setSelectedPlaylistId(playlists[0].id)
+      onNavigateRoute?.('playlists', playlists[0].id)
+      return
+    }
+
+    const id = getIdForTab(nextTab)
+    onNavigateRoute?.(nextTab, id ?? null)
+  }, [getIdForTab, onNavigateRoute, playlists, selectedPlaylistId, selectedSongId, songs])
 
   const filteredSongs = useMemo(() => {
     const needle = searchQuery.trim().toLowerCase()
@@ -116,12 +151,28 @@ export default function AdminPanel({
   }, [playlistSongQuery, songs])
 
   useEffect(() => {
-    if (!selectedSongId && songs[0]) setSelectedSongId(songs[0].id)
-  }, [selectedSongId, songs])
+    if (!selectedSongId && songs[0]) {
+      setSelectedSongId(songs[0].id)
+      if (tab === 'songs') onNavigateRoute?.('songs', songs[0].id)
+    }
+  }, [onNavigateRoute, selectedSongId, songs, tab])
 
   useEffect(() => {
-    if (!selectedPlaylistId && playlists[0]) setSelectedPlaylistId(playlists[0].id)
-  }, [playlists, selectedPlaylistId])
+    if (!selectedPlaylistId && playlists[0]) {
+      setSelectedPlaylistId(playlists[0].id)
+      if (tab === 'playlists') onNavigateRoute?.('playlists', playlists[0].id)
+    }
+  }, [onNavigateRoute, playlists, selectedPlaylistId, tab])
+
+  useEffect(() => {
+    if (!routeTab) return
+    setTab(routeTab)
+    setSearchQuery('')
+    if (routeObjectId === null || routeObjectId === undefined) return
+    if (routeTab === 'songs') setSelectedSongId(routeObjectId)
+    if (routeTab === 'playlists') setSelectedPlaylistId(routeObjectId)
+    if (routeTab === 'users') setSelectedUserId(routeObjectId)
+  }, [routeObjectId, routeTab])
 
   useEffect(() => {
     if (tab !== 'users') return
@@ -133,6 +184,9 @@ export default function AdminPanel({
         if (cancelled) return
         setUsers(loaded)
         setSelectedUserId(prev => prev ?? loaded[0]?.id ?? null)
+        if (selectedUserId == null && loaded[0]?.id && tab === 'users') {
+          onNavigateRoute?.('users', loaded[0].id)
+        }
       })
       .catch((error: unknown) => {
         if (cancelled) return
@@ -144,10 +198,11 @@ export default function AdminPanel({
     return () => {
       cancelled = true
     }
-  }, [tab])
+  }, [onNavigateRoute, selectedUserId, tab])
 
   useEffect(() => {
     if (!selectedSongId) {
+      setAdminSong(null)
       return
     }
 
@@ -157,6 +212,7 @@ export default function AdminPanel({
     void api.getAdminSong(selectedSongId)
       .then((detail) => {
         if (cancelled) return
+        setAdminSong(detail)
         setSongDraft({
           spotify_uri: detail.spotify_uri,
           title: detail.title,
@@ -165,7 +221,12 @@ export default function AdminPanel({
           apple_music_url: detail.apple_music_url ?? '',
           playlist_ids: [...detail.playlist_ids],
         })
-        setLyricsDraft(detail.lines.map(line => ({ ...line })))
+        // Load lyrics for the current source
+        const sourceLinesEntry = detail.source_lines.find(s => s.source === lyricsSource)
+        const linesToLoad = lyricsSource === 'default'
+          ? detail.lines
+          : (sourceLinesEntry?.lines ?? detail.lines)
+        setLyricsDraft(linesToLoad.map(line => ({ ...line })))
       })
       .catch((error: unknown) => {
         if (cancelled) return
@@ -177,6 +238,7 @@ export default function AdminPanel({
     return () => {
       cancelled = true
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedSongId])
 
   useEffect(() => {
@@ -249,6 +311,18 @@ export default function AdminPanel({
     }
   }, [selectedUserId])
 
+  // When source tab changes, re-derive lyricsDraft from adminSong without a network request.
+  useEffect(() => {
+    if (!adminSong) return
+    if (lyricsSource === 'default') {
+      setLyricsDraft(adminSong.lines.map(line => ({ ...line })))
+    } else {
+      const sourceLinesEntry = adminSong.source_lines.find(s => s.source === lyricsSource)
+      // If no source-specific lines exist yet, seed from default as a starting point.
+      setLyricsDraft((sourceLinesEntry?.lines ?? adminSong.lines).map(line => ({ ...line })))
+    }
+  }, [adminSong, lyricsSource])
+
   const handleSaveSong = useCallback(async () => {
     if (!selectedSongId || !songDraft) return
     setSongSaving(true)
@@ -262,6 +336,7 @@ export default function AdminPanel({
         apple_music_url: songDraft.apple_music_url.trim() || null,
         playlist_ids: songDraft.playlist_ids,
       })
+      setAdminSong(updated)
       setLyricsDraft(updated.lines.map(line => ({ ...line })))
       await Promise.all([onRefreshSongs(), onRefreshPlaylists()])
     } catch (error) {
@@ -276,24 +351,99 @@ export default function AdminPanel({
     setLyricsSaving(true)
     setSongError(null)
     try {
-      const updated = await api.updateAdminLyrics(selectedSongId, {
-        lines: lyricsDraft.map((line, index) => ({
-          id: line.id,
-          position: index,
-          start_time_ms: line.start_time_ms,
-          end_time_ms: line.end_time_ms,
-          original_line: line.original_line,
-          phonetic_line: line.phonetic_line,
-          translation: line.translation,
-        })),
-      })
-      setLyricsDraft(updated.lines.map(line => ({ ...line })))
+      let updated: AdminSongDetail
+      if (lyricsSource === 'default') {
+        updated = await api.updateAdminLyrics(selectedSongId, {
+          lines: lyricsDraft.map((line, index) => ({
+            id: line.id,
+            position: index,
+            start_time_ms: line.start_time_ms,
+            end_time_ms: line.end_time_ms,
+            original_line: line.original_line,
+            phonetic_line: line.phonetic_line,
+            translation: line.translation,
+          })),
+        })
+      } else {
+        updated = await api.updateSourceLyrics(
+          selectedSongId,
+          lyricsSource,
+          lyricsDraft.map((line, index) => ({
+            position: index,
+            start_time_ms: line.start_time_ms,
+            end_time_ms: line.end_time_ms,
+            original_line: line.original_line,
+            phonetic_line: line.phonetic_line,
+            translation: line.translation,
+          })),
+        )
+      }
+      setAdminSong(updated)
+      const refreshedEntry = updated.source_lines.find(s => s.source === lyricsSource)
+      const refreshedLines = lyricsSource === 'default'
+        ? updated.lines
+        : (refreshedEntry?.lines ?? updated.lines)
+      setLyricsDraft(refreshedLines.map(line => ({ ...line })))
     } catch (error) {
       setSongError(error instanceof Error ? error.message : 'Failed to save lyrics')
     } finally {
       setLyricsSaving(false)
     }
-  }, [lyricsDraft, selectedSongId])
+  }, [lyricsDraft, lyricsSource, selectedSongId])
+
+  // Atomic: shift all timestamps by offsetMs then save — avoids stale-state race
+  // that happens when onApplyOffset (setState) and onSave (reads state) are separate.
+  const handleSyncApplyAndSave = useCallback(async (offsetMs: number) => {
+    if (!selectedSongId) return
+    setLyricsSaving(true)
+    setSongError(null)
+    try {
+      const shiftedLines = lyricsDraft.map((line, index) => ({
+        ...line,
+        position: index,
+        start_time_ms: line.start_time_ms + offsetMs,
+        end_time_ms: line.end_time_ms + offsetMs,
+      }))
+      setLyricsDraft(shiftedLines)
+      let updated: AdminSongDetail
+      if (lyricsSource === 'default') {
+        updated = await api.updateAdminLyrics(selectedSongId, {
+          lines: shiftedLines.map(line => ({
+            id: line.id,
+            position: line.position,
+            start_time_ms: line.start_time_ms,
+            end_time_ms: line.end_time_ms,
+            original_line: line.original_line,
+            phonetic_line: line.phonetic_line,
+            translation: line.translation,
+          })),
+        })
+      } else {
+        updated = await api.updateSourceLyrics(
+          selectedSongId,
+          lyricsSource,
+          shiftedLines.map(line => ({
+            position: line.position,
+            start_time_ms: line.start_time_ms,
+            end_time_ms: line.end_time_ms,
+            original_line: line.original_line,
+            phonetic_line: line.phonetic_line,
+            translation: line.translation,
+          })),
+        )
+      }
+      setAdminSong(updated)
+      const refreshedEntry = updated.source_lines.find(s => s.source === lyricsSource)
+      const refreshedLines = lyricsSource === 'default'
+        ? updated.lines
+        : (refreshedEntry?.lines ?? updated.lines)
+      setLyricsDraft(refreshedLines.map(line => ({ ...line })))
+    } catch (error) {
+      setSongError(error instanceof Error ? error.message : 'Failed to save lyrics')
+    } finally {
+      setLyricsSaving(false)
+    }
+  }, [lyricsDraft, lyricsSource, selectedSongId])
 
   const handleSavePlaylist = useCallback(async () => {
     if (!selectedPlaylistId || !playlistDetail) return
@@ -350,12 +500,13 @@ export default function AdminPanel({
       setSelectedPlaylistId(created.id)
       setNewPlaylistDraft(emptyPlaylistDraft())
       setTab('playlists')
+      onNavigateRoute?.('playlists', created.id)
     } catch (error) {
       setPlaylistError(error instanceof Error ? error.message : 'Failed to create playlist')
     } finally {
       setPlaylistSaving(false)
     }
-  }, [newPlaylistDraft, onRefreshPlaylists])
+  }, [newPlaylistDraft, onNavigateRoute, onRefreshPlaylists])
 
   const handleDeletePlaylist = useCallback(async () => {
     if (!selectedPlaylistId) return
@@ -365,13 +516,15 @@ export default function AdminPanel({
     try {
       await api.deletePlaylist(selectedPlaylistId)
       await onRefreshPlaylists()
-      setSelectedPlaylistId(playlists.find(item => item.id !== selectedPlaylistId)?.id ?? null)
+      const nextPlaylistId = playlists.find(item => item.id !== selectedPlaylistId)?.id ?? null
+      setSelectedPlaylistId(nextPlaylistId)
+      onNavigateRoute?.('playlists', nextPlaylistId)
     } catch (error) {
       setPlaylistError(error instanceof Error ? error.message : 'Failed to delete playlist')
     } finally {
       setPlaylistSaving(false)
     }
-  }, [onRefreshPlaylists, playlists, selectedPlaylistId])
+  }, [onNavigateRoute, onRefreshPlaylists, playlists, selectedPlaylistId])
 
   const handleSaveUser = useCallback(async () => {
     if (!selectedUserId || !userDraft) return
@@ -442,9 +595,9 @@ export default function AdminPanel({
         </div>
 
         <div className="flex gap-2">
-          <button type="button" onClick={() => { setTab('songs'); setSearchQuery('') }} className={`rounded-xl border px-4 py-2 text-sm font-semibold transition-colors ${tabButtonClass(tab === 'songs')}`}>Songs</button>
-          <button type="button" onClick={() => { setTab('playlists'); setSearchQuery('') }} className={`rounded-xl border px-4 py-2 text-sm font-semibold transition-colors ${tabButtonClass(tab === 'playlists')}`}>Playlists</button>
-          <button type="button" onClick={() => { setTab('users'); setSearchQuery('') }} className={`rounded-xl border px-4 py-2 text-sm font-semibold transition-colors ${tabButtonClass(tab === 'users')}`}>Users</button>
+          <button type="button" onClick={() => openTab('songs')} className={`rounded-xl border px-4 py-2 text-sm font-semibold transition-colors ${tabButtonClass(tab === 'songs')}`}>Songs</button>
+          <button type="button" onClick={() => openTab('playlists')} className={`rounded-xl border px-4 py-2 text-sm font-semibold transition-colors ${tabButtonClass(tab === 'playlists')}`}>Playlists</button>
+          <button type="button" onClick={() => openTab('users')} className={`rounded-xl border px-4 py-2 text-sm font-semibold transition-colors ${tabButtonClass(tab === 'users')}`}>Users</button>
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[320px_minmax(0,1fr)]">
@@ -465,7 +618,10 @@ export default function AdminPanel({
                   <button
                     key={song.id}
                     type="button"
-                    onClick={() => setSelectedSongId(song.id)}
+                    onClick={() => {
+                      setSelectedSongId(song.id)
+                      onNavigateRoute?.('songs', song.id)
+                    }}
                     className={`w-full rounded-2xl border px-3 py-3 text-left transition-colors ${selectedSongId === song.id ? 'border-indigo-500 bg-indigo-950/40' : 'border-gray-800 bg-gray-950/30 hover:border-gray-700'}`}
                   >
                     <p className="text-sm font-medium text-white truncate">{song.title}</p>
@@ -481,7 +637,10 @@ export default function AdminPanel({
                   <button
                     key={playlist.id}
                     type="button"
-                    onClick={() => setSelectedPlaylistId(playlist.id)}
+                    onClick={() => {
+                      setSelectedPlaylistId(playlist.id)
+                      onNavigateRoute?.('playlists', playlist.id)
+                    }}
                     className={`w-full rounded-2xl border px-3 py-3 text-left transition-colors ${selectedPlaylistId === playlist.id ? 'border-indigo-500 bg-indigo-950/40' : 'border-gray-800 bg-gray-950/30 hover:border-gray-700'}`}
                   >
                     <p className="text-sm font-medium text-white truncate">{playlist.name}</p>
@@ -498,7 +657,10 @@ export default function AdminPanel({
                   <button
                     key={item.id}
                     type="button"
-                    onClick={() => setSelectedUserId(item.id)}
+                    onClick={() => {
+                      setSelectedUserId(item.id)
+                      onNavigateRoute?.('users', item.id)
+                    }}
                     className={`w-full rounded-2xl border px-3 py-3 text-left transition-colors ${selectedUserId === item.id ? 'border-indigo-500 bg-indigo-950/40' : 'border-gray-800 bg-gray-950/30 hover:border-gray-700'}`}
                   >
                     <div className="flex items-center justify-between gap-2">
@@ -552,6 +714,19 @@ export default function AdminPanel({
                   )}
                 </div>
 
+                {songDraft?.youtube_url && lyricsSource === 'youtube' && (
+                  <div className="rounded-3xl border border-gray-800/80 p-5" style={{ background: '#12121f' }}>
+                    <p className="text-white font-semibold mb-1">Sync Calibrator — YouTube</p>
+                    <p className="text-xs text-gray-500 mb-4">Play the YouTube video and use the offset controls to align lyrics in real time. Click a line to seek to it.</p>
+                    <SyncCalibrator
+                      youtubeUrl={songDraft.youtube_url}
+                      lines={lyricsDraft}
+                      onApplyAndSave={handleSyncApplyAndSave}
+                      saving={lyricsSaving}
+                    />
+                  </div>
+                )}
+
                 <div className="rounded-3xl border border-gray-800/80 p-5" style={{ background: '#12121f' }}>
                   <div className="flex items-center justify-between gap-4 mb-4">
                     <div>
@@ -559,6 +734,24 @@ export default function AdminPanel({
                       <p className="text-xs text-gray-500">Edit line text and timestamps for the selected song.</p>
                     </div>
                     <button type="button" onClick={() => void handleSaveLyrics()} disabled={!selectedSongId || lyricsSaving || !lyricsDraft.length} className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-500 disabled:bg-gray-800 disabled:text-gray-500">{lyricsSaving ? 'Saving...' : 'Save Lyrics'}</button>
+                  </div>
+                  <div className="flex gap-2 mb-4">
+                    {(['default', 'youtube', 'apple_music'] as const).map(src => {
+                      const hasLines = src === 'default'
+                        ? (adminSong?.lines.length ?? 0) > 0
+                        : (adminSong?.source_lines.some(s => s.source === src) ?? false)
+                      return (
+                        <button
+                          key={src}
+                          type="button"
+                          onClick={() => setLyricsSource(src)}
+                          className={`rounded-xl border px-3 py-1.5 text-xs font-semibold transition-colors ${lyricsSource === src ? 'border-indigo-500 bg-indigo-950/40 text-white' : 'border-gray-800 bg-gray-950/30 text-gray-400 hover:border-gray-700 hover:text-gray-200'}`}
+                        >
+                          {src === 'default' ? 'Default' : src === 'youtube' ? 'YouTube' : 'Apple Music'}
+                          {!hasLines && src !== 'default' && <span className="ml-1 text-gray-600">(copy)</span>}
+                        </button>
+                      )
+                    })}
                   </div>
                   <div className="max-h-[58vh] overflow-y-auto space-y-3 pr-1">
                     {lyricsDraft.map((line, index) => (

@@ -7,6 +7,28 @@ import YouTubePlayer, { YouTubePlayerHandle } from './components/YouTubePlayer'
 import AppleMusicPlayer, { AppleMusicPlayerHandle } from './components/AppleMusicPlayer'
 import { api, BackendUser, PlaylistDetail, PlaylistSummary, SongDetail, SongSummary, UserSettings as ApiUserSettings, clearAdminSession, setAdminSession } from './api/client'
 
+// ── Google Identity Services global type ──────────────────────────────────────
+declare global {
+  interface Window {
+    google?: {
+      accounts: {
+        id: {
+          initialize: (config: {
+            client_id: string
+            callback: (response: { credential: string }) => void
+            auto_select?: boolean
+          }) => void
+          renderButton: (
+            parent: HTMLElement,
+            options: { theme?: string; size?: string; width?: number; text?: string }
+          ) => void
+          disableAutoSelect: () => void
+        }
+      }
+    }
+  }
+}
+
 const PASSWORD_SESSION_KEY = 'flowup.password_user.v1'
 
 interface AppSettings {
@@ -22,7 +44,7 @@ const DEFAULT_SETTINGS: AppSettings = {
   pauseOnInspect: true,
   lastPlaylistId: null,
   lastSongId: null,
-  preferredSource: 'spotify',
+  preferredSource: 'youtube',
 }
 
 function fromApiSettings(settings: ApiUserSettings): AppSettings {
@@ -31,7 +53,7 @@ function fromApiSettings(settings: ApiUserSettings): AppSettings {
     pauseOnInspect: settings.pause_on_inspect,
     lastPlaylistId: settings.last_playlist_id ?? null,
     lastSongId: settings.last_song_id ?? null,
-    preferredSource: (settings.preferred_source as AppSettings['preferredSource']) ?? 'spotify',
+    preferredSource: (settings.preferred_source as AppSettings['preferredSource']) ?? 'youtube',
   }
 }
 
@@ -64,26 +86,94 @@ function formatMs(ms: number): string {
   return `${min}:${sec.toString().padStart(2, '0')}`
 }
 
+type AppRoute =
+  | { page: 'browse' }
+  | { page: 'song'; songId: number }
+  | { page: 'settings' }
+  | { page: 'admin'; tab: 'songs' | 'playlists' | 'users'; id: number | null }
+
+function parseAppRoute(pathname: string): AppRoute {
+  const path = pathname || '/browse'
+
+  if (path === '/settings') return { page: 'settings' }
+  const adminMatch = path.match(/^\/admin(?:\/(song|playlist|user)(?:\/(\d+))?)?$/)
+  if (adminMatch) {
+    const seg = adminMatch[1]
+    const id = adminMatch[2] ? Number(adminMatch[2]) : null
+    const tab = seg === 'playlist' ? 'playlists' : seg === 'user' ? 'users' : 'songs'
+    return { page: 'admin', tab, id }
+  }
+  if (path === '/browse' || path === '/') return { page: 'browse' }
+
+  const songMatch = path.match(/^\/song\/(\d+)$/)
+  if (songMatch) {
+    return { page: 'song', songId: Number(songMatch[1]) }
+  }
+
+  return { page: 'browse' }
+}
+
+function songPath(songId: number): string {
+  return `/song/${songId}`
+}
+
+function adminPath(tab: 'songs' | 'playlists' | 'users', id: number | null): string {
+  const seg = tab === 'playlists' ? 'playlist' : tab === 'users' ? 'user' : 'song'
+  if (id === null) return `/admin/${seg}`
+  return `/admin/${seg}/${id}`
+}
+
 // ── Login screen ──────────────────────────────────────────────────────────────
 
 function LoginScreen({
-  onSpotifyLogin,
   onEmailLogin,
+  onGoogleLogin,
   error,
   busy,
 }: {
-  onSpotifyLogin: () => void
   onEmailLogin: (email: string, password: string) => Promise<void>
+  onGoogleLogin: (credential: string) => Promise<void>
   error: string | null
   busy: boolean
 }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const googleBtnRef = useRef<HTMLDivElement>(null)
 
   const handleSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault()
     void onEmailLogin(email.trim(), password)
   }, [email, password, onEmailLogin])
+
+  // Initialise Google Identity Services once the GSI script has loaded.
+  useEffect(() => {
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined
+    if (!clientId || !googleBtnRef.current) return
+
+    const init = () => {
+      if (!window.google || !googleBtnRef.current) return
+      window.google.accounts.id.initialize({
+        client_id: clientId,
+        callback: (response) => { void onGoogleLogin(response.credential) },
+        auto_select: false,
+      })
+      window.google.accounts.id.renderButton(googleBtnRef.current, {
+        theme: 'filled_black',
+        size: 'large',
+        width: 360,
+        text: 'continue_with',
+      })
+    }
+
+    if (window.google) {
+      init()
+    } else {
+      // Wait for the async GSI script to finish loading.
+      const script = document.querySelector('script[src*="accounts.google.com/gsi"]')
+      script?.addEventListener('load', init, { once: true })
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4"
@@ -111,7 +201,13 @@ function LoginScreen({
           <div>
             <h2 className="text-white font-semibold text-base mb-1">Sign in</h2>
             <p className="text-gray-500 text-sm leading-relaxed">
-              Use email + password, or Spotify if your account is already connected.
+              {[
+                (import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined) && 'Google',
+                'email + password',
+                (import.meta.env.VITE_SPOTIFY_CLIENT_ID as string | undefined) &&
+                  (import.meta.env.VITE_SPOTIFY_CLIENT_ID as string) !== 'your_spotify_client_id_here' &&
+                  'Spotify',
+              ].filter(Boolean).join(', or ')}.
             </p>
           </div>
 
@@ -120,6 +216,19 @@ function LoginScreen({
               {error}
             </div>
           )}
+
+          {/* Google Sign-In button — rendered by GSI SDK; hidden if no client ID */}
+          {(import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined) && (
+            <div className="flex justify-center">
+              <div ref={googleBtnRef} />
+            </div>
+          )}
+
+          <div className="flex items-center gap-3 text-xs text-gray-600">
+            <div className="h-px flex-1 bg-gray-800" />
+            <span>or</span>
+            <div className="h-px flex-1 bg-gray-800" />
+          </div>
 
           <form onSubmit={handleSubmit} className="space-y-3">
             <input
@@ -152,31 +261,7 @@ function LoginScreen({
             </button>
           </form>
 
-          <div className="flex items-center gap-3 text-xs text-gray-600">
-            <div className="h-px flex-1 bg-gray-800" />
-            <span>or</span>
-            <div className="h-px flex-1 bg-gray-800" />
-          </div>
-
-          <button
-            onClick={onSpotifyLogin}
-            disabled={busy}
-            className="
-              w-full py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-3
-              bg-[#1DB954] hover:bg-[#1ed760] active:scale-[0.98]
-              disabled:bg-gray-800 disabled:text-gray-500
-              text-black transition-all duration-150 shadow-lg shadow-green-900/20
-            "
-          >
-            <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">
-              <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
-            </svg>
-            Continue with Spotify
-          </button>
-
-          <p className="text-gray-700 text-xs text-center mt-4">
-            First Spotify login requires onboarding: email + password setup.
-          </p>
+          {/* Spotify login — hidden; access is managed per-user via spotify_enabled flag */}
         </div>
       </div>
     </div>
@@ -192,13 +277,16 @@ const SOURCE_OPTIONS: { value: AppSettings['preferredSource']; label: string; de
 function SourcePicker({
   value,
   onChange,
+  spotifyEnabled = false,
 }: {
   value: AppSettings['preferredSource']
   onChange: (v: AppSettings['preferredSource']) => void
+  spotifyEnabled?: boolean
 }) {
+  const options = SOURCE_OPTIONS.filter(o => o.value !== 'spotify' || spotifyEnabled)
   return (
     <div className="space-y-2">
-      {SOURCE_OPTIONS.map(opt => (
+      {options.map(opt => (
         <button
           key={opt.value}
           type="button"
@@ -241,7 +329,7 @@ function OnboardingScreen({
   const [step, setStep] = useState<'account' | 'source'>('account')
   const [email, setEmail] = useState(initialEmail)
   const [password, setPassword] = useState('')
-  const [source, setSource] = useState<AppSettings['preferredSource']>('spotify')
+  const [source, setSource] = useState<AppSettings['preferredSource']>('youtube')
 
   const handleAccountSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault()
@@ -310,7 +398,7 @@ function OnboardingScreen({
             )}
 
             <div className="mt-5">
-              <SourcePicker value={source} onChange={setSource} />
+              <SourcePicker value={source} onChange={setSource} spotifyEnabled={true} />
             </div>
 
             <button
@@ -365,8 +453,51 @@ const LANG_BADGE_MAP: Record<string, string> = {
   ja: 'JA', zh: 'ZH', ko: 'KO', tr: 'TR', ar: 'AR', he: 'HE',
 }
 
+function SourceAvailabilityIcons({
+  song,
+  spotifyEnabled,
+}: {
+  song: SongSummary
+  spotifyEnabled: boolean
+}) {
+  const sources = [
+    spotifyEnabled ? { key: 'spotify', label: 'Spotify', className: 'text-emerald-500 bg-white' } : null,
+    song.youtube_url ? { key: 'youtube', label: 'YouTube', className: 'text-red-500 bg-white' } : null,
+    song.apple_music_url ? { key: 'apple_music', label: 'Apple Music', className: 'text-black bg-white' } : null,
+  ].filter(Boolean) as { key: string; label: string; className: string }[]
+
+  if (sources.length === 0) return null
+
+  return (
+    <div className="flex items-center gap-1.5 shrink-0" aria-label="Available sources">
+      {sources.map(source => (
+        <span
+          key={source.key}
+          title={source.label}
+          aria-label={source.label}
+          className={`inline-flex h-6 w-6 items-center justify-center rounded-full ${source.className}`}
+        >
+          {source.key === 'spotify' ? (
+            <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 fill-current" aria-hidden>
+              <path d="M16.84 15.33c-.2 0-.33-.07-.53-.2-1.47-.87-3.33-1.07-5.59-.53-.27.07-.47.13-.73.13-.6 0-1-.47-1-1 0-.47.33-.87.8-1 .27-.07.6-.13.87-.2 2.8-.6 5.13-.33 7 1 .4.2.6.53.6.93 0 .47-.47.87-.87.87Zm1.2-2.93c-.27 0-.47-.07-.73-.2-1.73-1-4.47-1.27-6.8-.67-.27.07-.53.13-.8.13-.67 0-1.13-.53-1.13-1.13 0-.53.33-1 .87-1.13.33-.07.67-.2 1.07-.27 2.73-.6 5.86-.27 8 1 .47.27.73.67.73 1.13 0 .6-.53 1.13-1.2 1.13Zm.87-3.13c-.33 0-.6-.07-.87-.2-2-.93-5.4-1.33-7.73-.73-.33.07-.73.2-1.07.2-.73 0-1.33-.6-1.33-1.33 0-.67.4-1.2 1.07-1.33.4-.13.8-.2 1.27-.33 2.8-.6 6.73-.13 9.13 1 .6.27.93.73.93 1.33 0 .73-.6 1.4-1.4 1.4Z" />
+            </svg>
+          ) : source.key === 'youtube' ? (
+            <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 fill-current" aria-hidden>
+              <path d="M21.58 7.19a2.8 2.8 0 0 0-1.97-1.98C17.86 4.75 12 4.75 12 4.75s-5.86 0-7.61.46A2.8 2.8 0 0 0 2.42 7.2 29.4 29.4 0 0 0 2 12a29.4 29.4 0 0 0 .42 4.81 2.8 2.8 0 0 0 1.97 1.98c1.75.46 7.61.46 7.61.46s5.86 0 7.61-.46a2.8 2.8 0 0 0 1.97-1.98A29.4 29.4 0 0 0 22 12a29.4 29.4 0 0 0-.42-4.81ZM10 15.5v-7l6 3.5-6 3.5Z" />
+            </svg>
+          ) : (
+            <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 fill-current" aria-hidden>
+              <path d="M16.37 1.43c0 1.14-.47 2.24-1.22 3.04-.76.79-1.8 1.35-2.94 1.27-.15-1.09.36-2.23 1.09-3 .76-.8 2.01-1.37 3.07-1.31ZM19.08 17.22c-.42.97-.63 1.4-1.18 2.26-.77 1.2-1.86 2.7-3.21 2.71-1.2.01-1.5-.78-3.13-.77-1.62.01-1.95.79-3.15.78-1.35-.01-2.37-1.36-3.14-2.56-2.16-3.34-2.38-7.27-1.06-9.29.94-1.44 2.43-2.28 3.84-2.28 1.44 0 2.35.8 3.54.8 1.15 0 1.85-.8 3.53-.8 1.26 0 2.6.69 3.54 1.89-3.11 1.71-2.61 6.18.42 7.26Z" />
+            </svg>
+          )}
+        </span>
+      ))}
+    </div>
+  )
+}
+
 function SongBrowser({
-  songs, playlists, activePlaylistId, loading, error, onSelect, onSelectPlaylist, onLogout, onOpenSettings, onOpenAdmin, isAdmin, user,
+  songs, playlists, activePlaylistId, loading, error, onSelect, onSelectPlaylist, onLogout, onOpenSettings, onOpenAdmin, isAdmin, user, spotifyEnabled,
 }: {
   songs: SongSummary[]
   playlists: PlaylistSummary[]
@@ -380,6 +511,7 @@ function SongBrowser({
   onOpenAdmin: () => void
   isAdmin: boolean
   user: { display_name: string | null } | null
+  spotifyEnabled: boolean
 }) {
   return (
     <div className="min-h-screen p-6 max-w-2xl mx-auto" style={{ background: '#0d0d14' }}>
@@ -486,6 +618,7 @@ function SongBrowser({
                   <p className="text-white font-semibold truncate">{song.title}</p>
                   <p className="text-gray-500 text-sm truncate">{song.artist ?? 'Unknown artist'}</p>
                 </div>
+                <SourceAvailabilityIcons song={song} spotifyEnabled={spotifyEnabled} />
                 <span className="text-[10px] font-mono font-medium text-indigo-400 bg-indigo-950/60 border border-indigo-900/50 px-1.5 py-0.5 rounded-md uppercase tracking-wider shrink-0">
                   {song.language_name}
                 </span>
@@ -544,12 +677,14 @@ function SettingsPage({
   onBack,
   onLogout,
   user,
+  spotifyEnabled,
 }: {
   settings: AppSettings
   onUpdate: (patch: Partial<AppSettings>) => void
   onBack: () => void
   onLogout: () => void
   user: { display_name: string | null } | null
+  spotifyEnabled: boolean
 }) {
   return (
     <div className="min-h-screen p-6 max-w-2xl mx-auto" style={{ background: '#0d0d14' }}>
@@ -577,7 +712,7 @@ function SettingsPage({
         <div className="rounded-2xl border border-gray-800/80 p-4" style={{ background: '#12121f' }}>
           <p className="text-white font-medium mb-1">Music source</p>
           <p className="text-xs text-gray-500 mb-3 leading-relaxed">Choose where songs play from. YouTube is used as fallback when Spotify is unavailable.</p>
-          <SourcePicker value={settings.preferredSource} onChange={v => onUpdate({ preferredSource: v })} />
+          <SourcePicker value={settings.preferredSource} onChange={v => onUpdate({ preferredSource: v })} spotifyEnabled={spotifyEnabled} />
         </div>
 
         <SettingRow
@@ -843,6 +978,33 @@ function PlayerView({
     }
   }, [infoVisible, isPlaying, effectiveSource, player, settings.pauseOnInspect])
 
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement ||
+        e.target instanceof HTMLSelectElement ||
+        (e.target instanceof HTMLElement && e.target.isContentEditable)
+      ) return
+
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault()
+        if (e.repeat || !canPrev) return
+        onPrev()
+        return
+      }
+
+      if (e.key === 'ArrowRight') {
+        e.preventDefault()
+        if (e.repeat || !canNext) return
+        onNext()
+      }
+    }
+
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [onPrev, onNext, canPrev, canNext])
+
   return (
     <div className="min-h-screen flex flex-col" style={{ background: effectiveSource === 'spotify' ? albumBg : '#0d0d14', transition: 'background 1.2s ease' }}>
 
@@ -1043,6 +1205,8 @@ function PlayerView({
               </div>
               <p className="text-xs text-gray-600 mt-0.5">
                 Press{' '}
+                <kbd className="font-mono bg-gray-800 text-gray-400 px-1 py-0.5 rounded text-[10px]">Space</kbd>
+                {' '}to play/pause,{' '}
                 <kbd className="font-mono bg-gray-800 text-gray-400 px-1 py-0.5 rounded text-[10px]">0</kbd>
                 {' '}for line translation,{' '}
                 <kbd className="font-mono bg-gray-800 text-gray-400 px-1 py-0.5 rounded text-[10px]">1</kbd>
@@ -1061,6 +1225,7 @@ function PlayerView({
             filterStopWordsForIndexing={settings.excludeStopWordsFromShortcuts}
             onInfoVisibilityChange={setInfoVisible}
             onSeek={seekTo}
+            onTogglePlayback={togglePlay}
           />
         </section>
       </main>
@@ -1072,6 +1237,7 @@ function PlayerView({
 
 export default function App() {
   const auth = useSpotifyAuth()
+  const [currentPath, setCurrentPath] = useState(() => (typeof window === 'undefined' ? '/browse' : (window.location.pathname || '/browse')))
   const [adminOpen, setAdminOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS)
@@ -1100,6 +1266,25 @@ export default function App() {
   const [lastSelectedSongId, setLastSelectedSongId] = useState<number | null>(null)
   const [settingsHydrated, setSettingsHydrated] = useState(false)
   const restoreDoneRef = useRef(false)
+  const route = useMemo(() => parseAppRoute(currentPath), [currentPath])
+
+  const navigateToPath = useCallback((path: string, replace = false) => {
+    if (typeof window === 'undefined') return
+    if (window.location.pathname === path) return
+    if (replace) {
+      window.history.replaceState(null, '', path)
+      setCurrentPath(path)
+      return
+    }
+    window.history.pushState(null, '', path)
+    setCurrentPath(path)
+  }, [])
+
+  useEffect(() => {
+    const onPopState = () => setCurrentPath(window.location.pathname || '/browse')
+    window.addEventListener('popstate', onPopState)
+    return () => window.removeEventListener('popstate', onPopState)
+  }, [])
 
   const appUser = useMemo(
     () => auth.user ?? (credentialUser ? { display_name: credentialUser.display_name, images: [] } : null),
@@ -1109,6 +1294,7 @@ export default function App() {
   const settingsOwnerSpotifyId = auth.user?.id ?? credentialUser?.spotify_id ?? null
   const isAuthenticated = auth.isAuthenticated || !!credentialUser
   const isAdmin = Boolean(credentialUser?.is_admin || syncedSpotifyUser?.is_admin)
+  const isSpotifyEnabled = Boolean(credentialUser?.spotify_enabled || syncedSpotifyUser?.spotify_enabled || auth.isAuthenticated)
 
   const loadSongs = useCallback(async () => {
     setSongsLoading(true)
@@ -1165,6 +1351,22 @@ export default function App() {
     }
   }, [])
 
+  const handleGoogleLogin = useCallback(async (credential: string) => {
+    setLoginBusy(true)
+    setLoginError(null)
+    try {
+      const user = await api.loginWithGoogle(credential)
+      clearAdminSession()
+      setCredentialUser(user)
+      localStorage.setItem(PASSWORD_SESSION_KEY, JSON.stringify(user))
+      setSyncedSpotifyUser(user)
+    } catch (e) {
+      setLoginError(e instanceof Error ? e.message : 'Google sign-in failed')
+    } finally {
+      setLoginBusy(false)
+    }
+  }, [])
+
   const handleCompleteOnboarding = useCallback(async (email: string, password: string, source: AppSettings['preferredSource']) => {
     if (!auth.user?.id) return
     setOnboardingBusy(true)
@@ -1193,18 +1395,33 @@ export default function App() {
     setCredentialUser(null)
     setSyncedSpotifyUser(null)
     setSettingsOpen(false)
+    setActiveSong(null)
     localStorage.removeItem(PASSWORD_SESSION_KEY)
-  }, [auth])
+    navigateToPath('/browse', true)
+  }, [auth, navigateToPath])
 
-  const handleSelectSong = useCallback(async (id: number) => {
+  const handleSelectSong = useCallback(async (id: number, options?: { updateRoute?: boolean }) => {
     try {
-      const detail = await api.getSong(id)
+      const source = settings.preferredSource !== 'spotify' ? settings.preferredSource : undefined
+      const detail = await api.getSong(id, source)
       setActiveSong(detail)
       setLastSelectedSongId(detail.id)
+      if (options?.updateRoute !== false) {
+        navigateToPath(songPath(detail.id))
+      }
     } catch (e) {
       setSongsError(e instanceof Error ? e.message : 'Failed to load song')
     }
-  }, [])
+  }, [settings.preferredSource, navigateToPath])
+
+  // Re-fetch active song lyrics when source preference changes so the player
+  // immediately gets the right per-source timestamps.
+  useEffect(() => {
+    if (!activeSong) return
+    const source = settings.preferredSource !== 'spotify' ? settings.preferredSource : undefined
+    void api.getSong(activeSong.id, source).then(setActiveSong).catch(() => {/* silent */})
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [settings.preferredSource])
 
   useEffect(() => {
     restoreDoneRef.current = false
@@ -1278,7 +1495,7 @@ export default function App() {
       setActivePlaylistId(settings.lastPlaylistId)
     }
 
-    if (settings.lastSongId !== null) {
+    if (settings.lastSongId !== null && route.page !== 'song' && route.page !== 'admin') {
       void handleSelectSong(settings.lastSongId)
       setLastSelectedSongId(settings.lastSongId)
     }
@@ -1288,7 +1505,44 @@ export default function App() {
     settings.lastPlaylistId,
     settings.lastSongId,
     handleSelectSong,
+    route,
   ])
+
+  useEffect(() => {
+    if (!isAuthenticated) return
+
+    if (route.page === 'settings') {
+      setSettingsOpen(true)
+      setAdminOpen(false)
+      return
+    }
+
+    if (route.page === 'admin') {
+      if (isAdmin) {
+        setAdminOpen(true)
+        setSettingsOpen(false)
+      } else {
+        setAdminOpen(false)
+        setSettingsOpen(false)
+        navigateToPath('/browse', true)
+      }
+      return
+    }
+
+    if (route.page === 'song') {
+      setSettingsOpen(false)
+      setAdminOpen(false)
+      if (activeSong?.id !== route.songId) {
+        void handleSelectSong(route.songId, { updateRoute: false })
+      }
+      return
+    }
+
+    // browse
+    setSettingsOpen(false)
+    setAdminOpen(false)
+    setActiveSong(null)
+  }, [isAuthenticated, isAdmin, activeSong?.id, handleSelectSong, navigateToPath, route])
 
   useEffect(() => {
     if (!settingsHydrated) return
@@ -1341,8 +1595,8 @@ export default function App() {
   if (!isAuthenticated) {
     return (
       <LoginScreen
-        onSpotifyLogin={auth.login}
         onEmailLogin={handleEmailLogin}
+        onGoogleLogin={handleGoogleLogin}
         error={loginError ?? auth.error}
         busy={loginBusy}
       />
@@ -1367,9 +1621,10 @@ export default function App() {
       <SettingsPage
         settings={settings}
         onUpdate={updateSettings}
-        onBack={() => setSettingsOpen(false)}
+        onBack={() => navigateToPath(activeSong ? songPath(activeSong.id) : '/browse')}
         onLogout={handleLogout}
         user={appUser}
+        spotifyEnabled={isSpotifyEnabled}
       />
     )
   }
@@ -1379,11 +1634,14 @@ export default function App() {
       <AdminPanel
         songs={songs}
         playlists={playlists}
-        onBack={() => setAdminOpen(false)}
+        onBack={() => navigateToPath(activeSong ? songPath(activeSong.id) : '/browse')}
         onLogout={handleLogout}
         onRefreshSongs={loadSongs}
         onRefreshPlaylists={loadPlaylists}
         user={appUser}
+        routeTab={route.page === 'admin' ? route.tab : 'songs'}
+        routeObjectId={route.page === 'admin' ? route.id : null}
+        onNavigateRoute={(tab, id) => navigateToPath(adminPath(tab, id))}
       />
     )
   }
@@ -1393,10 +1651,10 @@ export default function App() {
       <PlayerView
         song={activeSong}
         user={appUser}
-        onBack={() => setActiveSong(null)}
+        onBack={() => navigateToPath('/browse')}
         onLogout={handleLogout}
-        onOpenSettings={() => setSettingsOpen(true)}
-        onOpenAdmin={() => setAdminOpen(true)}
+        onOpenSettings={() => navigateToPath('/settings')}
+        onOpenAdmin={() => navigateToPath(adminPath('songs', activeSong.id))}
         isAdmin={isAdmin}
         onPrev={handlePrevSong}
         onNext={handleNextSong}
@@ -1416,11 +1674,12 @@ export default function App() {
       error={songsError}
       onSelect={handleSelectSong}
       onSelectPlaylist={setActivePlaylistId}
-      onOpenAdmin={() => setAdminOpen(true)}
+      onOpenAdmin={() => navigateToPath('/admin')}
       isAdmin={isAdmin}
-      onOpenSettings={() => setSettingsOpen(true)}
+      onOpenSettings={() => navigateToPath('/settings')}
       onLogout={handleLogout}
       user={appUser}
+      spotifyEnabled={isSpotifyEnabled}
     />
   )
 }

@@ -39,7 +39,10 @@ const STOP_WORDS: Record<string, Set<string>> = {
 function isStopWord(lemma: string, langCode: string): boolean {
   const set = STOP_WORDS[langCode]
   if (!set) return false
-  return set.has(lemma.toLowerCase())
+  // Strip combining diacritics (stress marks, etc.) before lookup so that
+  // lemmas like "на́" correctly match the plain "на" entry in the set.
+  const normalized = lemma.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+  return set.has(normalized)
 }
 
 /** Returns the word.key values of the indexable (non-stop) words in a line, max 9. */
@@ -107,6 +110,7 @@ interface Props {
   filterStopWordsForIndexing?: boolean
   onInfoVisibilityChange?: (visible: boolean) => void
   onSeek?: (ms: number) => void
+  onTogglePlayback?: () => void
 }
 
 export default function LyricsPlayer({
@@ -115,6 +119,7 @@ export default function LyricsPlayer({
   filterStopWordsForIndexing = true,
   onInfoVisibilityChange,
   onSeek,
+  onTogglePlayback,
 }: Props) {
   const { lines, language } = songData
   const isRTL = language.direction === 'rtl'
@@ -229,7 +234,31 @@ export default function LyricsPlayer({
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
+      if (
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement ||
+        e.target instanceof HTMLSelectElement ||
+        (e.target instanceof HTMLElement && e.target.isContentEditable)
+      ) return
+
+      // Space = toggle playback
+      if (e.key === ' ' || e.key === 'Spacebar' || e.code === 'Space') {
+        e.preventDefault()
+        onTogglePlayback?.()
+        return
+      }
+
+      // Q = previous line, E = next line
+      if (e.key === 'q' || e.key === 'Q' || e.key === 'e' || e.key === 'E') {
+        e.preventDefault()
+        if (!onSeek || lines.length === 0) return
+        const isPrev = e.key === 'q' || e.key === 'Q'
+        const targetIndex = isPrev
+          ? Math.max(0, activeIndex <= 0 ? 0 : activeIndex - 1)
+          : Math.min(lines.length - 1, activeIndex < 0 ? 0 : activeIndex + 1)
+        onSeek(lines[targetIndex].start_time_ms)
+        return
+      }
 
       const target = keyboardTargetFor(e.key)
       if (!target) return
@@ -289,7 +318,7 @@ export default function LyricsPlayer({
       window.removeEventListener('keyup', onKeyUp)
       window.removeEventListener('blur', onBlur)
     }
-  }, [keyboardTargetFor, clearInspect, togglePinned])
+  }, [keyboardTargetFor, clearInspect, togglePinned, lines, activeIndex, onSeek, onTogglePlayback])
 
   useEffect(() => {
     return () => {
@@ -503,7 +532,7 @@ function InspectPanel({ info, onClose, compact = false }: InspectPanelProps) {
     >
       <div className="flex items-start justify-between gap-3">
         <p className="text-[10px] font-mono font-medium text-indigo-500 uppercase tracking-wider">
-          {isWord ? 'Word' : 'Sentence'}
+          {isWord ? 'Definition' : 'Translation'}
         </p>
         <button
           type="button"
@@ -517,31 +546,48 @@ function InspectPanel({ info, onClose, compact = false }: InspectPanelProps) {
 
       {isWord ? (
         <>
-          <p className="stressed text-2xl font-bold text-white leading-tight mt-1">{info.word.display_form}</p>
-          <p className="stressed text-base text-violet-300 font-medium mt-1">{info.word.lemma}</p>
+          {/* ── Definition — most prominent ── */}
+          <p className="text-lg font-semibold text-yellow-200 leading-snug mt-1">
+            {info.word.dictionary_definition ?? <span className="text-gray-500 italic text-base font-normal">No definition yet</span>}
+          </p>
+
           <div className="my-3 border-t border-indigo-900/50" />
-          <div className="flex items-start gap-2">
-            <span className="shrink-0 text-[10px] font-mono font-medium text-indigo-500 uppercase tracking-wider mt-0.5">
-              Grammar
+
+          {/* ── Tapped word form ── */}
+          <p className="stressed text-2xl font-bold text-white leading-tight">{info.word.display_form}</p>
+
+          {/* ── POS + morphological details ── */}
+          {info.word.grammar && (() => {
+            const parts = info.word.grammar.split(',').map(s => s.trim())
+            const pos = parts[0]
+            const detail = parts.slice(1).join(' · ')
+            return (
+              <div className="mt-2 flex flex-wrap items-baseline gap-2">
+                <span className="rounded-md bg-indigo-900/50 px-2 py-0.5 text-[11px] font-semibold text-indigo-300 uppercase tracking-wide">
+                  {pos}
+                </span>
+                {detail && (
+                  <span className="text-xs text-gray-400">{detail}</span>
+                )}
+              </div>
+            )
+          })()}
+
+          {/* ── Nominative / infinitive (lemma) ── */}
+          <p className="text-sm text-violet-300 font-medium mt-2">
+            <span className="text-[10px] font-mono text-gray-600 uppercase tracking-wide mr-1.5">
+              {info.word.grammar?.startsWith('Verb') ? 'infinitive' : 'nominative'}
             </span>
-            <p className="text-gray-300 text-xs leading-snug">{info.word.grammar ?? 'Unknown'}</p>
-          </div>
-          <div className="flex items-start gap-2 mt-2">
-            <span className="shrink-0 text-[10px] font-mono font-medium text-indigo-500 uppercase tracking-wider mt-0.5">
-              Meaning
-            </span>
-            <p className="text-yellow-200 text-sm font-medium leading-snug">
-              {info.word.dictionary_definition ?? 'No dictionary definition yet'}
-            </p>
-          </div>
+            {info.word.lemma}
+          </p>
         </>
       ) : (
         <>
-          <p className="stressed text-white text-lg font-semibold leading-snug mt-1">{info.line.original_line}</p>
-          <div className="my-3 border-t border-indigo-900/50" />
-          <p className="text-indigo-200 text-sm leading-relaxed">
+          <p className="text-indigo-200 text-lg font-semibold leading-snug mt-1">
             {info.line.translation || 'No translation available for this line yet'}
           </p>
+          <div className="my-3 border-t border-indigo-900/50" />
+          <p className="stressed text-white text-sm leading-relaxed opacity-70">{info.line.original_line}</p>
         </>
       )}
     </div>

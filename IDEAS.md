@@ -12,5 +12,6 @@ Final UI Ideas:
 - (IMPLEMENTED) Difference between ui details:
     - On desktop/web/ipad word indexes (indicating which key will trigger which word)are displayed. on iphone only lyrics and circles on left side.
     - Only on the phone info opens over the lyrics, on other platforms on the side.
-- Choose the background color of the lyrics from the album cover, could either be average or most dominant color in it. Choose a darker tone as a background color and choose a light equivalent for font color.
-- Exclude most obvious words from indexing, such as nominative pronouns and prepositions, or words like и, или, но, а, б, что. But they should still be clickable.
+- (IMPLEMENTED) Choose the background color of the lyrics from the album cover, could either be average or most dominant color in it. Choose a darker tone as a background color and choose a light equivalent for font color.
+- (IMPLEMENTED) Exclude most obvious words from indexing, such as nominative pronouns and prepositions, or words like и, или, но, а, б, что. But they should still be clickable.
+- Make definition of the word in lookup layout larger and immediate and larger, next type, declension or verb info.

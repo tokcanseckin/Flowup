@@ -35,7 +35,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from fastapi import Depends, FastAPI, Header, HTTPException
+from fastapi import Depends, FastAPI, Header, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
@@ -44,12 +44,16 @@ from database import Line, Playlist, PlaylistSong, Song, User, Word, create_tabl
 from models import (
     AdminLyricsUpdate,
     AdminSongDetailResponse,
+    AdminSourceLyricsUpdate,
+    AdminSourceLineUpdate,
     AdminUserResponse,
     AdminUserUpdate,
     AdminSongUpdate,
+    SourceLinesResponse,
     BulkSongSourcesUpdate,
     CompleteOnboardingRequest,
     CredentialLoginRequest,
+    GoogleLoginRequest,
     LanguageIngest,
     LanguageResponse,
     LineResponse,
@@ -71,6 +75,7 @@ from models import (
 )
 from openrussian import ensure_loaded as _load_or, lookup as _or_lookup
 from spotify_auth import fetch_spotify_user, refresh_access_token
+from google_auth import verify_google_id_token
 
 
 # ── Startup ────────────────────────────────────────────────────────────────────
@@ -80,6 +85,7 @@ async def lifespan(app: FastAPI):
     create_tables()
     _seed_sample_data()
     _ensure_admin_user()
+    _ensure_spotify_enabled_users()
     # Pre-load OpenRussian index in a thread. If it fails, keep API alive.
     loop = asyncio.get_event_loop()
     try:
@@ -139,6 +145,23 @@ def _ensure_admin_user() -> None:
         db.close()
 
 
+def _ensure_spotify_enabled_users() -> None:
+    """Grant spotify_enabled=1 to emails listed in FLOWUP_SPOTIFY_ENABLED_EMAILS."""
+    raw = os.environ.get("FLOWUP_SPOTIFY_ENABLED_EMAILS", "")
+    emails = [e.strip().lower() for e in raw.split(",") if e.strip()]
+    if not emails:
+        return
+    db = next(get_db())
+    try:
+        for email in emails:
+            user = db.query(User).filter(User.email == email).first()
+            if user:
+                user.spotify_enabled = 1
+        db.commit()
+    finally:
+        db.close()
+
+
 app = FastAPI(title="FlowUp API", version="0.2.0", lifespan=lifespan)
 
 app.add_middleware(
@@ -170,7 +193,8 @@ def _word_response(word: Word) -> WordResponse:
     )
 
 
-def _line_response(line: Line) -> LineResponse:
+def _line_response(line: Line, override_words: Optional[list] = None) -> LineResponse:
+    words = override_words if override_words is not None else line.words
     return LineResponse(
         id=line.id,
         position=line.position,
@@ -179,11 +203,27 @@ def _line_response(line: Line) -> LineResponse:
         original_line=line.original_line,
         phonetic_line=line.phonetic_line,
         translation=line.translation,
-        words=[_word_response(w) for w in line.words],
+        words=[_word_response(w) for w in words],
+        source=line.source,
     )
 
 
-def _song_detail(song: Song) -> SongDetailResponse:
+def _song_detail(song: Song, source: Optional[str] = None) -> SongDetailResponse:
+    default_lines = [l for l in song.lines if l.source is None]
+
+    if source and source != "default":
+        source_lines = [l for l in song.lines if l.source == source]
+        if source_lines:
+            default_words_by_pos = {l.position: l.words for l in default_lines}
+            lines = [
+                _line_response(sl, override_words=default_words_by_pos.get(sl.position, []))
+                for sl in sorted(source_lines, key=lambda l: l.position)
+            ]
+        else:
+            lines = [_line_response(l) for l in default_lines]
+    else:
+        lines = [_line_response(l) for l in default_lines]
+
     return SongDetailResponse(
         id=song.id,
         spotify_uri=song.spotify_uri,
@@ -195,7 +235,7 @@ def _song_detail(song: Song) -> SongDetailResponse:
             script=song.language_script,
             direction=song.language_direction,
         ),
-        lines=[_line_response(ln) for ln in song.lines],
+        lines=lines,
         youtube_url=song.youtube_url,
         apple_music_url=song.apple_music_url,
     )
@@ -206,7 +246,17 @@ def _admin_song_detail(song: Song, db: Session) -> AdminSongDetailResponse:
         playlist_id
         for (playlist_id,) in db.query(PlaylistSong.playlist_id).filter(PlaylistSong.song_id == song.id).all()
     ]
-    return AdminSongDetailResponse(**_song_detail(song).model_dump(), playlist_ids=playlist_ids)
+    default_words_by_pos = {l.position: l.words for l in song.lines if l.source is None}
+    source_lines_map: dict[str, list[LineResponse]] = {}
+    for line in song.lines:
+        if line.source is not None:
+            lr = _line_response(line, override_words=default_words_by_pos.get(line.position, []))
+            source_lines_map.setdefault(line.source, []).append(lr)
+    source_lines = [
+        SourceLinesResponse(source=src, lines=sorted(lines, key=lambda l: l.position))
+        for src, lines in source_lines_map.items()
+    ]
+    return AdminSongDetailResponse(**_song_detail(song).model_dump(), playlist_ids=playlist_ids, source_lines=source_lines)
 
 
 def _admin_user_response(user: User) -> AdminUserResponse:
@@ -374,11 +424,11 @@ def list_songs(db: Session = Depends(get_db)):
 
 
 @app.get("/api/songs/{song_id}", response_model=SongDetailResponse)
-def get_song(song_id: int, db: Session = Depends(get_db)):
+def get_song(song_id: int, source: Optional[str] = Query(default=None), db: Session = Depends(get_db)):
     song = db.get(Song, song_id)
     if not song:
         raise HTTPException(status_code=404, detail="Song not found")
-    return _song_detail(song)
+    return _song_detail(song, source=source)
 
 
 @app.post("/api/songs", response_model=SongDetailResponse, status_code=201)
@@ -514,23 +564,63 @@ def update_admin_song(song_id: int, body: AdminSongUpdate, db: Session = Depends
 
 @app.put("/api/admin/songs/{song_id}/lyrics", response_model=AdminSongDetailResponse)
 def update_admin_song_lyrics(song_id: int, body: AdminLyricsUpdate, db: Session = Depends(get_db), _: User = Depends(_require_admin)):
+    """Update the default (Spotify-timed) lyrics in-place. Preserves word associations."""
     song = db.get(Song, song_id)
     if not song:
         raise HTTPException(status_code=404, detail="Song not found")
 
-    existing_lines = {line.id: line for line in song.lines}
+    # Only operate on default (source=None) lines so source-specific lines are untouched.
+    default_lines = {line.id: line for line in song.lines if line.source is None}
     incoming_ids = [line.id for line in body.lines]
-    if set(existing_lines.keys()) != set(incoming_ids) or len(incoming_ids) != len(set(incoming_ids)):
-        raise HTTPException(status_code=400, detail="Lyrics update must include every existing line exactly once")
+    if set(default_lines.keys()) != set(incoming_ids) or len(incoming_ids) != len(set(incoming_ids)):
+        raise HTTPException(status_code=400, detail="Lyrics update must include every default line exactly once")
 
     for line_data in body.lines:
-        line = existing_lines[line_data.id]
+        line = default_lines[line_data.id]
         line.position = line_data.position
         line.start_time_ms = line_data.start_time_ms
         line.end_time_ms = line_data.end_time_ms
         line.original_line = line_data.original_line
         line.phonetic_line = line_data.phonetic_line
         line.translation = line_data.translation
+
+    db.commit()
+    db.refresh(song)
+    return _admin_song_detail(song, db)
+
+
+@app.put("/api/admin/songs/{song_id}/source-lyrics", response_model=AdminSongDetailResponse)
+def update_source_lyrics(
+    song_id: int,
+    source: str = Query(..., description="Source key: 'youtube' or 'apple_music'"),
+    body: AdminSourceLyricsUpdate = ...,
+    db: Session = Depends(get_db),
+    _: User = Depends(_require_admin),
+):
+    """Replace all lines for a specific source (youtube / apple_music). Fully idempotent."""
+    if source in (None, "default", ""):
+        raise HTTPException(status_code=400, detail="Use PUT /lyrics for the default source")
+    song = db.get(Song, song_id)
+    if not song:
+        raise HTTPException(status_code=404, detail="Song not found")
+
+    # Delete existing source-specific lines (words cascade automatically).
+    for line in [l for l in song.lines if l.source == source]:
+        db.delete(line)
+    db.flush()
+
+    # Insert new lines. Words are not stored here — they're borrowed from default lines at read time.
+    for line_data in body.lines:
+        db.add(Line(
+            song_id=song_id,
+            source=source,
+            position=line_data.position,
+            start_time_ms=line_data.start_time_ms,
+            end_time_ms=line_data.end_time_ms,
+            original_line=line_data.original_line,
+            phonetic_line=line_data.phonetic_line,
+            translation=line_data.translation,
+        ))
 
     db.commit()
     db.refresh(song)
@@ -745,6 +835,7 @@ async def sync_user(body: UserSyncRequest, db: Session = Depends(get_db)):
         has_password=bool(user.password_hash),
         needs_onboarding=_is_onboarding_required(user),
         is_admin=bool(user.is_admin),
+        spotify_enabled=bool(user.spotify_enabled),
     )
 
 
@@ -762,6 +853,7 @@ async def login_with_credentials(body: CredentialLoginRequest, db: Session = Dep
         has_password=bool(user.password_hash),
         needs_onboarding=_is_onboarding_required(user),
         is_admin=bool(user.is_admin),
+        spotify_enabled=bool(user.spotify_enabled),
     )
 
 
@@ -794,6 +886,7 @@ async def complete_onboarding(body: CompleteOnboardingRequest, db: Session = Dep
         has_password=bool(user.password_hash),
         needs_onboarding=_is_onboarding_required(user),
         is_admin=bool(user.is_admin),
+        spotify_enabled=bool(user.spotify_enabled),
     )
 
 
@@ -841,6 +934,55 @@ async def update_user_settings(spotify_id: str, body: UserSettingsUpdate, db: Se
 
 
 # ── Auth ───────────────────────────────────────────────────────────────────────
+
+@app.post("/api/auth/google", response_model=UserResponse)
+async def login_with_google(body: GoogleLoginRequest, db: Session = Depends(get_db)):
+    """Verify a Google ID token and create/return the matching user."""
+    try:
+        claims = await verify_google_id_token(body.id_token)
+    except ValueError as exc:
+        raise HTTPException(status_code=401, detail=str(exc))
+
+    google_sub = claims["sub"]
+    email = claims["email"].strip().lower()
+    display_name = claims.get("name") or claims.get("email", "")
+
+    # Synthetic stable ID for Google users so existing settings endpoints work.
+    synthetic_id = f"google:{google_sub}"
+
+    user = db.query(User).filter(User.spotify_id == synthetic_id).first()
+    if not user:
+        # Also try matching by email in case they previously used email/password.
+        user = db.query(User).filter(User.email == email).first()
+
+    if not user:
+        user = User(
+            spotify_id=synthetic_id,
+            display_name=display_name,
+            email=email,
+        )
+        db.add(user)
+    else:
+        # Keep google synthetic_id canonical going forward.
+        if user.spotify_id != synthetic_id and not user.spotify_id.startswith("spotify:"):
+            user.spotify_id = synthetic_id
+        user.display_name = user.display_name or display_name
+        if not user.email:
+            user.email = email
+
+    db.commit()
+    db.refresh(user)
+    return UserResponse(
+        id=user.id,
+        spotify_id=user.spotify_id,
+        display_name=user.display_name,
+        email=user.email,
+        has_password=bool(user.password_hash),
+        needs_onboarding=False,
+        is_admin=bool(user.is_admin),
+        spotify_enabled=bool(user.spotify_enabled),
+    )
+
 
 @app.post("/api/auth/refresh")
 async def refresh_token_endpoint(body: dict):
