@@ -1,4 +1,4 @@
-"""SQLAlchemy models and session management for FlowUp."""
+"""SQLAlchemy models and session management for SingoLing."""
 
 from __future__ import annotations
 

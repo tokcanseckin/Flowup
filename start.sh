@@ -54,7 +54,7 @@ echo "  Frontend ready (pid $FRONTEND_PID)"
 
 # ── summary ───────────────────────────────────────────────────────────────────
 echo ""
-echo "FlowUp is running:"
+echo "SingoLing is running:"
 echo "  Backend   →  http://127.0.0.1:$BACKEND_PORT"
 echo "  Frontend  →  http://127.0.0.1:$FRONTEND_PORT"
 echo ""

@@ -128,13 +128,13 @@ def _ensure_admin_user() -> None:
         if not user:
             user = User(
                 spotify_id=admin_spotify_id,
-                display_name="FlowUp Admin",
+                display_name="SingoLing Admin",
                 email=admin_email,
                 is_admin=1,
             )
             db.add(user)
 
-        user.display_name = user.display_name or "FlowUp Admin"
+        user.display_name = user.display_name or "SingoLing Admin"
         user.email = admin_email
         user.is_admin = 1
         if not user.password_hash:
@@ -162,7 +162,7 @@ def _ensure_spotify_enabled_users() -> None:
         db.close()
 
 
-app = FastAPI(title="FlowUp API", version="0.2.0", lifespan=lifespan)
+app = FastAPI(title="SingoLing API", version="0.2.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,

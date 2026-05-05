@@ -187,7 +187,7 @@ function LoginScreen({
               </svg>
             </div>
             <h1 className="text-2xl font-bold tracking-tight text-white">
-              Flow<span className="text-indigo-400">Up</span>
+              Singo<span className="text-indigo-400">Ling</span>
             </h1>
           </div>
           <p className="text-gray-500 text-sm leading-relaxed max-w-xs mx-auto">
@@ -348,7 +348,7 @@ function OnboardingScreen({
           <>
             <h2 className="text-white font-semibold text-lg">Complete your onboarding</h2>
             <p className="text-gray-500 text-sm mt-1 leading-relaxed">
-              We need your email and a password to secure your FlowUp account.
+              We need your email and a password to secure your SingoLing account.
             </p>
             <p className="text-[11px] text-gray-600 mt-2 font-mono">Spotify ID: {spotifyId}</p>
 
@@ -523,7 +523,7 @@ function SongBrowser({
             </svg>
           </div>
           <h1 className="text-xl font-bold text-white">
-            Flow<span className="text-indigo-400">Up</span>
+            Singo<span className="text-indigo-400">Ling</span>
           </h1>
         </div>
         <div className="flex items-center gap-3">
@@ -837,10 +837,10 @@ function PlayerView({
   const logPlaybackDebug = (message: string, data?: unknown) => {
     if (!shouldLogPlaybackDebug) return
     if (data === undefined) {
-      console.debug('[FlowUp][PlayerView]', message)
+      console.debug('[SingoLing][PlayerView]', message)
       return
     }
-    console.debug('[FlowUp][PlayerView]', message, data)
+    console.debug('[SingoLing][PlayerView]', message, data)
   }
 
   // Determine which source to actually use for this song
@@ -1021,7 +1021,7 @@ function PlayerView({
               <path d="M12 3a9 9 0 100 18A9 9 0 0012 3zm-1 13V8l6 4-6 4z"/>
             </svg>
           </div>
-          <span className="font-bold text-white text-sm">Flow<span className="text-indigo-400">Up</span></span>
+          <span className="font-bold text-white text-sm">Singo<span className="text-indigo-400">Ling</span></span>
         </div>
         <div className="flex items-center gap-3">
           {isAdmin && (

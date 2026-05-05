@@ -1,4 +1,4 @@
-"""Pydantic request/response models for the FlowUp API."""
+"""Pydantic request/response models for the SingoLing API."""
 
 from __future__ import annotations
 

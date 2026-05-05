@@ -1,4 +1,4 @@
-"""Google Identity Services token verification for FlowUp.
+"""Google Identity Services token verification for SingoLing.
 
 Uses Google's tokeninfo endpoint to verify ID tokens issued by Google Sign-In.
 No extra dependencies required — only httpx (already used by spotify_auth).

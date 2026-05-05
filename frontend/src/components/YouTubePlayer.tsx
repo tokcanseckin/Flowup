@@ -53,10 +53,10 @@ function shouldLogYouTubeDebug(): boolean {
 function logYouTubeDebug(message: string, data?: unknown) {
   if (!shouldLogYouTubeDebug()) return
   if (data === undefined) {
-    console.debug('[FlowUp][YouTube]', message)
+    console.debug('[SingoLing][YouTube]', message)
     return
   }
-  console.debug('[FlowUp][YouTube]', message, data)
+  console.debug('[SingoLing][YouTube]', message, data)
 }
 
 // ── types ──────────────────────────────────────────────────────────────────────
