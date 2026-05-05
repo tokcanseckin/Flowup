@@ -269,6 +269,32 @@ export const api = {
   getAdminSong: (songId: number): Promise<AdminSongDetail> =>
     apiFetch(`/admin/songs/${songId}`, { headers: getAdminHeaders() }),
 
+  createAdminSong: (body: {
+    title: string
+    artist?: string | null
+    spotify_uri?: string | null
+    language_code?: string
+    language_name?: string
+    language_script?: string
+    language_direction?: string
+    youtube_url?: string | null
+    apple_music_url?: string | null
+    playlist_ids?: number[]
+  }): Promise<AdminSongDetail> =>
+    apiFetch('/admin/songs', {
+      method: 'POST',
+      body: JSON.stringify(body),
+      headers: getAdminHeaders(),
+    }),
+
+  deleteAdminSong: (songId: number): Promise<void> =>
+    fetch(`/api/admin/songs/${songId}`, { method: 'DELETE', headers: getAdminHeaders() }).then(async r => {
+      if (!r.ok) {
+        const body = await r.json().catch(() => ({ detail: r.statusText })) as { detail?: string }
+        throw new Error(body.detail ?? `API error ${r.status}`)
+      }
+    }),
+
   updateAdminSong: (songId: number, body: {
     title?: string
     artist?: string | null

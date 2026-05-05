@@ -244,6 +244,19 @@ class BulkSongSourcesUpdate(BaseModel):
     songs: list[BulkSongSourcesEntry]
 
 
+class AdminSongCreate(BaseModel):
+    title: str
+    artist: Optional[str] = None
+    spotify_uri: Optional[str] = None  # auto-generated (local:{uuid}) if omitted
+    language_code: str = "ru"
+    language_name: str = "Russian"
+    language_script: str = "Cyrillic"
+    language_direction: str = "ltr"
+    youtube_url: Optional[str] = None
+    apple_music_url: Optional[str] = None
+    playlist_ids: list[int] = []
+
+
 class AdminSongUpdate(BaseModel):
     title: Optional[str] = None
     artist: Optional[str] = None

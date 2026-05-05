@@ -25,6 +25,7 @@ import json
 import os
 import secrets
 import time
+import uuid
 from contextlib import asynccontextmanager
 from hashlib import pbkdf2_hmac
 from pathlib import Path
@@ -48,6 +49,7 @@ from models import (
     AdminSourceLineUpdate,
     AdminUserResponse,
     AdminUserUpdate,
+    AdminSongCreate,
     AdminSongUpdate,
     SourceLinesResponse,
     BulkSongSourcesUpdate,
@@ -508,6 +510,46 @@ def bulk_update_song_sources(body: BulkSongSourcesUpdate, db: Session = Depends(
         updated += 1
     db.commit()
     return {"updated": updated, "not_found": not_found}
+
+
+@app.post("/api/admin/songs", response_model=AdminSongDetailResponse, status_code=201)
+def create_admin_song(body: AdminSongCreate, db: Session = Depends(get_db), _: User = Depends(_require_admin)):
+    """Create a new song stub without lyrics (admin-only)."""
+    spotify_uri = (body.spotify_uri or '').strip() or f"local:{uuid.uuid4().hex}"
+    existing = db.query(Song).filter(Song.spotify_uri == spotify_uri).first()
+    if existing:
+        raise HTTPException(status_code=409, detail="spotify_uri already exists")
+    song = Song(
+        spotify_uri=spotify_uri,
+        title=body.title.strip(),
+        artist=body.artist.strip() if body.artist else None,
+        language_code=body.language_code.strip() or "ru",
+        language_name=body.language_name.strip() or "Russian",
+        language_script=body.language_script,
+        language_direction=body.language_direction,
+        youtube_url=body.youtube_url or None,
+        apple_music_url=body.apple_music_url or None,
+    )
+    db.add(song)
+    db.flush()
+    for pos, playlist_id in enumerate(body.playlist_ids):
+        pl = db.get(Playlist, playlist_id)
+        if pl:
+            clash = db.query(PlaylistSong).filter_by(playlist_id=playlist_id, song_id=song.id).first()
+            if not clash:
+                db.add(PlaylistSong(playlist_id=playlist_id, song_id=song.id, position=pos))
+    db.commit()
+    db.refresh(song)
+    return _admin_song_detail(song, db)
+
+
+@app.delete("/api/admin/songs/{song_id}", status_code=204)
+def delete_admin_song(song_id: int, db: Session = Depends(get_db), _: User = Depends(_require_admin)):
+    song = db.get(Song, song_id)
+    if not song:
+        raise HTTPException(status_code=404, detail="Song not found")
+    db.delete(song)
+    db.commit()
 
 
 @app.get("/api/admin/songs/{song_id}", response_model=AdminSongDetailResponse)
