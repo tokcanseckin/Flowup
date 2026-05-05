@@ -31,6 +31,7 @@ export interface SongLine {
   phonetic_line: string | null
   translation: string
   words: SongWord[]
+  source?: string | null
 }
 
 export interface SongSummary {
@@ -85,6 +86,7 @@ export interface BackendUser {
   has_password: boolean
   needs_onboarding: boolean
   is_admin: boolean
+  spotify_enabled: boolean
 }
 
 export interface AdminUser {
@@ -99,6 +101,7 @@ export interface AdminUser {
 
 export interface AdminSongDetail extends SongDetail {
   playlist_ids: number[]
+  source_lines: { source: string; lines: SongLine[] }[]
 }
 
 export interface UserSettings {
@@ -151,8 +154,8 @@ export const api = {
   listSongs: (): Promise<SongSummary[]> =>
     apiFetch('/songs'),
 
-  getSong: (id: number): Promise<SongDetail> =>
-    apiFetch(`/songs/${id}`),
+  getSong: (id: number, source?: string): Promise<SongDetail> =>
+    apiFetch(`/songs/${id}${source && source !== 'spotify' ? `?source=${encodeURIComponent(source)}` : ''}`),
 
   listPlaylists: (): Promise<PlaylistSummary[]> =>
     apiFetch('/playlists'),
@@ -214,6 +217,12 @@ export const api = {
     apiFetch('/auth/login', {
       method: 'POST',
       body: JSON.stringify(body),
+    }),
+
+  loginWithGoogle: (idToken: string): Promise<BackendUser> =>
+    apiFetch('/auth/google', {
+      method: 'POST',
+      body: JSON.stringify({ id_token: idToken }),
     }),
 
   completeOnboarding: (body: {
@@ -288,6 +297,24 @@ export const api = {
     apiFetch(`/admin/songs/${songId}/lyrics`, {
       method: 'PUT',
       body: JSON.stringify(body),
+      headers: getAdminHeaders(),
+    }),
+
+  updateSourceLyrics: (
+    songId: number,
+    source: string,
+    lines: Array<{
+      position: number
+      start_time_ms: number
+      end_time_ms: number
+      original_line: string
+      phonetic_line: string | null
+      translation: string
+    }>,
+  ): Promise<AdminSongDetail> =>
+    apiFetch(`/admin/songs/${songId}/source-lyrics?source=${encodeURIComponent(source)}`, {
+      method: 'PUT',
+      body: JSON.stringify({ lines }),
       headers: getAdminHeaders(),
     }),
 

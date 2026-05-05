@@ -28,6 +28,7 @@ class LineResponse(BaseModel):
     phonetic_line: Optional[str]
     translation: str
     words: list[WordResponse]
+    source: Optional[str] = None
 
     model_config = {"from_attributes": True}
 
@@ -128,6 +129,7 @@ class UserResponse(BaseModel):
     has_password: bool
     needs_onboarding: bool
     is_admin: bool
+    spotify_enabled: bool = False
 
     model_config = {"from_attributes": True}
 
@@ -163,6 +165,10 @@ class UserSyncRequest(BaseModel):
 class CredentialLoginRequest(BaseModel):
     email: str
     password: str
+
+
+class GoogleLoginRequest(BaseModel):
+    id_token: str
 
 
 class CompleteOnboardingRequest(BaseModel):
@@ -263,3 +269,22 @@ class AdminLyricsUpdate(BaseModel):
 
 class AdminSongDetailResponse(SongDetailResponse):
     playlist_ids: list[int]
+    source_lines: list["SourceLinesResponse"] = []
+
+
+class SourceLinesResponse(BaseModel):
+    source: str
+    lines: list[LineResponse]
+
+
+class AdminSourceLineUpdate(BaseModel):
+    position: int
+    start_time_ms: int
+    end_time_ms: int
+    original_line: str
+    phonetic_line: Optional[str] = None
+    translation: str
+
+
+class AdminSourceLyricsUpdate(BaseModel):
+    lines: list[AdminSourceLineUpdate]

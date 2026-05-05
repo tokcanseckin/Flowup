@@ -38,7 +38,7 @@ function describeYouTubeError(code: number): string {
       return 'YouTube error 100: Video not found or removed.'
     case 101:
     case 150:
-      return 'YouTube error 101/150: Video owner disabled embedding.'
+      return 'YouTube error 101/150: Embedding blocked. Possible causes: (1) the owner restricted embedding to specific domains — localhost is often excluded even when the "embed" option appears enabled on YouTube; (2) the video requires sign-in or is age-restricted. Try the video on a deployed domain, or use a different video.'
     default:
       return `YouTube playback error (code ${code}).`
   }
@@ -91,6 +91,7 @@ declare namespace YT {
     pauseVideo(): void
     seekTo(seconds: number, allowSeekAhead: boolean): void
     getCurrentTime?(): number
+    getPlayerState?(): number
     destroy(): void
   }
 
@@ -112,7 +113,12 @@ declare namespace YT {
   interface YTNamespace {
     Player: PlayerConstructor
     PlayerState: {
+      UNSTARTED: number
+      ENDED: number
       PLAYING: number
+      PAUSED: number
+      BUFFERING: number
+      CUED: number
     }
   }
 }
@@ -133,7 +139,10 @@ const YouTubePlayer = forwardRef<YouTubePlayerHandle, Props>(function YouTubePla
   const containerRef = useRef<HTMLDivElement>(null)
   const ytRef = useRef<YT.Player | null>(null)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const readyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const playbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [warning, setWarning] = useState<string | null>(null)
   const lastLoggedSecondRef = useRef(-1)
 
   // Expose imperative API to parent
@@ -146,6 +155,7 @@ const YouTubePlayer = forwardRef<YouTubePlayerHandle, Props>(function YouTubePla
   // Load / reload player whenever the URL changes
   useEffect(() => {
     setError(null)
+    setWarning(null)
     const videoId = extractVideoId(youtubeUrl)
     logYouTubeDebug('Player init requested', { youtubeUrl, videoId })
     if (!videoId) {
@@ -173,12 +183,24 @@ const YouTubePlayer = forwardRef<YouTubePlayerHandle, Props>(function YouTubePla
       }, 250)
     }
 
+    function clearTimers() {
+      if (readyTimerRef.current) { clearTimeout(readyTimerRef.current); readyTimerRef.current = null }
+      if (playbackTimerRef.current) { clearTimeout(playbackTimerRef.current); playbackTimerRef.current = null }
+    }
+
     function buildPlayer() {
       if (!containerRef.current) return
       logYouTubeDebug('Building iframe player', { videoId: resolvedVideoId })
       // destroy previous instance
       ytRef.current?.destroy()
       ytRef.current = null
+
+      // If onReady never fires the video likely can't be embedded at all
+      clearTimers()
+      readyTimerRef.current = setTimeout(() => {
+        setError('Player timed out — the video may not be embeddable or your connection is slow.')
+        logYouTubeDebug('Ready timeout', { videoId: resolvedVideoId })
+      }, 15_000)
 
       const div = document.createElement('div')
       containerRef.current.innerHTML = ''
@@ -187,7 +209,7 @@ const YouTubePlayer = forwardRef<YouTubePlayerHandle, Props>(function YouTubePla
       ytRef.current = new window.YT.Player(div, {
         videoId: resolvedVideoId,
         playerVars: {
-          autoplay: 1,
+          autoplay: 0,
           controls: 0,
           rel: 0,
           modestbranding: 1,
@@ -197,12 +219,31 @@ const YouTubePlayer = forwardRef<YouTubePlayerHandle, Props>(function YouTubePla
         events: {
           onReady: () => {
             logYouTubeDebug('Player ready', { videoId: resolvedVideoId })
+            // Cancel the ready-timeout — iframe loaded successfully
+            if (readyTimerRef.current) { clearTimeout(readyTimerRef.current); readyTimerRef.current = null }
             onReady?.()
             startPolling()
+            if (document.hasFocus()) {
+              ytRef.current?.playVideo()
+              // If playback doesn't start within 7 s the video is likely
+              // age-restricted, requires sign-in, or is region-blocked.
+              playbackTimerRef.current = setTimeout(() => {
+                const state = ytRef.current?.getPlayerState?.()
+                // -1 = unstarted, 5 = video cued — neither means it's playing
+                if (state === -1 || state === 5 || state === undefined) {
+                  setWarning('Video loaded but playback did not start — it may be age-restricted, require sign-in, or be region-blocked.')
+                  logYouTubeDebug('Playback stuck after ready', { videoId: resolvedVideoId, state })
+                }
+              }, 7_000)
+            }
           },
           onStateChange: (e: YT.OnStateChangeEvent) => {
-            // 1 = playing, 2 = paused
             logYouTubeDebug('State changed', { videoId: resolvedVideoId, state: e.data })
+            // Clear playback-stuck timer on any active state
+            if (e.data === 1 || e.data === 3) {
+              if (playbackTimerRef.current) { clearTimeout(playbackTimerRef.current); playbackTimerRef.current = null }
+              setWarning(null)
+            }
             onPlayStateChange?.(e.data === window.YT.PlayerState.PLAYING)
           },
           onError: (e: YT.OnErrorEvent) => {
@@ -231,6 +272,7 @@ const YouTubePlayer = forwardRef<YouTubePlayerHandle, Props>(function YouTubePla
     }
 
     return () => {
+      clearTimers()
       if (timerRef.current) clearInterval(timerRef.current)
       ytRef.current?.destroy()
       ytRef.current = null
@@ -240,7 +282,7 @@ const YouTubePlayer = forwardRef<YouTubePlayerHandle, Props>(function YouTubePla
   }, [youtubeUrl])
 
   return (
-    <div className="w-full">
+    <div className="w-full space-y-2">
       {error ? (
         <div className="rounded-xl border border-red-900/50 bg-red-950/20 px-4 py-3 text-sm text-red-400">
           {error}
@@ -250,6 +292,11 @@ const YouTubePlayer = forwardRef<YouTubePlayerHandle, Props>(function YouTubePla
           ref={containerRef}
           className="w-full aspect-video rounded-xl overflow-hidden bg-black"
         />
+      )}
+      {!error && warning && (
+        <div className="rounded-xl border border-yellow-900/50 bg-yellow-950/20 px-4 py-3 text-sm text-yellow-400">
+          {warning}
+        </div>
       )}
     </div>
   )
