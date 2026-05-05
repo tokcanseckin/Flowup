@@ -2,7 +2,8 @@
 """
 FlowUp – Multilingual Data Generation Pipeline
 
-Fetches time-synced lyrics from LRCLIB, translates via DeepL, runs
+Fetches time-synced lyrics from LRCLIB, falls back to faster-whisper forced
+alignment when only plain lyrics are available, translates via DeepL, runs
 language-specific NLP (phonetic annotation + morphological analysis),
 and writes a song_data.json file consumed by the React frontend.
 
@@ -28,9 +29,11 @@ New language backends can be added by implementing nlp.NLPBackend and
 registering an entry in LANGUAGES below.
 
 Environment variables:
-  DEEPL_API_KEY   – DeepL free-tier key (required for real translations)
-  DEEPL_URL       – Override endpoint (default: api-free.deepl.com)
-    ARGOS_AUTO_INSTALL – if "1", try to auto-download/install missing Argos model
+  DEEPL_API_KEY      – DeepL free-tier key (required for real translations)
+  DEEPL_URL          – Override endpoint (default: api-free.deepl.com)
+  ARGOS_AUTO_INSTALL – if "1", try to auto-download/install missing Argos model
+  WHISPERX_MODEL     – Whisper model size for transcription (default: tiny)
+                       Options: tiny, base, small, medium, large-v2, large-v3
 
 Usage:
   pip install -r requirements.txt
@@ -50,10 +53,13 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import difflib
 import json
 import os
 import re
+import subprocess
 import sys
+import tempfile
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -135,6 +141,8 @@ def build_arg_parser() -> argparse.ArgumentParser:
                         "When set, the processed song is also pushed to the backend database.")
     p.add_argument("--lrc-file",    dest="lrc_file", default="",
                    help="Path to a local .lrc file to use instead of fetching from LRCLIB.")
+    p.add_argument("--youtube-url", dest="youtube_url", default="",
+                   help="YouTube URL used for WhisperX alignment when synced lyrics are unavailable.")
     p.add_argument("--replace-id",  dest="replace_id", type=int, default=None,
                    help="Delete this song ID from the backend before pushing the re-processed version.")
     return p
@@ -167,10 +175,174 @@ def parse_lrc(text: str, offset_ms: int = 0) -> list[dict]:
         rows[-1]["end_ms"] = rows[-1]["start_ms"] + 4_000
     return rows
 
+
+def _format_lrc_timestamp(ms: int) -> str:
+    total_ms = max(0, ms)
+    minutes = total_ms // 60_000
+    seconds = (total_ms % 60_000) // 1_000
+    centiseconds = (total_ms % 1_000) // 10
+    return f"{minutes:02}:{seconds:02}.{centiseconds:02}"
+
+
+def rows_to_lrc(rows: list[dict]) -> str:
+    return "\n".join(f"[{_format_lrc_timestamp(row['start_ms'])}]{row['text']}" for row in rows)
+
+
+def _normalize_plain_lyrics(text: str) -> list[str]:
+    """Strip blank lines and section markers like [Chorus], [Verse 1], etc."""
+    lines: list[str] = []
+    for raw_line in text.splitlines():
+        line = raw_line.strip()
+        if not line:
+            continue
+        if re.match(r"^\[[^\]]+\]$", line):
+            continue
+        lines.append(line)
+    return lines
+
+
+def _map_lyrics_to_timestamps(lyric_lines: list[str], word_data: list[dict]) -> list[dict]:
+    """Map plain lyrics lines to timestamps using difflib sequence alignment.
+
+    word_data is a list of {word: str, start_ms: int} dicts from WhisperX.
+    Returns a list of {start_ms, end_ms, text} dicts.
+    """
+    def _norm(w: str) -> str:
+        return re.sub(r"[^\w]", "", w, flags=re.UNICODE).lower()
+
+    transcribed_words = [_norm(w["word"]) for w in word_data]
+    lyric_word_lists = [[_norm(w) for w in line.split() if _norm(w)] for line in lyric_lines]
+    lyric_flat = [w for wlist in lyric_word_lists for w in wlist]
+
+    # Find matching blocks between flattened lyric words and transcribed words
+    matcher = difflib.SequenceMatcher(None, lyric_flat, transcribed_words, autojunk=False)
+    lyric_to_trans: dict[int, int] = {}
+    for block in matcher.get_matching_blocks():
+        for offset in range(block.size):
+            lyric_to_trans[block.a + offset] = block.b + offset
+
+    rows: list[dict] = []
+    lyric_word_idx = 0
+    for line, wlist in zip(lyric_lines, lyric_word_lists):
+        start_ms: int | None = None
+        for i in range(len(wlist)):
+            trans_idx = lyric_to_trans.get(lyric_word_idx + i)
+            if trans_idx is not None:
+                start_ms = word_data[trans_idx]["start_ms"]
+                break
+        if start_ms is None:
+            start_ms = (rows[-1]["start_ms"] + 3_000) if rows else 0
+        rows.append({"start_ms": start_ms, "text": line})
+        lyric_word_idx += len(wlist)
+
+    for i in range(len(rows) - 1):
+        rows[i]["end_ms"] = rows[i + 1]["start_ms"]
+    if rows:
+        rows[-1]["end_ms"] = rows[-1]["start_ms"] + 4_000
+    return rows
+
+
+def align_with_whisperx(plain_lyrics: str, youtube_url: str, lang_code: str) -> str | None:
+    """Download audio via yt-dlp then use faster-whisper to force-align plain lyrics.
+
+    Transcribes the audio with word-level timestamps, then maps each plain
+    lyrics line to the start time of its first matching transcribed word via
+    difflib sequence alignment.  Returns an LRC string or None on failure.
+    """
+    if not youtube_url:
+        print("  [WhisperX] Skipping: no YouTube URL provided.")
+        return None
+
+    lyric_lines = _normalize_plain_lyrics(plain_lyrics)
+    if not lyric_lines:
+        print("  [WhisperX] Skipping: no usable lyric lines.")
+        return None
+
+    try:
+        from faster_whisper import WhisperModel  # type: ignore[import-untyped]
+    except ImportError as exc:
+        print(f"  [WhisperX] faster-whisper not available ({exc}). Run: pip install faster-whisper")
+        return None
+
+    model_name = os.environ.get("WHISPERX_MODEL", "tiny")
+    device = "cpu"
+    try:
+        import torch
+        if torch.cuda.is_available():
+            device = "cuda"
+    except ImportError:
+        pass
+    compute_type = "float16" if device == "cuda" else "int8"
+
+    with tempfile.TemporaryDirectory(prefix="singoling-wx-") as tmp_dir:
+        tmp_path = Path(tmp_dir)
+        audio_path = tmp_path / "audio.mp3"
+
+        # Step 1: Download audio
+        print("  [WhisperX] Downloading audio via yt-dlp …")
+        dl = subprocess.run(
+            [
+                sys.executable, "-m", "yt_dlp",
+                "-x", "--audio-format", "mp3",
+                "-o", str(tmp_path / "audio.%(ext)s"),
+                youtube_url,
+            ],
+            capture_output=True,
+            text=True,
+            timeout=180,
+            check=False,
+        )
+        if dl.returncode != 0 or not audio_path.exists():
+            print(f"  [WhisperX] Download failed: {(dl.stderr or dl.stdout).strip()[:400]}")
+            return None
+
+        # Step 2: Transcribe with word-level timestamps
+        print(f"  [WhisperX] Loading model '{model_name}' and transcribing ({device}) …")
+        try:
+            model = WhisperModel(model_name, device=device, compute_type=compute_type)
+            segments_iter, _ = model.transcribe(
+                str(audio_path),
+                language=lang_code,
+                word_timestamps=True,
+            )
+            segments = list(segments_iter)
+        except Exception as exc:
+            print(f"  [WhisperX] Transcription failed: {exc}")
+            return None
+
+        # Step 3: Collect word timestamps
+        word_data: list[dict] = []
+        for seg in segments:
+            if seg.words:
+                for w in seg.words:
+                    word_data.append({
+                        "word": w.word.strip(),
+                        "start_ms": int(w.start * 1_000),
+                    })
+            else:
+                # Segment without word timestamps — use segment as a unit
+                word_data.append({
+                    "word": seg.text.strip(),
+                    "start_ms": int(seg.start * 1_000),
+                })
+
+        if not word_data:
+            print("  [WhisperX] No timestamps produced.")
+            return None
+
+        # Step 4: Map plain lyrics lines to word timestamps
+        rows = _map_lyrics_to_timestamps(lyric_lines, word_data)
+        if not rows:
+            print("  [WhisperX] Could not map lyrics to timestamps.")
+            return None
+
+        print(f"  [WhisperX] Aligned {len(rows)} lyric lines.")
+        return rows_to_lrc(rows)
+
+
 # ── LRCLIB ────────────────────────────────────────────────────────────────────
 
-def fetch_synced_lyrics(artist: str, title: str) -> str | None:
-    print(f"  [LRCLIB] Searching '{title}' by '{artist}' …")
+def _fetch_lrclib_candidate(artist: str, title: str) -> dict | None:
     try:
         r = requests.get(
             "https://lrclib.net/api/search",
@@ -179,22 +351,40 @@ def fetch_synced_lyrics(artist: str, title: str) -> str | None:
         )
         r.raise_for_status()
         for hit in r.json():
-            if hit.get("syncedLyrics"):
-                print(f"  [LRCLIB] Found (id={hit['id']}, title={hit.get('trackName', '?')})")
-                return hit["syncedLyrics"]
+            if hit.get("syncedLyrics") or hit.get("plainLyrics"):
+                return hit
 
         r2 = requests.get(
             "https://lrclib.net/api/get",
             params={"artist_name": artist, "track_name": title},
             timeout=12,
         )
-        if r2.status_code == 200 and r2.json().get("syncedLyrics"):
-            print("  [LRCLIB] Found via exact-match endpoint.")
-            return r2.json()["syncedLyrics"]
-
-        print("  [LRCLIB] No synced lyrics found.")
+        if r2.status_code == 200:
+            body = r2.json()
+            if isinstance(body, dict) and (body.get("syncedLyrics") or body.get("plainLyrics")):
+                return body
     except requests.RequestException as exc:
         print(f"  [LRCLIB] Network error: {exc}")
+    return None
+
+def fetch_synced_lyrics(artist: str, title: str) -> str | None:
+    print(f"  [LRCLIB] Searching '{title}' by '{artist}' …")
+    candidate = _fetch_lrclib_candidate(artist, title)
+    if candidate and candidate.get("syncedLyrics"):
+        print(f"  [LRCLIB] Found (id={candidate.get('id', '?')}, title={candidate.get('trackName', '?')})")
+        return candidate["syncedLyrics"]
+    if candidate:
+        print("  [LRCLIB] No synced lyrics found.")
+    return None
+
+
+def fetch_plain_lyrics(artist: str, title: str) -> str | None:
+    print(f"  [LRCLIB] Looking for plain lyrics for '{title}' by '{artist}' …")
+    candidate = _fetch_lrclib_candidate(artist, title)
+    if candidate and candidate.get("plainLyrics"):
+        print("  [LRCLIB] Found plain lyrics.")
+        return candidate["plainLyrics"]
+    print("  [LRCLIB] No plain lyrics found.")
     return None
 
 
@@ -509,8 +699,14 @@ def main() -> None:
     else:
         print("\n[1/5] Fetching lyrics from LRCLIB …")
         lrc = fetch_synced_lyrics(args.artist, args.title)
+        if lrc is None:
+            plain_lyrics = fetch_plain_lyrics(args.artist, args.title)
+            if plain_lyrics and args.youtube_url:
+                print("  [WhisperX] Falling back to forced alignment …")
+                lrc = align_with_whisperx(plain_lyrics, args.youtube_url, args.lang)
     if lrc is None:
         print("ERROR: Could not retrieve synced lyrics. Aborting.")
+        print("TIP:   Provide --youtube-url and install whisperx to align plain lyrics.")
         print("TIP:   Pass --lrc-file <path> to use a local .lrc file as a fallback.")
         sys.exit(1)
     rows = parse_lrc(lrc, args.offset_ms)
