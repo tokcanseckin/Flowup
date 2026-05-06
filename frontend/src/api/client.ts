@@ -114,7 +114,7 @@ export interface UserSettings {
 
 const ADMIN_SESSION_KEY = 'flowup.admin.basic.v1'
 
-function getAdminHeaders(): HeadersInit {
+export function getAdminHeaders(): HeadersInit {
   if (typeof window === 'undefined') return {}
   const encoded = window.sessionStorage.getItem(ADMIN_SESSION_KEY)
   return encoded ? { Authorization: `Basic ${encoded}` } : {}

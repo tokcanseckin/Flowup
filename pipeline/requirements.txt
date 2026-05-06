@@ -1,10 +1,9 @@
 # ── Always required ───────────────────────────────────────────────────────────
 requests>=2.31.0
 
-# ── WhisperX forced alignment fallback ────────────────────────────────────────
-# Used when LRCLIB has no synced lyrics but plain lyrics exist + a YouTube URL.
-# faster-whisper is the Python 3.14-compatible alternative to whisperx.
-faster-whisper>=1.0.0
+# ── Audio download for forced alignment fallback ─────────────────────────────
+# Forced alignment now uses Aeneas in a separate Python environment
+# (configured via AENEAS_PYTHON_EXECUTABLE), so only yt-dlp is required here.
 yt-dlp>=2026.3.17
 
 # ── Offline sentence translation fallback ─────────────────────────────────────

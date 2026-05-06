@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
-import { AdminSongDetail, AdminUser, PlaylistDetail, PlaylistSummary, SongSummary, api } from '../api/client'
+import { AdminSongDetail, AdminUser, PlaylistDetail, PlaylistSummary, SongSummary, api, getAdminHeaders } from '../api/client'
 import SyncCalibrator from './SyncCalibrator'
 
 interface Props {
@@ -130,6 +130,11 @@ export default function AdminPanel({
   const [newSongDraft, setNewSongDraft] = useState<NewSongDraft>(emptyNewSongDraft())
   const [newSongSaving, setNewSongSaving] = useState(false)
   const [newSongError, setNewSongError] = useState<string | null>(null)
+
+  const [regenRunning, setRegenRunning] = useState(false)
+  const [regenLog, setRegenLog] = useState<string[]>([])
+  const [regenError, setRegenError] = useState<string | null>(null)
+  const regenLogRef = useRef<HTMLDivElement>(null)
 
   const [playlistDetail, setPlaylistDetail] = useState<PlaylistDetail | null>(null)
   const [playlistDraft, setPlaylistDraft] = useState<PlaylistDraft>(emptyPlaylistDraft())
@@ -420,6 +425,69 @@ export default function AdminPanel({
       setSongSaving(false)
     }
   }, [onNavigateRoute, onRefreshPlaylists, onRefreshSongs, selectedSongId, songs])
+
+  useEffect(() => {
+    if (regenLogRef.current) {
+      regenLogRef.current.scrollTop = regenLogRef.current.scrollHeight
+    }
+  }, [regenLog])
+
+  const handleRegenerate = useCallback(async () => {
+    if (!selectedSongId) return
+    setRegenRunning(true)
+    setRegenLog([])
+    setRegenError(null)
+    try {
+      const resp = await fetch(`/api/admin/songs/${selectedSongId}/regenerate`, {
+        method: 'POST',
+        headers: getAdminHeaders(),
+      })
+      if (!resp.ok || !resp.body) {
+        const body = await resp.json().catch(() => ({ detail: resp.statusText })) as { detail?: string }
+        setRegenError(body.detail ?? `Error ${resp.status}`)
+        return
+      }
+      const reader = resp.body.getReader()
+      const decoder = new TextDecoder()
+      let buffer = ''
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+        buffer += decoder.decode(value, { stream: true })
+        const chunks = buffer.split('\n\n')
+        buffer = chunks.pop() ?? ''
+        for (const chunk of chunks) {
+          let eventType = 'message'
+          let dataLine = ''
+          for (const row of chunk.split('\n')) {
+            if (row.startsWith('event: ')) eventType = row.slice(7).trim()
+            else if (row.startsWith('data: ')) dataLine = row.slice(6)
+          }
+          if (eventType === 'done') {
+            try {
+              const detail = JSON.parse(dataLine) as AdminSongDetail
+              setAdminSong(detail)
+              const srcEntry = detail.source_lines.find(s => s.source === lyricsSource)
+              const lines = lyricsSource === 'default' ? detail.lines : (srcEntry?.lines ?? detail.lines)
+              setLyricsDraft(lines.map(l => ({ ...l })))
+              setRegenLog(prev => [...prev, '✓ Lyrics updated successfully.'])
+            } catch {
+              setRegenError('Failed to parse updated song data')
+            }
+          } else if (eventType === 'error') {
+            setRegenError(dataLine)
+            setRegenLog(prev => [...prev, `✗ Error: ${dataLine}`])
+          } else if (dataLine) {
+            setRegenLog(prev => [...prev, dataLine])
+          }
+        }
+      }
+    } catch (err) {
+      setRegenError(err instanceof Error ? err.message : 'Unknown error')
+    } finally {
+      setRegenRunning(false)
+    }
+  }, [selectedSongId, lyricsSource])
 
   const handleSaveSong = useCallback(async () => {
     if (!selectedSongId || !songDraft) return
@@ -782,11 +850,29 @@ export default function AdminPanel({
                       <p className="text-xs text-gray-500">Metadata, source URLs, and playlist membership.</p>
                     </div>
                     <div className="flex gap-2">
+                      <button type="button" onClick={() => void handleRegenerate()} disabled={!selectedSongId || regenRunning || songSaving} className="rounded-xl border border-amber-700/60 bg-amber-950/20 px-4 py-2 text-sm font-semibold text-amber-300 hover:bg-amber-950/40 disabled:border-gray-800 disabled:text-gray-500">{regenRunning ? 'Running...' : 'Regenerate Lyrics'}</button>
                       <button type="button" onClick={() => void handleSaveSong()} disabled={!selectedSongId || !songDraft || songSaving} className="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:bg-gray-800 disabled:text-gray-500">{songSaving ? 'Saving...' : 'Save Song'}</button>
                       <button type="button" onClick={() => void handleDeleteSong()} disabled={!selectedSongId || songSaving} className="rounded-xl border border-red-900/60 px-4 py-2 text-sm font-semibold text-red-300 hover:bg-red-950/30 disabled:border-gray-800 disabled:text-gray-600">Delete</button>
                     </div>
                   </div>
                   {songError && <div className="mb-4 rounded-xl border border-red-900/50 bg-red-950/20 px-4 py-3 text-sm text-red-400">{songError}</div>}
+                  {regenError && <div className="mb-4 rounded-xl border border-amber-900/50 bg-amber-950/20 px-4 py-3 text-sm text-amber-400">{regenError}</div>}
+                  {(regenRunning || regenLog.length > 0) && (
+                    <div
+                      ref={regenLogRef}
+                      className="mb-4 max-h-48 overflow-y-auto rounded-xl border border-gray-800 bg-gray-950/60 p-3 font-mono text-xs space-y-0.5"
+                    >
+                      {regenLog.map((line, i) => (
+                        <div
+                          key={i}
+                          className={line.startsWith('✓') ? 'text-emerald-400' : line.startsWith('✗') ? 'text-red-400' : 'text-gray-400'}
+                        >
+                          {line}
+                        </div>
+                      ))}
+                      {regenRunning && <div className="text-indigo-400 animate-pulse">Running pipeline…</div>}
+                    </div>
+                  )}
                   {songLoading || !songDraft ? (
                     <div className="py-10 text-sm text-gray-500">Loading song editor...</div>
                   ) : (

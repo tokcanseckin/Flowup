@@ -2,7 +2,7 @@
 """
 FlowUp – Multilingual Data Generation Pipeline
 
-Fetches time-synced lyrics from LRCLIB, falls back to faster-whisper forced
+Fetches time-synced lyrics from LRCLIB, falls back to Aeneas forced
 alignment when only plain lyrics are available, translates via DeepL, runs
 language-specific NLP (phonetic annotation + morphological analysis),
 and writes a song_data.json file consumed by the React frontend.
@@ -32,8 +32,11 @@ Environment variables:
   DEEPL_API_KEY      – DeepL free-tier key (required for real translations)
   DEEPL_URL          – Override endpoint (default: api-free.deepl.com)
   ARGOS_AUTO_INSTALL – if "1", try to auto-download/install missing Argos model
-  WHISPERX_MODEL     – Whisper model size for transcription (default: tiny)
-                       Options: tiny, base, small, medium, large-v2, large-v3
+    AENEAS_PYTHON_EXECUTABLE – Python executable for the separate Aeneas env
+                                                         (required for forced alignment fallback)
+    AENEAS_TASK_LANGUAGE – Override Aeneas task language (default: mapped from --lang)
+    AENEAS_TASK_CONFIG – Full Aeneas task config override (advanced)
+  YOUTUBE_COOKIES_FILE – Path to Netscape-format cookies file for yt-dlp (bypasses bot detection)
 
 Usage:
   pip install -r requirements.txt
@@ -53,7 +56,6 @@ Usage:
 from __future__ import annotations
 
 import argparse
-import difflib
 import json
 import os
 import re
@@ -142,7 +144,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     p.add_argument("--lrc-file",    dest="lrc_file", default="",
                    help="Path to a local .lrc file to use instead of fetching from LRCLIB.")
     p.add_argument("--youtube-url", dest="youtube_url", default="",
-                   help="YouTube URL used for WhisperX alignment when synced lyrics are unavailable.")
+                   help="YouTube URL used for Aeneas alignment when synced lyrics are unavailable.")
     p.add_argument("--replace-id",  dest="replace_id", type=int, default=None,
                    help="Delete this song ID from the backend before pushing the re-processed version.")
     return p
@@ -201,142 +203,162 @@ def _normalize_plain_lyrics(text: str) -> list[str]:
     return lines
 
 
-def _map_lyrics_to_timestamps(lyric_lines: list[str], word_data: list[dict]) -> list[dict]:
-    """Map plain lyrics lines to timestamps using difflib sequence alignment.
-
-    word_data is a list of {word: str, start_ms: int} dicts from WhisperX.
-    Returns a list of {start_ms, end_ms, text} dicts.
-    """
-    def _norm(w: str) -> str:
-        return re.sub(r"[^\w]", "", w, flags=re.UNICODE).lower()
-
-    transcribed_words = [_norm(w["word"]) for w in word_data]
-    lyric_word_lists = [[_norm(w) for w in line.split() if _norm(w)] for line in lyric_lines]
-    lyric_flat = [w for wlist in lyric_word_lists for w in wlist]
-
-    # Find matching blocks between flattened lyric words and transcribed words
-    matcher = difflib.SequenceMatcher(None, lyric_flat, transcribed_words, autojunk=False)
-    lyric_to_trans: dict[int, int] = {}
-    for block in matcher.get_matching_blocks():
-        for offset in range(block.size):
-            lyric_to_trans[block.a + offset] = block.b + offset
-
-    rows: list[dict] = []
-    lyric_word_idx = 0
-    for line, wlist in zip(lyric_lines, lyric_word_lists):
-        start_ms: int | None = None
-        for i in range(len(wlist)):
-            trans_idx = lyric_to_trans.get(lyric_word_idx + i)
-            if trans_idx is not None:
-                start_ms = word_data[trans_idx]["start_ms"]
-                break
-        if start_ms is None:
-            start_ms = (rows[-1]["start_ms"] + 3_000) if rows else 0
-        rows.append({"start_ms": start_ms, "text": line})
-        lyric_word_idx += len(wlist)
-
-    for i in range(len(rows) - 1):
-        rows[i]["end_ms"] = rows[i + 1]["start_ms"]
-    if rows:
-        rows[-1]["end_ms"] = rows[-1]["start_ms"] + 4_000
-    return rows
+_AENEAS_TASK_LANG: dict[str, str] = {
+    "ar": "ara",
+    "de": "deu",
+    "en": "eng",
+    "es": "spa",
+    "fr": "fra",
+    "he": "heb",
+    "it": "ita",
+    "ja": "jpn",
+    "ko": "kor",
+    "nl": "nld",
+    "pl": "pol",
+    "pt": "por",
+    "ru": "rus",
+    "sv": "swe",
+    "tr": "tur",
+    "uk": "ukr",
+    "zh": "cmn",
+}
 
 
-def align_with_whisperx(plain_lyrics: str, youtube_url: str, lang_code: str) -> str | None:
-    """Download audio via yt-dlp then use faster-whisper to force-align plain lyrics.
+def align_with_aeneas(plain_lyrics: str, youtube_url: str, lang_code: str) -> str | None:
+    """Download audio via yt-dlp and align plain lyrics using Aeneas.
 
-    Transcribes the audio with word-level timestamps, then maps each plain
-    lyrics line to the start time of its first matching transcribed word via
-    difflib sequence alignment.  Returns an LRC string or None on failure.
+    Aeneas runs in a dedicated Python environment specified by
+    AENEAS_PYTHON_EXECUTABLE.
     """
     if not youtube_url:
-        print("  [WhisperX] Skipping: no YouTube URL provided.")
+        print("  [Aeneas] Skipping: no YouTube URL provided.")
         return None
 
     lyric_lines = _normalize_plain_lyrics(plain_lyrics)
     if not lyric_lines:
-        print("  [WhisperX] Skipping: no usable lyric lines.")
+        print("  [Aeneas] Skipping: no usable lyric lines.")
         return None
 
-    try:
-        from faster_whisper import WhisperModel  # type: ignore[import-untyped]
-    except ImportError as exc:
-        print(f"  [WhisperX] faster-whisper not available ({exc}). Run: pip install faster-whisper")
+    aeneas_python = os.environ.get("AENEAS_PYTHON_EXECUTABLE", "").strip()
+    if not aeneas_python:
+        print("  [Aeneas] Skipping: AENEAS_PYTHON_EXECUTABLE is not set.")
+        return None
+    if not Path(aeneas_python).exists():
+        print(f"  [Aeneas] Skipping: executable not found: {aeneas_python}")
         return None
 
-    model_name = os.environ.get("WHISPERX_MODEL", "tiny")
-    device = "cpu"
-    try:
-        import torch
-        if torch.cuda.is_available():
-            device = "cuda"
-    except ImportError:
-        pass
-    compute_type = "float16" if device == "cuda" else "int8"
+    task_lang = os.environ.get("AENEAS_TASK_LANGUAGE", _AENEAS_TASK_LANG.get(lang_code, "")).strip()
+    if not task_lang:
+        print(f"  [Aeneas] Unsupported language for fallback alignment: {lang_code}")
+        return None
 
-    with tempfile.TemporaryDirectory(prefix="singoling-wx-") as tmp_dir:
+    task_cfg = os.environ.get(
+        "AENEAS_TASK_CONFIG",
+        f"task_language={task_lang}|is_text_type=plain|os_task_file_format=json",
+    ).strip()
+
+    with tempfile.TemporaryDirectory(prefix="singoling-aeneas-") as tmp_dir:
         tmp_path = Path(tmp_dir)
         audio_path = tmp_path / "audio.mp3"
+        audio_small_path = tmp_path / "audio_16k.wav"
+        text_path = tmp_path / "lyrics.txt"
+        syncmap_path = tmp_path / "syncmap.json"
 
-        # Step 1: Download audio
-        print("  [WhisperX] Downloading audio via yt-dlp …")
+        print("  [Aeneas] Downloading audio via yt-dlp …")
+        yt_cmd = [
+            sys.executable, "-m", "yt_dlp",
+            "--remote-components", "ejs:github",
+            "--js-runtimes", "node:/usr/bin/node",
+            "--extractor-args", "youtube:player_client=web",
+            "-f", "bestaudio[acodec!=none]/best[acodec!=none]",
+            "-x", "--audio-format", "mp3",
+            "-o", str(tmp_path / "audio.%(ext)s"),
+        ]
+        cookies_file = os.environ.get("YOUTUBE_COOKIES_FILE", "")
+        if cookies_file and Path(cookies_file).exists():
+            yt_cmd += ["--cookies", cookies_file]
+            print(f"  [Aeneas] Using cookies from {cookies_file}")
+        yt_cmd.append(youtube_url)
         dl = subprocess.run(
-            [
-                sys.executable, "-m", "yt_dlp",
-                "-x", "--audio-format", "mp3",
-                "-o", str(tmp_path / "audio.%(ext)s"),
-                youtube_url,
-            ],
+            yt_cmd,
             capture_output=True,
             text=True,
             timeout=180,
             check=False,
         )
         if dl.returncode != 0 or not audio_path.exists():
-            print(f"  [WhisperX] Download failed: {(dl.stderr or dl.stdout).strip()[:400]}")
+            print(f"  [Aeneas] Download failed: {(dl.stderr or dl.stdout).strip()[:400]}")
             return None
 
-        # Step 2: Transcribe with word-level timestamps
-        print(f"  [WhisperX] Loading model '{model_name}' and transcribing ({device}) …")
+        # Downsample to 16kHz mono WAV — Aeneas runs much faster on smaller audio
+        print("  [Aeneas] Downsampling audio to 16kHz mono …")
+        ff = subprocess.run(
+            ["ffmpeg", "-y", "-i", str(audio_path), "-ar", "16000", "-ac", "1", str(audio_small_path)],
+            capture_output=True,
+            text=True,
+            timeout=60,
+            check=False,
+        )
+        if ff.returncode == 0 and audio_small_path.exists():
+            aeneas_audio = audio_small_path
+        else:
+            print("  [Aeneas] ffmpeg downsample failed, using original audio")
+            aeneas_audio = audio_path
+
+        text_path.write_text("\n".join(lyric_lines), encoding="utf-8")
+
+        print(f"  [Aeneas] Aligning with task language '{task_lang}' …")
+        align_cmd = [
+            aeneas_python,
+            "-m",
+            "aeneas.tools.execute_task",
+            str(aeneas_audio),
+            str(text_path),
+            task_cfg,
+            str(syncmap_path),
+        ]
+        run = subprocess.run(
+            align_cmd,
+            capture_output=True,
+            text=True,
+            timeout=600,
+            check=False,
+        )
+        if run.returncode != 0 or not syncmap_path.exists():
+            print(f"  [Aeneas] Alignment failed: {(run.stderr or run.stdout).strip()[:500]}")
+            return None
+
         try:
-            model = WhisperModel(model_name, device=device, compute_type=compute_type)
-            segments_iter, _ = model.transcribe(
-                str(audio_path),
-                language=lang_code,
-                word_timestamps=True,
-            )
-            segments = list(segments_iter)
-        except Exception as exc:
-            print(f"  [WhisperX] Transcription failed: {exc}")
+            payload = json.loads(syncmap_path.read_text(encoding="utf-8"))
+            fragments = payload.get("fragments", [])
+        except (json.JSONDecodeError, OSError) as exc:
+            print(f"  [Aeneas] Could not read sync map: {exc}")
             return None
 
-        # Step 3: Collect word timestamps
-        word_data: list[dict] = []
-        for seg in segments:
-            if seg.words:
-                for w in seg.words:
-                    word_data.append({
-                        "word": w.word.strip(),
-                        "start_ms": int(w.start * 1_000),
-                    })
-            else:
-                # Segment without word timestamps — use segment as a unit
-                word_data.append({
-                    "word": seg.text.strip(),
-                    "start_ms": int(seg.start * 1_000),
-                })
+        rows: list[dict] = []
+        for frag in fragments:
+            lines = frag.get("lines") or []
+            text = " ".join(str(x).strip() for x in lines if str(x).strip())
+            if not text:
+                continue
+            try:
+                begin_ms = int(float(frag.get("begin", "0")) * 1000)
+                end_ms = int(float(frag.get("end", "0")) * 1000)
+            except (TypeError, ValueError):
+                continue
+            if end_ms <= begin_ms:
+                end_ms = begin_ms + 200
+            rows.append({"start_ms": begin_ms, "end_ms": end_ms, "text": text})
 
-        if not word_data:
-            print("  [WhisperX] No timestamps produced.")
+        if len(rows) != len(lyric_lines):
+            print(f"  [Aeneas] Rejected: aligned {len(rows)} lines, expected {len(lyric_lines)}.")
             return None
 
-        # Step 4: Map plain lyrics lines to word timestamps
-        rows = _map_lyrics_to_timestamps(lyric_lines, word_data)
-        if not rows:
-            print("  [WhisperX] Could not map lyrics to timestamps.")
-            return None
+        for i in range(len(rows) - 1):
+            rows[i]["end_ms"] = max(rows[i]["end_ms"], rows[i + 1]["start_ms"])
+        rows[-1]["end_ms"] = max(rows[-1]["end_ms"], rows[-1]["start_ms"] + 4_000)
 
-        print(f"  [WhisperX] Aligned {len(rows)} lyric lines.")
+        print(f"  [Aeneas] Aligned {len(rows)} lyric lines.")
         return rows_to_lrc(rows)
 
 
@@ -702,11 +724,11 @@ def main() -> None:
         if lrc is None:
             plain_lyrics = fetch_plain_lyrics(args.artist, args.title)
             if plain_lyrics and args.youtube_url:
-                print("  [WhisperX] Falling back to forced alignment …")
-                lrc = align_with_whisperx(plain_lyrics, args.youtube_url, args.lang)
+                print("  [Aeneas] Falling back to forced alignment …")
+                lrc = align_with_aeneas(plain_lyrics, args.youtube_url, args.lang)
     if lrc is None:
         print("ERROR: Could not retrieve synced lyrics. Aborting.")
-        print("TIP:   Provide --youtube-url and install whisperx to align plain lyrics.")
+        print("TIP:   Provide --youtube-url and configure AENEAS_PYTHON_EXECUTABLE.")
         print("TIP:   Pass --lrc-file <path> to use a local .lrc file as a fallback.")
         sys.exit(1)
     rows = parse_lrc(lrc, args.offset_ms)
