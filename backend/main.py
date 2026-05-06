@@ -40,7 +40,7 @@ load_dotenv()
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from sqlalchemy.orm import Session
 
 from database import Line, Playlist, PlaylistSong, Song, User, Word, create_tables, get_db
@@ -772,6 +772,155 @@ def update_source_lyrics(
     db.commit()
     db.refresh(song)
     return _admin_song_detail(song, db)
+
+
+@app.post("/api/admin/songs/{song_id}/regenerate")
+async def regenerate_song_lyrics(
+    song_id: int,
+    db: Session = Depends(get_db),
+    _: User = Depends(_require_admin),
+):
+    """Re-run the full NLP pipeline for an existing song and replace all its lyrics."""
+    song = db.get(Song, song_id)
+    if not song:
+        raise HTTPException(status_code=404, detail="Song not found")
+
+    pipeline_script = Path(__file__).parent.parent / "pipeline" / "generate_song_data.py"
+    if not pipeline_script.exists():
+        raise HTTPException(status_code=500, detail="Pipeline script not found")
+
+    # Capture all needed info before closing the DI session
+    python_exe = os.environ.get("PYTHON_EXECUTABLE", "python3")
+    lang_code = song.language_code
+    artist = song.artist or "Unknown Artist"
+    title = song.title
+    spotify_uri = song.spotify_uri
+    youtube_url = song.youtube_url
+    script_dir = str(pipeline_script.parent)
+    script_path = str(pipeline_script)
+    env = os.environ.copy()
+
+    async def event_stream():
+        with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as tmp:
+            output_path = Path(tmp.name)
+
+        command = [
+            python_exe, script_path,
+            "--lang", lang_code,
+            "--artist", artist,
+            "--title", title,
+            "--display-title", title,
+            "--spotify-uri", spotify_uri,
+            "--output", str(output_path),
+        ]
+        if youtube_url:
+            command.extend(["--youtube-url", youtube_url])
+
+        try:
+            proc = await asyncio.create_subprocess_exec(
+                *command,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.STDOUT,
+                cwd=script_dir,
+                env=env,
+            )
+
+            async for raw in proc.stdout:
+                line_text = raw.decode("utf-8", errors="replace").rstrip()
+                if line_text:
+                    safe = line_text.replace("\n", " ")
+                    yield f"data: {safe}\n\n"
+
+            await proc.wait()
+
+            if proc.returncode != 0:
+                yield f"event: error\ndata: Pipeline exited with code {proc.returncode}\n\n"
+                return
+
+            try:
+                payload = json.loads(output_path.read_text(encoding="utf-8"))
+            except (json.JSONDecodeError, FileNotFoundError) as exc:
+                yield f"event: error\ndata: Failed to read pipeline output: {exc}\n\n"
+                return
+
+            # Update DB with new lyrics using a fresh session
+            from database import SessionLocal as _SessionLocal
+            new_db = _SessionLocal()
+            try:
+                db_song = new_db.get(Song, song_id)
+                if not db_song:
+                    yield f"event: error\ndata: Song not found in database\n\n"
+                    return
+
+                # Delete all existing default lines (words cascade via FK)
+                new_db.query(Line).filter(
+                    Line.song_id == song_id,
+                    Line.source.is_(None),
+                ).delete(synchronize_session=False)
+                new_db.flush()
+
+                # Insert new default lines and words
+                new_default_lines: list[Line] = []
+                for pos, line_data in enumerate(payload.get("lines", [])):
+                    new_line = Line(
+                        song_id=song_id,
+                        position=pos,
+                        start_time_ms=line_data["start_time_ms"],
+                        end_time_ms=line_data["end_time_ms"],
+                        original_line=line_data["original_line"],
+                        phonetic_line=line_data.get("phonetic_line"),
+                        translation=line_data.get("translation", ""),
+                    )
+                    new_db.add(new_line)
+                    new_db.flush()
+                    new_default_lines.append(new_line)
+
+                    for word_data in line_data.get("words", []):
+                        new_db.add(Word(
+                            line_id=new_line.id,
+                            key_index=word_data.get("key", pos),
+                            display_form=word_data.get("display_form", ""),
+                            lemma=word_data.get("lemma", ""),
+                            grammar=word_data.get("grammar"),
+                            dictionary_definition=word_data.get("dictionary_definition"),
+                        ))
+
+                # Rebuild source-specific lines (youtube, apple_music) from new defaults
+                for source in ("youtube", "apple_music"):
+                    new_db.query(Line).filter(
+                        Line.song_id == song_id,
+                        Line.source == source,
+                    ).delete(synchronize_session=False)
+                    new_db.flush()
+                    for dl in new_default_lines:
+                        new_db.add(Line(
+                            song_id=song_id,
+                            source=source,
+                            position=dl.position,
+                            start_time_ms=dl.start_time_ms,
+                            end_time_ms=dl.end_time_ms,
+                            original_line=dl.original_line,
+                            phonetic_line=dl.phonetic_line,
+                            translation=dl.translation,
+                        ))
+
+                new_db.commit()
+                new_db.refresh(db_song)
+                result = _admin_song_detail(db_song, new_db)
+                yield f"event: done\ndata: {result.model_dump_json()}\n\n"
+            finally:
+                new_db.close()
+
+        except Exception as exc:
+            yield f"event: error\ndata: {exc}\n\n"
+        finally:
+            output_path.unlink(missing_ok=True)
+
+    return StreamingResponse(
+        event_stream(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
 
 
 @app.get("/api/admin/users", response_model=list[AdminUserResponse])
