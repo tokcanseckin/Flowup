@@ -205,21 +205,15 @@ const AppleMusicPlayer = forwardRef<AppleMusicPlayerHandle, Props>(function Appl
       music.addEventListener(MK.Events.playbackStateDidChange, handleStateChange)
       music.addEventListener(MK.Events.playbackTimeDidChange, handleTimeChange)
 
-      // 4. Authorise if needed
-      // 4. Authorise — silently if a token is cached, popup only if needed.
-      //    If the popup is blocked we fall back to the manual button.
+      // 4. Authorise if needed.
+      //    authorize() requires a user gesture to open the popup — calling it
+      //    from useEffect causes browsers to silently hang the promise.
+      //    So if not yet authorized, show the manual button immediately.
       if (!music.isAuthorized) {
-        logAppleMusicDebug('Not authorized; attempting authorize()')
-        try {
-          await music.authorize()
-          logAppleMusicDebug('authorize() succeeded')
-        } catch {
-          // Popup was blocked or user cancelled — show the manual button.
-          if (!mountedRef.current) return
-          setStatus('needs-auth')
-          logAppleMusicDebug('authorize() failed; showing manual auth button')
-          return
-        }
+        logAppleMusicDebug('Not authorized; showing manual auth button')
+        if (!mountedRef.current) return
+        setStatus('needs-auth')
+        return
       }
 
       // 5. Set queue + play
