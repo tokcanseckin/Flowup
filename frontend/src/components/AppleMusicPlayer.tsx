@@ -225,14 +225,14 @@ const AppleMusicPlayer = forwardRef<AppleMusicPlayerHandle, Props>(function Appl
         return
       }
 
-      // 5. Set queue, then always require a tap to start playback.
-      //    Calling play() from useEffect causes Safari (both iOS and macOS) to
-      //    show a native "not allowed" alert before our catch block even runs.
-      //    The only safe approach is to always play() from a direct click handler.
+      // 5. Set queue. Play() must come from a direct user gesture (the parent
+      //    transport button) to avoid Safari's native alert. Signal onReady so
+      //    the parent transport is enabled and the user can click ▶ normally.
       await music.setQueue({ url: appleMusicUrl })
       if (mountedRef.current) {
         setStatus('needs-play')
-        logAppleMusicDebug('Queue loaded; showing tap-to-play')
+        onReadyRef.current?.()
+        logAppleMusicDebug('Queue loaded; parent transport now enabled')
       }
     } catch (e) {
       if (!mountedRef.current) return
@@ -255,7 +255,8 @@ const AppleMusicPlayer = forwardRef<AppleMusicPlayerHandle, Props>(function Appl
       await _mkInstance.setQueue({ url: appleMusicUrl })
       if (mountedRef.current) {
         setStatus('needs-play')
-        logAppleMusicDebug('Authorized + queue loaded; showing tap-to-play')
+        onReadyRef.current?.()
+        logAppleMusicDebug('Authorized + queue loaded; parent transport now enabled')
       }
     } catch (e) {
       if (!mountedRef.current) return
@@ -264,23 +265,6 @@ const AppleMusicPlayer = forwardRef<AppleMusicPlayerHandle, Props>(function Appl
       logAppleMusicDebug('Manual authorize failed', { error: e instanceof Error ? e.message : String(e) })
     }
   }, [appleMusicUrl])
-
-  const handleTapToPlay = useCallback(async () => {
-    if (!_mkInstance) return
-    logAppleMusicDebug('Tap-to-play clicked')
-    try {
-      await _mkInstance.play()
-      if (mountedRef.current) {
-        setStatus('playing')
-        onReady?.()
-      }
-    } catch (e) {
-      if (!mountedRef.current) return
-      setStatus('error')
-      setErrorMsg(e instanceof Error ? e.message : 'Playback failed')
-      logAppleMusicDebug('Tap-to-play failed', { error: e instanceof Error ? e.message : String(e) })
-    }
-  }, [onReady])
 
   useEffect(() => {
     logAppleMusicDebug('Status changed', { status })
@@ -353,27 +337,10 @@ const AppleMusicPlayer = forwardRef<AppleMusicPlayerHandle, Props>(function Appl
     )
   }
 
-  if (status === 'needs-play') {
-    return (
-      <div className="rounded-2xl border border-gray-800/80 p-4 text-center" style={{ background: '#12121f' }}>
-        <p className="text-white text-sm font-medium mb-3">Authorized — tap to start playback</p>
-        <button
-          type="button"
-          onClick={() => void handleTapToPlay()}
-          className="
-            inline-flex items-center gap-2 px-5 py-2.5 rounded-xl
-            bg-pink-600 hover:bg-pink-500
-            text-white text-sm font-semibold transition-all duration-150
-          "
-        >
-          ▶ Play
-        </button>
-      </div>
-    )
+  if (status === 'needs-play' || status === 'playing') {
+    // Audio-only — controls are in the parent transport
+    return null
   }
-
-  // status === 'playing' — player is hidden (audio-only; controls are in the parent)
-  return null
 })
 
 export default AppleMusicPlayer
