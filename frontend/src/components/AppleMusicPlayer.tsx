@@ -129,7 +129,7 @@ interface Props {
   onPlayStateChange?: (playing: boolean) => void
 }
 
-type Status = 'loading' | 'needs-auth' | 'authorizing' | 'playing' | 'error'
+type Status = 'loading' | 'needs-auth' | 'authorizing' | 'needs-play' | 'playing' | 'error'
 
 const AppleMusicPlayer = forwardRef<AppleMusicPlayerHandle, Props>(function AppleMusicPlayer(
   { appleMusicUrl, onReady, onTimeUpdate, onPlayStateChange },
@@ -245,14 +245,31 @@ const AppleMusicPlayer = forwardRef<AppleMusicPlayerHandle, Props>(function Appl
     try {
       await _mkInstance.authorize()
       if (!mountedRef.current) return
-      await loadAndPlay(_mkInstance, appleMusicUrl)
+      // After authorize() the async chain breaks iOS's user-gesture context,
+      // so play() would be rejected with NotAllowedError. Show a "Tap to Play"
+      // button instead so the next play() is inside a fresh gesture handler.
+      setStatus('needs-play')
+      logAppleMusicDebug('Authorized; waiting for tap-to-play gesture')
     } catch (e) {
       if (!mountedRef.current) return
       setStatus('error')
       setErrorMsg(e instanceof Error ? e.message : 'Authorization failed')
       logAppleMusicDebug('Manual authorize failed', { error: e instanceof Error ? e.message : String(e) })
     }
-  }, [appleMusicUrl, onReady])
+  }, [])
+
+  const handleTapToPlay = useCallback(async () => {
+    if (!_mkInstance) return
+    logAppleMusicDebug('Tap-to-play clicked')
+    try {
+      await loadAndPlay(_mkInstance, appleMusicUrl)
+    } catch (e) {
+      if (!mountedRef.current) return
+      setStatus('error')
+      setErrorMsg(e instanceof Error ? e.message : 'Playback failed')
+      logAppleMusicDebug('Tap-to-play failed', { error: e instanceof Error ? e.message : String(e) })
+    }
+  }, [appleMusicUrl])
 
   useEffect(() => {
     logAppleMusicDebug('Status changed', { status })
@@ -320,6 +337,25 @@ const AppleMusicPlayer = forwardRef<AppleMusicPlayerHandle, Props>(function Appl
               Authorize with Apple Music
             </>
           )}
+        </button>
+      </div>
+    )
+  }
+
+  if (status === 'needs-play') {
+    return (
+      <div className="rounded-2xl border border-gray-800/80 p-4 text-center" style={{ background: '#12121f' }}>
+        <p className="text-white text-sm font-medium mb-3">Authorized — tap to start playback</p>
+        <button
+          type="button"
+          onClick={() => void handleTapToPlay()}
+          className="
+            inline-flex items-center gap-2 px-5 py-2.5 rounded-xl
+            bg-pink-600 hover:bg-pink-500
+            text-white text-sm font-semibold transition-all duration-150
+          "
+        >
+          ▶ Play
         </button>
       </div>
     )
