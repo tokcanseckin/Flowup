@@ -777,7 +777,7 @@ def _resolve_definition(lemma: str, lang_code: str, translation: str = "") -> st
         return f"[{clean_lemma}]"
 
     ranked = _rank_definitions(candidates, translation)
-    return ranked[0]
+    return "; ".join(ranked)
 
 
 # ── Backend push ──────────────────────────────────────────────────────────────
