@@ -112,6 +112,24 @@ export interface UserSettings {
   preferred_source: 'spotify' | 'youtube' | 'apple_music'
 }
 
+export interface AlignmentTask {
+  id: number
+  status: 'pending' | 'processing' | 'done' | 'failed'
+  artist: string
+  title: string
+  display_title: string | null
+  youtube_url: string
+  lang: string
+  spotify_uri: string | null
+  target_lang: string
+  plain_lyrics: string | null
+  claimed_at: number | null
+  completed_at: number | null
+  result_lrc: string | null
+  error: string | null
+  created_at: number
+}
+
 const ADMIN_SESSION_KEY = 'flowup.admin.basic.v1'
 
 export function getAdminHeaders(): HeadersInit {
@@ -372,6 +390,44 @@ export const api = {
   removeSongFromPlaylist: (playlistId: number, songId: number): Promise<PlaylistDetail> =>
     apiFetch(`/playlists/${playlistId}/songs/${songId}`, {
       method: 'DELETE',
+      headers: getAdminHeaders(),
+    }),
+
+  createAlignmentTask: (body: {
+    artist: string
+    title: string
+    youtube_url: string
+    lang?: string
+    spotify_uri?: string | null
+    target_lang?: string
+    plain_lyrics?: string | null
+    display_title?: string | null
+  }): Promise<AlignmentTask> =>
+    apiFetch('/admin/alignment-tasks', {
+      method: 'POST',
+      body: JSON.stringify(body),
+      headers: getAdminHeaders(),
+    }),
+
+  listAlignmentTasks: (status?: string): Promise<AlignmentTask[]> =>
+    apiFetch(`/admin/alignment-tasks${status ? `?status=${encodeURIComponent(status)}` : ''}`, {
+      headers: getAdminHeaders(),
+    }),
+
+  getAlignmentTask: (id: number): Promise<AlignmentTask> =>
+    apiFetch(`/admin/alignment-tasks/${id}`, { headers: getAdminHeaders() }),
+
+  deleteAlignmentTask: (id: number): Promise<void> =>
+    fetch(`/api/admin/alignment-tasks/${id}`, { method: 'DELETE', headers: getAdminHeaders() }).then(async r => {
+      if (!r.ok) {
+        const body = await r.json().catch(() => ({ detail: r.statusText })) as { detail?: string }
+        throw new Error(body.detail ?? `API error ${r.status}`)
+      }
+    }),
+
+  retryAlignmentTask: (id: number): Promise<AlignmentTask> =>
+    apiFetch(`/admin/alignment-tasks/${id}/retry`, {
+      method: 'PATCH',
       headers: getAdminHeaders(),
     }),
 

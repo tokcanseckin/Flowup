@@ -301,3 +301,59 @@ class AdminSourceLineUpdate(BaseModel):
 
 class AdminSourceLyricsUpdate(BaseModel):
     lines: list[AdminSourceLineUpdate]
+
+
+# ── Alignment task (worker queue) ──────────────────────────────────────────────
+
+
+class AlignmentTaskCreate(BaseModel):
+    """Body for POST /api/admin/alignment-tasks — create a new alignment task."""
+    artist: str
+    title: str
+    youtube_url: str
+    lang: str = "ru"
+    spotify_uri: Optional[str] = None
+    display_title: Optional[str] = None
+    target_lang: str = "EN-US"
+    # Provide plain lyrics here to skip the worker's LRCLIB lookup.
+    plain_lyrics: Optional[str] = None
+
+
+class AlignmentTaskResponse(BaseModel):
+    """Full task record returned to admins."""
+    id: int
+    status: str
+    artist: str
+    title: str
+    display_title: Optional[str]
+    youtube_url: str
+    lang: str
+    spotify_uri: Optional[str]
+    target_lang: str
+    plain_lyrics: Optional[str]
+    claimed_at: Optional[int]
+    completed_at: Optional[int]
+    result_lrc: Optional[str]
+    error: Optional[str]
+    created_at: int
+
+    model_config = {"from_attributes": True}
+
+
+class WorkerTaskResponse(BaseModel):
+    """Minimal task payload sent to the worker (excludes large fields)."""
+    id: int
+    artist: str
+    title: str
+    youtube_url: str
+    lang: str
+    plain_lyrics: Optional[str]
+
+    model_config = {"from_attributes": True}
+
+
+class WorkerResultSubmit(BaseModel):
+    """Body for POST /api/worker/tasks/{id}/result — submit LRC or error."""
+    lrc: Optional[str] = None
+    error: Optional[str] = None
+

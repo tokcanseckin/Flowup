@@ -43,7 +43,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
 from sqlalchemy.orm import Session
 
-from database import Line, Playlist, PlaylistSong, Song, User, Word, create_tables, get_db
+from database import AlignmentTask, Line, Playlist, PlaylistSong, Song, User, Word, create_tables, get_db
 from models import (
     AdminLyricsUpdate,
     AdminSongDetailResponse,
@@ -53,6 +53,8 @@ from models import (
     AdminUserUpdate,
     AdminSongCreate,
     AdminSongUpdate,
+    AlignmentTaskCreate,
+    AlignmentTaskResponse,
     SourceLinesResponse,
     BulkSongSourcesUpdate,
     CompleteOnboardingRequest,
@@ -76,6 +78,8 @@ from models import (
     UserSettingsUpdate,
     UserSyncRequest,
     WordResponse,
+    WorkerResultSubmit,
+    WorkerTaskResponse,
 )
 from openrussian import ensure_loaded as _load_or, lookup as _or_lookup
 from spotify_auth import fetch_spotify_user, refresh_access_token
@@ -175,6 +179,35 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# ── Worker API key auth ────────────────────────────────────────────────────────
+
+_WORKER_API_KEY = os.environ.get("WORKER_API_KEY", "").strip()
+
+
+def _require_worker_key(
+    x_worker_api_key: str | None = Header(default=None),
+) -> None:
+    """
+    Dependency that validates the X-Worker-Api-Key header.
+    Used on all /api/worker/* endpoints.
+    """
+    if not _WORKER_API_KEY:
+        raise HTTPException(
+            status_code=503,
+            detail="Worker endpoint not configured (WORKER_API_KEY not set on server)",
+        )
+    if not x_worker_api_key:
+        raise HTTPException(
+            status_code=401,
+            detail="X-Worker-Api-Key header is required",
+        )
+    if not secrets.compare_digest(
+        x_worker_api_key.encode("utf-8"),
+        _WORKER_API_KEY.encode("utf-8"),
+    ):
+        raise HTTPException(status_code=401, detail="Invalid worker API key")
 
 
 # ── Internal helpers ───────────────────────────────────────────────────────────
@@ -1293,12 +1326,6 @@ async def refresh_token_endpoint(body: dict):
         raise HTTPException(status_code=502, detail=str(exc))
 
 
-# ── Apple Music ─────────────────────────────────────────────────────────────────
-
-# Cache: (token_str, expiry_unix_ts)
-_apple_token_cache: tuple[str, int] | None = None
-
-
 def _generate_apple_music_token() -> str:
     team_id     = os.environ.get("APPLE_MUSIC_TEAM_ID", "")
     key_id      = os.environ.get("APPLE_MUSIC_KEY_ID", "")
@@ -1317,6 +1344,235 @@ def _generate_apple_music_token() -> str:
         headers={"kid": key_id},
     )
     return token, exp  # type: ignore[return-value]
+
+
+# ── Worker task queue ──────────────────────────────────────────────────────────
+
+
+@app.get("/api/worker/tasks/next", response_model=WorkerTaskResponse)
+def worker_get_next_task(
+    db: Session = Depends(get_db),
+    _: None = Depends(_require_worker_key),
+):
+    """
+    Atomically fetch the next pending alignment task and mark it as 'processing'.
+    Returns HTTP 204 (no content) when the queue is empty.
+    """
+    task = (
+        db.query(AlignmentTask)
+        .filter(AlignmentTask.status == "pending")
+        .order_by(AlignmentTask.created_at)
+        .with_for_update(skip_locked=True)
+        .first()
+    )
+    if task is None:
+        from fastapi.responses import Response
+        return Response(status_code=204)
+
+    task.status = "processing"
+    task.claimed_at = int(time.time())
+    db.commit()
+    db.refresh(task)
+    return WorkerTaskResponse.model_validate(task)
+
+
+@app.post("/api/worker/tasks/{task_id}/result")
+def worker_submit_result(
+    task_id: int,
+    body: WorkerResultSubmit,
+    db: Session = Depends(get_db),
+    _: None = Depends(_require_worker_key),
+):
+    """
+    Submit the alignment result (LRC string) or an error for a task.
+
+    On success with an LRC, the backend automatically runs the full pipeline
+    (translation + NLP) and ingests the finished song into the database.
+    """
+    task = db.get(AlignmentTask, task_id)
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+    if task.status not in ("processing", "pending"):
+        raise HTTPException(
+            status_code=409,
+            detail=f"Task is already in state '{task.status}'",
+        )
+
+    task.completed_at = int(time.time())
+
+    if body.error:
+        task.status = "failed"
+        task.error = body.error
+        db.commit()
+        return {"status": "failed", "task_id": task_id}
+
+    if not body.lrc:
+        raise HTTPException(status_code=400, detail="Provide either 'lrc' or 'error'")
+
+    task.status = "done"
+    task.result_lrc = body.lrc
+    db.commit()
+
+    # ── Run the full pipeline (translation + NLP) and ingest the song ─────────
+    pipeline_script = Path(__file__).parent.parent / "pipeline" / "generate_song_data.py"
+    song_id: Optional[int] = None
+    pipeline_error: Optional[str] = None
+
+    if pipeline_script.exists():
+        import tempfile as _tmpmod
+        spotify_uri = task.spotify_uri or f"local:{uuid.uuid4().hex}"
+        lang_code   = task.lang
+        artist      = task.artist
+        title       = task.display_title or task.title
+        target_lang = task.target_lang or "EN-US"
+
+        with _tmpmod.NamedTemporaryFile(suffix=".lrc", mode="w",
+                                        encoding="utf-8", delete=False) as lf:
+            lf.write(body.lrc)
+            lrc_file = Path(lf.name)
+
+        with _tmpmod.NamedTemporaryFile(suffix=".json", delete=False) as jf:
+            out_path = Path(jf.name)
+
+        try:
+            cmd = [
+                os.environ.get("PYTHON_EXECUTABLE", "python3"),
+                str(pipeline_script),
+                "--lang",         lang_code,
+                "--artist",       artist,
+                "--title",        title,
+                "--display-title", title,
+                "--spotify-uri",  spotify_uri,
+                "--target-lang",  target_lang,
+                "--lrc-file",     str(lrc_file),
+                "--output",       str(out_path),
+            ]
+            run = subprocess.run(
+                cmd,
+                capture_output=True, text=True, timeout=600,
+                cwd=str(pipeline_script.parent),
+                env=os.environ.copy(),
+                check=False,
+            )
+            if run.returncode == 0 and out_path.exists():
+                payload = json.loads(out_path.read_text(encoding="utf-8"))
+                payload.setdefault("youtube_url", task.youtube_url)
+                ingest_payload = SongIngest(**payload)
+                ingested = _ingest_song(ingest_payload, db)
+                song_id = ingested.id
+            else:
+                pipeline_error = (run.stderr or run.stdout or "pipeline failed").strip()[:400]
+        except Exception as exc:
+            pipeline_error = str(exc)[:400]
+        finally:
+            lrc_file.unlink(missing_ok=True)
+            out_path.unlink(missing_ok=True)
+    else:
+        pipeline_error = "Pipeline script not found on server"
+
+    response: dict = {"status": "done", "task_id": task_id}
+    if song_id is not None:
+        response["song_id"] = song_id
+    if pipeline_error:
+        response["pipeline_warning"] = pipeline_error
+    return response
+
+
+# ── Admin: alignment task management ──────────────────────────────────────────
+
+
+@app.post(
+    "/api/admin/alignment-tasks",
+    response_model=AlignmentTaskResponse,
+    status_code=201,
+)
+def create_alignment_task(
+    body: AlignmentTaskCreate,
+    db: Session = Depends(get_db),
+    _: User = Depends(_require_admin),
+):
+    """Create a new alignment task for the worker to pick up."""
+    task = AlignmentTask(
+        status="pending",
+        artist=body.artist,
+        title=body.title,
+        display_title=body.display_title,
+        youtube_url=body.youtube_url,
+        lang=body.lang,
+        spotify_uri=body.spotify_uri,
+        target_lang=body.target_lang,
+        plain_lyrics=body.plain_lyrics,
+    )
+    db.add(task)
+    db.commit()
+    db.refresh(task)
+    return AlignmentTaskResponse.model_validate(task)
+
+
+@app.get("/api/admin/alignment-tasks", response_model=list[AlignmentTaskResponse])
+def list_alignment_tasks(
+    status: Optional[str] = Query(default=None, description="Filter by status: pending|processing|done|failed"),
+    db: Session = Depends(get_db),
+    _: User = Depends(_require_admin),
+):
+    """List all alignment tasks, optionally filtered by status."""
+    q = db.query(AlignmentTask).order_by(AlignmentTask.created_at.desc())
+    if status:
+        q = q.filter(AlignmentTask.status == status)
+    return [AlignmentTaskResponse.model_validate(t) for t in q.all()]
+
+
+@app.get("/api/admin/alignment-tasks/{task_id}", response_model=AlignmentTaskResponse)
+def get_alignment_task(
+    task_id: int,
+    db: Session = Depends(get_db),
+    _: User = Depends(_require_admin),
+):
+    task = db.get(AlignmentTask, task_id)
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+    return AlignmentTaskResponse.model_validate(task)
+
+
+@app.delete("/api/admin/alignment-tasks/{task_id}", status_code=204)
+def delete_alignment_task(
+    task_id: int,
+    db: Session = Depends(get_db),
+    _: User = Depends(_require_admin),
+):
+    """Delete a task (cancel pending / remove failed)."""
+    task = db.get(AlignmentTask, task_id)
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+    db.delete(task)
+    db.commit()
+
+
+@app.patch("/api/admin/alignment-tasks/{task_id}/retry", response_model=AlignmentTaskResponse)
+def retry_alignment_task(
+    task_id: int,
+    db: Session = Depends(get_db),
+    _: User = Depends(_require_admin),
+):
+    """Reset a failed (or stuck processing) task back to pending so the worker retries it."""
+    task = db.get(AlignmentTask, task_id)
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+    if task.status == "done":
+        raise HTTPException(status_code=409, detail="Task already completed successfully")
+    task.status = "pending"
+    task.claimed_at = None
+    task.completed_at = None
+    task.error = None
+    db.commit()
+    db.refresh(task)
+    return AlignmentTaskResponse.model_validate(task)
+
+
+# ── Apple Music ─────────────────────────────────────────────────────────────────
+
+# Cache: (token_str, expiry_unix_ts)
+_apple_token_cache: tuple[str, int] | None = None
 
 
 @app.get("/api/apple-music/token")
