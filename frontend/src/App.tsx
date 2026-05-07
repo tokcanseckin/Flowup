@@ -1069,7 +1069,7 @@ function PlayerView({
         </div>
       )}
 
-      <main className="flex-1 p-4 max-w-2xl mx-auto w-full space-y-4">
+      <main className="flex-1 p-4 max-w-[1080px] mx-auto w-full space-y-4">
 
         {/* YouTube embed */}
         {effectiveSource === 'youtube' && song.youtube_url && (
