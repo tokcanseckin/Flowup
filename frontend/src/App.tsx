@@ -910,9 +910,14 @@ function PlayerView({
 
   const [pendingPlay, setPendingPlay] = useState(false)
 
-  // Clear pending indicator once playback actually starts
+  // Clear pending indicator once playback actually starts, with a short
+  // debounce. MusicKit can briefly fire intermediate states (waiting/stalled)
+  // just before firing "playing", which would cause a flash of the play icon
+  // if we cleared pendingPlay immediately on the first playing event.
   useEffect(() => {
-    if (isPlaying) setPendingPlay(false)
+    if (!isPlaying) return
+    const t = setTimeout(() => setPendingPlay(false), 400)
+    return () => clearTimeout(t)
   }, [isPlaying])
 
   // Also clear on song change
