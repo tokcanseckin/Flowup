@@ -27,6 +27,8 @@ import secrets
 import subprocess
 import tempfile
 import time
+import urllib.parse
+import urllib.request
 import uuid
 from contextlib import asynccontextmanager
 from hashlib import pbkdf2_hmac
@@ -1481,6 +1483,78 @@ def worker_submit_result(
 # ── Admin: alignment task management ──────────────────────────────────────────
 
 
+def _lrclib_synced(artist: str, title: str) -> Optional[str]:
+    """Return synced LRC from LRCLIB if available, else None."""
+    try:
+        params = urllib.parse.urlencode({"artist_name": artist, "track_name": title})
+        req = urllib.request.Request(
+            f"https://lrclib.net/api/search?{params}",
+            headers={"User-Agent": "FlowUp/1.0 (https://singoling.com)"},
+        )
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            hits = json.loads(resp.read().decode())
+        if not hits:
+            return None
+        for hit in hits:
+            if hit.get("syncedLyrics"):
+                return hit["syncedLyrics"]
+    except Exception:
+        pass
+    return None
+
+
+def _run_pipeline_with_lrc(task: AlignmentTask, lrc: str, db: Session) -> dict:
+    """Run the NLP pipeline with a ready LRC and ingest the song. Returns response dict."""
+    pipeline_script = Path(__file__).parent.parent / "pipeline" / "generate_song_data.py"
+    song_id: Optional[int] = None
+    pipeline_error: Optional[str] = None
+
+    if pipeline_script.exists():
+        spotify_uri = task.spotify_uri or f"local:{uuid.uuid4().hex}"
+        with tempfile.NamedTemporaryFile(suffix=".lrc", mode="w",
+                                         encoding="utf-8", delete=False) as lf:
+            lf.write(lrc)
+            lrc_file = Path(lf.name)
+        with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as jf:
+            out_path = Path(jf.name)
+        try:
+            cmd = [
+                os.environ.get("PYTHON_EXECUTABLE", "python3"),
+                str(pipeline_script),
+                "--lang",          task.lang,
+                "--artist",        task.artist,
+                "--title",         task.display_title or task.title,
+                "--display-title", task.display_title or task.title,
+                "--spotify-uri",   spotify_uri,
+                "--target-lang",   task.target_lang or "EN-US",
+                "--lrc-file",      str(lrc_file),
+                "--output",        str(out_path),
+            ]
+            run = subprocess.run(
+                cmd,
+                capture_output=True, text=True, timeout=600,
+                cwd=str(pipeline_script.parent),
+                env=os.environ.copy(),
+                check=False,
+            )
+            if run.returncode == 0 and out_path.exists():
+                payload = json.loads(out_path.read_text(encoding="utf-8"))
+                payload.setdefault("youtube_url", task.youtube_url)
+                ingested = _ingest_song(SongIngest(**payload), db)
+                song_id = ingested.id
+            else:
+                pipeline_error = (run.stderr or run.stdout or "pipeline failed").strip()[:400]
+        except Exception as exc:
+            pipeline_error = str(exc)[:400]
+        finally:
+            lrc_file.unlink(missing_ok=True)
+            out_path.unlink(missing_ok=True)
+    else:
+        pipeline_error = "Pipeline script not found on server"
+
+    return {"song_id": song_id, "pipeline_error": pipeline_error}
+
+
 @app.post(
     "/api/admin/alignment-tasks",
     response_model=AlignmentTaskResponse,
@@ -1491,7 +1565,14 @@ def create_alignment_task(
     db: Session = Depends(get_db),
     _: User = Depends(_require_admin),
 ):
-    """Create a new alignment task for the worker to pick up."""
+    """
+    Create an alignment task.
+
+    If LRCLIB already has synced lyrics for this track the pipeline is run
+    immediately on the server and the task is returned in 'done' state.
+    Otherwise a 'pending' task is created for the worker.
+    """
+    now = int(time.time())
     task = AlignmentTask(
         status="pending",
         artist=body.artist,
@@ -1503,6 +1584,25 @@ def create_alignment_task(
         target_lang=body.target_lang,
         plain_lyrics=body.plain_lyrics,
     )
+
+    # ── Check LRCLIB first ────────────────────────────────────────────────────
+    synced_lrc = _lrclib_synced(body.artist, body.title)
+    if synced_lrc:
+        task.status = "done"
+        task.result_lrc = synced_lrc
+        task.completed_at = now
+        db.add(task)
+        db.commit()
+        db.refresh(task)
+        result = _run_pipeline_with_lrc(task, synced_lrc, db)
+        if result["pipeline_error"]:
+            # Pipeline failed but we still have the LRC — keep task as done,
+            # admin will see song_id=None and can retry.
+            task.error = result["pipeline_error"]
+            db.commit()
+        return AlignmentTaskResponse.model_validate(task)
+
+    # ── No synced lyrics — queue for worker ───────────────────────────────────
     db.add(task)
     db.commit()
     db.refresh(task)
