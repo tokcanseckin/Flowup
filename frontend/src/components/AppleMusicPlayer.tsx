@@ -229,11 +229,20 @@ const AppleMusicPlayer = forwardRef<AppleMusicPlayerHandle, Props>(function Appl
   async function loadAndPlay(music: MusicKitInstance, url: string) {
     logAppleMusicDebug('Queueing URL and starting playback', { url })
     await music.setQueue({ url })
-    await music.play()
-    if (mountedRef.current) {
-      setStatus('playing')
-      onReady?.()
-      logAppleMusicDebug('Playback started')
+    try {
+      await music.play()
+      if (mountedRef.current) {
+        setStatus('playing')
+        onReady?.()
+        logAppleMusicDebug('Playback started')
+      }
+    } catch {
+      // iOS Safari blocks play() without a direct user gesture (e.g. from useEffect).
+      // Show a tap-to-play button — the queue is already loaded.
+      if (mountedRef.current) {
+        setStatus('needs-play')
+        logAppleMusicDebug('play() blocked by browser; showing tap-to-play')
+      }
     }
   }
 
@@ -262,14 +271,18 @@ const AppleMusicPlayer = forwardRef<AppleMusicPlayerHandle, Props>(function Appl
     if (!_mkInstance) return
     logAppleMusicDebug('Tap-to-play clicked')
     try {
-      await loadAndPlay(_mkInstance, appleMusicUrl)
+      await _mkInstance.play()
+      if (mountedRef.current) {
+        setStatus('playing')
+        onReady?.()
+      }
     } catch (e) {
       if (!mountedRef.current) return
       setStatus('error')
       setErrorMsg(e instanceof Error ? e.message : 'Playback failed')
       logAppleMusicDebug('Tap-to-play failed', { error: e instanceof Error ? e.message : String(e) })
     }
-  }, [appleMusicUrl])
+  }, [onReady])
 
   useEffect(() => {
     logAppleMusicDebug('Status changed', { status })
