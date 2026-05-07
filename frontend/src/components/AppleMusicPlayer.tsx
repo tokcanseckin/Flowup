@@ -127,12 +127,18 @@ interface Props {
   /** Fires ~4× per second with current position and total duration in ms. */
   onTimeUpdate?: (positionMs: number, durationMs: number) => void
   onPlayStateChange?: (playing: boolean) => void
+  /**
+   * When true, play() is called automatically after the queue is set.
+   * Only safe to use after the audio context has been unlocked by a prior
+   * user-gesture-initiated play() call (i.e. not on first ever playback).
+   */
+  autoPlay?: boolean
 }
 
 type Status = 'loading' | 'needs-auth' | 'authorizing' | 'needs-play' | 'playing' | 'error'
 
 const AppleMusicPlayer = forwardRef<AppleMusicPlayerHandle, Props>(function AppleMusicPlayer(
-  { appleMusicUrl, onReady, onTimeUpdate, onPlayStateChange },
+  { appleMusicUrl, onReady, onTimeUpdate, onPlayStateChange, autoPlay },
   ref,
 ) {
   const [status, setStatus] = useState<Status>('loading')
@@ -143,9 +149,11 @@ const AppleMusicPlayer = forwardRef<AppleMusicPlayerHandle, Props>(function Appl
   const onTimeUpdateRef = useRef(onTimeUpdate)
   const onPlayStateChangeRef = useRef(onPlayStateChange)
   const onReadyRef = useRef(onReady)
+  const autoPlayRef = useRef(autoPlay)
   useEffect(() => { onTimeUpdateRef.current = onTimeUpdate }, [onTimeUpdate])
   useEffect(() => { onPlayStateChangeRef.current = onPlayStateChange }, [onPlayStateChange])
   useEffect(() => { onReadyRef.current = onReady }, [onReady])
+  useEffect(() => { autoPlayRef.current = autoPlay }, [autoPlay])
 
   // ── Imperative API ───────────────────────────────────────────────────────────
 
@@ -225,11 +233,23 @@ const AppleMusicPlayer = forwardRef<AppleMusicPlayerHandle, Props>(function Appl
         return
       }
 
-      // 5. Set queue. Play() must come from a direct user gesture (the parent
-      //    transport button) to avoid Safari's native alert. Signal onReady so
-      //    the parent transport is enabled and the user can click ▶ normally.
+      // 5. Set queue.
+      //    If autoPlay is true, the audio context was already unlocked by a
+      //    prior gesture-initiated play(), so we can call play() here safely.
+      //    Otherwise, signal onReady so the parent transport button is enabled
+      //    and the user must click ▶ to start (required for first-ever play).
       await music.setQueue({ url: appleMusicUrl })
-      if (mountedRef.current) {
+      if (!mountedRef.current) return
+      if (autoPlayRef.current) {
+        logAppleMusicDebug('Auto-playing (audio context already unlocked)')
+        setStatus('needs-play')
+        onReadyRef.current?.()
+        // play() is safe here because the audio context is already unlocked.
+        // handleStateChange will transition status to 'playing' when it fires.
+        void music.play().catch((e) => {
+          logAppleMusicDebug('Auto-play failed; user must tap play', { error: e instanceof Error ? e.message : String(e) })
+        })
+      } else {
         setStatus('needs-play')
         onReadyRef.current?.()
         logAppleMusicDebug('Queue loaded; parent transport now enabled')

@@ -889,17 +889,33 @@ function PlayerView({
   const [amDurationMs, setAmDurationMs] = useState(0)
   const [amPlaying, setAmPlaying] = useState(false)
   const [amReady, setAmReady] = useState(false)
+  // Once the user has successfully played Apple Music once, the audio context
+  // is unlocked for this page session. Subsequent song navigations can then
+  // auto-play without requiring another user gesture.
+  const amEverPlayedRef = useRef(false)
+  const [amAutoPlay, setAmAutoPlay] = useState(false)
 
   const handleAmTimeUpdate = useCallback((posMs: number, durMs: number) => {
     setAmPositionMs(posMs)
     setAmDurationMs(durMs)
   }, [])
 
+  // Once Apple Music starts playing for the first time, mark the audio context
+  // as unlocked so we can auto-play on future song navigations.
+  useEffect(() => {
+    if (amPlaying) amEverPlayedRef.current = true
+  }, [amPlaying])
+
   // Reset Apple Music ready state when the URL changes so the parent
-  // transport is disabled until the user taps the tap-to-play button.
+  // transport is disabled until the queue is loaded.
   useEffect(() => {
     setAmReady(false)
     setAmPlaying(false)
+    // amAutoPlay is already set by handlePrevSong/handleNextSong before the
+    // URL changes; it will be consumed by AppleMusicPlayer's initAndPlay.
+    // Clear it after a short delay so it doesn't linger.
+    const t = setTimeout(() => setAmAutoPlay(false), 5000)
+    return () => clearTimeout(t)
   }, [song.apple_music_url])
 
   // Combined values depending on active source
@@ -1123,6 +1139,7 @@ function PlayerView({
             onReady={() => setAmReady(true)}
             onTimeUpdate={handleAmTimeUpdate}
             onPlayStateChange={setAmPlaying}
+            autoPlay={amAutoPlay}
           />
         )}
 
@@ -1617,13 +1634,23 @@ export default function App() {
 
   const handlePrevSong = useCallback(() => {
     if (activeSongIndex <= 0) return
+    // If Apple Music is active and has been played before, auto-play the next song.
+    if (effectiveSource === 'apple_music' && amEverPlayedRef.current) {
+      setAmAutoPlay(true)
+      setPendingPlay(true)
+    }
     void handleSelectSong(displayedSongs[activeSongIndex - 1].id)
-  }, [activeSongIndex, displayedSongs, handleSelectSong])
+  }, [activeSongIndex, displayedSongs, handleSelectSong, effectiveSource])
 
   const handleNextSong = useCallback(() => {
     if (activeSongIndex < 0 || activeSongIndex >= displayedSongs.length - 1) return
+    // If Apple Music is active and has been played before, auto-play the next song.
+    if (effectiveSource === 'apple_music' && amEverPlayedRef.current) {
+      setAmAutoPlay(true)
+      setPendingPlay(true)
+    }
     void handleSelectSong(displayedSongs[activeSongIndex + 1].id)
-  }, [activeSongIndex, displayedSongs, handleSelectSong])
+  }, [activeSongIndex, displayedSongs, handleSelectSong, effectiveSource])
 
   if (auth.isLoading) return <LoadingScreen message="Restoring session..." />
 
