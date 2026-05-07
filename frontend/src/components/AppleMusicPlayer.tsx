@@ -142,8 +142,10 @@ const AppleMusicPlayer = forwardRef<AppleMusicPlayerHandle, Props>(function Appl
   // Keep latest callbacks in refs to avoid stale closures in event handlers
   const onTimeUpdateRef = useRef(onTimeUpdate)
   const onPlayStateChangeRef = useRef(onPlayStateChange)
+  const onReadyRef = useRef(onReady)
   useEffect(() => { onTimeUpdateRef.current = onTimeUpdate }, [onTimeUpdate])
   useEffect(() => { onPlayStateChangeRef.current = onPlayStateChange }, [onPlayStateChange])
+  useEffect(() => { onReadyRef.current = onReady }, [onReady])
 
   // ── Imperative API ───────────────────────────────────────────────────────────
 
@@ -162,6 +164,13 @@ const AppleMusicPlayer = forwardRef<AppleMusicPlayerHandle, Props>(function Appl
     const playing = state === MK.PlaybackStates.playing
     logAppleMusicDebug('State changed', { state, playing })
     onPlayStateChangeRef.current?.(playing)
+    // Sync local status with actual MusicKit state. This ensures the pink
+    // tap-to-play button disappears even when play() was triggered via the
+    // parent transport controls rather than the tap-to-play button itself.
+    if (playing && mountedRef.current) {
+      setStatus('playing')
+      onReadyRef.current?.()
+    }
   }, [])
 
   const handleTimeChange = useCallback((ev: Record<string, unknown>) => {

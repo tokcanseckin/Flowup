@@ -895,6 +895,13 @@ function PlayerView({
     setAmDurationMs(durMs)
   }, [])
 
+  // Reset Apple Music ready state when the URL changes so the parent
+  // transport is disabled until the user taps the tap-to-play button.
+  useEffect(() => {
+    setAmReady(false)
+    setAmPlaying(false)
+  }, [song.apple_music_url])
+
   // Combined values depending on active source
   const isPlaying  = effectiveSource === 'youtube' ? ytPlaying  : effectiveSource === 'apple_music' ? amPlaying  : player.isPlaying
   const positionMs = effectiveSource === 'youtube' ? ytPositionMs : effectiveSource === 'apple_music' ? amPositionMs : player.currentPositionMs
