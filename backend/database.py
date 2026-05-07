@@ -6,7 +6,7 @@ import os
 import time
 from collections.abc import Generator
 
-from sqlalchemy import Column, ForeignKey, Integer, String, Text, UniqueConstraint, create_engine, text
+from sqlalchemy import Column, ForeignKey, Integer, String, Text, UniqueConstraint, create_engine, event, text
 from sqlalchemy.orm import DeclarativeBase, Session, relationship, sessionmaker
 
 DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///./flowup.db")
@@ -16,6 +16,11 @@ engine = create_engine(
     connect_args={"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {},
     echo=False,
 )
+
+if DATABASE_URL.startswith("sqlite"):
+    @event.listens_for(engine, "connect")
+    def _set_sqlite_pragma(dbapi_conn, _):
+        dbapi_conn.execute("PRAGMA foreign_keys = ON")
 
 SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
 
