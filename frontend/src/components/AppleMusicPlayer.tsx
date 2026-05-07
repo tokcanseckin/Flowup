@@ -216,8 +216,15 @@ const AppleMusicPlayer = forwardRef<AppleMusicPlayerHandle, Props>(function Appl
         return
       }
 
-      // 5. Set queue + play
-      await loadAndPlay(music, appleMusicUrl)
+      // 5. Set queue, then always require a tap to start playback.
+      //    Calling play() from useEffect causes Safari (both iOS and macOS) to
+      //    show a native "not allowed" alert before our catch block even runs.
+      //    The only safe approach is to always play() from a direct click handler.
+      await music.setQueue({ url: appleMusicUrl })
+      if (mountedRef.current) {
+        setStatus('needs-play')
+        logAppleMusicDebug('Queue loaded; showing tap-to-play')
+      }
     } catch (e) {
       if (!mountedRef.current) return
       setStatus('error')
@@ -225,26 +232,6 @@ const AppleMusicPlayer = forwardRef<AppleMusicPlayerHandle, Props>(function Appl
       logAppleMusicDebug('Init failed', { error: e instanceof Error ? e.message : String(e) })
     }
   }, [appleMusicUrl, handleStateChange, handleTimeChange])
-
-  async function loadAndPlay(music: MusicKitInstance, url: string) {
-    logAppleMusicDebug('Queueing URL and starting playback', { url })
-    await music.setQueue({ url })
-    try {
-      await music.play()
-      if (mountedRef.current) {
-        setStatus('playing')
-        onReady?.()
-        logAppleMusicDebug('Playback started')
-      }
-    } catch {
-      // iOS Safari blocks play() without a direct user gesture (e.g. from useEffect).
-      // Show a tap-to-play button — the queue is already loaded.
-      if (mountedRef.current) {
-        setStatus('needs-play')
-        logAppleMusicDebug('play() blocked by browser; showing tap-to-play')
-      }
-    }
-  }
 
   const handleAuthorize = useCallback(async () => {
     const MK = window.MusicKit
@@ -254,18 +241,20 @@ const AppleMusicPlayer = forwardRef<AppleMusicPlayerHandle, Props>(function Appl
     try {
       await _mkInstance.authorize()
       if (!mountedRef.current) return
-      // After authorize() the async chain breaks iOS's user-gesture context,
-      // so play() would be rejected with NotAllowedError. Show a "Tap to Play"
-      // button instead so the next play() is inside a fresh gesture handler.
-      setStatus('needs-play')
-      logAppleMusicDebug('Authorized; waiting for tap-to-play gesture')
+      // After authorize(), set the queue then show tap-to-play.
+      // Never call play() here — Safari will block it after the async auth chain.
+      await _mkInstance.setQueue({ url: appleMusicUrl })
+      if (mountedRef.current) {
+        setStatus('needs-play')
+        logAppleMusicDebug('Authorized + queue loaded; showing tap-to-play')
+      }
     } catch (e) {
       if (!mountedRef.current) return
       setStatus('error')
       setErrorMsg(e instanceof Error ? e.message : 'Authorization failed')
       logAppleMusicDebug('Manual authorize failed', { error: e instanceof Error ? e.message : String(e) })
     }
-  }, [])
+  }, [appleMusicUrl])
 
   const handleTapToPlay = useCallback(async () => {
     if (!_mkInstance) return
