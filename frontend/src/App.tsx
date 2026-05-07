@@ -813,7 +813,7 @@ function useAlbumBg(albumArtUrl: string | null): string {
 // ── Player view ────────────────────────────────────────────────────────────────
 
 function PlayerView({
-  song, user, onBack, onLogout, onOpenSettings, onOpenAdmin, isAdmin, onPrev, onNext, canPrev, canNext, settings,
+  song, user, onBack, onLogout, onOpenSettings, onOpenAdmin, isAdmin, onPrev, onNext, canPrev, canNext, settings, onUpdate, spotifyEnabled,
 }: {
   song: SongDetail
   user: { display_name: string | null; images: { url: string }[] } | null
@@ -827,6 +827,8 @@ function PlayerView({
   canPrev: boolean
   canNext: boolean
   settings: AppSettings
+  onUpdate: (patch: Partial<AppSettings>) => void
+  spotifyEnabled: boolean
 }) {
   const [trackUri, setTrackUri] = useState(song.spotify_uri)
   const [loading,  setLoading]  = useState(false)
@@ -1111,24 +1113,30 @@ function PlayerView({
           >
             Settings
           </button>
-          {effectiveSource === 'spotify' && player.isReady && (
-            <span className="flex items-center gap-1.5 text-xs text-green-400">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-              Spotify
-            </span>
-          )}
-          {effectiveSource === 'youtube' && ytReady && (
-            <span className="flex items-center gap-1.5 text-xs text-red-400">
-              <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />
-              YouTube
-            </span>
-          )}
-          {effectiveSource === 'apple_music' && amReady && (
-            <span className="flex items-center gap-1.5 text-xs text-pink-400">
-              <span className="w-1.5 h-1.5 rounded-full bg-pink-400 animate-pulse" />
-              Apple Music
-            </span>
-          )}
+          {/* Inline source switcher — only shows sources available for this song */}
+          {(() => {
+            const opts: { value: AppSettings['preferredSource']; label: string; activeClass: string }[] = []
+            if (song.youtube_url) opts.push({ value: 'youtube', label: 'YT', activeClass: 'bg-red-500/20 text-red-400' })
+            if (song.apple_music_url) opts.push({ value: 'apple_music', label: 'AM', activeClass: 'bg-pink-500/20 text-pink-400' })
+            if (spotifyEnabled && song.spotify_uri) opts.push({ value: 'spotify', label: 'SP', activeClass: 'bg-green-500/20 text-green-400' })
+            if (opts.length < 2) return null
+            return (
+              <div className="flex items-center gap-0.5 rounded-lg bg-gray-800/70 p-0.5">
+                {opts.map(opt => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => onUpdate({ preferredSource: opt.value })}
+                    className={`px-2.5 py-1 rounded-md text-xs font-medium transition-all ${
+                      effectiveSource === opt.value ? opt.activeClass : 'text-gray-500 hover:text-gray-300'
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            )
+          })()}
           {user?.display_name && <span className="text-xs text-gray-500">{user.display_name}</span>}
           <button onClick={onLogout} className="text-xs text-gray-600 hover:text-gray-400 transition-colors">Sign out</button>
         </div>
@@ -1736,6 +1744,8 @@ export default function App() {
         canPrev={activeSongIndex > 0}
         canNext={activeSongIndex >= 0 && activeSongIndex < displayedSongs.length - 1}
         settings={settings}
+        onUpdate={updateSettings}
+        spotifyEnabled={isSpotifyEnabled}
       />
     )
   }
