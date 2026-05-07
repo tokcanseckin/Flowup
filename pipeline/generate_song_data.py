@@ -2,7 +2,7 @@
 """
 FlowUp – Multilingual Data Generation Pipeline
 
-Fetches time-synced lyrics from LRCLIB, falls back to Aeneas forced
+Fetches time-synced lyrics from LRCLIB, falls back to stable-ts forced
 alignment when only plain lyrics are available, translates via DeepL, runs
 language-specific NLP (phonetic annotation + morphological analysis),
 and writes a song_data.json file consumed by the React frontend.
@@ -32,11 +32,8 @@ Environment variables:
   DEEPL_API_KEY      – DeepL free-tier key (required for real translations)
   DEEPL_URL          – Override endpoint (default: api-free.deepl.com)
   ARGOS_AUTO_INSTALL – if "1", try to auto-download/install missing Argos model
-    AENEAS_PYTHON_EXECUTABLE – Python executable for the separate Aeneas env
-                                                         (required for forced alignment fallback)
-    AENEAS_TASK_LANGUAGE – Override Aeneas task language (default: mapped from --lang)
-    AENEAS_TASK_CONFIG – Full Aeneas task config override (advanced)
   YOUTUBE_COOKIES_FILE – Path to Netscape-format cookies file for yt-dlp (bypasses bot detection)
+  STABLE_TS_MODEL      – stable-ts Whisper model for forced alignment (default: large-v3-turbo)
 
 Usage:
   pip install -r requirements.txt
@@ -63,6 +60,7 @@ import subprocess
 import sys
 import tempfile
 import time
+import unicodedata
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable
@@ -144,7 +142,10 @@ def build_arg_parser() -> argparse.ArgumentParser:
     p.add_argument("--lrc-file",    dest="lrc_file", default="",
                    help="Path to a local .lrc file to use instead of fetching from LRCLIB.")
     p.add_argument("--youtube-url", dest="youtube_url", default="",
-                   help="YouTube URL used for Aeneas alignment when synced lyrics are unavailable.")
+                   help="YouTube URL used for stable-ts forced alignment when synced lyrics are unavailable.")
+    p.add_argument("--stable-ts-model", dest="stable_ts_model",
+                   default=os.environ.get("STABLE_TS_MODEL", "large-v3-turbo"),
+                   help="stable-ts Whisper model name (default: large-v3-turbo)")
     p.add_argument("--replace-id",  dest="replace_id", type=int, default=None,
                    help="Delete this song ID from the backend before pushing the re-processed version.")
     return p
@@ -203,162 +204,316 @@ def _normalize_plain_lyrics(text: str) -> list[str]:
     return lines
 
 
-_AENEAS_TASK_LANG: dict[str, str] = {
-    "ar": "ara",
-    "de": "deu",
-    "en": "eng",
-    "es": "spa",
-    "fr": "fra",
-    "he": "heb",
-    "it": "ita",
-    "ja": "jpn",
-    "ko": "kor",
-    "nl": "nld",
-    "pl": "pol",
-    "pt": "por",
-    "ru": "rus",
-    "sv": "swe",
-    "tr": "tur",
-    "uk": "ukr",
-    "zh": "cmn",
-}
+# ── stable-ts forced-alignment helpers ───────────────────────────────────────
+
+_STTS_METADATA_PAT = re.compile(r'^\(.*\)$')
+_STTS_STOPWORDS = {"я", "и", "в", "на", "не", "но", "он", "её", "мне",
+                   "мой", "моя", "его", "мы", "вы", "ты", "да", "нет", "вот"}
 
 
-def align_with_aeneas(plain_lyrics: str, youtube_url: str, lang_code: str) -> str | None:
-    """Download audio via yt-dlp and align plain lyrics using Aeneas.
+def _stts_filter_metadata(lines: list[str]) -> list[str]:
+    """Remove parenthetical-only lines (e.g. composer credits like '(Авт. текста)')."""
+    filtered = [l for l in lines if not _STTS_METADATA_PAT.match(l)]
+    if len(filtered) < len(lines):
+        print(f"  [stable-ts] Removed {len(lines) - len(filtered)} metadata line(s)")
+    return filtered
 
-    Aeneas runs in a dedicated Python environment specified by
-    AENEAS_PYTHON_EXECUTABLE.
+
+def _stts_norm(s: str) -> str:
+    s = unicodedata.normalize("NFC", s.lower())
+    return re.sub(r"[^\w]", "", s, flags=re.UNICODE)
+
+
+def _stts_anchor_for(lw: list[str]) -> tuple[int, list[str]]:
+    for i, w in enumerate(lw):
+        nw = _stts_norm(w)
+        if nw not in _STTS_STOPWORDS and len(nw) >= 3:
+            anchor = [nw]
+            if i + 1 < len(lw):
+                anchor.append(_stts_norm(lw[i + 1]))
+            return i, anchor
+    return 0, [_stts_norm(lw[0])]
+
+
+def _stts_collect_words(result) -> list[tuple[float, float, str]]:
+    words = []
+    for seg in result.segments:
+        for w in (seg.words or []):
+            t = w.word.strip()
+            if t:
+                words.append((w.start, w.end, t))
+    return words
+
+
+def _stts_match_lines(lyrics: list[str], words: list[tuple]) -> list:
+    out = []
+    wi = 0
+    for line in lyrics:
+        lw = line.split()
+        if not lw:
+            out.append(None)
+            continue
+        offset, anchors = _stts_anchor_for(lw)
+        found = None
+        for i in range(wi, len(words)):
+            if _stts_norm(words[i][2]) == anchors[0]:
+                if len(anchors) > 1 and i + 1 < len(words):
+                    if _stts_norm(words[i + 1][2]) != anchors[1]:
+                        continue
+                si = max(0, i - offset)
+                ei = min(si + len(lw) - 1, len(words) - 1)
+                found = (si, ei, words[si][0], words[ei][1])
+                wi = i + 1
+                break
+        out.append(found)
+    return out
+
+
+def _stts_is_stacked(words: list[tuple], si: int, ei: int) -> bool:
+    from collections import Counter
+    if ei <= si:
+        return False
+    times = [round(words[j][0], 2) for j in range(si, min(ei + 1, len(words)))]
+    return max(Counter(times).values(), default=0) >= 3
+
+
+def _stts_audio_duration(audio_path: Path) -> float:
+    r = subprocess.run(
+        ["ffprobe", "-v", "quiet", "-show_entries", "format=duration",
+         "-of", "default=noprint_wrappers=1:nokey=1", str(audio_path)],
+        capture_output=True, text=True,
+    )
+    try:
+        return float(r.stdout.strip())
+    except ValueError:
+        return 0.0
+
+
+def _stts_isolate_vocals(audio_path: Path, work_dir: Path) -> Path:
+    print("  [stable-ts] Isolating vocals with Demucs …")
+    t0 = time.perf_counter()
+    demucs_out = work_dir / "demucs_out"
+    r = subprocess.run(
+        [sys.executable, "-m", "demucs",
+         "--two-stems", "vocals", "-n", "htdemucs",
+         "-o", str(demucs_out), str(audio_path)],
+        capture_output=True, text=True, timeout=600,
+    )
+    if r.returncode != 0:
+        print(f"  [stable-ts] Demucs failed — using original audio")
+        return audio_path
+    candidates = list(demucs_out.rglob("vocals.wav"))
+    if not candidates:
+        print("  [stable-ts] vocals.wav not found — using original audio")
+        return audio_path
+    print(f"  [stable-ts] Demucs done in {time.perf_counter() - t0:.1f}s")
+    return candidates[0]
+
+
+def _stts_ngap_loop(
+    model,
+    audio_path: Path,
+    lyrics: list[str],
+    language: str,
+    work_dir: Path,
+    offset_abs: float = 0.0,
+    gap_threshold: float = 15.0,
+    lookback: float = 25.0,
+) -> tuple[list[tuple], float]:
+    """N-gap forced alignment loop with density guard."""
+    all_words: list[tuple] = []
+    committed = 0
+    sub_start = 0.0
+    consecutive_no_progress = 0
+    align_time = 0.0
+    MAX_PASSES = 10
+    MAX_LINE_DENSITY = 0.5   # lines/s — above this, alignment reliably fails
+    audio_total = _stts_audio_duration(audio_path)
+
+    for pass_num in range(1, MAX_PASSES + 1):
+        remaining = lyrics[committed:]
+        if not remaining:
+            break
+
+        audio_remaining = max(audio_total - sub_start, 1.0)
+        density = len(remaining) / audio_remaining
+        if density > MAX_LINE_DENSITY:
+            print(f"  [stable-ts] pass {pass_num}: ⚠ density too high "
+                  f"({len(remaining)} lines / {audio_remaining:.0f}s = {density:.2f}/s) — stopping")
+            break
+
+        if sub_start > 0:
+            sub_crop = work_dir / f".ngap_{int(offset_abs + sub_start)}.wav"
+            if not sub_crop.exists():
+                subprocess.run(
+                    ["ffmpeg", "-y", "-i", str(audio_path), "-ss", str(sub_start), str(sub_crop)],
+                    capture_output=True, check=True,
+                )
+            align_src = sub_crop
+        else:
+            align_src = audio_path
+
+        t0 = time.perf_counter()
+        result = model.align(str(align_src), "\n".join(remaining), language=language)
+        align_time += time.perf_counter() - t0
+
+        words_rel = _stts_collect_words(result)
+        abs_off = offset_abs + sub_start
+        words_abs = [(s + abs_off, e + abs_off, w) for s, e, w in words_rel]
+        assignments = _stts_match_lines(remaining, words_rel)
+
+        first_bad = None
+        for i, a in enumerate(assignments):
+            if a and _stts_is_stacked(words_rel, a[0], a[1]):
+                first_bad = i
+                break
+
+        if first_bad is None:
+            first_wi = assignments[0][0] if assignments[0] else 0
+            all_words += words_abs[first_wi:]
+            committed = len(lyrics)
+            break
+
+        bad_time_rel = assignments[first_bad][2]
+        major_gap = None
+        for j in range(1, len(words_rel)):
+            gap = words_rel[j][0] - words_rel[j - 1][1]
+            if gap >= gap_threshold and words_rel[j - 1][1] >= bad_time_rel - lookback:
+                major_gap = (words_rel[j - 1][1], words_rel[j][0])
+                break
+
+        if major_gap is None:
+            first_wi = assignments[0][0] if assignments[0] else 0
+            all_words += words_abs[first_wi:]
+            committed = len(lyrics)
+            break
+
+        gap_start_rel, gap_end_rel = major_gap
+        good_count = 0
+        last_good_wi_rel = -1
+        for i, a in enumerate(assignments):
+            if i >= first_bad:
+                break
+            if a and a[3] <= gap_start_rel:
+                good_count = i + 1
+                last_good_wi_rel = a[1]
+
+        new_sub_start = sub_start + max(0.0, gap_end_rel - lookback)
+
+        if good_count > 0:
+            first_wi = assignments[0][0] if assignments[0] else 0
+            all_words += words_abs[first_wi:last_good_wi_rel + 1]
+            committed += good_count
+            consecutive_no_progress = 0
+            print(f"  [stable-ts] pass {pass_num}: gap "
+                  f"{abs_off + gap_start_rel:.1f}→{abs_off + gap_end_rel:.1f}s — "
+                  f"committed {committed}/{len(lyrics)} lines")
+        else:
+            consecutive_no_progress += 1
+            if consecutive_no_progress >= 2:
+                first_wi = assignments[0][0] if assignments[0] else 0
+                all_words += words_abs[first_wi:]
+                committed = len(lyrics)
+                break
+
+        sub_start = new_sub_start
+
+    return all_words, align_time
+
+
+def align_with_stable_ts(
+    plain_lyrics: str,
+    youtube_url: str,
+    lang_code: str,
+    model_name: str = "large-v3-turbo",
+) -> str | None:
+    """Download audio via yt-dlp, isolate vocals with Demucs, then force-align
+    lyrics using stable-ts (Whisper encoder). Returns LRC string or None.
     """
     if not youtube_url:
-        print("  [Aeneas] Skipping: no YouTube URL provided.")
+        print("  [stable-ts] Skipping: no YouTube URL provided.")
         return None
 
     lyric_lines = _normalize_plain_lyrics(plain_lyrics)
+    lyric_lines = _stts_filter_metadata(lyric_lines)
     if not lyric_lines:
-        print("  [Aeneas] Skipping: no usable lyric lines.")
+        print("  [stable-ts] Skipping: no usable lyric lines.")
         return None
 
-    aeneas_python = os.environ.get("AENEAS_PYTHON_EXECUTABLE", "").strip()
-    if not aeneas_python:
-        print("  [Aeneas] Skipping: AENEAS_PYTHON_EXECUTABLE is not set.")
-        return None
-    if not Path(aeneas_python).exists():
-        print(f"  [Aeneas] Skipping: executable not found: {aeneas_python}")
+    try:
+        import stable_whisper
+    except ImportError:
+        print("  [stable-ts] stable-ts not installed — pip install stable-ts")
         return None
 
-    task_lang = os.environ.get("AENEAS_TASK_LANGUAGE", _AENEAS_TASK_LANG.get(lang_code, "")).strip()
-    if not task_lang:
-        print(f"  [Aeneas] Unsupported language for fallback alignment: {lang_code}")
-        return None
+    with tempfile.TemporaryDirectory(prefix="flowup-stablts-") as tmp_dir:
+        tmp = Path(tmp_dir)
+        audio_path = tmp / "audio.mp3"
 
-    task_cfg = os.environ.get(
-        "AENEAS_TASK_CONFIG",
-        f"task_language={task_lang}|is_text_type=plain|os_task_file_format=json",
-    ).strip()
-
-    with tempfile.TemporaryDirectory(prefix="singoling-aeneas-") as tmp_dir:
-        tmp_path = Path(tmp_dir)
-        audio_path = tmp_path / "audio.mp3"
-        audio_small_path = tmp_path / "audio_16k.wav"
-        text_path = tmp_path / "lyrics.txt"
-        syncmap_path = tmp_path / "syncmap.json"
-
-        print("  [Aeneas] Downloading audio via yt-dlp …")
+        # ── Download audio
+        print("  [stable-ts] Downloading audio via yt-dlp …")
         yt_cmd = [
             sys.executable, "-m", "yt_dlp",
-            "--remote-components", "ejs:github",
-            "--js-runtimes", "node:/usr/bin/node",
-            "--extractor-args", "youtube:player_client=web",
             "-f", "bestaudio[acodec!=none]/best[acodec!=none]",
             "-x", "--audio-format", "mp3",
-            "-o", str(tmp_path / "audio.%(ext)s"),
+            "-o", str(tmp / "audio.%(ext)s"),
+            "--no-playlist",
         ]
         cookies_file = os.environ.get("YOUTUBE_COOKIES_FILE", "")
         if cookies_file and Path(cookies_file).exists():
             yt_cmd += ["--cookies", cookies_file]
-            print(f"  [Aeneas] Using cookies from {cookies_file}")
+            print(f"  [stable-ts] Using cookies from {cookies_file}")
         yt_cmd.append(youtube_url)
-        dl = subprocess.run(
-            yt_cmd,
-            capture_output=True,
-            text=True,
-            timeout=180,
-            check=False,
-        )
+        dl = subprocess.run(yt_cmd, capture_output=True, text=True, timeout=180, check=False)
         if dl.returncode != 0 or not audio_path.exists():
-            print(f"  [Aeneas] Download failed: {(dl.stderr or dl.stdout).strip()[:400]}")
+            print(f"  [stable-ts] Download failed: {(dl.stderr or dl.stdout).strip()[:400]}")
             return None
 
-        # Downsample to 16kHz mono WAV — Aeneas runs much faster on smaller audio
-        print("  [Aeneas] Downsampling audio to 16kHz mono …")
-        ff = subprocess.run(
-            ["ffmpeg", "-y", "-i", str(audio_path), "-ar", "16000", "-ac", "1", str(audio_small_path)],
-            capture_output=True,
-            text=True,
-            timeout=60,
-            check=False,
+        # ── Isolate vocals with Demucs
+        vocals_path = _stts_isolate_vocals(audio_path, tmp)
+
+        # ── Load model
+        print(f"  [stable-ts] Loading model '{model_name}' …")
+        t0 = time.perf_counter()
+        model = stable_whisper.load_model(model_name)
+        print(f"  [stable-ts] Model loaded in {time.perf_counter() - t0:.1f}s")
+
+        # ── Align
+        print(f"  [stable-ts] Aligning {len(lyric_lines)} lines …")
+        all_words, align_time = _stts_ngap_loop(
+            model, vocals_path, lyric_lines, lang_code,
+            work_dir=tmp, offset_abs=0.0,
+            gap_threshold=15.0, lookback=25.0,
         )
-        if ff.returncode == 0 and audio_small_path.exists():
-            aeneas_audio = audio_small_path
-        else:
-            print("  [Aeneas] ffmpeg downsample failed, using original audio")
-            aeneas_audio = audio_path
+        print(f"  [stable-ts] Alignment done in {align_time:.1f}s")
 
-        text_path.write_text("\n".join(lyric_lines), encoding="utf-8")
-
-        print(f"  [Aeneas] Aligning with task language '{task_lang}' …")
-        align_cmd = [
-            aeneas_python,
-            "-m",
-            "aeneas.tools.execute_task",
-            str(aeneas_audio),
-            str(text_path),
-            task_cfg,
-            str(syncmap_path),
-        ]
-        run = subprocess.run(
-            align_cmd,
-            capture_output=True,
-            text=True,
-            timeout=600,
-            check=False,
-        )
-        if run.returncode != 0 or not syncmap_path.exists():
-            print(f"  [Aeneas] Alignment failed: {(run.stderr or run.stdout).strip()[:500]}")
-            return None
-
-        try:
-            payload = json.loads(syncmap_path.read_text(encoding="utf-8"))
-            fragments = payload.get("fragments", [])
-        except (json.JSONDecodeError, OSError) as exc:
-            print(f"  [Aeneas] Could not read sync map: {exc}")
-            return None
-
+        # ── Build LRC rows: dedup consecutive same-timestamp stacked lines
+        assignments = _stts_match_lines(lyric_lines, all_words)
         rows: list[dict] = []
-        for frag in fragments:
-            lines = frag.get("lines") or []
-            text = " ".join(str(x).strip() for x in lines if str(x).strip())
-            if not text:
+        last_stacked_start: float | None = None
+        for a, line in zip(assignments, lyric_lines):
+            if not a:
+                print(f"  [stable-ts] ⚠ unaligned (skipped): {line[:60]}")
                 continue
-            try:
-                begin_ms = int(float(frag.get("begin", "0")) * 1000)
-                end_ms = int(float(frag.get("end", "0")) * 1000)
-            except (TypeError, ValueError):
-                continue
-            if end_ms <= begin_ms:
-                end_ms = begin_ms + 200
-            rows.append({"start_ms": begin_ms, "end_ms": end_ms, "text": text})
+            stacked = _stts_is_stacked(all_words, a[0], a[1])
+            if stacked:
+                if last_stacked_start is not None and abs(a[2] - last_stacked_start) < 0.5:
+                    print(f"  [stable-ts] ⚠ duplicate skipped: {line[:60]}")
+                    continue
+                last_stacked_start = a[2]
+            else:
+                last_stacked_start = None
+            rows.append({"start_ms": int(a[2] * 1000), "end_ms": int(a[3] * 1000), "text": line})
 
-        if len(rows) != len(lyric_lines):
-            print(f"  [Aeneas] Rejected: aligned {len(rows)} lines, expected {len(lyric_lines)}.")
+        if not rows:
+            print("  [stable-ts] No lines aligned.")
             return None
 
         for i in range(len(rows) - 1):
-            rows[i]["end_ms"] = max(rows[i]["end_ms"], rows[i + 1]["start_ms"])
-        rows[-1]["end_ms"] = max(rows[-1]["end_ms"], rows[-1]["start_ms"] + 4_000)
+            rows[i]["end_ms"] = rows[i + 1]["start_ms"]
+        rows[-1]["end_ms"] = rows[-1]["start_ms"] + 4_000
 
-        print(f"  [Aeneas] Aligned {len(rows)} lyric lines.")
+        print(f"  [stable-ts] Aligned {len(rows)}/{len(lyric_lines)} lines.")
         return rows_to_lrc(rows)
 
 
@@ -724,11 +879,14 @@ def main() -> None:
         if lrc is None:
             plain_lyrics = fetch_plain_lyrics(args.artist, args.title)
             if plain_lyrics and args.youtube_url:
-                print("  [Aeneas] Falling back to forced alignment …")
-                lrc = align_with_aeneas(plain_lyrics, args.youtube_url, args.lang)
+                print("  [stable-ts] Falling back to forced alignment …")
+                lrc = align_with_stable_ts(
+                    plain_lyrics, args.youtube_url, args.lang,
+                    model_name=args.stable_ts_model,
+                )
     if lrc is None:
         print("ERROR: Could not retrieve synced lyrics. Aborting.")
-        print("TIP:   Provide --youtube-url and configure AENEAS_PYTHON_EXECUTABLE.")
+        print("TIP:   Provide --youtube-url for stable-ts forced alignment.")
         print("TIP:   Pass --lrc-file <path> to use a local .lrc file as a fallback.")
         sys.exit(1)
     rows = parse_lrc(lrc, args.offset_ms)
