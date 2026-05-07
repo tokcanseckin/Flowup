@@ -44,7 +44,7 @@ def fetch_plain_lyrics(artist: str, title: str) -> list[str]:
                     print(f"[LRCLIB] Found: {hit.get('trackName')} (id={hit.get('id')})")
                     lines = [l.strip() for l in hit["plainLyrics"].splitlines()
                              if l.strip() and l.strip() != "♪"]
-                    return lines
+                    return filter_metadata_lines(lines)
         except requests.RequestException as e:
             print(f"[LRCLIB] Error: {e}")
     # fallback: /api/get
@@ -57,7 +57,7 @@ def fetch_plain_lyrics(artist: str, title: str) -> list[str]:
                 lines = [l.strip() for l in body["plainLyrics"].splitlines()
                          if l.strip() and l.strip() != "♪"]
                 print(f"[LRCLIB] Found via /api/get (id={body.get('id')})")
-                return lines
+                return filter_metadata_lines(lines)
     except requests.RequestException as e:
         print(f"[LRCLIB] Error: {e}")
     print("[LRCLIB] No plain lyrics found — cannot proceed.")
@@ -85,6 +85,17 @@ def download_audio(youtube_url: str, out_path: Path) -> None:
 
 import unicodedata as _uc
 import re as _re
+
+_METADATA_LINE_PAT = _re.compile(r'^\(.*\)$')
+
+def filter_metadata_lines(lines: list[str]) -> list[str]:
+    """Remove parenthetical-only lines (e.g. composer credits like '(Ю. Антонов)')."""
+    filtered = [l for l in lines if not _METADATA_LINE_PAT.match(l)]
+    n_removed = len(lines) - len(filtered)
+    if n_removed:
+        print(f"[lyrics] Removed {n_removed} metadata line(s) (parenthetical-only)")
+    return filtered
+
 
 STOPWORDS = {"я", "и", "в", "на", "не", "но", "он", "её", "мне",
              "мой", "моя", "его", "мы", "вы", "ты", "да", "нет", "вот"}
@@ -143,6 +154,34 @@ def is_stacked(words: list[tuple], si: int, ei: int) -> bool:
         return False
     times = [round(words[j][0], 2) for j in range(si, min(ei + 1, len(words)))]
     return max(Counter(times).values(), default=0) >= 3
+
+
+def dedup_assignments(lyrics: list[str], assignments: list, all_words: list[tuple]) -> list[bool]:
+    """Mark consecutive stacked lines that share the same timestamp as duplicates."""
+    is_dup = [False] * len(lyrics)
+    last_stacked_start = None
+    for i, a in enumerate(assignments):
+        if a and is_stacked(all_words, a[0], a[1]):
+            if last_stacked_start is not None and abs(a[2] - last_stacked_start) < 0.5:
+                is_dup[i] = True
+            else:
+                last_stacked_start = a[2]
+        else:
+            last_stacked_start = None
+    return is_dup
+
+
+def get_audio_duration(audio_path: Path) -> float:
+    """Return audio duration in seconds via ffprobe."""
+    result = subprocess.run(
+        ["ffprobe", "-v", "quiet", "-show_entries", "format=duration",
+         "-of", "default=noprint_wrappers=1:nokey=1", str(audio_path)],
+        capture_output=True, text=True,
+    )
+    try:
+        return float(result.stdout.strip())
+    except ValueError:
+        return 0.0
 
 def isolate_vocals(audio_path: Path, cache_dir: Path) -> Path:
     """Run Demucs htdemucs to isolate vocals. Returns cached vocals.wav path."""
@@ -379,10 +418,21 @@ def _ngap_loop(
     consecutive_no_progress = 0
     align_time = 0.0
     MAX_PASSES = 10
+    MAX_LINE_DENSITY = 0.5   # lines/s — above this, alignment reliably fails
+    audio_total = get_audio_duration(audio_path)
 
     for pass_num in range(1, MAX_PASSES + 1):
         remaining = lyrics[committed:]
         if not remaining:
+            break
+
+        # Density guard: stop if remaining lines can't possibly fit in remaining audio
+        audio_remaining = max(audio_total - sub_start, 1.0)
+        density = len(remaining) / audio_remaining
+        if density > MAX_LINE_DENSITY:
+            print(f"    pass {pass_num}: ⚠ DENSITY TOO HIGH "
+                  f"({len(remaining)} lines / {audio_remaining:.0f}s = {density:.2f}/s) "
+                  f"— stopping to avoid stacking")
             break
 
         if sub_start > 0:
@@ -530,6 +580,7 @@ def main():
 
     # ── Match words to lines ──────────────────────────────────────────────────
     assignments = match_lines(lyrics, all_words)
+    dups = dedup_assignments(lyrics, assignments, all_words)
 
     # ── Print results ─────────────────────────────────────────────────────────
     width = 72
@@ -540,16 +591,32 @@ def main():
     print(f"  {'start':>7}  {'end':>7}  line")
     print(f"  {'-'*7}  {'-'*7}  {'-'*52}")
 
-    for a, line in zip(assignments, lyrics):
-        if a:
+    n_ok = 0
+    n_stacked = 0
+    n_deduped = 0
+    n_missing = 0
+    for i, (a, line) in enumerate(zip(assignments, lyrics)):
+        if dups[i]:
+            print(f"  {'[dup]':>7}  {'':>7}  {line} ⚠")
+            n_deduped += 1
+        elif a:
+            stacked = is_stacked(all_words, a[0], a[1])
             s = f"{a[2]:.1f}s"
             e = f"{a[3]:.1f}s"
-            flag = " ⚠" if is_stacked(all_words, a[0], a[1]) else ""
+            flag = " ⚠" if stacked else ""
+            print(f"  {s:>7}  {e:>7}  {line}{flag}")
+            if stacked:
+                n_stacked += 1
+            else:
+                n_ok += 1
         else:
-            s, e, flag = "  ???", "  ???", " ⚠"
-        print(f"  {s:>7}  {e:>7}  {line}{flag}")
+            print(f"  {'  ???':>7}  {'  ???':>7}  {line} ⚠")
+            n_missing += 1
 
     print("═" * width)
+    total_lines = len(lyrics)
+    print(f"  Lines      : {n_ok}/{total_lines} clean  "
+          f"| {n_stacked} stacked  | {n_deduped} deduped  | {n_missing} missing")
     print(f"  Model load : {load_time:.1f}s")
     print(f"  Align time : {align_time:.1f}s")
     print(f"  Total      : {total_time:.1f}s")
