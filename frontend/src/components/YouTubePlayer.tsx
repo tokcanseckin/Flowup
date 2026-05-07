@@ -290,7 +290,7 @@ const YouTubePlayer = forwardRef<YouTubePlayerHandle, Props>(function YouTubePla
       ) : (
         <div
           ref={containerRef}
-          className="w-full aspect-video rounded-xl overflow-hidden bg-black"
+          className="w-full rounded-xl overflow-hidden bg-black" style={{ height: '250px' }}
         />
       )}
       {!error && warning && (
