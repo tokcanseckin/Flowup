@@ -895,6 +895,24 @@ function PlayerView({
   const amEverPlayedRef = useRef(false)
   const [amAutoPlay, setAmAutoPlay] = useState(false)
 
+  // Wrap onPrev/onNext: if AM is active and audio context is already unlocked,
+  // mark the next song for auto-play before navigating.
+  const handlePrev = useCallback(() => {
+    if (effectiveSource === 'apple_music' && amEverPlayedRef.current) {
+      setAmAutoPlay(true)
+      setPendingPlay(true)
+    }
+    onPrev()
+  }, [effectiveSource, onPrev])
+
+  const handleNext = useCallback(() => {
+    if (effectiveSource === 'apple_music' && amEverPlayedRef.current) {
+      setAmAutoPlay(true)
+      setPendingPlay(true)
+    }
+    onNext()
+  }, [effectiveSource, onNext])
+
   const handleAmTimeUpdate = useCallback((posMs: number, durMs: number) => {
     setAmPositionMs(posMs)
     setAmDurationMs(durMs)
@@ -1038,20 +1056,20 @@ function PlayerView({
       if (e.key === 'ArrowLeft') {
         e.preventDefault()
         if (e.repeat || !canPrev) return
-        onPrev()
+        handlePrev()
         return
       }
 
       if (e.key === 'ArrowRight') {
         e.preventDefault()
         if (e.repeat || !canNext) return
-        onNext()
+        handleNext()
       }
     }
 
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [onPrev, onNext, canPrev, canNext, togglePlay, isReady])
+  }, [handlePrev, handleNext, canPrev, canNext, togglePlay, isReady])
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: effectiveSource === 'spotify' ? albumBg : '#0d0d14', transition: 'background 1.2s ease' }}>
@@ -1199,7 +1217,7 @@ function PlayerView({
           <ProgressBar posMs={positionMs} durMs={durationMs} onSeek={seekTo} />
           <div className="flex items-center justify-center gap-3 mt-5">
             <button
-              onClick={onPrev}
+              onClick={handlePrev}
               disabled={!canPrev}
               aria-label="Previous song"
               className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-800 hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed text-gray-200 transition-all"
@@ -1233,7 +1251,7 @@ function PlayerView({
               )}
             </button>
             <button
-              onClick={onNext}
+              onClick={handleNext}
               disabled={!canNext}
               aria-label="Next song"
               className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-800 hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed text-gray-200 transition-all"
@@ -1634,23 +1652,13 @@ export default function App() {
 
   const handlePrevSong = useCallback(() => {
     if (activeSongIndex <= 0) return
-    // If Apple Music is active and has been played before, auto-play the next song.
-    if (effectiveSource === 'apple_music' && amEverPlayedRef.current) {
-      setAmAutoPlay(true)
-      setPendingPlay(true)
-    }
     void handleSelectSong(displayedSongs[activeSongIndex - 1].id)
-  }, [activeSongIndex, displayedSongs, handleSelectSong, effectiveSource])
+  }, [activeSongIndex, displayedSongs, handleSelectSong])
 
   const handleNextSong = useCallback(() => {
     if (activeSongIndex < 0 || activeSongIndex >= displayedSongs.length - 1) return
-    // If Apple Music is active and has been played before, auto-play the next song.
-    if (effectiveSource === 'apple_music' && amEverPlayedRef.current) {
-      setAmAutoPlay(true)
-      setPendingPlay(true)
-    }
     void handleSelectSong(displayedSongs[activeSongIndex + 1].id)
-  }, [activeSongIndex, displayedSongs, handleSelectSong, effectiveSource])
+  }, [activeSongIndex, displayedSongs, handleSelectSong])
 
   if (auth.isLoading) return <LoadingScreen message="Restoring session..." />
 
