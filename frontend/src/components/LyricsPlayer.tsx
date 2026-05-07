@@ -570,14 +570,22 @@ function InspectPanel({ info, onClose, compact = false }: InspectPanelProps) {
 
           {/* ── POS + morphological details ── */}
           {info.word.grammar && (() => {
-            const parts = info.word.grammar.split(',').map(s => s.trim())
+            const firstReading = info.word.grammar.split(' / ')[0]
+            const parts = firstReading.split(',').map(s => s.trim())
             const pos = parts[0]
-            const detail = parts.slice(1).join(' · ')
+            const ASPECTS = new Set(['Perfective', 'Imperfective'])
+            const aspect = parts.find(p => ASPECTS.has(p)) ?? null
+            const detail = parts.slice(1).filter(p => !ASPECTS.has(p)).join(' · ')
             return (
               <div className="mt-2 flex flex-wrap items-baseline gap-2">
                 <span className="rounded-md bg-indigo-900/50 px-2 py-0.5 text-[11px] font-semibold text-indigo-300 uppercase tracking-wide">
                   {pos}
                 </span>
+                {aspect && (
+                  <span className="rounded-md bg-violet-900/50 px-2 py-0.5 text-[11px] font-semibold text-violet-300 uppercase tracking-wide">
+                    {aspect}
+                  </span>
+                )}
                 {detail && (
                   <span className="text-xs text-gray-400">{detail}</span>
                 )}
