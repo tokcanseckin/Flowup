@@ -869,6 +869,7 @@ function PlayerView({
   // ── YouTube player ───────────────────────────────────────────────────────────
   const ytRef = useRef<YouTubePlayerHandle>(null)
   const [ytPositionMs, setYtPositionMs] = useState(0)
+  const [ytDurationMs, setYtDurationMs] = useState(0)
   const [ytPlaying, setYtPlaying] = useState(false)
   const [ytReady, setYtReady] = useState(false)
 
@@ -897,7 +898,7 @@ function PlayerView({
   // Combined values depending on active source
   const isPlaying  = effectiveSource === 'youtube' ? ytPlaying  : effectiveSource === 'apple_music' ? amPlaying  : player.isPlaying
   const positionMs = effectiveSource === 'youtube' ? ytPositionMs : effectiveSource === 'apple_music' ? amPositionMs : player.currentPositionMs
-  const durationMs = effectiveSource === 'youtube' ? 0           : effectiveSource === 'apple_music' ? amDurationMs : player.durationMs
+  const durationMs = effectiveSource === 'youtube' ? ytDurationMs : effectiveSource === 'apple_music' ? amDurationMs : player.durationMs
   const isReady    = effectiveSource === 'youtube' ? ytReady    : effectiveSource === 'apple_music' ? amReady    : player.isReady
 
   const togglePlay = useCallback(() => {
@@ -1078,6 +1079,7 @@ function PlayerView({
             youtubeUrl={song.youtube_url}
             onReady={handleYtReady}
             onTimeUpdate={setYtPositionMs}
+            onDurationChange={setYtDurationMs}
             onPlayStateChange={handleYtPlayStateChange}
           />
         )}

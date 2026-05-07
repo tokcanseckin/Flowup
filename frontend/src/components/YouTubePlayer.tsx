@@ -75,6 +75,8 @@ interface Props {
   onTimeUpdate?: (positionMs: number) => void
   /** Fires when the player starts or stops playing. */
   onPlayStateChange?: (playing: boolean) => void
+  /** Fires once (or whenever it changes) with the video duration in ms. */
+  onDurationChange?: (durationMs: number) => void
 }
 
 declare namespace YT {
@@ -91,6 +93,7 @@ declare namespace YT {
     pauseVideo(): void
     seekTo(seconds: number, allowSeekAhead: boolean): void
     getCurrentTime?(): number
+    getDuration?(): number
     getPlayerState?(): number
     destroy(): void
   }
@@ -133,7 +136,7 @@ declare global {
 // ── component ─────────────────────────────────────────────────────────────────
 
 const YouTubePlayer = forwardRef<YouTubePlayerHandle, Props>(function YouTubePlayer(
-  { youtubeUrl, onReady, onTimeUpdate, onPlayStateChange },
+  { youtubeUrl, onReady, onTimeUpdate, onPlayStateChange, onDurationChange },
   ref,
 ) {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -167,6 +170,7 @@ const YouTubePlayer = forwardRef<YouTubePlayerHandle, Props>(function YouTubePla
 
     function startPolling() {
       if (timerRef.current) clearInterval(timerRef.current)
+      let reportedDurMs = 0
       timerRef.current = setInterval(() => {
         const player = ytRef.current
         if (!player) return
@@ -178,6 +182,14 @@ const YouTubePlayer = forwardRef<YouTubePlayerHandle, Props>(function YouTubePla
           if (sec >= 0 && sec % 5 === 0 && sec !== lastLoggedSecondRef.current) {
             lastLoggedSecondRef.current = sec
             logYouTubeDebug('Playback progress', { sec, videoId: resolvedVideoId })
+          }
+        }
+        const durS = player.getDuration?.()
+        if (durS && durS > 0) {
+          const durMs = Math.floor(durS * 1000)
+          if (durMs !== reportedDurMs) {
+            reportedDurMs = durMs
+            onDurationChange?.(durMs)
           }
         }
       }, 250)
