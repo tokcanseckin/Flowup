@@ -894,6 +894,10 @@ function PlayerView({
   // auto-play without requiring another user gesture.
   const amEverPlayedRef = useRef(false)
   const [amAutoPlay, setAmAutoPlay] = useState(false)
+  // Mirror amAutoPlay into a ref so the song.id effect (below) can read the
+  // current value synchronously without adding it to deps.
+  const amAutoPlayRef = useRef(false)
+  useEffect(() => { amAutoPlayRef.current = amAutoPlay }, [amAutoPlay])
 
   // Wrap onPrev/onNext: if AM is active and audio context is already unlocked,
   // mark the next song for auto-play before navigating.
@@ -954,9 +958,10 @@ function PlayerView({
     return () => clearTimeout(t)
   }, [isPlaying])
 
-  // Also clear on song change
+  // Also clear on song change — but not during an AM auto-play transition
+  // (pendingPlay should persist until the new song actually starts playing).
   useEffect(() => {
-    setPendingPlay(false)
+    if (!amAutoPlayRef.current) setPendingPlay(false)
   }, [song.id])
 
   const togglePlay = useCallback(() => {
