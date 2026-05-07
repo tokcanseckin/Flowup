@@ -547,9 +547,21 @@ function InspectPanel({ info, onClose, compact = false }: InspectPanelProps) {
       {isWord ? (
         <>
           {/* ── Definition — most prominent ── */}
-          <p className="text-lg font-semibold text-yellow-200 leading-snug mt-1">
-            {info.word.dictionary_definition ?? <span className="text-gray-500 italic text-base font-normal">No definition yet</span>}
-          </p>
+          {info.word.dictionary_definition ? (() => {
+            const meanings = info.word.dictionary_definition!.split(';').map(s => s.trim()).filter(Boolean)
+            return meanings.length === 1
+              ? <p className="text-lg font-semibold text-yellow-200 leading-snug mt-1">{meanings[0]}</p>
+              : (
+                <ol className="mt-1 space-y-0.5 list-none pl-0">
+                  {meanings.map((m, i) => (
+                    <li key={i} className="flex gap-1.5 text-base font-semibold text-yellow-200 leading-snug">
+                      <span className="text-[11px] font-mono text-yellow-500/70 mt-0.5 shrink-0">{i + 1}.</span>
+                      <span>{m}</span>
+                    </li>
+                  ))}
+                </ol>
+              )
+          })() : <p className="text-gray-500 italic text-base font-normal mt-1">No definition yet</p>}
 
           <div className="my-3 border-t border-indigo-900/50" />
 

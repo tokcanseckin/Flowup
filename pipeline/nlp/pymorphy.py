@@ -46,6 +46,7 @@ _GEND = {"masc": "Masculine", "femn": "Feminine",  "neut": "Neuter"}
 _NUM  = {"sing": "Singular",  "plur": "Plural"}
 _TENS = {"pres": "Present",   "past": "Past",       "futr": "Future"}
 _PERS = {"1per": "1st Person","2per": "2nd Person", "3per": "3rd Person"}
+_ASPC = {"perf": "Perfective",  "impf": "Imperfective"}
 
 
 def _humanize(parse) -> str:
@@ -57,6 +58,7 @@ def _humanize(parse) -> str:
     if t.number: parts.append(_NUM.get(t.number, t.number))
     if t.gender: parts.append(_GEND.get(t.gender, t.gender))
     if t.case:   parts.append(_CASE.get(t.case, t.case))
+    if t.aspect: parts.append(_ASPC.get(t.aspect, t.aspect))
     return ", ".join(parts) or "Unknown"
 
 
