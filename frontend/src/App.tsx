@@ -908,6 +908,18 @@ function PlayerView({
   const durationMs = effectiveSource === 'youtube' ? ytDurationMs : effectiveSource === 'apple_music' ? amDurationMs : player.durationMs
   const isReady    = effectiveSource === 'youtube' ? ytReady    : effectiveSource === 'apple_music' ? amReady    : player.isReady
 
+  const [pendingPlay, setPendingPlay] = useState(false)
+
+  // Clear pending indicator once playback actually starts
+  useEffect(() => {
+    if (isPlaying) setPendingPlay(false)
+  }, [isPlaying])
+
+  // Also clear on song change
+  useEffect(() => {
+    setPendingPlay(false)
+  }, [song.id])
+
   const togglePlay = useCallback(() => {
     logPlaybackDebug('Toggle play requested', {
       effectiveSource,
@@ -917,10 +929,10 @@ function PlayerView({
     })
     if (effectiveSource === 'youtube') {
       if (ytPlaying) ytRef.current?.pause()
-      else ytRef.current?.play()
+      else { setPendingPlay(true); ytRef.current?.play() }
     } else if (effectiveSource === 'apple_music') {
       if (amPlaying) amRef.current?.pause()
-      else amRef.current?.play()
+      else { setPendingPlay(true); amRef.current?.play() }
     } else {
       player.togglePlay()
     }
@@ -1185,7 +1197,9 @@ function PlayerView({
                 text-white shadow-lg shadow-indigo-900/40 transition-all duration-150
               "
             >
-              {isPlaying ? (
+              {pendingPlay && !isPlaying ? (
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              ) : isPlaying ? (
                 <svg viewBox="0 0 24 24" className="w-6 h-6 fill-current">
                   <rect x="6" y="5" width="4" height="14" rx="1.5"/>
                   <rect x="14" y="5" width="4" height="14" rx="1.5"/>
