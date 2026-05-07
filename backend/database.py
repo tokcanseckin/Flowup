@@ -142,6 +142,34 @@ class PlaylistSong(Base):
     song     = relationship("Song")
 
 
+class AlignmentTask(Base):
+    """
+    A queued request for the Mac Mini alignment worker to process one song.
+
+    Lifecycle: pending → processing → done | failed
+    """
+    __tablename__ = "alignment_tasks"
+
+    id            = Column(Integer,     primary_key=True)
+    # pending | processing | done | failed
+    status        = Column(String(16),  nullable=False, default="pending")
+    artist        = Column(String(512), nullable=False)
+    title         = Column(String(512), nullable=False)
+    display_title = Column(String(512), nullable=True)
+    youtube_url   = Column(Text,        nullable=False)
+    lang          = Column(String(8),   nullable=False, default="ru")
+    spotify_uri   = Column(String(128), nullable=True)
+    target_lang   = Column(String(8),   nullable=True,  default="EN-US")
+    # Optional: plain lyrics pre-fetched by the task creator.
+    # If absent, the worker fetches from LRCLIB itself.
+    plain_lyrics  = Column(Text,        nullable=True)
+    claimed_at    = Column(Integer,     nullable=True)
+    completed_at  = Column(Integer,     nullable=True)
+    result_lrc    = Column(Text,        nullable=True)
+    error         = Column(Text,        nullable=True)
+    created_at    = Column(Integer,     default=lambda: int(time.time()))
+
+
 def create_tables() -> None:
     Base.metadata.create_all(bind=engine)
     _migrate_users_table()

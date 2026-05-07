@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
-import { AdminSongDetail, AdminUser, PlaylistDetail, PlaylistSummary, SongSummary, api, getAdminHeaders } from '../api/client'
+import { AdminSongDetail, AlignmentTask, AdminUser, PlaylistDetail, PlaylistSummary, SongSummary, api, getAdminHeaders } from '../api/client'
 import SyncCalibrator from './SyncCalibrator'
 
 interface Props {
@@ -16,7 +16,7 @@ interface Props {
   onNavigateRoute?: (tab: TabKey, id: number | null) => void
 }
 
-type TabKey = 'songs' | 'playlists' | 'users'
+type TabKey = 'songs' | 'playlists' | 'users' | 'tasks'
 
 type PlaylistDraft = {
   name: string
@@ -50,6 +50,16 @@ type UserDraft = {
   email: string
   is_admin: boolean
   password: string
+}
+
+type NewTaskDraft = {
+  artist: string
+  title: string
+  display_title: string
+  youtube_url: string
+  lang: string
+  spotify_uri: string
+  plain_lyrics: string
 }
 
 function emptyPlaylistDraft(): PlaylistDraft {
@@ -91,6 +101,25 @@ function emptyNewSongDraft(): NewSongDraft {
     apple_music_url: '',
     playlist_ids: [],
   }
+}
+
+function emptyNewTaskDraft(): NewTaskDraft {
+  return {
+    artist: '',
+    title: '',
+    display_title: '',
+    youtube_url: '',
+    lang: 'ru',
+    spotify_uri: '',
+    plain_lyrics: '',
+  }
+}
+
+function taskStatusClass(status: string): string {
+  if (status === 'pending') return 'border-amber-700/50 bg-amber-950/30 text-amber-300'
+  if (status === 'processing') return 'border-blue-700/50 bg-blue-950/30 text-blue-300'
+  if (status === 'done') return 'border-emerald-700/50 bg-emerald-950/30 text-emerald-300'
+  return 'border-red-700/50 bg-red-950/30 text-red-300'
 }
 
 function tabButtonClass(active: boolean): string {
@@ -152,10 +181,20 @@ export default function AdminPanel({
   const [userSaving, setUserSaving] = useState(false)
   const [userError, setUserError] = useState<string | null>(null)
 
+  const [tasks, setTasks] = useState<AlignmentTask[]>([])
+  const [tasksLoading, setTasksLoading] = useState(false)
+  const [taskStatusFilter, setTaskStatusFilter] = useState<string>('all')
+  const [taskError, setTaskError] = useState<string | null>(null)
+  const [newTaskDraft, setNewTaskDraft] = useState<NewTaskDraft>(emptyNewTaskDraft())
+  const [newTaskSaving, setNewTaskSaving] = useState(false)
+  const [newTaskError, setNewTaskError] = useState<string | null>(null)
+  const [expandedTaskId, setExpandedTaskId] = useState<number | null>(null)
+
   const getIdForTab = useCallback((tabKey: TabKey): number | null => {
     if (tabKey === 'songs') return selectedSongId
     if (tabKey === 'playlists') return selectedPlaylistId
-    return selectedUserId
+    if (tabKey === 'users') return selectedUserId
+    return null
   }, [selectedPlaylistId, selectedSongId, selectedUserId])
 
   const openTab = useCallback((nextTab: TabKey) => {
@@ -195,6 +234,18 @@ export default function AdminPanel({
     if (tab !== 'users' || !needle) return users
     return users.filter(item => `${item.display_name ?? ''} ${item.email ?? ''} ${item.spotify_id}`.toLowerCase().includes(needle))
   }, [searchQuery, tab, users])
+
+  const filteredTasks = useMemo(() => {
+    let result = tasks
+    if (taskStatusFilter !== 'all') {
+      result = result.filter(t => t.status === taskStatusFilter)
+    }
+    const needle = searchQuery.trim().toLowerCase()
+    if (tab === 'tasks' && needle) {
+      result = result.filter(t => `${t.artist} ${t.title}`.toLowerCase().includes(needle))
+    }
+    return result
+  }, [tasks, taskStatusFilter, searchQuery, tab])
 
   const filteredSongsForPlaylist = useMemo(() => {
     const needle = playlistSongQuery.trim().toLowerCase()
@@ -362,6 +413,35 @@ export default function AdminPanel({
       cancelled = true
     }
   }, [selectedUserId])
+
+  useEffect(() => {
+    if (tab !== 'tasks') return
+    let cancelled = false
+
+    const loadTasks = () => {
+      void api.listAlignmentTasks()
+        .then(loaded => {
+          if (cancelled) return
+          setTasks(loaded)
+          setTaskError(null)
+          setTasksLoading(false)
+        })
+        .catch(err => {
+          if (cancelled) return
+          setTaskError(err instanceof Error ? err.message : 'Failed to load tasks')
+          setTasksLoading(false)
+        })
+    }
+
+    setTasksLoading(true)
+    loadTasks()
+    const interval = setInterval(loadTasks, 15000)
+
+    return () => {
+      cancelled = true
+      clearInterval(interval)
+    }
+  }, [tab])
 
   // When source tab changes, re-derive lyricsDraft from adminSong without a network request.
   useEffect(() => {
@@ -718,6 +798,57 @@ export default function AdminPanel({
     }
   }, [selectedUserId, userDraft])
 
+  const handleCreateTask = useCallback(async () => {
+    if (!newTaskDraft.artist.trim() || !newTaskDraft.title.trim() || !newTaskDraft.youtube_url.trim()) {
+      setNewTaskError('Artist, title, and YouTube URL are required')
+      return
+    }
+    setNewTaskSaving(true)
+    setNewTaskError(null)
+    try {
+      await api.createAlignmentTask({
+        artist: newTaskDraft.artist.trim(),
+        title: newTaskDraft.title.trim(),
+        display_title: newTaskDraft.display_title.trim() || null,
+        youtube_url: newTaskDraft.youtube_url.trim(),
+        lang: newTaskDraft.lang,
+        spotify_uri: newTaskDraft.spotify_uri.trim() || null,
+        plain_lyrics: newTaskDraft.plain_lyrics.trim() || null,
+      })
+      setNewTaskDraft(emptyNewTaskDraft())
+      const loaded = await api.listAlignmentTasks()
+      setTasks(loaded)
+    } catch (err) {
+      setNewTaskError(err instanceof Error ? err.message : 'Failed to create task')
+    } finally {
+      setNewTaskSaving(false)
+    }
+  }, [newTaskDraft])
+
+  const handleDeleteTask = useCallback(async (taskId: number) => {
+    if (!window.confirm('Delete this alignment task? This cannot be undone.')) return
+    try {
+      await api.deleteAlignmentTask(taskId)
+      setTasks(prev => prev.filter(t => t.id !== taskId))
+      if (expandedTaskId === taskId) setExpandedTaskId(null)
+    } catch (err) {
+      setTaskError(err instanceof Error ? err.message : 'Failed to delete task')
+    }
+  }, [expandedTaskId])
+
+  const handleRetryTask = useCallback(async (taskId: number) => {
+    try {
+      const updated = await api.retryAlignmentTask(taskId)
+      setTasks(prev => prev.map(t => t.id === taskId ? updated : t))
+    } catch (err) {
+      setTaskError(err instanceof Error ? err.message : 'Failed to retry task')
+    }
+  }, [])
+
+  const toggleExpandedTask = useCallback((taskId: number) => {
+    setExpandedTaskId(prev => prev === taskId ? null : taskId)
+  }, [])
+
   const toggleSongPlaylistMembership = useCallback((playlistId: number) => {
     setSongDraft(prev => prev ? {
       ...prev,
@@ -737,7 +868,9 @@ export default function AdminPanel({
     ? 'Search songs'
     : tab === 'playlists'
       ? 'Search playlists'
-      : 'Search users'
+      : tab === 'tasks'
+        ? 'Search tasks'
+        : 'Search users'
 
   return (
     <div className="min-h-screen p-6" style={{ background: '#0d0d14' }}>
@@ -764,6 +897,7 @@ export default function AdminPanel({
           <button type="button" onClick={() => openTab('songs')} className={`rounded-xl border px-4 py-2 text-sm font-semibold transition-colors ${tabButtonClass(tab === 'songs')}`}>Songs</button>
           <button type="button" onClick={() => openTab('playlists')} className={`rounded-xl border px-4 py-2 text-sm font-semibold transition-colors ${tabButtonClass(tab === 'playlists')}`}>Playlists</button>
           <button type="button" onClick={() => openTab('users')} className={`rounded-xl border px-4 py-2 text-sm font-semibold transition-colors ${tabButtonClass(tab === 'users')}`}>Users</button>
+          <button type="button" onClick={() => openTab('tasks')} className={`rounded-xl border px-4 py-2 text-sm font-semibold transition-colors ${tabButtonClass(tab === 'tasks')}`}>Tasks</button>
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[320px_minmax(0,1fr)]">
@@ -836,6 +970,28 @@ export default function AdminPanel({
                     <p className="text-xs text-gray-500 truncate">{item.email ?? item.spotify_id}</p>
                   </button>
                 ))}
+              </div>
+            )}
+
+            {tab === 'tasks' && (
+              <div className="space-y-1">
+                <p className="text-xs text-gray-500 mb-2">Filter by status</p>
+                {(['all', 'pending', 'processing', 'done', 'failed'] as const).map(s => {
+                  const count = s === 'all' ? tasks.length : tasks.filter(t => t.status === s).length
+                  return (
+                    <button
+                      key={s}
+                      type="button"
+                      onClick={() => setTaskStatusFilter(s)}
+                      className={`w-full rounded-2xl border px-3 py-2.5 text-left transition-colors ${taskStatusFilter === s ? 'border-indigo-500 bg-indigo-950/40 text-white' : 'border-gray-800 bg-gray-950/30 text-gray-400 hover:border-gray-700 hover:text-gray-200'}`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium capitalize">{s}</span>
+                        <span className={`rounded-md border px-1.5 py-0.5 text-[10px] font-semibold ${s === 'all' ? 'border-gray-700 bg-gray-900/50 text-gray-400' : `${taskStatusClass(s)} opacity-80`}`}>{count}</span>
+                      </div>
+                    </button>
+                  )
+                })}
               </div>
             )}
           </section>
@@ -1102,6 +1258,149 @@ export default function AdminPanel({
                   </div>
                 )}
               </div>
+            )}
+
+            {tab === 'tasks' && (
+              <>
+                <div className="rounded-3xl border border-gray-800/80 p-5" style={{ background: '#12121f' }}>
+                  <div className="flex items-center justify-between gap-4 mb-4">
+                    <div>
+                      <p className="text-white font-semibold">Alignment Tasks</p>
+                      <p className="text-xs text-gray-500">Processed by the Mac Mini worker. Auto-refreshes every 15 s.</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setTasksLoading(true)
+                        void api.listAlignmentTasks().then(loaded => { setTasks(loaded); setTaskError(null) }).catch(err => setTaskError(err instanceof Error ? err.message : 'Failed')).finally(() => setTasksLoading(false))
+                      }}
+                      className="rounded-xl border border-gray-700 px-3 py-1.5 text-xs font-semibold text-gray-300 hover:border-gray-500 hover:text-white transition-colors"
+                    >
+                      {tasksLoading ? 'Refreshing…' : 'Refresh'}
+                    </button>
+                  </div>
+
+                  {taskError && <div className="mb-4 rounded-xl border border-red-900/50 bg-red-950/20 px-4 py-3 text-sm text-red-400">{taskError}</div>}
+
+                  {tasksLoading && !tasks.length ? (
+                    <div className="py-10 text-sm text-gray-500">Loading tasks…</div>
+                  ) : filteredTasks.length === 0 ? (
+                    <div className="py-10 text-sm text-gray-500">No tasks{taskStatusFilter !== 'all' ? ` with status "${taskStatusFilter}"` : ''}.</div>
+                  ) : (
+                    <div className="space-y-2">
+                      {filteredTasks.map(task => (
+                        <div key={task.id} className="rounded-2xl border border-gray-800 bg-gray-950/30 p-4">
+                          <div className="flex items-center gap-3">
+                            <span className="shrink-0 font-mono text-xs text-gray-600">#{task.id}</span>
+                            <div className="min-w-0 flex-1">
+                              <p className="truncate text-sm font-medium text-white">{task.artist} — {task.title}</p>
+                              <p className="text-xs text-gray-500">
+                                {task.lang.toUpperCase()}
+                                {' · '}
+                                {new Date(task.created_at * 1000).toLocaleString()}
+                                {task.completed_at ? ` · done ${new Date(task.completed_at * 1000).toLocaleString()}` : ''}
+                              </p>
+                            </div>
+                            <span className={`shrink-0 rounded-md border px-2 py-0.5 text-[11px] font-semibold ${taskStatusClass(task.status)}`}>
+                              {task.status}
+                            </span>
+                            <div className="flex shrink-0 gap-1">
+                              {(task.status === 'failed' || task.status === 'processing') && (
+                                <button
+                                  type="button"
+                                  onClick={() => void handleRetryTask(task.id)}
+                                  className="rounded-lg border border-amber-700/50 px-2 py-1 text-xs font-semibold text-amber-300 hover:bg-amber-950/30 transition-colors"
+                                >
+                                  Retry
+                                </button>
+                              )}
+                              <button
+                                type="button"
+                                onClick={() => toggleExpandedTask(task.id)}
+                                className="rounded-lg border border-gray-700 px-2 py-1 text-xs font-semibold text-gray-400 hover:border-gray-500 hover:text-white transition-colors"
+                              >
+                                {expandedTaskId === task.id ? 'Hide' : 'Details'}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => void handleDeleteTask(task.id)}
+                                className="rounded-lg border border-red-900/50 px-2 py-1 text-xs font-semibold text-red-400 hover:bg-red-950/20 transition-colors"
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          </div>
+
+                          {expandedTaskId === task.id && (
+                            <div className="mt-3 border-t border-gray-800 pt-3 space-y-2">
+                              {task.plain_lyrics && (
+                                <div>
+                                  <p className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-gray-600">Lyrics (input)</p>
+                                  <pre className="max-h-32 overflow-y-auto rounded-lg bg-gray-950/60 p-2 font-mono text-xs text-gray-400 whitespace-pre-wrap">{task.plain_lyrics}</pre>
+                                </div>
+                              )}
+                              {task.error && (
+                                <div>
+                                  <p className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-red-600">Error</p>
+                                  <pre className="max-h-32 overflow-y-auto rounded-lg border border-red-900/40 bg-red-950/10 p-2 font-mono text-xs text-red-400 whitespace-pre-wrap">{task.error}</pre>
+                                </div>
+                              )}
+                              {task.result_lrc && (
+                                <div>
+                                  <p className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-emerald-600">Result LRC</p>
+                                  <pre className="max-h-48 overflow-y-auto rounded-lg border border-emerald-900/40 bg-emerald-950/10 p-2 font-mono text-xs text-emerald-400 whitespace-pre-wrap">{task.result_lrc}</pre>
+                                </div>
+                              )}
+                              {!task.error && !task.result_lrc && (
+                                <p className="text-xs text-gray-600">No additional details yet.</p>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="rounded-3xl border border-gray-800/80 p-5" style={{ background: '#12121f' }}>
+                  <p className="text-white font-semibold mb-3">Queue New Task</p>
+                  {newTaskError && <div className="mb-3 rounded-xl border border-red-900/50 bg-red-950/20 px-4 py-3 text-sm text-red-400">{newTaskError}</div>}
+                  <div className="space-y-3">
+                    <div className="grid gap-3 md:grid-cols-2">
+                      <label className="block text-xs text-gray-500">Artist *
+                        <input value={newTaskDraft.artist} onChange={e => setNewTaskDraft(prev => ({ ...prev, artist: e.target.value }))} placeholder="Artist name" className="mt-1 w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
+                      </label>
+                      <label className="block text-xs text-gray-500">Title *
+                        <input value={newTaskDraft.title} onChange={e => setNewTaskDraft(prev => ({ ...prev, title: e.target.value }))} placeholder="Song title" className="mt-1 w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
+                      </label>
+                    </div>
+                    <label className="block text-xs text-gray-500">YouTube URL *
+                      <input value={newTaskDraft.youtube_url} onChange={e => setNewTaskDraft(prev => ({ ...prev, youtube_url: e.target.value }))} placeholder="https://youtube.com/watch?v=..." className="mt-1 w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500" />
+                    </label>
+                    <div className="grid gap-3 md:grid-cols-2">
+                      <label className="block text-xs text-gray-500">Language
+                        <select value={newTaskDraft.lang} onChange={e => setNewTaskDraft(prev => ({ ...prev, lang: e.target.value }))} className="mt-1 w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
+                          {LANGUAGE_PRESETS.map(p => (
+                            <option key={p.code} value={p.code}>{p.name} ({p.code})</option>
+                          ))}
+                        </select>
+                      </label>
+                      <label className="block text-xs text-gray-500">Spotify URI <span className="text-gray-600">(optional)</span>
+                        <input value={newTaskDraft.spotify_uri} onChange={e => setNewTaskDraft(prev => ({ ...prev, spotify_uri: e.target.value }))} placeholder="spotify:track:..." className="mt-1 w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500" />
+                      </label>
+                    </div>
+                    <label className="block text-xs text-gray-500">Display title <span className="text-gray-600">(optional override)</span>
+                      <input value={newTaskDraft.display_title} onChange={e => setNewTaskDraft(prev => ({ ...prev, display_title: e.target.value }))} placeholder="Leave blank to use title" className="mt-1 w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500" />
+                    </label>
+                    <label className="block text-xs text-gray-500">Plain lyrics <span className="text-gray-600">(optional — worker can fetch automatically)</span>
+                      <textarea value={newTaskDraft.plain_lyrics} onChange={e => setNewTaskDraft(prev => ({ ...prev, plain_lyrics: e.target.value }))} rows={6} placeholder="Paste lyrics here, one line per row…" className="mt-1 w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500" />
+                    </label>
+                    <button type="button" onClick={() => void handleCreateTask()} disabled={newTaskSaving} className="w-full rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:bg-gray-800 disabled:text-gray-500">
+                      {newTaskSaving ? 'Queuing…' : 'Queue Task'}
+                    </button>
+                  </div>
+                </div>
+              </>
             )}
           </section>
         </div>
