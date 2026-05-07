@@ -8,6 +8,8 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 SERVER="root@185.20.139.134"
 BACKEND_REMOTE="/opt/flowup/backend"
+PIPELINE_REMOTE="/opt/flowup/pipeline"
+WORKER_REMOTE="/opt/flowup/worker"
 FRONTEND_REMOTE="/var/www/flowup"
 
 # ── 1. Commit & push ──────────────────────────────────────────────────────────
@@ -29,7 +31,23 @@ rsync -az \
   --exclude='.venv' \
   "$ROOT/backend/" "$SERVER:$BACKEND_REMOTE/"
 
-# ── 3. Build & deploy frontend ────────────────────────────────────────────────
+# ── 3. Deploy pipeline ────────────────────────────────────────────────────────
+echo "→ Syncing pipeline…"
+rsync -az \
+  --exclude='__pycache__' \
+  --exclude='*.pyc' \
+  --exclude='.env' \
+  "$ROOT/pipeline/" "$SERVER:$PIPELINE_REMOTE/"
+
+# ── 4. Deploy worker ──────────────────────────────────────────────────────────
+echo "→ Syncing worker…"
+rsync -az \
+  --exclude='__pycache__' \
+  --exclude='*.pyc' \
+  --exclude='.env' \
+  "$ROOT/worker/" "$SERVER:$WORKER_REMOTE/"
+
+# ── 5. Build & deploy frontend ────────────────────────────────────────────────
 echo "→ Building frontend…"
 cd "$ROOT/frontend"
 npm run build
@@ -37,7 +55,7 @@ npm run build
 echo "→ Syncing frontend…"
 rsync -az "$ROOT/frontend/dist/" "$SERVER:$FRONTEND_REMOTE/"
 
-# ── 4. Restart backend service ────────────────────────────────────────────────
+# ── 6. Restart backend service ────────────────────────────────────────────────
 echo "→ Restarting backend service…"
 ssh "$SERVER" "systemctl restart flowup-backend && systemctl is-active flowup-backend"
 
