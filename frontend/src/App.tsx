@@ -995,6 +995,13 @@ function PlayerView({
         (e.target instanceof HTMLElement && e.target.isContentEditable)
       ) return
 
+      if (e.key === ' ') {
+        e.preventDefault()
+        if (e.repeat || !isReady) return
+        togglePlay()
+        return
+      }
+
       if (e.key === 'ArrowLeft') {
         e.preventDefault()
         if (e.repeat || !canPrev) return
@@ -1011,7 +1018,7 @@ function PlayerView({
 
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [onPrev, onNext, canPrev, canNext])
+  }, [onPrev, onNext, canPrev, canNext, togglePlay, isReady])
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: effectiveSource === 'spotify' ? albumBg : '#0d0d14', transition: 'background 1.2s ease' }}>
