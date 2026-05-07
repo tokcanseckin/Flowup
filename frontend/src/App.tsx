@@ -90,17 +90,17 @@ type AppRoute =
   | { page: 'browse' }
   | { page: 'song'; songId: number }
   | { page: 'settings' }
-  | { page: 'admin'; tab: 'songs' | 'playlists' | 'users'; id: number | null }
+  | { page: 'admin'; tab: 'songs' | 'playlists' | 'users' | 'tasks'; id: number | null }
 
 function parseAppRoute(pathname: string): AppRoute {
   const path = pathname || '/browse'
 
   if (path === '/settings') return { page: 'settings' }
-  const adminMatch = path.match(/^\/admin(?:\/(song|playlist|user)(?:\/(\d+))?)?$/)
+  const adminMatch = path.match(/^\/admin(?:\/(song|playlist|user|task)(?:\/(\d+))?)?$/)
   if (adminMatch) {
     const seg = adminMatch[1]
     const id = adminMatch[2] ? Number(adminMatch[2]) : null
-    const tab = seg === 'playlist' ? 'playlists' : seg === 'user' ? 'users' : 'songs'
+    const tab = seg === 'playlist' ? 'playlists' : seg === 'user' ? 'users' : seg === 'task' ? 'tasks' : 'songs'
     return { page: 'admin', tab, id }
   }
   if (path === '/browse' || path === '/') return { page: 'browse' }
@@ -117,8 +117,8 @@ function songPath(songId: number): string {
   return `/song/${songId}`
 }
 
-function adminPath(tab: 'songs' | 'playlists' | 'users', id: number | null): string {
-  const seg = tab === 'playlists' ? 'playlist' : tab === 'users' ? 'user' : 'song'
+function adminPath(tab: 'songs' | 'playlists' | 'users' | 'tasks', id: number | null): string {
+  const seg = tab === 'playlists' ? 'playlist' : tab === 'users' ? 'user' : tab === 'tasks' ? 'task' : 'song'
   if (id === null) return `/admin/${seg}`
   return `/admin/${seg}/${id}`
 }
