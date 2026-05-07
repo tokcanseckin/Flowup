@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
-import { AdminSongDetail, AlignmentTask, AdminUser, PlaylistDetail, PlaylistSummary, SongSummary, api, getAdminHeaders } from '../api/client'
+import { AdminSongDetail, AlignmentTask, AdminUser, PlaylistDetail, PlaylistSummary, SongSummary, api } from '../api/client'
 import SyncCalibrator from './SyncCalibrator'
 
 interface Props {
@@ -160,10 +160,8 @@ export default function AdminPanel({
   const [newSongSaving, setNewSongSaving] = useState(false)
   const [newSongError, setNewSongError] = useState<string | null>(null)
 
-  const [regenRunning, setRegenRunning] = useState(false)
-  const [regenLog, setRegenLog] = useState<string[]>([])
-  const [regenError, setRegenError] = useState<string | null>(null)
-  const regenLogRef = useRef<HTMLDivElement>(null)
+  const [selectedSongTask, setSelectedSongTask] = useState<AlignmentTask | null>(null)
+  const [selectedSongTaskLoading, setSelectedSongTaskLoading] = useState(false)
 
   const [playlistDetail, setPlaylistDetail] = useState<PlaylistDetail | null>(null)
   const [playlistDraft, setPlaylistDraft] = useState<PlaylistDraft>(emptyPlaylistDraft())
@@ -344,6 +342,34 @@ export default function AdminPanel({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedSongId])
 
+  // Load the most recent alignment task for the currently-selected song.
+  useEffect(() => {
+    if (!adminSong) { setSelectedSongTask(null); return }
+    const spotifyUri = adminSong.spotify_uri
+    let cancelled = false
+    void api.listAlignmentTasks()
+      .then(all => {
+        if (cancelled) return
+        const match = all.find(t => t.spotify_uri === spotifyUri)
+        setSelectedSongTask(match ?? null)
+      })
+      .catch(() => {})
+    return () => { cancelled = true }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [adminSong?.spotify_uri])
+
+  // Poll the task every 10 s while it is active.
+  useEffect(() => {
+    if (!selectedSongTask) return
+    if (selectedSongTask.status !== 'pending' && selectedSongTask.status !== 'processing') return
+    const id = setInterval(() => {
+      void api.getAlignmentTask(selectedSongTask.id)
+        .then(updated => setSelectedSongTask(updated))
+        .catch(() => {})
+    }, 10000)
+    return () => clearInterval(id)
+  }, [selectedSongTask?.id, selectedSongTask?.status])
+
   useEffect(() => {
     if (!selectedPlaylistId) {
       setPlaylistDetail(null)
@@ -506,68 +532,29 @@ export default function AdminPanel({
     }
   }, [onNavigateRoute, onRefreshPlaylists, onRefreshSongs, selectedSongId, songs])
 
-  useEffect(() => {
-    if (regenLogRef.current) {
-      regenLogRef.current.scrollTop = regenLogRef.current.scrollHeight
+  const handleQueueTask = useCallback(async () => {
+    if (!adminSong) return
+    if (!adminSong.youtube_url) {
+      setSongError('Song has no YouTube URL — required for the worker')
+      return
     }
-  }, [regenLog])
-
-  const handleRegenerate = useCallback(async () => {
-    if (!selectedSongId) return
-    setRegenRunning(true)
-    setRegenLog([])
-    setRegenError(null)
+    setSelectedSongTaskLoading(true)
+    setSongError(null)
     try {
-      const resp = await fetch(`/api/admin/songs/${selectedSongId}/regenerate`, {
-        method: 'POST',
-        headers: getAdminHeaders(),
+      const task = await api.createAlignmentTask({
+        artist: adminSong.artist ?? adminSong.title,
+        title: adminSong.title,
+        youtube_url: adminSong.youtube_url,
+        lang: adminSong.language.code,
+        spotify_uri: adminSong.spotify_uri || undefined,
       })
-      if (!resp.ok || !resp.body) {
-        const body = await resp.json().catch(() => ({ detail: resp.statusText })) as { detail?: string }
-        setRegenError(body.detail ?? `Error ${resp.status}`)
-        return
-      }
-      const reader = resp.body.getReader()
-      const decoder = new TextDecoder()
-      let buffer = ''
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
-        buffer += decoder.decode(value, { stream: true })
-        const chunks = buffer.split('\n\n')
-        buffer = chunks.pop() ?? ''
-        for (const chunk of chunks) {
-          let eventType = 'message'
-          let dataLine = ''
-          for (const row of chunk.split('\n')) {
-            if (row.startsWith('event: ')) eventType = row.slice(7).trim()
-            else if (row.startsWith('data: ')) dataLine = row.slice(6)
-          }
-          if (eventType === 'done') {
-            try {
-              const detail = JSON.parse(dataLine) as AdminSongDetail
-              setAdminSong(detail)
-              const srcEntry = detail.source_lines.find(s => s.source === lyricsSource)
-              const lines = lyricsSource === 'default' ? detail.lines : (srcEntry?.lines ?? detail.lines)
-              setLyricsDraft(lines.map(l => ({ ...l })))
-              setRegenLog(prev => [...prev, '✓ Lyrics updated successfully.'])
-            } catch {
-              setRegenError('Failed to parse updated song data')
-            }
-          } else if (eventType === 'error') {
-            setRegenError(dataLine)
-            setRegenLog(prev => [...prev, `✗ Error: ${dataLine}`])
-          } else if (dataLine) {
-            setRegenLog(prev => [...prev, dataLine])
-          }
-        }
-      }
+      setSelectedSongTask(task)
     } catch (err) {
-      setRegenError(err instanceof Error ? err.message : 'Unknown error')
+      setSongError(err instanceof Error ? err.message : 'Failed to queue task')
     } finally {
-      setRegenRunning(false)
+      setSelectedSongTaskLoading(false)
     }
-  }, [selectedSongId, lyricsSource])
+  }, [adminSong])
 
   const handleSaveSong = useCallback(async () => {
     if (!selectedSongId || !songDraft) return
@@ -1006,27 +993,46 @@ export default function AdminPanel({
                       <p className="text-xs text-gray-500">Metadata, source URLs, and playlist membership.</p>
                     </div>
                     <div className="flex gap-2">
-                      <button type="button" onClick={() => void handleRegenerate()} disabled={!selectedSongId || regenRunning || songSaving} className="rounded-xl border border-amber-700/60 bg-amber-950/20 px-4 py-2 text-sm font-semibold text-amber-300 hover:bg-amber-950/40 disabled:border-gray-800 disabled:text-gray-500">{regenRunning ? 'Running...' : 'Regenerate Lyrics'}</button>
+                      <button
+                        type="button"
+                        onClick={() => void handleQueueTask()}
+                        disabled={!selectedSongId || !adminSong || selectedSongTaskLoading || songSaving || selectedSongTask?.status === 'pending' || selectedSongTask?.status === 'processing'}
+                        className="rounded-xl border border-amber-700/60 bg-amber-950/20 px-4 py-2 text-sm font-semibold text-amber-300 hover:bg-amber-950/40 disabled:border-gray-800 disabled:text-gray-500"
+                      >
+                        {selectedSongTaskLoading ? 'Queuing…' : 'Regenerate Lyrics'}
+                      </button>
                       <button type="button" onClick={() => void handleSaveSong()} disabled={!selectedSongId || !songDraft || songSaving} className="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:bg-gray-800 disabled:text-gray-500">{songSaving ? 'Saving...' : 'Save Song'}</button>
                       <button type="button" onClick={() => void handleDeleteSong()} disabled={!selectedSongId || songSaving} className="rounded-xl border border-red-900/60 px-4 py-2 text-sm font-semibold text-red-300 hover:bg-red-950/30 disabled:border-gray-800 disabled:text-gray-600">Delete</button>
                     </div>
                   </div>
                   {songError && <div className="mb-4 rounded-xl border border-red-900/50 bg-red-950/20 px-4 py-3 text-sm text-red-400">{songError}</div>}
-                  {regenError && <div className="mb-4 rounded-xl border border-amber-900/50 bg-amber-950/20 px-4 py-3 text-sm text-amber-400">{regenError}</div>}
-                  {(regenRunning || regenLog.length > 0) && (
-                    <div
-                      ref={regenLogRef}
-                      className="mb-4 max-h-48 overflow-y-auto rounded-xl border border-gray-800 bg-gray-950/60 p-3 font-mono text-xs space-y-0.5"
-                    >
-                      {regenLog.map((line, i) => (
-                        <div
-                          key={i}
-                          className={line.startsWith('✓') ? 'text-emerald-400' : line.startsWith('✗') ? 'text-red-400' : 'text-gray-400'}
-                        >
-                          {line}
-                        </div>
-                      ))}
-                      {regenRunning && <div className="text-indigo-400 animate-pulse">Running pipeline…</div>}
+                  {selectedSongTask && (
+                    <div className={`mb-4 rounded-xl border px-4 py-3 text-sm flex items-start justify-between gap-3 ${
+                      selectedSongTask.status === 'done'       ? 'border-emerald-800/50 bg-emerald-950/20 text-emerald-300' :
+                      selectedSongTask.status === 'failed'     ? 'border-red-900/50 bg-red-950/20 text-red-400' :
+                      selectedSongTask.status === 'processing' ? 'border-indigo-800/50 bg-indigo-950/20 text-indigo-300' :
+                                                                 'border-amber-900/50 bg-amber-950/20 text-amber-300'
+                    }`}>
+                      <div className="min-w-0">
+                        <span className="font-semibold capitalize mr-2">{selectedSongTask.status}</span>
+                        <span className="text-xs opacity-70">Task #{selectedSongTask.id} · {new Date(selectedSongTask.created_at * 1000).toLocaleString()}</span>
+                        {selectedSongTask.status === 'failed' && selectedSongTask.error && (
+                          <p className="mt-1 text-xs opacity-80 break-all">{selectedSongTask.error}</p>
+                        )}
+                        {selectedSongTask.status === 'done' && (
+                          <p className="mt-1 text-xs opacity-70">Song data updated by worker. Reload to see new lyrics.</p>
+                        )}
+                        {(selectedSongTask.status === 'pending' || selectedSongTask.status === 'processing') && (
+                          <p className="mt-1 text-xs opacity-70 animate-pulse">Worker will pick this up on next poll…</p>
+                        )}
+                      </div>
+                      {selectedSongTask.status === 'done' && (
+                        <button
+                          type="button"
+                          onClick={() => { setSelectedSongTask(null); setSelectedSongId(prev => { setTimeout(() => setSelectedSongId(prev), 0); return null }) }}
+                          className="shrink-0 rounded-lg border border-emerald-700/50 px-3 py-1 text-xs font-semibold hover:bg-emerald-900/30"
+                        >Reload</button>
+                      )}
                     </div>
                   )}
                   {songLoading || !songDraft ? (
