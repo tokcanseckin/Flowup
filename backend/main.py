@@ -258,10 +258,14 @@ def _require_worker_key(
 # ── Internal helpers ───────────────────────────────────────────────────────────
 
 def _strip_accents(s: str) -> str:
-    """Strip combining accent marks so 'пи́сать' → 'писать' for dictionary lookup."""
+    """Strip combining stress marks (U+0301) so 'пи́сать' → 'писать' for dictionary lookup.
+
+    Only removes the acute accent (U+0301). Stripping all combining chars would
+    corrupt letters like й (и + U+0306 breve) → и, breaking keys like нужный.
+    """
     import unicodedata
     nfd = unicodedata.normalize("NFD", s)
-    return "".join(c for c in nfd if not unicodedata.combining(c))
+    return unicodedata.normalize("NFC", "".join(c for c in nfd if c != "\u0301"))
 
 
 def _enrich_definition(raw_def: Optional[str], lemma: str, lang_code: str = "ru", display_form: str = "") -> Optional[str]:
