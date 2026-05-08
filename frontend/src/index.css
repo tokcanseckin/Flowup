@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+@keyframes break-fill {
+  from { width: 0% }
+  to   { width: 100% }
+}
+
 @layer base {
   html {
     background-color: #0d0d14;

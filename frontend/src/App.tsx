@@ -1279,6 +1279,7 @@ function PlayerView({
           <LyricsPlayer
             currentPositionMs={positionMs}
             durationMs={durationMs}
+            isPlaying={isPlaying}
             songData={song}
             filterStopWordsForIndexing={settings.excludeStopWordsFromShortcuts}
             onInfoVisibilityChange={setInfoVisible}
