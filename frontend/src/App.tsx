@@ -1279,30 +1279,6 @@ function PlayerView({
 
         {/* Lyrics panel */}
         <section className="rounded-2xl border border-gray-800/80 overflow-hidden" style={{ background: '#12121f' }}>
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800/80">
-            <div>
-              <div className="flex items-center gap-2">
-                <h2 className="font-semibold text-white">{song.title}</h2>
-                <span className="text-[10px] font-mono font-medium text-indigo-400 bg-indigo-950/60 border border-indigo-900/50 px-1.5 py-0.5 rounded-md uppercase tracking-wider">
-                  {song.language.name}
-                </span>
-              </div>
-              <p className="text-xs text-gray-600 mt-0.5">
-                Press{' '}
-                <kbd className="font-mono bg-gray-800 text-gray-400 px-1 py-0.5 rounded text-[10px]">Space</kbd>
-                {' '}to play/pause,{' '}
-                <kbd className="font-mono bg-gray-800 text-gray-400 px-1 py-0.5 rounded text-[10px]">0</kbd>
-                {' '}for line translation,{' '}
-                <kbd className="font-mono bg-gray-800 text-gray-400 px-1 py-0.5 rounded text-[10px]">1</kbd>
-                –
-                <kbd className="font-mono bg-gray-800 text-gray-400 px-1 py-0.5 rounded text-[10px]">9</kbd>
-                {' '}to inspect a word
-              </p>
-            </div>
-            <span className="text-xs font-mono text-indigo-400 bg-indigo-950/50 border border-indigo-900/50 px-2.5 py-1 rounded-lg">
-              {formatMs(positionMs)}
-            </span>
-          </div>
           <LyricsPlayer
             currentPositionMs={positionMs}
             songData={song}
