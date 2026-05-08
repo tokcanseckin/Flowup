@@ -1180,62 +1180,11 @@ function PlayerView({
 
       <main className="flex-1 p-4 max-w-[1080px] mx-auto w-full space-y-4">
 
-        {/* YouTube embed */}
-        {effectiveSource === 'youtube' && song.youtube_url && (
-          <YouTubePlayer
-            ref={ytRef}
-            youtubeUrl={song.youtube_url}
-            onReady={handleYtReady}
-            onTimeUpdate={setYtPositionMs}
-            onDurationChange={setYtDurationMs}
-            onPlayStateChange={handleYtPlayStateChange}
-          />
-        )}
+        {/* Controls + media embed row */}
+        <div className="flex flex-col sm:flex-row gap-4 items-stretch">
 
-        {/* Apple Music embed */}
-        {effectiveSource === 'apple_music' && song.apple_music_url && (
-          <AppleMusicPlayer
-            ref={amRef}
-            appleMusicUrl={song.apple_music_url}
-            onReady={() => setAmReady(true)}
-            onTimeUpdate={handleAmTimeUpdate}
-            onPlayStateChange={setAmPlaying}
-            autoPlay={amAutoPlay}
-          />
-        )}
-
-        {/* Spotify track URI loader (only shown in Spotify mode) */}
-        {effectiveSource === 'spotify' && (
-          <div className="rounded-2xl border border-gray-800/80 p-4 flex gap-3" style={{ background: '#12121f' }}>
-            <input
-              className="
-                flex-1 rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2
-                text-white text-sm font-mono placeholder-gray-600
-                focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30
-                transition-all
-              "
-              value={trackUri}
-              onChange={e => setTrackUri(e.target.value)}
-              placeholder="spotify:track:..."
-              spellCheck={false}
-            />
-            <button
-              onClick={handleLoadTrack}
-              disabled={!player.isReady || loading}
-              className="
-                px-4 py-2 rounded-xl text-sm font-semibold
-                bg-indigo-600 hover:bg-indigo-500 active:scale-[0.98]
-                disabled:bg-gray-800 disabled:text-gray-600
-                text-white transition-all duration-150
-              "
-            >
-              {loading ? 'Loading…' : 'Load'}
-            </button>
-          </div>
-        )}
-
-        {/* Player controls */}
-        <section className="rounded-2xl border border-gray-800/80 p-5" style={{ background: '#12121f' }}>
+          {/* Player controls — narrower, left-aligned */}
+          <section className="rounded-2xl border border-gray-800/80 p-5 sm:w-72 flex-shrink-0" style={{ background: '#12121f' }}>
           <div className="flex items-center gap-4 mb-5">
             {effectiveSource === 'spotify' && player.albumArtUrl ? (
               <img src={player.albumArtUrl} alt="Album art" className="w-14 h-14 rounded-xl object-cover shadow-lg" />
@@ -1305,6 +1254,64 @@ function PlayerView({
             </button>
           </div>
         </section>
+
+          {/* Media embed — right side */}
+          {effectiveSource === 'youtube' && song.youtube_url && (
+            <div className="flex-1 min-w-0 rounded-2xl border border-gray-800/80 overflow-hidden bg-black">
+              <YouTubePlayer
+                ref={ytRef}
+                youtubeUrl={song.youtube_url}
+                onReady={handleYtReady}
+                onTimeUpdate={setYtPositionMs}
+                onDurationChange={setYtDurationMs}
+                onPlayStateChange={handleYtPlayStateChange}
+              />
+            </div>
+          )}
+
+          {effectiveSource === 'apple_music' && song.apple_music_url && (
+            <div className="flex-1 min-w-0 rounded-2xl border border-gray-800/80 overflow-hidden" style={{ background: '#12121f' }}>
+              <AppleMusicPlayer
+                ref={amRef}
+                appleMusicUrl={song.apple_music_url}
+                onReady={() => setAmReady(true)}
+                onTimeUpdate={handleAmTimeUpdate}
+                onPlayStateChange={setAmPlaying}
+                autoPlay={amAutoPlay}
+              />
+            </div>
+          )}
+
+          {effectiveSource === 'spotify' && (
+            <div className="flex-1 min-w-0 rounded-2xl border border-gray-800/80 p-4 flex flex-col gap-3 justify-center" style={{ background: '#12121f' }}>
+              <input
+                className="
+                  w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2
+                  text-white text-sm font-mono placeholder-gray-600
+                  focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30
+                  transition-all
+                "
+                value={trackUri}
+                onChange={e => setTrackUri(e.target.value)}
+                placeholder="spotify:track:..."
+                spellCheck={false}
+              />
+              <button
+                onClick={handleLoadTrack}
+                disabled={!player.isReady || loading}
+                className="
+                  w-full px-4 py-2 rounded-xl text-sm font-semibold
+                  bg-indigo-600 hover:bg-indigo-500 active:scale-[0.98]
+                  disabled:bg-gray-800 disabled:text-gray-600
+                  text-white transition-all duration-150
+                "
+              >
+                {loading ? 'Loading…' : 'Load'}
+              </button>
+            </div>
+          )}
+
+        </div>{/* end controls + media row */}
 
         {/* Lyrics panel */}
         <section className="rounded-2xl border border-gray-800/80 overflow-hidden" style={{ background: '#12121f' }}>
