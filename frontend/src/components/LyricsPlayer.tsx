@@ -613,9 +613,6 @@ function ActiveLineContent({
         })}
       </div>
 
-      {!hideWordIndexes && (
-        <p className="mt-1.5 text-gray-700 text-xs">press number keys for words, 0 for line</p>
-      )}
     </div>
   )
 }
