@@ -860,8 +860,6 @@ function PlayerView({
   onUpdate: (patch: Partial<AppSettings>) => void
   spotifyEnabled: boolean
 }) {
-  const [trackUri, setTrackUri] = useState(song.spotify_uri)
-  const [loading,  setLoading]  = useState(false)
   const [infoVisible, setInfoVisible] = useState(false)
   const autoPausedRef = useRef(false)
 
@@ -949,11 +947,6 @@ function PlayerView({
     onNext()
   }, [effectiveSource, onNext])
 
-  const handleAmTimeUpdate = useCallback((posMs: number, durMs: number) => {
-    setAmPositionMs(posMs)
-    setAmDurationMs(durMs)
-  }, [])
-
   // Once Apple Music starts playing for the first time, mark the audio context
   // as unlocked so we can auto-play on future song navigations.
   useEffect(() => {
@@ -1021,32 +1014,12 @@ function PlayerView({
     else player.seekTo(ms)
   }, [effectiveSource, player])
 
-  const handleLoadTrack = useCallback(async () => {
-    if (effectiveSource !== 'spotify') return
-    setLoading(true)
-    await player.loadAndPlayTrack(trackUri)
-    setLoading(false)
-  }, [player, trackUri, effectiveSource])
-
-  useEffect(() => {
-    setTrackUri(song.spotify_uri)
-  }, [song.spotify_uri])
-
   // Auto-load Spotify track when player is ready
   useEffect(() => {
     if (effectiveSource !== 'spotify' || !player.isReady) return
-
     let cancelled = false
-    setLoading(true)
-
-    void player.loadAndPlayTrack(song.spotify_uri)
-      .finally(() => {
-        if (!cancelled) setLoading(false)
-      })
-
-    return () => {
-      cancelled = true
-    }
+    void player.loadAndPlayTrack(song.spotify_uri).catch(() => { if (!cancelled) {} })
+    return () => { cancelled = true }
   }, [effectiveSource, player.isReady, player.loadAndPlayTrack, song.spotify_uri])
 
   // Pause-on-inspect
@@ -1180,11 +1153,11 @@ function PlayerView({
 
       <main className="flex-1 p-4 max-w-[1080px] mx-auto w-full space-y-4">
 
-        {/* Controls + media embed row */}
+        {/* Controls + YouTube row */}
         <div className="flex flex-col sm:flex-row gap-4 items-stretch">
 
-          {/* Player controls — narrower, left-aligned */}
-          <section className="rounded-2xl border border-gray-800/80 p-5 sm:w-72 flex-shrink-0" style={{ background: '#12121f' }}>
+          {/* Player controls — takes remaining width */}
+          <section className="rounded-2xl border border-gray-800/80 p-5 flex-1 min-w-0" style={{ background: '#12121f' }}>
           <div className="flex items-center gap-4 mb-5">
             {effectiveSource === 'spotify' && player.albumArtUrl ? (
               <img src={player.albumArtUrl} alt="Album art" className="w-14 h-14 rounded-xl object-cover shadow-lg" />
@@ -1255,9 +1228,9 @@ function PlayerView({
           </div>
         </section>
 
-          {/* Media embed — right side */}
+          {/* YouTube embed — fixed video width, only shown in YouTube mode */}
           {effectiveSource === 'youtube' && song.youtube_url && (
-            <div className="flex-1 min-w-0 rounded-2xl border border-gray-800/80 overflow-hidden bg-black">
+            <div className="sm:w-[480px] flex-shrink-0 rounded-2xl border border-gray-800/80 overflow-hidden bg-black">
               <YouTubePlayer
                 ref={ytRef}
                 youtubeUrl={song.youtube_url}
@@ -1269,49 +1242,21 @@ function PlayerView({
             </div>
           )}
 
-          {effectiveSource === 'apple_music' && song.apple_music_url && (
-            <div className="flex-1 min-w-0 rounded-2xl border border-gray-800/80 overflow-hidden" style={{ background: '#12121f' }}>
-              <AppleMusicPlayer
-                ref={amRef}
-                appleMusicUrl={song.apple_music_url}
-                onReady={() => setAmReady(true)}
-                onTimeUpdate={handleAmTimeUpdate}
-                onPlayStateChange={setAmPlaying}
-                autoPlay={amAutoPlay}
-              />
-            </div>
-          )}
-
-          {effectiveSource === 'spotify' && (
-            <div className="flex-1 min-w-0 rounded-2xl border border-gray-800/80 p-4 flex flex-col gap-3 justify-center" style={{ background: '#12121f' }}>
-              <input
-                className="
-                  w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2
-                  text-white text-sm font-mono placeholder-gray-600
-                  focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30
-                  transition-all
-                "
-                value={trackUri}
-                onChange={e => setTrackUri(e.target.value)}
-                placeholder="spotify:track:..."
-                spellCheck={false}
-              />
-              <button
-                onClick={handleLoadTrack}
-                disabled={!player.isReady || loading}
-                className="
-                  w-full px-4 py-2 rounded-xl text-sm font-semibold
-                  bg-indigo-600 hover:bg-indigo-500 active:scale-[0.98]
-                  disabled:bg-gray-800 disabled:text-gray-600
-                  text-white transition-all duration-150
-                "
-              >
-                {loading ? 'Loading…' : 'Load'}
-              </button>
-            </div>
-          )}
-
         </div>{/* end controls + media row */}
+
+        {/* Apple Music player — rendered hidden so audio context stays alive */}
+        {effectiveSource === 'apple_music' && song.apple_music_url && (
+          <div className="hidden">
+            <AppleMusicPlayer
+              ref={amRef}
+              appleMusicUrl={song.apple_music_url}
+              onReady={() => setAmReady(true)}
+              onTimeUpdate={(posMs, durMs) => { setAmPositionMs(posMs); setAmDurationMs(durMs) }}
+              onPlayStateChange={setAmPlaying}
+              autoPlay={amAutoPlay}
+            />
+          </div>
+        )}
 
         {/* Lyrics panel */}
         <section className="rounded-2xl border border-gray-800/80 overflow-hidden" style={{ background: '#12121f' }}>
