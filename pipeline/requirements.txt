@@ -1,5 +1,6 @@
 # ── Always required ───────────────────────────────────────────────────────────
 requests>=2.31.0
+transliterate>=1.10.2
 
 # ── Audio download for forced alignment fallback ─────────────────────────────
 # Forced alignment now uses Aeneas in a separate Python environment
