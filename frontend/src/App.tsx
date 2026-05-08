@@ -1374,6 +1374,7 @@ export default function App() {
   const [activePlaylist, setActivePlaylist] = useState<PlaylistDetail | null>(null)
   const [songsLoading, setSongsLoading] = useState(false)
   const [playlistsLoading, setPlaylistsLoading] = useState(false)
+  const [playlistDetailLoading, setPlaylistDetailLoading] = useState(false)
   const [songsError,   setSongsError]   = useState<string | null>(null)
   const [activeSong,   setActiveSong]   = useState<SongDetail | null>(null)
   const [songLoading,  setSongLoading]  = useState(false)
@@ -1576,11 +1577,14 @@ export default function App() {
   useEffect(() => {
     if (!activePlaylistId) {
       setActivePlaylist(null)
+      setPlaylistDetailLoading(false)
       return
     }
+    setActivePlaylist(null)
+    setPlaylistDetailLoading(true)
     api.getPlaylist(activePlaylistId)
-      .then(setActivePlaylist)
-      .catch(() => setActivePlaylist(null))
+      .then(pl => { setActivePlaylist(pl); setPlaylistDetailLoading(false) })
+      .catch(() => { setActivePlaylist(null); setPlaylistDetailLoading(false) })
   }, [activePlaylistId])
 
   // Sync user to backend (non-fatal if backend is down)
@@ -1840,7 +1844,7 @@ export default function App() {
       songs={displayedSongs}
       playlists={playlists}
       activePlaylistId={activePlaylistId}
-      loading={songsLoading || playlistsLoading}
+      loading={songsLoading || playlistsLoading || playlistDetailLoading}
       error={songsError}
       onSelect={handleSelectSong}
       onPrefetch={handlePrefetchSong}
