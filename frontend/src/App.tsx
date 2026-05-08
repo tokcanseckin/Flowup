@@ -1546,6 +1546,11 @@ export default function App() {
     }
   }, [settings.preferredSource, navigateToPath])
 
+  const handlePrefetchSong = useCallback((id: number) => {
+    const source = settings.preferredSource !== 'spotify' ? settings.preferredSource : undefined
+    void _fetchSong(id, source).catch(() => {})
+  }, [settings.preferredSource])
+
   // Re-fetch active song lyrics when source preference changes so the player
   // immediately gets the right per-source timestamps. Invalidate stale cache entry.
   useEffect(() => {
@@ -1836,10 +1841,7 @@ export default function App() {
       loading={songsLoading || playlistsLoading}
       error={songsError}
       onSelect={handleSelectSong}
-      onPrefetch={useCallback((id: number) => {
-        const source = settings.preferredSource !== 'spotify' ? settings.preferredSource : undefined
-        void _fetchSong(id, source).catch(() => {})
-      }, [settings.preferredSource])}
+      onPrefetch={handlePrefetchSong}
       onSelectPlaylist={setActivePlaylistId}
       onOpenAdmin={() => navigateToPath('/admin')}
       isAdmin={isAdmin}
