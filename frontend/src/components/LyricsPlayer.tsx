@@ -421,7 +421,7 @@ export default function LyricsPlayer({
           })}
         </div>
 
-        {activeIndex === -1 && (
+        {lines.length === 0 && (
           <div className="flex flex-col items-center justify-center gap-2 py-16">
             <p className="text-gray-600 text-sm">Waiting for playback...</p>
             <p className="text-gray-700 text-xs">Load a track and press Play</p>
