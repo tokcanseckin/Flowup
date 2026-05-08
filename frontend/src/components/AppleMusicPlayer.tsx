@@ -171,6 +171,24 @@ const AppleMusicPlayer = forwardRef<AppleMusicPlayerHandle, Props>(function Appl
   useEffect(() => { onArtworkUrlRef.current = onArtworkUrl }, [onArtworkUrl])
   useEffect(() => { autoPlayRef.current = autoPlay }, [autoPlay])
 
+  // ── Smooth extrapolation ticker (mirrors Spotify's approach) ─────────────────
+  // MusicKit fires playbackTimeDidChange at irregular intervals (~1 s or less).
+  // We anchor the last known position + wall-clock timestamp on each event, then
+  // a 100 ms ticker extrapolates forward so the progress bar stays smooth.
+  const basePositionMsRef = useRef(0)
+  const baseTimestampRef  = useRef(0)
+  const amIsPlayingRef    = useRef(false)
+  const amDurMsRef        = useRef(0)
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      if (!amIsPlayingRef.current) return
+      const extrapolated = basePositionMsRef.current + (Date.now() - baseTimestampRef.current)
+      onTimeUpdateRef.current?.(extrapolated, amDurMsRef.current)
+    }, 100)
+    return () => clearInterval(id)
+  }, [])
+
   // ── Imperative API ───────────────────────────────────────────────────────────
 
   useImperativeHandle(ref, () => ({
@@ -187,6 +205,12 @@ const AppleMusicPlayer = forwardRef<AppleMusicPlayerHandle, Props>(function Appl
     if (!MK) return
     const playing = state === MK.PlaybackStates.playing
     logAppleMusicDebug('State changed', { state, playing })
+    amIsPlayingRef.current = playing
+    if (playing) {
+      // Re-anchor position on resume so the ticker starts from the right place
+      basePositionMsRef.current = Math.floor((_mkInstance?.currentPlaybackTime ?? 0) * 1000)
+      baseTimestampRef.current  = Date.now()
+    }
     onPlayStateChangeRef.current?.(playing)
     // Sync local status with actual MusicKit state. This ensures the pink
     // tap-to-play button disappears even when play() was triggered via the
@@ -200,7 +224,10 @@ const AppleMusicPlayer = forwardRef<AppleMusicPlayerHandle, Props>(function Appl
   const handleTimeChange = useCallback((ev: Record<string, unknown>) => {
     const posS = (ev.currentPlaybackTime as number | undefined) ?? _mkInstance?.currentPlaybackTime ?? 0
     const durS = _mkInstance?.currentPlaybackDuration ?? 0
-    onTimeUpdateRef.current?.(Math.floor(posS * 1000), Math.floor(durS * 1000))
+    // Anchor the base; the 100 ms ticker will extrapolate from here
+    basePositionMsRef.current = Math.floor(posS * 1000)
+    baseTimestampRef.current  = Date.now()
+    amDurMsRef.current        = Math.floor(durS * 1000)
   }, [])
 
   // ── Load + configure + authorise ─────────────────────────────────────────────
