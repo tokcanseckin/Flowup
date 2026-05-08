@@ -1281,6 +1281,7 @@ function PlayerView({
         <section className="rounded-2xl border border-gray-800/80 overflow-hidden flex-1 min-h-0 flex flex-col" style={{ background: '#12121f' }}>
           <LyricsPlayer
             currentPositionMs={positionMs}
+            durationMs={durationMs}
             songData={song}
             filterStopWordsForIndexing={settings.excludeStopWordsFromShortcuts}
             onInfoVisibilityChange={setInfoVisible}
