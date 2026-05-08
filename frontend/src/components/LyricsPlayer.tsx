@@ -349,6 +349,7 @@ export default function LyricsPlayer({
         return
       }
 
+      if (e.metaKey || e.ctrlKey) return
       const target = keyboardTargetFor(e.key)
       if (!target) return
       e.preventDefault()

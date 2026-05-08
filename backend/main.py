@@ -285,13 +285,15 @@ def _enrich_definition(raw_def: Optional[str], lemma: str, lang_code: str = "ru"
             parts = [p.strip() for p in s.split(';') if p.strip()]
             return '; '.join(parts[:n]) if parts else None
 
-        if raw_def and raw_def.startswith("[") and raw_def.endswith("]"):
-            return _cap_it(
-                _italian_dict.lookup(raw_def[1:-1])
-                or _italian_dict.lookup(lemma)
-                or (clean_display and _italian_dict.lookup(clean_display))
-            )
-        return _cap_it(raw_def or _italian_dict.lookup(lemma) or (clean_display and _italian_dict.lookup(clean_display)))
+        # Always re-lookup from the in-memory OMW (fast, no network) so that
+        # DB-stored verbose glosses are replaced with the current lemma_names output.
+        live = (
+            _italian_dict.lookup(lemma)
+            or (clean_display and _italian_dict.lookup(clean_display))
+            or (raw_def and not raw_def.startswith("[") and raw_def)
+            or None
+        )
+        return _cap_it(live)
     # Russian (default): strip combining accents so 'пи́сать' looks up 'писать'.
     bare_lemma = _strip_accents(lemma)
     if raw_def and raw_def.startswith("[") and raw_def.endswith("]"):
