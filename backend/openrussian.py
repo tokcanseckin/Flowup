@@ -20,6 +20,7 @@ import requests
 _CACHE_DIR = Path(__file__).parent / ".cache"
 _WORDS_FILE = _CACHE_DIR / "openrussian_words.csv"
 _TRANSLATIONS_FILE = _CACHE_DIR / "openrussian_translations.csv"
+_FORMS_FILE = _CACHE_DIR / "openrussian_words_forms.csv"
 
 _WORDS_URLS = [
     "https://raw.githubusercontent.com/openrussian/russian-dictionary/main/data/words.csv",
@@ -31,9 +32,18 @@ _TRANSLATIONS_URLS = [
     "https://raw.githubusercontent.com/Badestrand/russian-dictionary/main/data/translations.csv",
     "https://raw.githubusercontent.com/Badestrand/russian-dictionary/master/data/translations.csv",
 ]
+_FORMS_URLS = [
+    "https://raw.githubusercontent.com/openrussian/russian-dictionary/main/data/words_forms.csv",
+    "https://raw.githubusercontent.com/Badestrand/russian-dictionary/main/data/words_forms.csv",
+    "https://raw.githubusercontent.com/Badestrand/russian-dictionary/master/data/words_forms.csv",
+]
 
 # In-memory index: lowercase bare lemma -> "def1; def2; def3"
 _lookup: dict[str, str] | None = None
+# word_id -> list[definition] — for form-based disambiguation
+_wid_defs: dict[str, list[str]] | None = None
+# lowercase inflected form -> word_id — built from words_forms.csv
+_form_index: dict[str, str] | None = None
 # Cache of Wiktionary lookups to avoid repeated API calls
 _wiktionary_cache: dict[str, Optional[str]] = {}
 
@@ -94,6 +104,14 @@ def _download_from_togetherdb() -> bool:
         print("[Dictionary] Downloading words/translations from TogetherDB...")
         _download_togetherdb_table("words", _WORDS_FILE)
         _download_togetherdb_table("translations", _TRANSLATIONS_FILE)
+        # Also download forms table if present (non-fatal if missing)
+        if "words_forms" in table_names:
+            try:
+                _download_togetherdb_table("words_forms", _FORMS_FILE)
+                forms_kb = _FORMS_FILE.stat().st_size // 1024
+                print(f"[Dictionary] Saved words_forms: {forms_kb:,} KB")
+            except Exception as exc:
+                print(f"[Dictionary] words_forms download skipped: {exc}")
         words_kb = _WORDS_FILE.stat().st_size // 1024
         trans_kb = _TRANSLATIONS_FILE.stat().st_size // 1024
         print(
@@ -267,16 +285,26 @@ def _query_wiktionary(lemma: str) -> Optional[str]:
         return None
 
 
-def _build_lookup(already_tried_download: bool = False) -> dict[str, str]:
+def _build_lookup(already_tried_download: bool = False) -> tuple[dict[str, str], dict[str, list[str]], dict[str, str]]:
+    """Return (lemma_lookup, wid_defs, form_index).
+
+    lemma_lookup : bare_lemma -> "; "-joined definitions (all homographs merged,
+                   higher-frequency word's senses listed first).
+    wid_defs     : word_id   -> list[definition] for direct word_id access.
+    form_index   : inflected_form -> word_id (from words_forms.csv, if available).
+    """
     _CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
     result: dict[str, str] = {}
-    
+    wid_defs: dict[str, list[str]] = {}
+    form_index: dict[str, str] = {}
+
     # Try to load from local cache
     if _WORDS_FILE.exists() and _TRANSLATIONS_FILE.exists():
         try:
-            # Build word_id -> bare lemma map
+            # Build word_id -> (bare lemma, rank) map
             id_to_bare: dict[str, str] = {}
+            id_to_rank: dict[str, int] = {}
             with _WORDS_FILE.open(encoding="utf-8-sig") as fh:
                 reader = csv.DictReader(fh)
                 for row in reader:
@@ -284,6 +312,8 @@ def _build_lookup(already_tried_download: bool = False) -> dict[str, str]:
                     wid = (row.get("id") or "").strip()
                     if bare and wid:
                         id_to_bare[wid] = bare.lower()
+                        rank_raw = (row.get("rank") or "").strip()
+                        id_to_rank[wid] = int(rank_raw) if rank_raw.isdigit() else 999_999
 
             # Build word_id -> English definitions map
             id_to_defs: dict[str, list[str]] = {}
@@ -298,17 +328,47 @@ def _build_lookup(already_tried_download: bool = False) -> dict[str, str]:
                     if wid and word:
                         id_to_defs.setdefault(wid, []).append(word)
 
-            # Merge into bare_lemma -> definition string (max 4 senses)
+            # Build wid_defs
+            for wid, defs in id_to_defs.items():
+                wid_defs[wid] = defs[:4]
+
+            # Merge into bare_lemma -> definition string.
+            # When multiple word_ids share the same bare lemma (homographs), collect
+            # all their definitions ordered by word frequency rank (lower = more common),
+            # so the primary meaning comes first rather than being overwritten.
+            from collections import defaultdict
+            bare_to_wids: dict[str, list[str]] = defaultdict(list)
             for wid, bare in id_to_bare.items():
-                defs = id_to_defs.get(wid, [])
-                if defs:
-                    result[bare] = "; ".join(defs[:4])
-            
+                bare_to_wids[bare].append(wid)
+
+            for bare, wids in bare_to_wids.items():
+                # Sort by rank ascending (most common word first)
+                sorted_wids = sorted(wids, key=lambda w: id_to_rank.get(w, 999_999))
+                merged: list[str] = []
+                for wid in sorted_wids:
+                    merged.extend(id_to_defs.get(wid, [])[:2])  # up to 2 senses per homograph
+                if merged:
+                    result[bare] = "; ".join(merged[:4])
+
+            # Build form index from words_forms.csv if available
+            if _FORMS_FILE.exists():
+                try:
+                    with _FORMS_FILE.open(encoding="utf-8-sig") as fh:
+                        reader = csv.DictReader(fh)
+                        for row in reader:
+                            wid = (row.get("word_id") or "").strip()
+                            form = (row.get("form") or "").strip().lower()
+                            if wid and form and wid in id_to_bare:
+                                form_index[form] = wid
+                    print(f"[Dictionary] Forms index: {len(form_index):,} entries.")
+                except Exception as exc:
+                    print(f"[Dictionary] Could not load forms index: {exc}")
+
             print(f"[Dictionary] Loaded {len(result):,} words from local cache.")
-            return result
+            return result, wid_defs, form_index
         except Exception as exc:
             print(f"[Dictionary] Failed to read local cache: {exc}")
-            return {}
+            return {}, {}, {}
     
     # Try to download fresh copies on first call (not on recursive call)
     if not already_tried_download:
@@ -320,6 +380,11 @@ def _build_lookup(already_tried_download: bool = False) -> dict[str, str]:
         try:
             _download_first(_WORDS_URLS, _WORDS_FILE)
             _download_first(_TRANSLATIONS_URLS, _TRANSLATIONS_FILE)
+            # Also attempt forms file (non-fatal if unavailable)
+            try:
+                _download_first(_FORMS_URLS, _FORMS_FILE)
+            except Exception:
+                pass
             # Now try loading from the files we just downloaded
             return _build_lookup(already_tried_download=True)
         except Exception as exc:
@@ -336,31 +401,76 @@ def _build_lookup(already_tried_download: bool = False) -> dict[str, str]:
             print("[Dictionary] Partial Archive.org recovery (will use Wiktionary for fallback)")
     
     print("[Dictionary] Will use Wiktionary API for live lookups.")
-    return {}
+    return {}, {}, {}
 
 
 def ensure_loaded() -> None:
     """Load the dictionary index into memory (idempotent)."""
-    global _lookup
+    global _lookup, _wid_defs, _form_index
     if _lookup is None:
-        _lookup = _build_lookup()
+        _lookup, _wid_defs, _form_index = _build_lookup()
 
 
 def lookup_all(lemma: str) -> list[str]:
     """Return all English definitions for lemma as a list.
 
-    Splits the "; "-joined string stored in the CSV lookup (up to 4 senses)
-    and, if absent, falls back to Wiktionary (which may also return several
-    senses joined the same way).
+    Strips combining accent marks before lookup so stressed lemmas (е.г. пи́сать)
+    correctly resolve to the bare entry.  When multiple homographs share the same
+    bare form their definitions are already merged in frequency order by
+    _build_lookup.  Falls back to Wiktionary when not in the local cache.
     """
     if _lookup is None:
         return []
-    combined = _lookup.get(lemma.lower().strip())
+    # Strip combining accents (U+0300-U+036F) so "пи́сать" → "писать"
+    import unicodedata
+    bare = unicodedata.normalize("NFD", lemma.lower().strip())
+    bare = "".join(c for c in bare if not unicodedata.combining(c))
+    combined = _lookup.get(bare)
     if combined is None:
-        combined = _query_wiktionary_russian(lemma.lower().strip())
+        combined = _query_wiktionary_russian(bare)
     if not combined:
         return []
     return [d.strip() for d in combined.split(";") if d.strip()]
+
+
+def lookup_all_by_form(raw_form: str) -> list[str]:
+    """Return definitions by looking up the original inflected form directly.
+
+    Uses the words_forms.csv index to find the exact word_id for `raw_form`,
+    which unambiguously picks the right homograph.  For example, 'пишет'
+    maps to the word_id for писать (to write), not пи́сать (to piss), because
+    'пишет' is not a valid form of the latter.
+
+    Returns an empty list when the form index is unavailable or the form is
+    not found; the caller should then fall back to `lookup_all(lemma)`.
+    """
+    if not _form_index or not _wid_defs:
+        return []
+    import unicodedata
+    bare = unicodedata.normalize("NFD", raw_form.lower().strip())
+    bare = "".join(c for c in bare if not unicodedata.combining(c))
+    wid = _form_index.get(bare)
+    if not wid:
+        return []
+    return list(_wid_defs.get(wid, []))
+
+
+def lookup_local(lemma: str) -> Optional[str]:
+    """Return English definition(s) for lemma using only the local in-memory dict.
+
+    Never makes network calls — guaranteed O(1).  Use this in the serve-time
+    path (e.g. _enrich_definition) so GET /songs/{id} never blocks on Wiktionary.
+    """
+    if _lookup is None:
+        return None
+    import unicodedata
+    bare = unicodedata.normalize("NFD", lemma.lower().strip())
+    bare = "".join(c for c in bare if not unicodedata.combining(c))
+    combined = _lookup.get(bare)
+    if not combined:
+        return None
+    defs = [d.strip() for d in combined.split(";") if d.strip()]
+    return "; ".join(defs) if defs else None
 
 
 def lookup(lemma: str) -> Optional[str]:

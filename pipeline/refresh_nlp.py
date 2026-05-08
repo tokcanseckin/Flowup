@@ -147,7 +147,7 @@ def _process_song(conn: sqlite3.Connection, song_id: int, dry_run: bool, grammar
     LOG_EVERY = max(1, total_words // 10)  # log ~10 progress checkpoints
 
     for i, (word_id, lemma, line_id, display_form) in enumerate(words, 1):
-        new_def = _resolve_definition(lemma, lang_code, trans_map.get(line_id, ""))
+        new_def = _resolve_definition(lemma, lang_code, trans_map.get(line_id, ""), display_form or "")
         updates: dict[str, object] = {"dictionary_definition": new_def}
 
         if morph is not None and display_form:
