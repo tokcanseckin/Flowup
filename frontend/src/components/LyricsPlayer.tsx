@@ -98,24 +98,52 @@ interface BreakProps {
 function BreakIndicator({ startMs, endMs, currentPositionMs, isPlaying, label }: BreakProps) {
   const duration = endMs - startMs
   const isActive = currentPositionMs >= startMs && currentPositionMs < endMs
-  const isPast = currentPositionMs >= endMs
+  const isPast   = currentPositionMs >= endMs
 
-  // Detect seeks: if position jumps more than 800 ms from where we expect,
-  // bump the key so React remounts the element and restarts the CSS animation.
-  const animKeyRef   = useRef(0)
-  const lastPosRef   = useRef(currentPositionMs)
-  const lastTsRef    = useRef(Date.now())
+  // ── Seek detection ────────────────────────────────────────────────────────
+  // If the position jumps more than 1 s from the linearly-expected value,
+  // bump seekKey so the fill div remounts and the animation restarts correctly.
+  const seekKeyRef = useRef(0)
+  const prevPosRef = useRef(currentPositionMs)
+  const prevTsRef  = useRef(Date.now())
   const now = Date.now()
-  const expectedPos  = lastPosRef.current + (isPlaying ? (now - lastTsRef.current) : 0)
-  if (Math.abs(currentPositionMs - expectedPos) > 800) {
-    animKeyRef.current++
+  if (isActive) {
+    const expected = prevPosRef.current + (now - prevTsRef.current)
+    if (Math.abs(currentPositionMs - expected) > 1000) seekKeyRef.current++
   }
-  lastPosRef.current = currentPositionMs
-  lastTsRef.current  = now
+  prevPosRef.current = currentPositionMs
+  prevTsRef.current  = now
 
-  // How far into this break are we? Used as a negative animation-delay so the
-  // animation starts mid-way at exactly the right position.
-  const elapsedInBreak = Math.max(0, currentPositionMs - startMs)
+  // ── Keep fresh values in refs so callback ref sees them at mount ──────────
+  const isPlayingRef  = useRef(isPlaying)
+  const currentPosRef = useRef(currentPositionMs)
+  isPlayingRef.current  = isPlaying
+  currentPosRef.current = currentPositionMs
+
+  // fillElRef: stable handle to the fill bar DOM node
+  const fillElRef = useRef<HTMLDivElement | null>(null)
+
+  // Callback ref: fires ONLY when the element mounts (or remounts after seek).
+  // Sets animation-delay from position at that instant — never updated again,
+  // so the browser compositor runs the animation freely at 60 fps.
+  const fillRefCallback = useCallback((el: HTMLDivElement | null) => {
+    fillElRef.current = el
+    if (!el) return
+    const elapsed = Math.max(0, currentPosRef.current - startMs)
+    el.style.animationName         = 'break-fill'
+    el.style.animationDuration     = `${duration}ms`
+    el.style.animationDelay        = `-${elapsed}ms`
+    el.style.animationTimingFunction = 'linear'
+    el.style.animationFillMode     = 'forwards'
+    el.style.animationPlayState    = isPlayingRef.current ? 'running' : 'paused'
+  }, [startMs, duration]) // stable; reads live values via refs
+
+  // Update animationPlayState only — never touch animation-delay again.
+  useEffect(() => {
+    const el = fillElRef.current
+    if (!el) return
+    el.style.animationPlayState = isPlaying ? 'running' : 'paused'
+  }, [isPlaying])
 
   return (
     <div className={`flex items-center gap-3 px-3 py-2 transition-opacity duration-300 ${isPast ? 'opacity-30' : isActive ? 'opacity-100' : 'opacity-40'}`}>
@@ -123,18 +151,14 @@ function BreakIndicator({ startMs, endMs, currentPositionMs, isPlaying, label }:
         <span className="text-xs text-gray-500 shrink-0 font-mono uppercase tracking-widest">{label}</span>
       )}
       <div className="relative flex-1 h-0.5 rounded-full bg-gray-800 overflow-hidden">
-        {(isActive || isPast) && (
+        {isPast && (
+          <div className="absolute inset-0 rounded-full bg-indigo-600/70" />
+        )}
+        {isActive && (
           <div
-            key={animKeyRef.current}
+            key={seekKeyRef.current}
+            ref={fillRefCallback}
             className="absolute inset-y-0 left-0 rounded-full bg-indigo-600/70"
-            style={isActive ? {
-              animationName: 'break-fill',
-              animationDuration: `${duration}ms`,
-              animationDelay: `-${elapsedInBreak}ms`,
-              animationTimingFunction: 'linear',
-              animationFillMode: 'forwards',
-              animationPlayState: isPlaying ? 'running' : 'paused',
-            } : { width: '100%' }}
           />
         )}
       </div>
