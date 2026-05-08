@@ -52,10 +52,16 @@ def lookup_all(lemma: str) -> list[str]:
         synsets = _wn.synsets(lemma.lower(), lang="ita")
         for syn in synsets:
             defn = syn.definition()
-            if defn and defn not in results:
-                results.append(defn)
-                if len(results) >= 5:
-                    break
+            if not defn or defn in results:
+                continue
+            # Skip citation-style entries (e.g. "- Thomas Gray", "- Andrea Parke")
+            # and entries that are too short to be real definitions
+            stripped = defn.strip()
+            if stripped.startswith("-") or len(stripped) < 10:
+                continue
+            results.append(defn)
+            if len(results) >= 5:
+                break
     except Exception:
         pass
     return results
