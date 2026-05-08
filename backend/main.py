@@ -84,6 +84,7 @@ from models import (
     WorkerTaskResponse,
 )
 from openrussian import ensure_loaded as _load_or, lookup as _or_lookup, lookup_local as _or_lookup_local
+import italian_dict as _italian_dict
 from spotify_auth import fetch_spotify_user, refresh_access_token
 from google_auth import verify_google_id_token
 
@@ -133,6 +134,11 @@ async def lifespan(app: FastAPI):
         await loop.run_in_executor(None, _load_or)
     except Exception as exc:
         print(f"[OpenRussian] Startup preload failed (non-fatal): {exc}")
+    # Pre-load Italian OMW dictionary.
+    try:
+        await loop.run_in_executor(None, _italian_dict.ensure_loaded)
+    except Exception as exc:
+        print(f"[ItalianDict] Startup preload failed (non-fatal): {exc}")
     # Warm the song cache so first requests are served from memory.
     try:
         await loop.run_in_executor(None, _warm_song_cache)
@@ -257,13 +263,19 @@ def _strip_accents(s: str) -> str:
     return "".join(c for c in nfd if not unicodedata.combining(c))
 
 
-def _enrich_definition(raw_def: Optional[str], lemma: str) -> Optional[str]:
-    """Replace stub definitions (e.g. '[mesto]') with OpenRussian lookups.
+def _enrich_definition(raw_def: Optional[str], lemma: str, lang_code: str = "ru") -> Optional[str]:
+    """Replace stub definitions (e.g. '[mesto]') with local dictionary lookups.
 
-    Uses the local in-memory dict only (no Wiktionary network calls) so this
-    function is always O(1) and never blocks a GET /songs/{id} request.
+    Uses the local in-memory dict only (no network calls) so this function is
+    always fast and never blocks a GET /songs/{id} request.
     """
-    # Strip combining accents so a stressed lemma like 'пи́сать' looks up 'писать'
+    if lang_code == "it":
+        # For stubs, try the inner key first, then the stored lemma.
+        # Return None (rather than the ugly stub) when OMW has no entry.
+        if raw_def and raw_def.startswith("[") and raw_def.endswith("]"):
+            return _italian_dict.lookup(raw_def[1:-1]) or _italian_dict.lookup(lemma) or None
+        return raw_def or _italian_dict.lookup(lemma) or None
+    # Russian (default): strip combining accents so 'пи́сать' looks up 'писать'.
     bare_lemma = _strip_accents(lemma)
     if raw_def and raw_def.startswith("[") and raw_def.endswith("]"):
         live = _or_lookup_local(raw_def[1:-1]) or _or_lookup_local(bare_lemma)
@@ -271,17 +283,17 @@ def _enrich_definition(raw_def: Optional[str], lemma: str) -> Optional[str]:
     return raw_def or _or_lookup_local(bare_lemma)
 
 
-def _word_response(word: Word) -> WordResponse:
+def _word_response(word: Word, lang_code: str = "ru") -> WordResponse:
     return WordResponse(
         key=word.key_index,
         display_form=word.display_form,
         lemma=word.lemma,
         grammar=word.grammar,
-        dictionary_definition=_enrich_definition(word.dictionary_definition, word.lemma),
+        dictionary_definition=_enrich_definition(word.dictionary_definition, word.lemma, lang_code),
     )
 
 
-def _line_response(line: Line, override_words: Optional[list] = None) -> LineResponse:
+def _line_response(line: Line, override_words: Optional[list] = None, lang_code: str = "ru") -> LineResponse:
     words = override_words if override_words is not None else line.words
     return LineResponse(
         id=line.id,
@@ -291,26 +303,27 @@ def _line_response(line: Line, override_words: Optional[list] = None) -> LineRes
         original_line=line.original_line,
         phonetic_line=line.phonetic_line,
         translation=line.translation,
-        words=[_word_response(w) for w in words],
+        words=[_word_response(w, lang_code) for w in words],
         source=line.source,
     )
 
 
 def _song_detail(song: Song, source: Optional[str] = None) -> SongDetailResponse:
     default_lines = [l for l in song.lines if l.source is None]
+    lang_code = song.language_code or "ru"
 
     if source and source != "default":
         source_lines = [l for l in song.lines if l.source == source]
         if source_lines:
             default_words_by_pos = {l.position: l.words for l in default_lines}
             lines = [
-                _line_response(sl, override_words=default_words_by_pos.get(sl.position, []))
+                _line_response(sl, override_words=default_words_by_pos.get(sl.position, []), lang_code=lang_code)
                 for sl in sorted(source_lines, key=lambda l: l.position)
             ]
         else:
-            lines = [_line_response(l) for l in default_lines]
+            lines = [_line_response(l, lang_code=lang_code) for l in default_lines]
     else:
-        lines = [_line_response(l) for l in default_lines]
+        lines = [_line_response(l, lang_code=lang_code) for l in default_lines]
 
     return SongDetailResponse(
         id=song.id,
@@ -336,9 +349,10 @@ def _admin_song_detail(song: Song, db: Session) -> AdminSongDetailResponse:
     ]
     default_words_by_pos = {l.position: l.words for l in song.lines if l.source is None}
     source_lines_map: dict[str, list[LineResponse]] = {}
+    lang_code = song.language_code or "ru"
     for line in song.lines:
         if line.source is not None:
-            lr = _line_response(line, override_words=default_words_by_pos.get(line.position, []))
+            lr = _line_response(line, override_words=default_words_by_pos.get(line.position, []), lang_code=lang_code)
             source_lines_map.setdefault(line.source, []).append(lr)
     source_lines = [
         SourceLinesResponse(source=src, lines=sorted(lines, key=lambda l: l.position))
@@ -401,7 +415,7 @@ def _ingest_song(body: SongIngest, db: Session) -> Song:
                 lemma=word_data.lemma,
                 grammar=word_data.grammar,
                 # Resolve stubs at ingest time so the DB always has clean values.
-                dictionary_definition=_enrich_definition(word_data.dictionary_definition, word_data.lemma),
+                dictionary_definition=_enrich_definition(word_data.dictionary_definition, word_data.lemma, body.language.code),
             ))
 
     db.commit()
