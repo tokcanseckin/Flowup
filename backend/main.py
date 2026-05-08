@@ -88,6 +88,37 @@ from spotify_auth import fetch_spotify_user, refresh_access_token
 from google_auth import verify_google_id_token
 
 
+# ── Server-side song cache ───────────────────────────────────────────────────
+# Key: (song_id, source) where source is None for default/Spotify.
+# Values: SongDetailResponse serialised as dict (JSON-ready, ~30 KB/song).
+_song_response_cache: dict[tuple[int, Optional[str]], dict] = {}
+
+
+def _cache_invalidate(song_id: int) -> None:
+    """Remove all cached variants for a song. Call after any write."""
+    keys = [k for k in _song_response_cache if k[0] == song_id]
+    for k in keys:
+        del _song_response_cache[k]
+
+
+def _warm_song_cache() -> None:
+    """Pre-populate the cache for every song in the DB at startup."""
+    db = next(get_db())
+    try:
+        songs = db.query(Song).all()
+        count = 0
+        for song in songs:
+            # Always cache the default view.
+            detail = _song_detail(song, source=None)
+            _song_response_cache[(song.id, None)] = detail.model_dump()
+            count += 1
+        print(f"[Cache] Warmed {count} songs.")
+    except Exception as exc:
+        print(f"[Cache] Warm-up failed (non-fatal): {exc}")
+    finally:
+        db.close()
+
+
 # ── Startup ────────────────────────────────────────────────────────────────────
 
 @asynccontextmanager
@@ -96,12 +127,17 @@ async def lifespan(app: FastAPI):
     _seed_sample_data()
     _ensure_admin_user()
     _ensure_spotify_enabled_users()
-    # Pre-load OpenRussian index in a thread. If it fails, keep API alive.
     loop = asyncio.get_event_loop()
+    # Pre-load OpenRussian index in a thread. If it fails, keep API alive.
     try:
         await loop.run_in_executor(None, _load_or)
     except Exception as exc:
         print(f"[OpenRussian] Startup preload failed (non-fatal): {exc}")
+    # Warm the song cache so first requests are served from memory.
+    try:
+        await loop.run_in_executor(None, _warm_song_cache)
+    except Exception as exc:
+        print(f"[Cache] Startup warm failed (non-fatal): {exc}")
     yield
 
 
@@ -364,7 +400,8 @@ def _ingest_song(body: SongIngest, db: Session) -> Song:
                 display_form=word_data.display_form,
                 lemma=word_data.lemma,
                 grammar=word_data.grammar,
-                dictionary_definition=word_data.dictionary_definition,
+                # Resolve stubs at ingest time so the DB always has clean values.
+                dictionary_definition=_enrich_definition(word_data.dictionary_definition, word_data.lemma),
             ))
 
     db.commit()
@@ -593,10 +630,23 @@ def list_songs(db: Session = Depends(get_db)):
 
 @app.get("/api/songs/{song_id}", response_model=SongDetailResponse)
 def get_song(song_id: int, source: Optional[str] = Query(default=None), db: Session = Depends(get_db)):
+    cache_key = (song_id, source or None)
+    cached = _song_response_cache.get(cache_key)
+    if cached is not None:
+        return JSONResponse(
+            content=cached,
+            headers={"Cache-Control": "private, max-age=3600"},
+        )
     song = db.get(Song, song_id)
     if not song:
         raise HTTPException(status_code=404, detail="Song not found")
-    return _song_detail(song, source=source)
+    detail = _song_detail(song, source=source)
+    data = detail.model_dump()
+    _song_response_cache[cache_key] = data
+    return JSONResponse(
+        content=data,
+        headers={"Cache-Control": "private, max-age=3600"},
+    )
 
 
 @app.post("/api/songs", response_model=SongDetailResponse, status_code=201)
@@ -606,7 +656,10 @@ def create_song(body: SongIngest, db: Session = Depends(get_db)):
     If the spotify_uri already exists it is fully replaced.
     """
     song = _ingest_song(body, db)
-    return _song_detail(song)
+    _cache_invalidate(song.id)
+    detail = _song_detail(song)
+    _song_response_cache[(song.id, None)] = detail.model_dump()
+    return detail
 
 
 @app.delete("/api/songs/{song_id}", status_code=204)
@@ -614,6 +667,7 @@ def delete_song(song_id: int, db: Session = Depends(get_db)):
     song = db.get(Song, song_id)
     if not song:
         raise HTTPException(status_code=404, detail="Song not found")
+    _cache_invalidate(song_id)
     db.delete(song)
     db.commit()
 
@@ -641,6 +695,7 @@ def update_song_sources(song_id: int, body: SongSourcesUpdate, db: Session = Dep
         song.apple_music_url = body.apple_music_url or None
     db.commit()
     db.refresh(song)
+    _cache_invalidate(song_id)
     return SongSummaryResponse(
         id=song.id,
         spotify_uri=song.spotify_uri,
@@ -675,6 +730,11 @@ def bulk_update_song_sources(body: BulkSongSourcesUpdate, db: Session = Depends(
             song.apple_music_url = entry.apple_music_url or None
         updated += 1
     db.commit()
+    for entry in body.songs:
+        spotify_uri = f"spotify:track:{entry.spotify_id}"
+        s = db.query(Song).filter(Song.spotify_uri == spotify_uri).first()
+        if s:
+            _cache_invalidate(s.id)
     return {"updated": updated, "not_found": not_found}
 
 
@@ -693,6 +753,7 @@ def create_admin_song(body: AdminSongCreate, db: Session = Depends(get_db), _: U
     _populate_source_lines(song, db)
     db.commit()
     db.refresh(song)
+    _cache_invalidate(song.id)
     return _admin_song_detail(song, db)
 
 
@@ -701,6 +762,7 @@ def delete_admin_song(song_id: int, db: Session = Depends(get_db), _: User = Dep
     song = db.get(Song, song_id)
     if not song:
         raise HTTPException(status_code=404, detail="Song not found")
+    _cache_invalidate(song_id)
     db.delete(song)
     db.commit()
 
@@ -754,6 +816,7 @@ def update_admin_song(song_id: int, body: AdminSongUpdate, db: Session = Depends
 
     db.commit()
     db.refresh(song)
+    _cache_invalidate(song_id)
     return _admin_song_detail(song, db)
 
 
@@ -781,6 +844,7 @@ def update_admin_song_lyrics(song_id: int, body: AdminLyricsUpdate, db: Session 
 
     db.commit()
     db.refresh(song)
+    _cache_invalidate(song_id)
     return _admin_song_detail(song, db)
 
 
@@ -819,6 +883,7 @@ def update_source_lyrics(
 
     db.commit()
     db.refresh(song)
+    _cache_invalidate(song_id)
     return _admin_song_detail(song, db)
 
 
