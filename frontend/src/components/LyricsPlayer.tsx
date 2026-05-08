@@ -91,14 +91,31 @@ interface BreakProps {
   startMs: number
   endMs: number
   currentPositionMs: number
+  isPlaying: boolean
   label?: string
 }
 
-function BreakIndicator({ startMs, endMs, currentPositionMs, label }: BreakProps) {
+function BreakIndicator({ startMs, endMs, currentPositionMs, isPlaying, label }: BreakProps) {
   const duration = endMs - startMs
-  const progress = Math.max(0, Math.min(1, (currentPositionMs - startMs) / duration))
   const isActive = currentPositionMs >= startMs && currentPositionMs < endMs
   const isPast = currentPositionMs >= endMs
+
+  // Detect seeks: if position jumps more than 800 ms from where we expect,
+  // bump the key so React remounts the element and restarts the CSS animation.
+  const animKeyRef   = useRef(0)
+  const lastPosRef   = useRef(currentPositionMs)
+  const lastTsRef    = useRef(Date.now())
+  const now = Date.now()
+  const expectedPos  = lastPosRef.current + (isPlaying ? (now - lastTsRef.current) : 0)
+  if (Math.abs(currentPositionMs - expectedPos) > 800) {
+    animKeyRef.current++
+  }
+  lastPosRef.current = currentPositionMs
+  lastTsRef.current  = now
+
+  // How far into this break are we? Used as a negative animation-delay so the
+  // animation starts mid-way at exactly the right position.
+  const elapsedInBreak = Math.max(0, currentPositionMs - startMs)
 
   return (
     <div className={`flex items-center gap-3 px-3 py-2 transition-opacity duration-300 ${isPast ? 'opacity-30' : isActive ? 'opacity-100' : 'opacity-40'}`}>
@@ -106,18 +123,18 @@ function BreakIndicator({ startMs, endMs, currentPositionMs, label }: BreakProps
         <span className="text-xs text-gray-500 shrink-0 font-mono uppercase tracking-widest">{label}</span>
       )}
       <div className="relative flex-1 h-0.5 rounded-full bg-gray-800 overflow-hidden">
-        <div
-          className="absolute inset-y-0 left-0 rounded-full bg-indigo-600/70"
-          style={{ width: `${progress * 100}%`, transition: 'width 300ms linear' }}
-        />
-        {isActive && (
+        {(isActive || isPast) && (
           <div
-            className="absolute inset-y-0 w-8 rounded-full"
-            style={{
-              left: `calc(${progress * 100}% - 2rem)`,
-              background: 'linear-gradient(to right, transparent, rgba(129,140,248,0.5), transparent)',
-              transition: 'left 300ms linear',
-            }}
+            key={animKeyRef.current}
+            className="absolute inset-y-0 left-0 rounded-full bg-indigo-600/70"
+            style={isActive ? {
+              animationName: 'break-fill',
+              animationDuration: `${duration}ms`,
+              animationDelay: `-${elapsedInBreak}ms`,
+              animationTimingFunction: 'linear',
+              animationFillMode: 'forwards',
+              animationPlayState: isPlaying ? 'running' : 'paused',
+            } : { width: '100%' }}
           />
         )}
       </div>
@@ -159,6 +176,7 @@ function resolveInspectInfo(lines: SongDetail['lines'], state: InspectState | nu
 interface Props {
   currentPositionMs: number
   durationMs?: number
+  isPlaying: boolean
   songData: SongDetail
   filterStopWordsForIndexing?: boolean
   onInfoVisibilityChange?: (visible: boolean) => void
@@ -169,6 +187,7 @@ interface Props {
 export default function LyricsPlayer({
   currentPositionMs,
   durationMs = 0,
+  isPlaying,
   songData,
   filterStopWordsForIndexing = true,
   onInfoVisibilityChange,
@@ -459,6 +478,7 @@ export default function LyricsPlayer({
                     startMs={breakBefore.startMs}
                     endMs={breakBefore.endMs}
                     currentPositionMs={currentPositionMs}
+                    isPlaying={isPlaying}
                     label={breakBefore.label}
                   />
                 )}
@@ -515,6 +535,7 @@ export default function LyricsPlayer({
                 startMs={outro.startMs}
                 endMs={outro.endMs}
                 currentPositionMs={currentPositionMs}
+                isPlaying={isPlaying}
                 label={outro.label}
               />
             ) : null
