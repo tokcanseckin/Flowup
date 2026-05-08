@@ -946,7 +946,19 @@ async def regenerate_song_lyrics(
     script_path = str(pipeline_script)
     env = os.environ.copy()
 
+    # Check LRCLIB before spawning the worker — if synced lyrics exist we can
+    # skip Whisper entirely and pass --lrc-file to the pipeline.
+    synced_lrc = _lrclib_synced(artist, title)
+
     async def event_stream():
+        lrc_tmp_path: Optional[Path] = None
+        if synced_lrc:
+            yield "data: Found synced lyrics on LRCLIB — skipping Whisper alignment\n\n"
+            with tempfile.NamedTemporaryFile(suffix=".lrc", mode="w",
+                                             encoding="utf-8", delete=False) as lf:
+                lf.write(synced_lrc)
+                lrc_tmp_path = Path(lf.name)
+
         with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as tmp:
             output_path = Path(tmp.name)
 
@@ -961,6 +973,8 @@ async def regenerate_song_lyrics(
         ]
         if youtube_url:
             command.extend(["--youtube-url", youtube_url])
+        if lrc_tmp_path:
+            command.extend(["--lrc-file", str(lrc_tmp_path)])
 
         try:
             proc = await asyncio.create_subprocess_exec(
@@ -1061,6 +1075,8 @@ async def regenerate_song_lyrics(
             yield f"event: error\ndata: {exc}\n\n"
         finally:
             output_path.unlink(missing_ok=True)
+            if lrc_tmp_path:
+                lrc_tmp_path.unlink(missing_ok=True)
 
     return StreamingResponse(
         event_stream(),
