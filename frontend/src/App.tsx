@@ -1161,13 +1161,28 @@ function PlayerView({
           <div className="flex items-center gap-4 mb-5">
             {effectiveSource === 'spotify' && player.albumArtUrl ? (
               <img src={player.albumArtUrl} alt="Album art" className="w-14 h-14 rounded-xl object-cover shadow-lg" />
-            ) : (
-              <div className="w-14 h-14 rounded-xl bg-gray-800 flex items-center justify-center">
-                <svg viewBox="0 0 24 24" className="w-6 h-6 fill-gray-600">
-                  <path d="M12 3a9 9 0 100 18A9 9 0 0012 3zm-1 13V8l6 4-6 4z"/>
-                </svg>
-              </div>
-            )}
+            ) : (() => {
+              const ytThumb = song.youtube_url
+                ? (() => {
+                    try {
+                      const u = new URL(song.youtube_url)
+                      const id = u.hostname === 'youtu.be'
+                        ? u.pathname.slice(1).split('?')[0]
+                        : (u.searchParams.get('v') ?? u.pathname.split('/').pop() ?? '')
+                      return id ? `https://img.youtube.com/vi/${id}/mqdefault.jpg` : null
+                    } catch { return null }
+                  })()
+                : null
+              return ytThumb ? (
+                <img src={ytThumb} alt="Video thumbnail" className="w-14 h-14 rounded-xl object-cover shadow-lg" />
+              ) : (
+                <div className="w-14 h-14 rounded-xl bg-gray-800 flex items-center justify-center">
+                  <svg viewBox="0 0 24 24" className="w-6 h-6 fill-gray-600">
+                    <path d="M12 3a9 9 0 100 18A9 9 0 0012 3zm-1 13V8l6 4-6 4z"/>
+                  </svg>
+                </div>
+              )
+            })()}
             <div className="min-w-0">
               <p className="text-white font-semibold truncate">
                 {effectiveSource === 'spotify' ? (player.currentTrackName ?? song.title) : song.title}
