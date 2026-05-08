@@ -1613,15 +1613,28 @@ def worker_submit_result(
 def _lrclib_synced(artist: str, title: str) -> Optional[str]:
     """Return synced LRC from LRCLIB if available, else None."""
     try:
+        # 1. Try the exact-match GET endpoint first (most precise)
         params = urllib.parse.urlencode({"artist_name": artist, "track_name": title})
         req = urllib.request.Request(
-            f"https://lrclib.net/api/search?{params}",
+            f"https://lrclib.net/api/get?{params}",
             headers={"User-Agent": "FlowUp/1.0 (https://singoling.com)"},
         )
-        with urllib.request.urlopen(req, timeout=10) as resp:
-            hits = json.loads(resp.read().decode())
-        if not hits:
-            return None
+        try:
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                body = json.loads(resp.read().decode())
+            if isinstance(body, dict) and body.get("syncedLyrics"):
+                return body["syncedLyrics"]
+        except Exception:
+            pass
+
+        # 2. Fall back to search with q param
+        params2 = urllib.parse.urlencode({"q": f"{artist} {title}"})
+        req2 = urllib.request.Request(
+            f"https://lrclib.net/api/search?{params2}",
+            headers={"User-Agent": "FlowUp/1.0 (https://singoling.com)"},
+        )
+        with urllib.request.urlopen(req2, timeout=10) as resp2:
+            hits = json.loads(resp2.read().decode())
         for hit in hits:
             if hit.get("syncedLyrics"):
                 return hit["syncedLyrics"]
