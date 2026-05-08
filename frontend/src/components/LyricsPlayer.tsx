@@ -45,11 +45,21 @@ function isStopWord(lemma: string, langCode: string): boolean {
   return set.has(normalized)
 }
 
+/**
+ * Returns true when a definition string is meaningful — i.e. not null, empty,
+ * or a bracket-wrapped pipeline placeholder like "[тёплый]" or "[love]".
+ */
+function isRealDefinition(def: string | null | undefined): def is string {
+  if (!def) return false
+  const t = def.trim()
+  return !(t.startsWith('[') && t.endsWith(']'))
+}
+
 /** Returns the word.key values of the indexable (non-stop, has-definition) words in a line, max 9. */
 function computeIndexedKeys(words: WordType[], langCode: string, filterStopWords: boolean): number[] {
   const result: number[] = []
   for (const w of words) {
-    if (!w.dictionary_definition) continue
+    if (!isRealDefinition(w.dictionary_definition)) continue
     if (!filterStopWords || !isStopWord(w.lemma, langCode)) result.push(w.key)
     if (result.length === 9) break
   }
@@ -548,7 +558,7 @@ function InspectPanel({ info, onClose, compact = false }: InspectPanelProps) {
       {isWord ? (
         <>
           {/* ── Definition — most prominent ── */}
-          {info.word.dictionary_definition ? (() => {
+          {isRealDefinition(info.word.dictionary_definition) ? (() => {
             const meanings = info.word.dictionary_definition!.split(';').map(s => s.trim()).filter(Boolean)
             return meanings.length === 1
               ? <p className="text-lg font-semibold text-yellow-200 leading-snug mt-1">{meanings[0]}</p>
