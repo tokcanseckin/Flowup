@@ -360,11 +360,10 @@ export default function LyricsPlayer({
   }, [activeIndex])
 
   return (
-    <div className={isPhone ? 'relative' : 'grid grid-cols-[minmax(0,1fr)_300px] gap-4'}>
+    <div className={isPhone ? 'relative h-full' : 'grid grid-cols-[minmax(0,1fr)_300px] gap-4 h-full'}>
       <div
         ref={containerRef}
-        className="relative select-none overflow-y-auto"
-        style={{ maxHeight: '70vh' }}
+        className="relative select-none overflow-y-auto h-full"
         dir={language.direction}
         lang={language.code}
       >

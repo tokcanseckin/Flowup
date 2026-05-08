@@ -1084,7 +1084,7 @@ function PlayerView({
   }, [handlePrev, handleNext, canPrev, canNext, togglePlay, isReady])
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: effectiveSource === 'spotify' ? albumBg : '#0d0d14', transition: 'background 1.2s ease' }}>
+    <div className="h-screen flex flex-col overflow-hidden" style={{ background: effectiveSource === 'spotify' ? albumBg : '#0d0d14', transition: 'background 1.2s ease' }}>
 
       {/* Header */}
       <header className="glass sticky top-0 z-20 flex items-center justify-between px-6 py-3 border-b border-gray-800/60">
@@ -1153,10 +1153,10 @@ function PlayerView({
         </div>
       )}
 
-      <main className="flex-1 p-4 max-w-[1080px] mx-auto w-full space-y-4">
+      <main className="flex-1 min-h-0 p-4 max-w-[1080px] mx-auto w-full flex flex-col gap-4">
 
         {/* Controls + YouTube row */}
-        <div className="flex flex-col sm:flex-row gap-4 items-stretch">
+        <div className="flex flex-col sm:flex-row gap-4 items-stretch flex-shrink-0">
 
           {/* Player controls — takes remaining width */}
           <section className="rounded-2xl border border-gray-800/80 p-5 flex-1 min-w-0" style={{ background: '#12121f' }}>
@@ -1278,7 +1278,7 @@ function PlayerView({
         )}
 
         {/* Lyrics panel */}
-        <section className="rounded-2xl border border-gray-800/80 overflow-hidden" style={{ background: '#12121f' }}>
+        <section className="rounded-2xl border border-gray-800/80 overflow-hidden flex-1 min-h-0 flex flex-col" style={{ background: '#12121f' }}>
           <LyricsPlayer
             currentPositionMs={positionMs}
             songData={song}
