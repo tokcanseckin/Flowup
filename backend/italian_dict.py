@@ -54,6 +54,8 @@ def lookup_all(lemma: str) -> list[str]:
             defn = syn.definition()
             if defn and defn not in results:
                 results.append(defn)
+                if len(results) >= 5:
+                    break
     except Exception:
         pass
     return results

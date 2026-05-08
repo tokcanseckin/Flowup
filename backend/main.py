@@ -279,14 +279,19 @@ def _enrich_definition(raw_def: Optional[str], lemma: str, lang_code: str = "ru"
         clean_display = re.sub(r"[^\w]", "", display_form, flags=re.UNICODE).lower() if display_form else ""
         # For stubs, try: stub inner key → stored lemma → display form.
         # Return None (rather than the ugly stub) when OMW has no entry.
+        def _cap_it(s: str | None, n: int = 4) -> str | None:
+            if not s:
+                return s
+            parts = [p.strip() for p in s.split(';') if p.strip()]
+            return '; '.join(parts[:n]) if parts else None
+
         if raw_def and raw_def.startswith("[") and raw_def.endswith("]"):
-            return (
+            return _cap_it(
                 _italian_dict.lookup(raw_def[1:-1])
                 or _italian_dict.lookup(lemma)
                 or (clean_display and _italian_dict.lookup(clean_display))
-                or None
             )
-        return raw_def or _italian_dict.lookup(lemma) or (clean_display and _italian_dict.lookup(clean_display)) or None
+        return _cap_it(raw_def or _italian_dict.lookup(lemma) or (clean_display and _italian_dict.lookup(clean_display)))
     # Russian (default): strip combining accents so 'пи́сать' looks up 'писать'.
     bare_lemma = _strip_accents(lemma)
     if raw_def and raw_def.startswith("[") and raw_def.endswith("]"):
