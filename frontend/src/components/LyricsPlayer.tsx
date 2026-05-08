@@ -191,12 +191,22 @@ export default function LyricsPlayer({
     if (firstStart >= BREAK_THRESHOLD_MS) {
       slots.push({ startMs: 0, endMs: firstStart, label: 'intro', beforeLineIndex: 0 })
     }
-    // Between lines: end[i] == start[i+1] (lrclib format), so detect breaks
-    // by the line's own duration (it "owns" the silence after it)
+    // Between lines: end[i] == start[i+1] (lrclib format), so each line "owns"
+    // the silence after it. Detect breaks by comparing each line's duration
+    // against the typical (median) line duration.
+    const allDurations = lines.slice(0, -1).map(l => l.end_time_ms - l.start_time_ms)
+    const normalDurations = allDurations.filter(d => d < 12_000).sort((a, b) => a - b)
+    const medianDuration = normalDurations.length > 0
+      ? normalDurations[Math.floor(normalDurations.length / 2)]
+      : 3_000
     for (let i = 0; i < lines.length - 1; i++) {
       const lineDuration = lines[i].end_time_ms - lines[i].start_time_ms
-      if (lineDuration >= BREAK_THRESHOLD_MS) {
-        slots.push({ startMs: lines[i].start_time_ms, endMs: lines[i].end_time_ms, beforeLineIndex: i + 1 })
+      const excessMs = lineDuration - medianDuration
+      if (excessMs >= BREAK_THRESHOLD_MS) {
+        // Break starts after the estimated singing portion, ends at next line start
+        const breakStart = lines[i].start_time_ms + medianDuration
+        const breakEnd = lines[i].end_time_ms
+        slots.push({ startMs: breakStart, endMs: breakEnd, beforeLineIndex: i + 1 })
       }
     }
     // Outro
