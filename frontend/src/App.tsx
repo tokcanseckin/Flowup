@@ -475,12 +475,6 @@ function LoadingScreen({ message }: { message: string }) {
 
 // ── Song browser ──────────────────────────────────────────────────────────────
 
-const LANG_BADGE_MAP: Record<string, string> = {
-  ru: 'RU', uk: 'UK', de: 'DE', es: 'ES', fr: 'FR',
-  it: 'IT', pt: 'PT', nl: 'NL', pl: 'PL', sv: 'SV',
-  ja: 'JA', zh: 'ZH', ko: 'KO', tr: 'TR', ar: 'AR', he: 'HE',
-}
-
 function SourceAvailabilityIcons({
   song,
   spotifyEnabled,
@@ -525,7 +519,7 @@ function SourceAvailabilityIcons({
 }
 
 function SongBrowser({
-  songs, playlists, activePlaylistId, loading, error, onSelect, onPrefetch, onSelectPlaylist, onLogout, onOpenSettings, onOpenAdmin, isAdmin, user, spotifyEnabled,
+  songs, playlists, activePlaylistId, loading, error, onSelect, onPrefetch, onSelectPlaylist, onLogout, onOpenSettings, onOpenAdmin, isAdmin, user, spotifyEnabled, openedSongIds,
 }: {
   songs: SongSummary[]
   playlists: PlaylistSummary[]
@@ -541,6 +535,7 @@ function SongBrowser({
   isAdmin: boolean
   user: { display_name: string | null } | null
   spotifyEnabled: boolean
+  openedSongIds: Set<number>
 }) {
   return (
     <div className="min-h-screen p-6 max-w-2xl mx-auto" style={{ background: '#0d0d14' }}>
@@ -641,9 +636,11 @@ function SongBrowser({
               style={{ background: '#12121f' }}
             >
               <div className="flex items-center gap-3">
-                <span className="text-[10px] font-mono font-semibold text-gray-400 bg-gray-800 px-1.5 py-1 rounded" aria-hidden>
-                  {LANG_BADGE_MAP[song.language_code] ?? 'INTL'}
-                </span>
+                <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden className="shrink-0">
+                  {openedSongIds.has(song.id)
+                    ? <circle cx="6" cy="6" r="6" fill="none" stroke="#6b7280" strokeWidth="1.5" />
+                    : <circle cx="6" cy="6" r="6" fill="#6b7280" />}
+                </svg>
                 <div className="min-w-0 flex-1">
                   <p className="text-white font-semibold truncate">{song.title}</p>
                   <p className="text-gray-500 text-sm truncate">{song.artist ?? 'Unknown artist'}</p>
@@ -1327,6 +1324,12 @@ export default function App() {
   const [activeSong,   setActiveSong]   = useState<SongDetail | null>(null)
   const [songLoading,  setSongLoading]  = useState(false)
   const [lastSelectedSongId, setLastSelectedSongId] = useState<number | null>(null)
+  const [openedSongIds, setOpenedSongIds] = useState<Set<number>>(() => {
+    try {
+      const raw = localStorage.getItem('flowup.openedSongs.v1')
+      return raw ? new Set<number>(JSON.parse(raw)) : new Set<number>()
+    } catch { return new Set<number>() }
+  })
   const [settingsHydrated, setSettingsHydrated] = useState(false)
   const restoreDoneRef = useRef(false)
   const route = useMemo(() => parseAppRoute(currentPath), [currentPath])
@@ -1466,6 +1469,13 @@ export default function App() {
   }, [auth, navigateToPath])
 
   const handleSelectSong = useCallback(async (id: number, options?: { updateRoute?: boolean }) => {
+    setOpenedSongIds(prev => {
+      if (prev.has(id)) return prev
+      const next = new Set(prev)
+      next.add(id)
+      try { localStorage.setItem('flowup.openedSongs.v1', JSON.stringify([...next])) } catch {}
+      return next
+    })
     // Navigate immediately so the UI responds at once; song data loads in background.
     if (options?.updateRoute !== false) {
       navigateToPath(songPath(id))
@@ -1646,6 +1656,18 @@ export default function App() {
     updateSettings({ lastSongId: lastSelectedSongId })
   }, [lastSelectedSongId, settings.lastSongId, settingsHydrated, updateSettings])
 
+  useEffect(() => {
+    if (activeSong && route.page === 'song') {
+      document.title = `${activeSong.title} — ${activeSong.artist} | SingoLing`
+    } else if (route.page === 'settings') {
+      document.title = 'Settings | SingoLing'
+    } else if (route.page === 'admin') {
+      document.title = 'Admin | SingoLing'
+    } else {
+      document.title = 'SingoLing'
+    }
+  }, [activeSong?.id, activeSong?.title, activeSong?.artist, route.page])
+
   const displayedSongs = useMemo(() => {
     if (!activePlaylist) return songs
     const byId = new Map(songs.map(s => [s.id, s]))
@@ -1803,6 +1825,7 @@ export default function App() {
       onLogout={handleLogout}
       user={appUser}
       spotifyEnabled={isSpotifyEnabled}
+      openedSongIds={openedSongIds}
     />
   )
 }
