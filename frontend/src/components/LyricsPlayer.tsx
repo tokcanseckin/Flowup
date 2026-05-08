@@ -239,7 +239,6 @@ export default function LyricsPlayer({
 
   useEffect(() => {
     if (!inspectState) return
-    if (inspectState.mode !== 'hold') return
     if (inspectState.target.lineIndex !== activeIndex) clearInspect()
   }, [activeIndex, inspectState, clearInspect])
 
