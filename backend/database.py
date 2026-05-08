@@ -21,6 +21,9 @@ if DATABASE_URL.startswith("sqlite"):
     @event.listens_for(engine, "connect")
     def _set_sqlite_pragma(dbapi_conn, _):
         dbapi_conn.execute("PRAGMA foreign_keys = ON")
+        dbapi_conn.execute("PRAGMA journal_mode = WAL")
+        dbapi_conn.execute("PRAGMA synchronous = NORMAL")
+        dbapi_conn.execute("PRAGMA mmap_size = 134217728")  # 128 MB OS page cache
 
 SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
 

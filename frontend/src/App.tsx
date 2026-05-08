@@ -7,6 +7,34 @@ import YouTubePlayer, { YouTubePlayerHandle } from './components/YouTubePlayer'
 import AppleMusicPlayer, { AppleMusicPlayerHandle } from './components/AppleMusicPlayer'
 import { api, BackendUser, PlaylistDetail, PlaylistSummary, SongDetail, SongSummary, UserSettings as ApiUserSettings, clearAdminSession, setAdminSession } from './api/client'
 
+// ── Module-level song cache (survives re-renders, cleared on logout) ──────────
+// Key: `{id}:{source}` where source is '' for default/spotify.
+const _songCache = new Map<string, SongDetail>()
+const _inFlight  = new Map<string, Promise<SongDetail>>()
+
+function _songCacheKey(id: number, source?: string): string {
+  return `${id}:${source ?? ''}`
+}
+
+/** Fetch a song, using the module-level cache. Deduplicates concurrent requests. */
+function _fetchSong(id: number, source?: string): Promise<SongDetail> {
+  const key = _songCacheKey(id, source)
+  const cached = _songCache.get(key)
+  if (cached) return Promise.resolve(cached)
+  const inflight = _inFlight.get(key)
+  if (inflight) return inflight
+  const p = api.getSong(id, source).then(detail => {
+    _songCache.set(key, detail)
+    _inFlight.delete(key)
+    return detail
+  }).catch(err => {
+    _inFlight.delete(key)
+    throw err
+  })
+  _inFlight.set(key, p)
+  return p
+}
+
 // ── Google Identity Services global type ──────────────────────────────────────
 declare global {
   interface Window {
@@ -497,7 +525,7 @@ function SourceAvailabilityIcons({
 }
 
 function SongBrowser({
-  songs, playlists, activePlaylistId, loading, error, onSelect, onSelectPlaylist, onLogout, onOpenSettings, onOpenAdmin, isAdmin, user, spotifyEnabled,
+  songs, playlists, activePlaylistId, loading, error, onSelect, onPrefetch, onSelectPlaylist, onLogout, onOpenSettings, onOpenAdmin, isAdmin, user, spotifyEnabled,
 }: {
   songs: SongSummary[]
   playlists: PlaylistSummary[]
@@ -505,6 +533,7 @@ function SongBrowser({
   loading: boolean
   error: string | null
   onSelect: (id: number) => void
+  onPrefetch: (id: number) => void
   onSelectPlaylist: (id: number | null) => void
   onLogout: () => void
   onOpenSettings: () => void
@@ -603,6 +632,7 @@ function SongBrowser({
             <button
               key={song.id}
               onClick={() => onSelect(song.id)}
+              onPointerEnter={() => onPrefetch(song.id)}
               className="
                 w-full text-left rounded-2xl border border-gray-800/80 p-4
                 hover:border-indigo-800/80 hover:bg-indigo-950/20
@@ -1480,6 +1510,8 @@ export default function App() {
     setSyncedSpotifyUser(null)
     setSettingsOpen(false)
     setActiveSong(null)
+    _songCache.clear()
+    _inFlight.clear()
     localStorage.removeItem(PASSWORD_SESSION_KEY)
     navigateToPath('/browse', true)
   }, [auth, navigateToPath])
@@ -1489,11 +1521,21 @@ export default function App() {
     if (options?.updateRoute !== false) {
       navigateToPath(songPath(id))
     }
+    const source = settings.preferredSource !== 'spotify' ? settings.preferredSource : undefined
+    const key = _songCacheKey(id, source)
+    const cached = _songCache.get(key)
+    if (cached) {
+      // Instant render from cache; silently re-fetch in background to stay fresh.
+      setActiveSong(cached)
+      setSongLoading(false)
+      setLastSelectedSongId(id)
+      void _fetchSong(id, source).then(d => { _songCache.set(key, d); setActiveSong(d) }).catch(() => {})
+      return
+    }
     setSongLoading(true)
     setActiveSong(null)
     try {
-      const source = settings.preferredSource !== 'spotify' ? settings.preferredSource : undefined
-      const detail = await api.getSong(id, source)
+      const detail = await _fetchSong(id, source)
       setActiveSong(detail)
       setLastSelectedSongId(detail.id)
     } catch (e) {
@@ -1505,11 +1547,13 @@ export default function App() {
   }, [settings.preferredSource, navigateToPath])
 
   // Re-fetch active song lyrics when source preference changes so the player
-  // immediately gets the right per-source timestamps.
+  // immediately gets the right per-source timestamps. Invalidate stale cache entry.
   useEffect(() => {
     if (!activeSong) return
     const source = settings.preferredSource !== 'spotify' ? settings.preferredSource : undefined
-    void api.getSong(activeSong.id, source).then(setActiveSong).catch(() => {/* silent */})
+    const key = _songCacheKey(activeSong.id, source)
+    _songCache.delete(key)  // force fresh fetch for new source
+    void _fetchSong(activeSong.id, source).then(d => { setActiveSong(d) }).catch(() => {})
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [settings.preferredSource])
 
@@ -1680,6 +1724,18 @@ export default function App() {
     void handleSelectSong(displayedSongs[activeSongIndex + 1].id)
   }, [activeSongIndex, displayedSongs, handleSelectSong])
 
+  // Prefetch the next song in the playlist ~2s after the current song loads.
+  useEffect(() => {
+    if (!activeSong || activeSongIndex < 0) return
+    const next = displayedSongs[activeSongIndex + 1]
+    if (!next) return
+    const source = settings.preferredSource !== 'spotify' ? settings.preferredSource : undefined
+    const timer = window.setTimeout(() => {
+      void _fetchSong(next.id, source).catch(() => {})
+    }, 2000)
+    return () => window.clearTimeout(timer)
+  }, [activeSong, activeSongIndex, displayedSongs, settings.preferredSource])
+
   if (auth.isLoading) return <LoadingScreen message="Restoring session..." />
 
   if (!isAuthenticated) {
@@ -1780,6 +1836,10 @@ export default function App() {
       loading={songsLoading || playlistsLoading}
       error={songsError}
       onSelect={handleSelectSong}
+      onPrefetch={useCallback((id: number) => {
+        const source = settings.preferredSource !== 'spotify' ? settings.preferredSource : undefined
+        void _fetchSong(id, source).catch(() => {})
+      }, [settings.preferredSource])}
       onSelectPlaylist={setActivePlaylistId}
       onOpenAdmin={() => navigateToPath('/admin')}
       isAdmin={isAdmin}
