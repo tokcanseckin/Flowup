@@ -95,6 +95,7 @@ declare namespace YT {
     getCurrentTime?(): number
     getDuration?(): number
     getPlayerState?(): number
+    getVideoUrl?(): string
     destroy(): void
   }
 
@@ -147,6 +148,11 @@ const YouTubePlayer = forwardRef<YouTubePlayerHandle, Props>(function YouTubePla
   const [error, setError] = useState<string | null>(null)
   const [warning, setWarning] = useState<string | null>(null)
   const lastLoggedSecondRef = useRef(-1)
+  // Ad detection state
+  const expectedVideoIdRef = useRef<string | null>(null)
+  const prevYTStateRef = useRef<number>(-2)
+  const hasPlayedSongRef = useRef(false)
+  const suspiciousTransitionRef = useRef(false)
 
   // Expose imperative API to parent
   useImperativeHandle(ref, () => ({
@@ -218,6 +224,12 @@ const YouTubePlayer = forwardRef<YouTubePlayerHandle, Props>(function YouTubePla
       containerRef.current.innerHTML = ''
       containerRef.current.appendChild(div)
 
+      // Reset ad-detection state for this video
+      expectedVideoIdRef.current = resolvedVideoId
+      prevYTStateRef.current = -2
+      hasPlayedSongRef.current = false
+      suspiciousTransitionRef.current = false
+
       ytRef.current = new window.YT.Player(div, {
         videoId: resolvedVideoId,
         playerVars: {
@@ -250,13 +262,63 @@ const YouTubePlayer = forwardRef<YouTubePlayerHandle, Props>(function YouTubePla
             }
           },
           onStateChange: (e: YT.OnStateChangeEvent) => {
-            logYouTubeDebug('State changed', { videoId: resolvedVideoId, state: e.data })
-            // Clear playback-stuck timer on any active state
-            if (e.data === 1 || e.data === 3) {
-              if (playbackTimerRef.current) { clearTimeout(playbackTimerRef.current); playbackTimerRef.current = null }
-              setWarning(null)
+            const curr = e.data
+            const prev = prevYTStateRef.current
+            const UNSTARTED = -1, PLAYING = 1, BUFFERING = 3
+
+            logYouTubeDebug('State changed', { videoId: resolvedVideoId, state: curr, prev })
+
+            // Step 1: Flag suspicious re-init (UNSTARTED→BUFFERING after song has played)
+            if (prev === UNSTARTED && curr === BUFFERING && hasPlayedSongRef.current) {
+              suspiciousTransitionRef.current = true
+              logYouTubeDebug('Suspicious transition detected (possible ad injection)', { videoId: resolvedVideoId })
             }
-            onPlayStateChange?.(e.data === window.YT.PlayerState.PLAYING)
+
+            // Step 2: Update prevState; skip deep checks for non-active states
+            prevYTStateRef.current = curr
+            if (curr !== PLAYING && curr !== BUFFERING) {
+              if (playbackTimerRef.current) { clearTimeout(playbackTimerRef.current); playbackTimerRef.current = null }
+              onPlayStateChange?.(false)
+              return
+            }
+
+            // Steps 3 & 4: ID and duration checks — only reliable during PLAYING
+            let idMismatch = false
+            let shortDuration = false
+            if (curr === PLAYING) {
+              // ID check via getVideoUrl (public IFrame API)
+              const liveUrl = ytRef.current?.getVideoUrl?.()
+              if (liveUrl && expectedVideoIdRef.current) {
+                const liveId = extractVideoId(liveUrl)
+                idMismatch = liveId !== null && liveId !== expectedVideoIdRef.current
+                if (idMismatch) logYouTubeDebug('Ad detected: video ID mismatch', { expected: expectedVideoIdRef.current, live: liveId })
+              }
+              // Duration check: ads are universally < 60 s
+              const durS = ytRef.current?.getDuration?.() ?? 0
+              shortDuration = durS > 0 && durS < 60
+              if (shortDuration && suspiciousTransitionRef.current) {
+                logYouTubeDebug('Ad detected: short duration after suspicious transition', { durS })
+              }
+            }
+
+            // Step 5: Verdict
+            const isAd = idMismatch || (shortDuration && suspiciousTransitionRef.current)
+
+            // Clear playback-stuck timer on any active state
+            if (curr === PLAYING || curr === BUFFERING) {
+              if (playbackTimerRef.current) { clearTimeout(playbackTimerRef.current); playbackTimerRef.current = null }
+            }
+
+            if (isAd) {
+              onPlayStateChange?.(false)
+            } else {
+              if (curr === PLAYING) {
+                hasPlayedSongRef.current = true
+                suspiciousTransitionRef.current = false
+                setWarning(null)
+              }
+              onPlayStateChange?.(curr === PLAYING)
+            }
           },
           onError: (e: YT.OnErrorEvent) => {
             const message = describeYouTubeError(e.data)
