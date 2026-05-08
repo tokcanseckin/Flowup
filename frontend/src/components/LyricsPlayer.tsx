@@ -83,6 +83,51 @@ type InspectInfo =
   | { kind: 'word'; line: LineType; word: WordType }
 
 const HOLD_DELAY_MS = 220
+const BREAK_THRESHOLD_MS = 5_000
+
+// ── Break indicator ───────────────────────────────────────────────────────────
+
+interface BreakProps {
+  startMs: number
+  endMs: number
+  currentPositionMs: number
+  label?: string
+}
+
+function BreakIndicator({ startMs, endMs, currentPositionMs, label }: BreakProps) {
+  const duration = endMs - startMs
+  const progress = Math.max(0, Math.min(1, (currentPositionMs - startMs) / duration))
+  const isActive = currentPositionMs >= startMs && currentPositionMs < endMs
+  const isPast = currentPositionMs >= endMs
+
+  return (
+    <div className={`flex items-center gap-3 px-3 py-2 transition-opacity duration-300 ${isPast ? 'opacity-30' : isActive ? 'opacity-100' : 'opacity-40'}`}>
+      {label && (
+        <span className="text-xs text-gray-500 shrink-0 font-mono uppercase tracking-widest">{label}</span>
+      )}
+      <div className="relative flex-1 h-0.5 rounded-full bg-gray-800 overflow-hidden">
+        <div
+          className="absolute inset-y-0 left-0 rounded-full bg-indigo-600/70 transition-none"
+          style={{ width: `${progress * 100}%` }}
+        />
+        {isActive && (
+          <div
+            className="absolute inset-y-0 w-8 rounded-full"
+            style={{
+              left: `calc(${progress * 100}% - 2rem)`,
+              background: 'linear-gradient(to right, transparent, rgba(129,140,248,0.5), transparent)',
+            }}
+          />
+        )}
+      </div>
+      {!label && (
+        <span className="text-xs text-gray-600 shrink-0 tabular-nums">
+          {Math.ceil((endMs - Math.max(currentPositionMs, startMs)) / 1000)}s
+        </span>
+      )}
+    </div>
+  )
+}
 
 function findActiveLineIndex(lines: SongDetail['lines'], posMs: number): number {
   if (posMs <= 0) return -1
@@ -117,6 +162,7 @@ function resolveInspectInfo(lines: SongDetail['lines'], state: InspectState | nu
 
 interface Props {
   currentPositionMs: number
+  durationMs?: number
   songData: SongDetail
   filterStopWordsForIndexing?: boolean
   onInfoVisibilityChange?: (visible: boolean) => void
@@ -126,6 +172,7 @@ interface Props {
 
 export default function LyricsPlayer({
   currentPositionMs,
+  durationMs = 0,
   songData,
   filterStopWordsForIndexing = true,
   onInfoVisibilityChange,
@@ -138,6 +185,31 @@ export default function LyricsPlayer({
 
   const activeIndex = findActiveLineIndex(lines, currentPositionMs)
   const activeLine = activeIndex >= 0 ? lines[activeIndex] : null
+
+  // Pre-compute break slots: gaps > 5 s before/between/after lines
+  const breakSlots = useMemo(() => {
+    const slots: { startMs: number; endMs: number; label?: string; beforeLineIndex: number }[] = []
+    if (lines.length === 0) return slots
+    // Intro
+    const firstStart = lines[0].start_time_ms
+    if (firstStart >= BREAK_THRESHOLD_MS) {
+      slots.push({ startMs: 0, endMs: firstStart, label: 'intro', beforeLineIndex: 0 })
+    }
+    // Between lines
+    for (let i = 0; i < lines.length - 1; i++) {
+      const gap = lines[i + 1].start_time_ms - lines[i].end_time_ms
+      if (gap >= BREAK_THRESHOLD_MS) {
+        slots.push({ startMs: lines[i].end_time_ms, endMs: lines[i + 1].start_time_ms, beforeLineIndex: i + 1 })
+      }
+    }
+    // Outro
+    const lastEnd = lines[lines.length - 1].end_time_ms
+    const totalMs = durationMs > lastEnd ? durationMs : 0
+    if (totalMs > 0 && totalMs - lastEnd >= BREAK_THRESHOLD_MS) {
+      slots.push({ startMs: lastEnd, endMs: totalMs, label: 'outro', beforeLineIndex: lines.length })
+    }
+    return slots
+  }, [lines, durationMs])
 
   // Pre-compute indexed (non-stop) word keys for the active line
   const indexedWordKeys = useMemo(
@@ -370,10 +442,19 @@ export default function LyricsPlayer({
             const isActive = idx === activeIndex
             const lineTarget: InspectTarget = { type: 'line', lineIndex: idx }
             const circleActive = !!inspectState && inspectState.target.type === 'line' && inspectState.target.lineIndex === idx
+            const breakBefore = breakSlots.find(b => b.beforeLineIndex === idx)
 
             return (
-              <div
-                key={idx}
+              <div key={idx}>
+                {breakBefore && (
+                  <BreakIndicator
+                    startMs={breakBefore.startMs}
+                    endMs={breakBefore.endMs}
+                    currentPositionMs={currentPositionMs}
+                    label={breakBefore.label}
+                  />
+                )}
+                <div
                 ref={el => setLineRef(idx, el)}
                 className={`rounded-xl transition-colors duration-200 ${isActive ? 'bg-indigo-900/30' : ''}`}
               >
@@ -415,9 +496,21 @@ export default function LyricsPlayer({
                     )}
                   </div>
                 </div>
+                </div>
               </div>
             )
           })}
+          {(() => {
+            const outro = breakSlots.find(b => b.beforeLineIndex === lines.length)
+            return outro ? (
+              <BreakIndicator
+                startMs={outro.startMs}
+                endMs={outro.endMs}
+                currentPositionMs={currentPositionMs}
+                label={outro.label}
+              />
+            ) : null
+          })()}
         </div>
 
         {lines.length === 0 && (
