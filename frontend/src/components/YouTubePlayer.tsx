@@ -300,10 +300,12 @@ const YouTubePlayer = forwardRef<YouTubePlayerHandle, Props>(function YouTubePla
           {error}
         </div>
       ) : (
-        <div
-          ref={containerRef}
-          className="w-full rounded-xl overflow-hidden bg-black" style={{ height: '250px' }}
-        />
+        <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+          <div
+            ref={containerRef}
+            className="absolute inset-0 bg-black [&_iframe]:w-full [&_iframe]:h-full"
+          />
+        </div>
       )}
       {!error && warning && (
         <div className="rounded-xl border border-yellow-900/50 bg-yellow-950/20 px-4 py-3 text-sm text-yellow-400">
