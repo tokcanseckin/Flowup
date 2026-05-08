@@ -37,6 +37,12 @@ from urllib.parse import urlencode
 
 import requests
 
+try:
+    from transliterate import translit as _cyr_translit
+    _HAS_TRANSLITERATE = True
+except ImportError:
+    _HAS_TRANSLITERATE = False
+
 # ── iTunes Search API ──────────────────────────────────────────────────────────
 
 _ITUNES_SEARCH = "https://itunes.apple.com/search"
@@ -61,18 +67,33 @@ def _similarity(a: str, b: str) -> float:
     return SequenceMatcher(None, _normalise(a), _normalise(b)).ratio()
 
 
+def _artist_similarity(db_artist: str, itunes_artist: str) -> float:
+    """Compare artist names, also trying a Cyrillic→Latin transliteration."""
+    direct = _similarity(db_artist, itunes_artist)
+    if _HAS_TRANSLITERATE:
+        try:
+            latin = _cyr_translit(db_artist, "ru", reversed=True)
+            via_translit = _similarity(latin, itunes_artist)
+            return max(direct, via_translit)
+        except Exception:
+            pass
+    return direct
+
+
 def search_apple_music(
     title: str,
     artist: str,
     storefront: str = "us",
-) -> Optional[str]:
+) -> tuple[Optional[str], list[dict]]:
     """
-    Search iTunes for the best matching track and return its Apple Music URL,
-    or None if no confident match is found.
+    Search iTunes for the best matching track.
 
-    The returned URL is in the form:
-      https://music.apple.com/<storefront>/album/<name>/<album-id>?i=<track-id>
-    which MusicKit JS v3 can play directly.
+    Returns:
+        (best_url, all_candidates)
+
+    best_url is None if no result cleared the similarity thresholds.
+    all_candidates is a list of dicts with keys: title, artist, title_sim,
+    artist_sim, score, url — sorted by score descending, threshold not applied.
     """
     query = f"{artist} {title}"
     params = {
@@ -90,8 +111,9 @@ def search_apple_music(
         results = r.json().get("results", [])
     except requests.RequestException as exc:
         print(f"    [iTunes] Request failed: {exc}")
-        return None
+        return None, []
 
+    all_candidates: list[dict] = []
     best_url: Optional[str] = None
     best_score = 0.0
 
@@ -99,28 +121,34 @@ def search_apple_music(
         r_title = result.get("trackName", "")
         r_artist = result.get("artistName", "")
         r_url = result.get("trackViewUrl", "")
-
         if not r_url:
             continue
 
         title_sim = _similarity(title, r_title)
-        artist_sim = _similarity(artist, r_artist)
-
-        # Both must clear the minimum threshold.
-        if title_sim < _MIN_TITLE_SIMILARITY or artist_sim < _MIN_ARTIST_SIMILARITY:
-            continue
-
+        artist_sim = _artist_similarity(artist, r_artist)
         score = (title_sim * 0.6) + (artist_sim * 0.4)
-        if score > best_score:
-            best_score = score
-            best_url = r_url
-            print(
-                f"    [iTunes] Candidate  title={r_title!r}  artist={r_artist!r}"
-                f"  title_sim={title_sim:.2f}  artist_sim={artist_sim:.2f}"
-                f"  score={score:.2f}"
-            )
 
-    return best_url
+        all_candidates.append({
+            "title": r_title,
+            "artist": r_artist,
+            "title_sim": title_sim,
+            "artist_sim": artist_sim,
+            "score": score,
+            "url": r_url,
+        })
+
+        if title_sim >= _MIN_TITLE_SIMILARITY and artist_sim >= _MIN_ARTIST_SIMILARITY:
+            if score > best_score:
+                best_score = score
+                best_url = r_url
+                print(
+                    f"    [iTunes] Candidate  title={r_title!r}  artist={r_artist!r}"
+                    f"  title_sim={title_sim:.2f}  artist_sim={artist_sim:.2f}"
+                    f"  score={score:.2f}"
+                )
+
+    all_candidates.sort(key=lambda c: c["score"], reverse=True)
+    return best_url, all_candidates
 
 
 # ── Backend helpers ────────────────────────────────────────────────────────────
@@ -173,6 +201,11 @@ def main() -> None:
         action="store_true",
         help="Search iTunes and print results but do not write to the backend",
     )
+    parser.add_argument(
+        "--review",
+        action="store_true",
+        help="For songs with no confident match, print top iTunes candidates so you can inspect them",
+    )
     args = parser.parse_args()
 
     print(f"Fetching songs from {args.api_url} …")
@@ -211,7 +244,7 @@ def main() -> None:
             + (f"  (current: {existing_url})" if existing_url else "")
         )
 
-        apple_url = search_apple_music(title, artist, storefront=args.storefront)
+        apple_url, candidates = search_apple_music(title, artist, storefront=args.storefront)
 
         if apple_url:
             print(f"    → Match: {apple_url}")
@@ -226,6 +259,17 @@ def main() -> None:
                 found += 1
         else:
             print("    ✗ No confident match found")
+            if args.review and candidates:
+                print(f"      Top iTunes results for query {artist!r} + {title!r}:")
+                for c in candidates[:5]:
+                    print(
+                        f"        title={c['title']!r}  artist={c['artist']!r}"
+                        f"  title_sim={c['title_sim']:.2f}  artist_sim={c['artist_sim']:.2f}"
+                        f"  score={c['score']:.2f}"
+                    )
+                    print(f"        {c['url']}")
+            elif args.review:
+                print("      (iTunes returned no results)")
             skipped += 1
 
         # Respect iTunes rate limit.
