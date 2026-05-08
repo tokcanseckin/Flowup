@@ -107,8 +107,8 @@ function BreakIndicator({ startMs, endMs, currentPositionMs, label }: BreakProps
       )}
       <div className="relative flex-1 h-0.5 rounded-full bg-gray-800 overflow-hidden">
         <div
-          className="absolute inset-y-0 left-0 rounded-full bg-indigo-600/70 transition-none"
-          style={{ width: `${progress * 100}%` }}
+          className="absolute inset-y-0 left-0 rounded-full bg-indigo-600/70"
+          style={{ width: `${progress * 100}%`, transition: 'width 300ms linear' }}
         />
         {isActive && (
           <div
@@ -116,15 +116,11 @@ function BreakIndicator({ startMs, endMs, currentPositionMs, label }: BreakProps
             style={{
               left: `calc(${progress * 100}% - 2rem)`,
               background: 'linear-gradient(to right, transparent, rgba(129,140,248,0.5), transparent)',
+              transition: 'left 300ms linear',
             }}
           />
         )}
       </div>
-      {!label && (
-        <span className="text-xs text-gray-600 shrink-0 tabular-nums">
-          {Math.ceil((endMs - Math.max(currentPositionMs, startMs)) / 1000)}s
-        </span>
-      )}
     </div>
   )
 }
@@ -195,11 +191,12 @@ export default function LyricsPlayer({
     if (firstStart >= BREAK_THRESHOLD_MS) {
       slots.push({ startMs: 0, endMs: firstStart, label: 'intro', beforeLineIndex: 0 })
     }
-    // Between lines
+    // Between lines: end[i] == start[i+1] (lrclib format), so detect breaks
+    // by the line's own duration (it "owns" the silence after it)
     for (let i = 0; i < lines.length - 1; i++) {
-      const gap = lines[i + 1].start_time_ms - lines[i].end_time_ms
-      if (gap >= BREAK_THRESHOLD_MS) {
-        slots.push({ startMs: lines[i].end_time_ms, endMs: lines[i + 1].start_time_ms, beforeLineIndex: i + 1 })
+      const lineDuration = lines[i].end_time_ms - lines[i].start_time_ms
+      if (lineDuration >= BREAK_THRESHOLD_MS) {
+        slots.push({ startMs: lines[i].start_time_ms, endMs: lines[i].end_time_ms, beforeLineIndex: i + 1 })
       }
     }
     // Outro
