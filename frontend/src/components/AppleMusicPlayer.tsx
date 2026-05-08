@@ -127,6 +127,8 @@ interface Props {
   /** Fires ~4× per second with current position and total duration in ms. */
   onTimeUpdate?: (positionMs: number, durationMs: number) => void
   onPlayStateChange?: (playing: boolean) => void
+  /** Called with the artwork URL (or null) after the queue is set. */
+  onArtworkUrl?: (url: string | null) => void
   /**
    * When true, play() is called automatically after the queue is set.
    * Only safe to use after the audio context has been unlocked by a prior
@@ -137,8 +139,20 @@ interface Props {
 
 type Status = 'loading' | 'needs-auth' | 'authorizing' | 'needs-play' | 'playing' | 'error'
 
+function extractArtworkUrl(music: MusicKitInstance): string | null {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const item = (music as any).nowPlayingItem
+    const art = item?.artwork
+    if (!art) return null
+    if (typeof art.url === 'function') return art.url(112, 112) as string
+    if (typeof art.url === 'string') return art.url.replace('{w}', '112').replace('{h}', '112')
+    return null
+  } catch { return null }
+}
+
 const AppleMusicPlayer = forwardRef<AppleMusicPlayerHandle, Props>(function AppleMusicPlayer(
-  { appleMusicUrl, onReady, onTimeUpdate, onPlayStateChange, autoPlay },
+  { appleMusicUrl, onReady, onTimeUpdate, onPlayStateChange, onArtworkUrl, autoPlay },
   ref,
 ) {
   const [status, setStatus] = useState<Status>('loading')
@@ -149,10 +163,12 @@ const AppleMusicPlayer = forwardRef<AppleMusicPlayerHandle, Props>(function Appl
   const onTimeUpdateRef = useRef(onTimeUpdate)
   const onPlayStateChangeRef = useRef(onPlayStateChange)
   const onReadyRef = useRef(onReady)
+  const onArtworkUrlRef = useRef(onArtworkUrl)
   const autoPlayRef = useRef(autoPlay)
   useEffect(() => { onTimeUpdateRef.current = onTimeUpdate }, [onTimeUpdate])
   useEffect(() => { onPlayStateChangeRef.current = onPlayStateChange }, [onPlayStateChange])
   useEffect(() => { onReadyRef.current = onReady }, [onReady])
+  useEffect(() => { onArtworkUrlRef.current = onArtworkUrl }, [onArtworkUrl])
   useEffect(() => { autoPlayRef.current = autoPlay }, [autoPlay])
 
   // ── Imperative API ───────────────────────────────────────────────────────────
@@ -240,6 +256,7 @@ const AppleMusicPlayer = forwardRef<AppleMusicPlayerHandle, Props>(function Appl
       //    and the user must click ▶ to start (required for first-ever play).
       await music.setQueue({ url: appleMusicUrl })
       if (!mountedRef.current) return
+      onArtworkUrlRef.current?.(extractArtworkUrl(music))
       if (autoPlayRef.current) {
         logAppleMusicDebug('Auto-playing (audio context already unlocked)')
         setStatus('needs-play')
@@ -274,6 +291,7 @@ const AppleMusicPlayer = forwardRef<AppleMusicPlayerHandle, Props>(function Appl
       // Never call play() here — Safari will block it after the async auth chain.
       await _mkInstance.setQueue({ url: appleMusicUrl })
       if (mountedRef.current) {
+        onArtworkUrlRef.current?.(extractArtworkUrl(_mkInstance))
         setStatus('needs-play')
         onReadyRef.current?.()
         logAppleMusicDebug('Authorized + queue loaded; parent transport now enabled')

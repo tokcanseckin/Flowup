@@ -919,6 +919,7 @@ function PlayerView({
   const [amDurationMs, setAmDurationMs] = useState(0)
   const [amPlaying, setAmPlaying] = useState(false)
   const [amReady, setAmReady] = useState(false)
+  const [amArtworkUrl, setAmArtworkUrl] = useState<string | null>(null)
   // Once the user has successfully played Apple Music once, the audio context
   // is unlocked for this page session. Subsequent song navigations can then
   // auto-play without requiring another user gesture.
@@ -958,6 +959,7 @@ function PlayerView({
   useEffect(() => {
     setAmReady(false)
     setAmPlaying(false)
+    setAmArtworkUrl(null)
     // amAutoPlay is already set by handlePrevSong/handleNextSong before the
     // URL changes; it will be consumed by AppleMusicPlayer's initAndPlay.
     // Clear it after a short delay so it doesn't linger.
@@ -1159,22 +1161,23 @@ function PlayerView({
           {/* Player controls — takes remaining width */}
           <section className="rounded-2xl border border-gray-800/80 p-5 flex-1 min-w-0" style={{ background: '#12121f' }}>
           <div className="flex items-center gap-4 mb-5">
-            {effectiveSource === 'spotify' && player.albumArtUrl ? (
-              <img src={player.albumArtUrl} alt="Album art" className="w-14 h-14 rounded-xl object-cover shadow-lg" />
-            ) : (() => {
-              const ytThumb = song.youtube_url
-                ? (() => {
-                    try {
-                      const u = new URL(song.youtube_url)
-                      const id = u.hostname === 'youtu.be'
-                        ? u.pathname.slice(1).split('?')[0]
-                        : (u.searchParams.get('v') ?? u.pathname.split('/').pop() ?? '')
-                      return id ? `https://img.youtube.com/vi/${id}/mqdefault.jpg` : null
-                    } catch { return null }
-                  })()
-                : null
-              return ytThumb ? (
-                <img src={ytThumb} alt="Video thumbnail" className="w-14 h-14 rounded-xl object-cover shadow-lg" />
+            {(() => {
+              let artUrl: string | null = null
+              if (effectiveSource === 'spotify' && player.albumArtUrl) {
+                artUrl = player.albumArtUrl
+              } else if (effectiveSource === 'apple_music' && amArtworkUrl) {
+                artUrl = amArtworkUrl
+              } else if (song.youtube_url) {
+                try {
+                  const u = new URL(song.youtube_url)
+                  const id = u.hostname === 'youtu.be'
+                    ? u.pathname.slice(1).split('?')[0]
+                    : (u.searchParams.get('v') ?? u.pathname.split('/').pop() ?? '')
+                  if (id) artUrl = `https://img.youtube.com/vi/${id}/mqdefault.jpg`
+                } catch { /* noop */ }
+              }
+              return artUrl ? (
+                <img src={artUrl} alt="Album art" className="w-14 h-14 rounded-xl object-cover shadow-lg" />
               ) : (
                 <div className="w-14 h-14 rounded-xl bg-gray-800 flex items-center justify-center">
                   <svg viewBox="0 0 24 24" className="w-6 h-6 fill-gray-600">
@@ -1268,6 +1271,7 @@ function PlayerView({
               onReady={() => setAmReady(true)}
               onTimeUpdate={(posMs, durMs) => { setAmPositionMs(posMs); setAmDurationMs(durMs) }}
               onPlayStateChange={setAmPlaying}
+              onArtworkUrl={setAmArtworkUrl}
               autoPlay={amAutoPlay}
             />
           </div>
