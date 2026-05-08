@@ -352,11 +352,10 @@ export default function LyricsPlayer({
 
     const containerRect = container.getBoundingClientRect()
     const activeRect = activeEl.getBoundingClientRect()
-    const padding = 24
+    const targetScrollTop =
+      container.scrollTop + (activeRect.top - containerRect.top) - containerRect.height / 2 + activeRect.height / 2
 
-    if (activeRect.top < containerRect.top + padding || activeRect.bottom > containerRect.bottom - padding) {
-      activeEl.scrollIntoView({ behavior: 'smooth', block: 'center' })
-    }
+    container.scrollTo({ top: targetScrollTop, behavior: 'smooth' })
   }, [activeIndex])
 
   return (
