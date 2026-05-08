@@ -697,10 +697,11 @@ def translate_batch(texts: list[str], source_lang: str, target_lang: str) -> lis
 
 # ── Language dictionary lookups ──────────────────────────────────────────────
 
-_or_lookup_fn     = None   # OpenRussian single-def (ru)
-_or_lookup_all_fn = None   # OpenRussian all-defs   (ru)
-_it_lookup_fn     = None   # Italian OMW single-def (it)
-_it_lookup_all_fn = None   # Italian OMW all-defs   (it)
+_or_lookup_fn          = None   # OpenRussian single-def (ru)
+_or_lookup_all_fn      = None   # OpenRussian all-defs   (ru)
+_or_lookup_by_form_fn  = None   # OpenRussian form-based lookup (ru)
+_it_lookup_fn          = None   # Italian OMW single-def (it)
+_it_lookup_all_fn      = None   # Italian OMW all-defs   (it)
 
 
 def _backend_dir() -> str:
@@ -712,18 +713,20 @@ def _backend_dir() -> str:
 
 def _load_openrussian() -> None:
     """Attempt to load the OpenRussian index from the backend cache."""
-    global _or_lookup_fn, _or_lookup_all_fn
+    global _or_lookup_fn, _or_lookup_all_fn, _or_lookup_by_form_fn
     _backend_dir()
     try:
-        from openrussian import ensure_loaded, lookup, lookup_all  # type: ignore[import]
+        from openrussian import ensure_loaded, lookup, lookup_all, lookup_all_by_form  # type: ignore[import]
         ensure_loaded()
         _or_lookup_fn = lookup
         _or_lookup_all_fn = lookup_all
+        _or_lookup_by_form_fn = lookup_all_by_form
         print("  [OpenRussian] Dictionary loaded.")
     except Exception as exc:
         print(f"  [OpenRussian] Could not load dictionary: {exc}")
         _or_lookup_fn = None
         _or_lookup_all_fn = None
+        _or_lookup_by_form_fn = None
 
 
 def _load_italian_dict() -> None:
@@ -744,32 +747,50 @@ def _load_italian_dict() -> None:
 def _rank_definitions(candidates: list[str], translation: str) -> list[str]:
     """Re-order candidates so the one with most word-overlap with `translation` comes first.
 
-    Only content words longer than 2 characters are counted to avoid noise
-    from common stop-words ('a', 'to', 'of', …).
+    Uses 4-character prefix matching so inflected translation words (e.g. 'writes')
+    correctly match definition stems (e.g. 'write').
     """
     if not translation or len(candidates) <= 1:
         return candidates
-    trans_words = set(re.findall(r'\w+', translation.lower()))
-    trans_words = {w for w in trans_words if len(w) > 2}
+    trans_words = [w for w in re.findall(r'\w+', translation.lower()) if len(w) > 2]
 
     def _score(defn: str) -> int:
-        return sum(1 for w in re.findall(r'\w+', defn.lower()) if w in trans_words)
+        defn_words = [w for w in re.findall(r'\w+', defn.lower()) if len(w) > 3]
+        score = 0
+        for dw in defn_words:
+            for tw in trans_words:
+                # Prefix match on the first 4 chars handles morphological variants
+                # e.g. 'write' matches 'writes', 'writing', 'wrote'… via 'writ'
+                if tw.startswith(dw[:4]) or dw.startswith(tw[:4]):
+                    score += 1
+                    break  # count each definition word at most once
+        return score
 
     return sorted(candidates, key=_score, reverse=True)
 
 
-def _resolve_definition(lemma: str, lang_code: str, translation: str = "") -> str:
+def _resolve_definition(lemma: str, lang_code: str, translation: str = "",
+                         raw_token: str = "") -> str:
     """Return the best English definition for the lemma.
 
-    Fetches all candidate definitions from the appropriate dictionary, then
-    ranks them by word-overlap with `translation` so the most contextually
-    relevant meaning appears first.  Falls back to a stub if nothing is found.
+    For Russian, first tries to look up the original inflected form directly via
+    the OpenRussian words_forms index — this unambiguously identifies the correct
+    homograph (e.g. 'пишет' → писа́ть 'to write', not пи́сать 'to piss').
+    Falls back to bare-lemma lookup when the form index is unavailable.
+    Candidates are then ranked by word-overlap with the line translation so
+    the most contextually relevant meaning appears first.
     """
     clean_lemma = re.sub(r"[^\w]", "", lemma, flags=re.UNICODE)
+    clean_token = re.sub(r"[^\w]", "", raw_token, flags=re.UNICODE)
     candidates: list[str] = []
 
-    if lang_code == "ru" and _or_lookup_all_fn is not None:
-        candidates = _or_lookup_all_fn(clean_lemma) or []
+    if lang_code == "ru":
+        # Prefer exact form lookup: unambiguously picks the right homograph.
+        if clean_token and _or_lookup_by_form_fn is not None:
+            candidates = _or_lookup_by_form_fn(clean_token) or []
+        # Fall back to lemma lookup (collects all homograph senses, ranked by frequency).
+        if not candidates and _or_lookup_all_fn is not None:
+            candidates = _or_lookup_all_fn(clean_lemma) or []
     elif lang_code == "it" and _it_lookup_all_fn is not None:
         candidates = _it_lookup_all_fn(clean_lemma) or []
 
@@ -845,7 +866,7 @@ def process_line(
             "display_form":         analysis.display_form,
             "lemma":                analysis.lemma,
             "grammar":              analysis.grammar,
-            "dictionary_definition": _resolve_definition(analysis.lemma, lang_code, translation),
+            "dictionary_definition": _resolve_definition(analysis.lemma, lang_code, translation, raw_tok),
         })
         key += 1
 

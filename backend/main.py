@@ -83,7 +83,7 @@ from models import (
     WorkerResultSubmit,
     WorkerTaskResponse,
 )
-from openrussian import ensure_loaded as _load_or, lookup as _or_lookup
+from openrussian import ensure_loaded as _load_or, lookup as _or_lookup, lookup_local as _or_lookup_local
 from spotify_auth import fetch_spotify_user, refresh_access_token
 from google_auth import verify_google_id_token
 
@@ -214,12 +214,25 @@ def _require_worker_key(
 
 # ── Internal helpers ───────────────────────────────────────────────────────────
 
+def _strip_accents(s: str) -> str:
+    """Strip combining accent marks so 'пи́сать' → 'писать' for dictionary lookup."""
+    import unicodedata
+    nfd = unicodedata.normalize("NFD", s)
+    return "".join(c for c in nfd if not unicodedata.combining(c))
+
+
 def _enrich_definition(raw_def: Optional[str], lemma: str) -> Optional[str]:
-    """Replace stub definitions (e.g. '[mesto]') with OpenRussian lookups."""
+    """Replace stub definitions (e.g. '[mesto]') with OpenRussian lookups.
+
+    Uses the local in-memory dict only (no Wiktionary network calls) so this
+    function is always O(1) and never blocks a GET /songs/{id} request.
+    """
+    # Strip combining accents so a stressed lemma like 'пи́сать' looks up 'писать'
+    bare_lemma = _strip_accents(lemma)
     if raw_def and raw_def.startswith("[") and raw_def.endswith("]"):
-        live = _or_lookup(raw_def[1:-1]) or _or_lookup(lemma)
+        live = _or_lookup_local(raw_def[1:-1]) or _or_lookup_local(bare_lemma)
         return live or raw_def
-    return raw_def or _or_lookup(lemma)
+    return raw_def or _or_lookup_local(bare_lemma)
 
 
 def _word_response(word: Word) -> WordResponse:

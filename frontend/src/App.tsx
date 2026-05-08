@@ -1346,6 +1346,7 @@ export default function App() {
   const [playlistsLoading, setPlaylistsLoading] = useState(false)
   const [songsError,   setSongsError]   = useState<string | null>(null)
   const [activeSong,   setActiveSong]   = useState<SongDetail | null>(null)
+  const [songLoading,  setSongLoading]  = useState(false)
   const [lastSelectedSongId, setLastSelectedSongId] = useState<number | null>(null)
   const [settingsHydrated, setSettingsHydrated] = useState(false)
   const restoreDoneRef = useRef(false)
@@ -1484,16 +1485,22 @@ export default function App() {
   }, [auth, navigateToPath])
 
   const handleSelectSong = useCallback(async (id: number, options?: { updateRoute?: boolean }) => {
+    // Navigate immediately so the UI responds at once; song data loads in background.
+    if (options?.updateRoute !== false) {
+      navigateToPath(songPath(id))
+    }
+    setSongLoading(true)
+    setActiveSong(null)
     try {
       const source = settings.preferredSource !== 'spotify' ? settings.preferredSource : undefined
       const detail = await api.getSong(id, source)
       setActiveSong(detail)
       setLastSelectedSongId(detail.id)
-      if (options?.updateRoute !== false) {
-        navigateToPath(songPath(detail.id))
-      }
     } catch (e) {
       setSongsError(e instanceof Error ? e.message : 'Failed to load song')
+      navigateToPath('/browse')
+    } finally {
+      setSongLoading(false)
     }
   }, [settings.preferredSource, navigateToPath])
 
@@ -1726,6 +1733,21 @@ export default function App() {
         routeObjectId={route.page === 'admin' ? route.id : null}
         onNavigateRoute={(tab, id) => navigateToPath(adminPath(tab, id))}
       />
+    )
+  }
+
+  if (songLoading && !activeSong) {
+    return (
+      <div className="min-h-screen flex items-center justify-center"
+           style={{ background: 'radial-gradient(ellipse 120% 80% at 50% 110%, #1a1040 0%, #0d0d14 60%)' }}>
+        <div className="flex flex-col items-center gap-4 text-gray-400">
+          <svg className="w-10 h-10 animate-spin text-indigo-500" viewBox="0 0 24 24" fill="none">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+          </svg>
+          <span className="text-sm">Loading song…</span>
+        </div>
+      </div>
     )
   }
 
