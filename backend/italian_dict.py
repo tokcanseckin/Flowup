@@ -48,20 +48,19 @@ def lookup_all(lemma: str) -> list[str]:
     if _wn is None:
         return []
     results: list[str] = []
+    seen: set[str] = set()
     try:
         synsets = _wn.synsets(lemma.lower(), lang="ita")
         for syn in synsets:
-            defn = syn.definition()
-            if not defn or defn in results:
-                continue
-            # Skip citation-style entries (e.g. "- Thomas Gray", "- Andrea Parke")
-            # and entries that are too short to be real definitions
-            stripped = defn.strip()
-            if stripped.startswith("-") or len(stripped) < 10:
-                continue
-            results.append(defn)
-            if len(results) >= 5:
-                break
+            # Use English lemma names (direct translations) rather than verbose glosses.
+            # e.g. "rosso" → ["red", "crimson", "scarlet"] instead of a long description.
+            for name in syn.lemma_names():
+                clean = name.replace("_", " ").strip()
+                if clean and clean.lower() not in seen:
+                    seen.add(clean.lower())
+                    results.append(clean)
+                    if len(results) >= 4:
+                        return results
     except Exception:
         pass
     return results
