@@ -24,6 +24,7 @@ from __future__ import annotations
 import argparse
 import logging
 import os
+import subprocess
 import sys
 import time
 from pathlib import Path
@@ -178,6 +179,45 @@ def process_task(task: dict) -> None:
     submit_result(task_id, lrc)
 
 
+# ── Auto-update ────────────────────────────────────────────────────────────────
+
+_REPO_DIR = Path(__file__).resolve().parent.parent  # root of the git repo
+_REQUIREMENTS = Path(__file__).resolve().parent / "requirements.txt"
+_last_known_commit: str = ""
+
+
+def _git(*args: str) -> str:
+    r = subprocess.run(
+        ["git", *args], cwd=str(_REPO_DIR),
+        capture_output=True, text=True, timeout=30,
+    )
+    return r.stdout.strip()
+
+
+def _check_for_updates() -> None:
+    """Pull latest code from git; if the commit changed, reinstall deps and re-exec."""
+    global _last_known_commit
+    try:
+        if not _last_known_commit:
+            _last_known_commit = _git("rev-parse", "HEAD")
+
+        _git("fetch", "--quiet")
+        remote_hash = _git("rev-parse", "@{u}")
+
+        if remote_hash and remote_hash != _last_known_commit:
+            log.info(f"New commit detected ({remote_hash[:8]}) — pulling and restarting …")
+            _git("pull", "--ff-only", "--quiet")
+            subprocess.run(
+                [sys.executable, "-m", "pip", "install", "-q",
+                 "-r", str(_REQUIREMENTS)],
+                check=False, timeout=300,
+            )
+            log.info("Restarting worker with updated code …")
+            os.execv(sys.executable, [sys.executable] + sys.argv)
+    except Exception as exc:
+        log.debug(f"Auto-update check failed (non-fatal): {exc}")
+
+
 # ── Main loop ──────────────────────────────────────────────────────────────────
 
 
@@ -219,6 +259,7 @@ def run(once: bool = False) -> None:
         except Exception as exc:
             log.error(f"Unexpected error: {exc}")
 
+        _check_for_updates()
         time.sleep(POLL_SECS)
 
 
