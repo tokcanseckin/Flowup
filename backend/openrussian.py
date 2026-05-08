@@ -421,10 +421,12 @@ def lookup_all(lemma: str) -> list[str]:
     """
     if _lookup is None:
         return []
-    # Strip combining accents (U+0300-U+036F) so "пи́сать" → "писать"
+    # Strip only combining acute accent (U+0301 — stress mark) so "пи́сать" → "писать"
+    # Do NOT strip all combining chars: й decomposes into и + U+0306 (breve) in NFD,
+    # so a blanket strip would corrupt keys like нужный → нужныи.
     import unicodedata
     bare = unicodedata.normalize("NFD", lemma.lower().strip())
-    bare = "".join(c for c in bare if not unicodedata.combining(c))
+    bare = unicodedata.normalize("NFC", "".join(c for c in bare if c != "\u0301"))
     combined = _lookup.get(bare)
     if combined is None:
         combined = _query_wiktionary_russian(bare)
@@ -448,7 +450,7 @@ def lookup_all_by_form(raw_form: str) -> list[str]:
         return []
     import unicodedata
     bare = unicodedata.normalize("NFD", raw_form.lower().strip())
-    bare = "".join(c for c in bare if not unicodedata.combining(c))
+    bare = unicodedata.normalize("NFC", "".join(c for c in bare if c != "\u0301"))
     wid = _form_index.get(bare)
     if not wid:
         return []
@@ -465,7 +467,7 @@ def lookup_local(lemma: str) -> Optional[str]:
         return None
     import unicodedata
     bare = unicodedata.normalize("NFD", lemma.lower().strip())
-    bare = "".join(c for c in bare if not unicodedata.combining(c))
+    bare = unicodedata.normalize("NFC", "".join(c for c in bare if c != "\u0301"))
     combined = _lookup.get(bare)
     if not combined:
         return None
