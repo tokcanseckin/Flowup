@@ -45,10 +45,11 @@ function isStopWord(lemma: string, langCode: string): boolean {
   return set.has(normalized)
 }
 
-/** Returns the word.key values of the indexable (non-stop) words in a line, max 9. */
+/** Returns the word.key values of the indexable (non-stop, has-definition) words in a line, max 9. */
 function computeIndexedKeys(words: WordType[], langCode: string, filterStopWords: boolean): number[] {
   const result: number[] = []
   for (const w of words) {
+    if (!w.dictionary_definition) continue
     if (!filterStopWords || !isStopWord(w.lemma, langCode)) result.push(w.key)
     if (result.length === 9) break
   }
