@@ -1525,11 +1525,10 @@ export default function App() {
     const key = _songCacheKey(id, source)
     const cached = _songCache.get(key)
     if (cached) {
-      // Instant render from cache; silently re-fetch in background to stay fresh.
+      // Instant render from cache.
       setActiveSong(cached)
       setSongLoading(false)
       setLastSelectedSongId(id)
-      void _fetchSong(id, source).then(d => { _songCache.set(key, d); setActiveSong(d) }).catch(() => {})
       return
     }
     setSongLoading(true)
@@ -1730,8 +1729,11 @@ export default function App() {
   }, [activeSongIndex, displayedSongs, handleSelectSong])
 
   // Prefetch the next song in the playlist ~2s after the current song loads.
+  const prefetchedSongRef = useRef<number | null>(null)
   useEffect(() => {
     if (!activeSong || activeSongIndex < 0) return
+    if (prefetchedSongRef.current === activeSong.id) return
+    prefetchedSongRef.current = activeSong.id
     const next = displayedSongs[activeSongIndex + 1]
     if (!next) return
     const source = settings.preferredSource !== 'spotify' ? settings.preferredSource : undefined
