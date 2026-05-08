@@ -23,6 +23,7 @@ import asyncio
 import base64
 import json
 import os
+import re
 import secrets
 import subprocess
 import tempfile
@@ -263,18 +264,25 @@ def _strip_accents(s: str) -> str:
     return "".join(c for c in nfd if not unicodedata.combining(c))
 
 
-def _enrich_definition(raw_def: Optional[str], lemma: str, lang_code: str = "ru") -> Optional[str]:
+def _enrich_definition(raw_def: Optional[str], lemma: str, lang_code: str = "ru", display_form: str = "") -> Optional[str]:
     """Replace stub definitions (e.g. '[mesto]') with local dictionary lookups.
 
     Uses the local in-memory dict only (no network calls) so this function is
     always fast and never blocks a GET /songs/{id} request.
     """
     if lang_code == "it":
-        # For stubs, try the inner key first, then the stored lemma.
+        # Strip non-word chars from display_form (e.g. trailing punctuation).
+        clean_display = re.sub(r"[^\w]", "", display_form, flags=re.UNICODE).lower() if display_form else ""
+        # For stubs, try: stub inner key → stored lemma → display form.
         # Return None (rather than the ugly stub) when OMW has no entry.
         if raw_def and raw_def.startswith("[") and raw_def.endswith("]"):
-            return _italian_dict.lookup(raw_def[1:-1]) or _italian_dict.lookup(lemma) or None
-        return raw_def or _italian_dict.lookup(lemma) or None
+            return (
+                _italian_dict.lookup(raw_def[1:-1])
+                or _italian_dict.lookup(lemma)
+                or (clean_display and _italian_dict.lookup(clean_display))
+                or None
+            )
+        return raw_def or _italian_dict.lookup(lemma) or (clean_display and _italian_dict.lookup(clean_display)) or None
     # Russian (default): strip combining accents so 'пи́сать' looks up 'писать'.
     bare_lemma = _strip_accents(lemma)
     if raw_def and raw_def.startswith("[") and raw_def.endswith("]"):
@@ -289,7 +297,7 @@ def _word_response(word: Word, lang_code: str = "ru") -> WordResponse:
         display_form=word.display_form,
         lemma=word.lemma,
         grammar=word.grammar,
-        dictionary_definition=_enrich_definition(word.dictionary_definition, word.lemma, lang_code),
+        dictionary_definition=_enrich_definition(word.dictionary_definition, word.lemma, lang_code, word.display_form or ""),
     )
 
 
@@ -415,7 +423,7 @@ def _ingest_song(body: SongIngest, db: Session) -> Song:
                 lemma=word_data.lemma,
                 grammar=word_data.grammar,
                 # Resolve stubs at ingest time so the DB always has clean values.
-                dictionary_definition=_enrich_definition(word_data.dictionary_definition, word_data.lemma, body.language.code),
+                dictionary_definition=_enrich_definition(word_data.dictionary_definition, word_data.lemma, body.language.code, word_data.display_form or ""),
             ))
 
     db.commit()
