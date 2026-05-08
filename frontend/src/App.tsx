@@ -638,8 +638,8 @@ function SongBrowser({
               <div className="flex items-center gap-3">
                 <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden className="shrink-0">
                   {openedSongIds.has(song.id)
-                    ? <circle cx="6" cy="6" r="5" fill="none" stroke="#6b7280" strokeWidth="1.5" />
-                    : <circle cx="6" cy="6" r="6" fill="#6b7280" />}
+                    ? <circle cx="6" cy="6" r="5" fill="none" stroke="#6366f1" strokeWidth="1.5" />
+                    : <circle cx="6" cy="6" r="6" fill="#6366f1" />}
                 </svg>
                 <div className="min-w-0 flex-1">
                   <p className="text-white font-semibold truncate">{song.title}</p>
