@@ -20,6 +20,10 @@ frontend/.vite/
 .env.local
 *.env
 
+# Local databases
+flowup.db
+backend/flowup.db
+
 # OS
 .DS_Store
 Thumbs.db
@@ -28,3 +32,4 @@ Thumbs.db
 .idea/
 .vscode/
 *.swp
+backend/flowup.db
