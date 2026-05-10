@@ -330,6 +330,7 @@ export default function LyricsPlayer({
 
   const containerRef = useRef<HTMLDivElement | null>(null)
   const lineRefs = useRef<Map<number, HTMLDivElement>>(new Map())
+  const scrollAnimRef = useRef<number | null>(null)
 
   const pointerPressRef = useRef<{
     timer: ReturnType<typeof setTimeout> | null
@@ -526,6 +527,7 @@ export default function LyricsPlayer({
     return () => {
       if (pointerPressRef.current.timer) clearTimeout(pointerPressRef.current.timer)
       if (keyPressRef.current.timer) clearTimeout(keyPressRef.current.timer)
+      if (scrollAnimRef.current !== null) cancelAnimationFrame(scrollAnimRef.current)
     }
   }, [])
 
@@ -541,12 +543,39 @@ export default function LyricsPlayer({
     const activeEl = lineRefs.current.get(activeIndex)
     if (!container || !activeEl) return
 
+    if (scrollAnimRef.current !== null) {
+      cancelAnimationFrame(scrollAnimRef.current)
+      scrollAnimRef.current = null
+    }
+
     const containerRect = container.getBoundingClientRect()
     const activeRect = activeEl.getBoundingClientRect()
-    const targetScrollTop =
+    const rawTargetScrollTop =
       container.scrollTop + (activeRect.top - containerRect.top) - containerRect.height / 2 + activeRect.height / 2
+    const maxScrollTop = Math.max(0, container.scrollHeight - container.clientHeight)
+    const targetScrollTop = Math.max(0, Math.min(rawTargetScrollTop, maxScrollTop))
 
-    container.scrollTo({ top: targetScrollTop, behavior: 'smooth' })
+    const startScrollTop = container.scrollTop
+    const distance = targetScrollTop - startScrollTop
+    if (Math.abs(distance) < 1) return
+
+    const durationMs = Math.min(520, Math.max(240, 220 + Math.abs(distance) * 0.18))
+    const startTs = performance.now()
+
+    const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3)
+
+    const step = (ts: number) => {
+      const elapsed = ts - startTs
+      const t = Math.min(1, elapsed / durationMs)
+      container.scrollTop = startScrollTop + distance * easeOutCubic(t)
+      if (t < 1) {
+        scrollAnimRef.current = requestAnimationFrame(step)
+      } else {
+        scrollAnimRef.current = null
+      }
+    }
+
+    scrollAnimRef.current = requestAnimationFrame(step)
   }, [activeIndex])
 
   return (
