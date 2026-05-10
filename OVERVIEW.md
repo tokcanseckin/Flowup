@@ -12,7 +12,8 @@ The long-term target is a **Progressive Web App (PWA) wrapped in Tauri** for des
 
 ```
 Real Song  →  Pre-generated JSON  →  Synchronized Lyrics UI  →  Word Inspection
-(Spotify)      (Python pipeline)       (React + Tailwind)         (keyboard 1–9)
+(YouTube /      (Python pipeline)       (React + Tailwind)         (keyboard 1–9)
+ Apple Music)
 ```
 
 The key architectural decision is **pre-generation**: all NLP processing (morphology, stress marks, grammar tags) happens offline in a Python pipeline and is baked into a static JSON file. The frontend has zero runtime NLP dependency — it only needs to sync a position counter against timestamps. This gives true zero-latency lyrics rendering regardless of network conditions.
@@ -21,14 +22,20 @@ The key architectural decision is **pre-generation**: all NLP processing (morpho
 
 ## Requirements
 
-### Requirement 1 — Audio Integration (Spotify Web Playback SDK)
+### Requirement 1 — Audio Integration (YouTube + Apple Music)
 
-- Use the official Spotify Web Playback SDK (`sdk.scdn.co/spotify-player.js`) injected at runtime.
-- Skip a full OAuth flow for the prototype. Provide a **token-paste UI** where the developer pastes a temporary access token from `developer.spotify.com/console`.
-- Required OAuth scopes: `streaming`, `user-modify-playback-state`.
-- The player must transfer playback to its own SDK device and start a given track URI on demand.
-- Track playback position with sub-200 ms accuracy for lyrics synchronization.
-- Note: Spotify Premium is required for SDK playback.
+Two playback backends are supported. Each song record stores a `youtube_url` and an Apple Music track ID; the frontend picks whichever is available.
+
+**YouTube**
+- Embed playback via the YouTube IFrame Player API (`youtube.com/iframe_api`).
+- No authentication required for playback.
+- Position is polled from `player.getCurrentTime()` and extrapolated locally at 100 ms for smooth lyrics sync.
+
+**Apple Music** *(primary)*
+- Uses MusicKit JS v3 (`js-cdn.music.apple.com/musickit/v3/musickit.js`).
+- Requires a signed Apple Music developer token (JWT, ES256, 6-month max expiry) served from the backend.
+- `MusicKit.configure()` is called once at app load; playback is started with `music.setQueue({ song: id })`.
+- Position is anchored on `timeupdate` events and extrapolated at 100 ms via local timestamp arithmetic (no SDK polling in the hot path).
 
 ### Requirement 2 — Data Generation Pipeline (Python)
 
@@ -46,7 +53,8 @@ A CLI script (`pipeline/generate_song_data.py`) that automates production of the
 **Required output schema:**
 ```jsonc
 {
-  "spotify_uri": "spotify:track:…",
+  "youtube_url": "https://www.youtube.com/watch?v=…",
+  "apple_music_id": "…",
   "title": "Song Title",
   "lines": [
     {
@@ -76,8 +84,9 @@ A CLI script (`pipeline/generate_song_data.py`) that automates production of the
 | Deliverable | Specification |
 |-------------|--------------|
 | **Scaffold** | Vite + React 18 + TypeScript + TailwindCSS |
-| **Auth view** | Full-screen card: textarea for token, track URI input, connect button |
-| **`useSpotifyPlayer` hook** | Injects SDK script, initializes `Spotify.Player`, extrapolates position at 100 ms via local timestamp arithmetic (no SDK polling in the hot path) |
+| **Auth view** | Full-screen card with **Sign in with Apple** button; on success stores the Apple ID JWT in `localStorage` |
+| **`AppleMusicPlayer` component** | Configures MusicKit JS v3 with a backend-issued developer token; extrapolates position at 100 ms via local timestamp arithmetic |
+| **`YouTubePlayer` component** | Embeds IFrame Player API; polls `getCurrentTime()` anchored to a local timestamp for smooth sync |
 | **Player controls** | Album art, track name/artist, seekable progress bar, Play/Pause button |
 | **`LyricsPlayer` component** | Imports `song_data.json`; teleprompter-style tape (active line centred, neighbours faded and scaled by distance); active line shows individual words with superscript number badges |
 | **Keyboard inspection** | `keydown` listener for keys `1`–`9`; locates the word by key, reads its DOM `getBoundingClientRect`, renders an anchored tooltip with inflected form, lemma, grammar, and definition |
@@ -105,11 +114,13 @@ Flowup/
         ├── App.tsx             # auth screen + player shell
         ├── index.css           # Tailwind layers + stressed / glass utilities
         ├── types/
-        │   └── spotify.d.ts   # global ambient SDK types (no export)
+        │   └── spotify.d.ts   # vestigial — ambient SDK types, kept for reference
         ├── hooks/
-        │   └── useSpotifyPlayer.ts
+        │   └── useAppleMusicPlayer.ts
         ├── components/
-        │   └── LyricsPlayer.tsx
+            ├── LyricsPlayer.tsx
+            ├── AppleMusicPlayer.tsx
+            └── YouTubePlayer.tsx
         └── data/
             └── song_data.json  # 13-line sample: Группа Крови — Кино
 ```
@@ -125,10 +136,10 @@ cd pipeline
 pip install -r requirements.txt
 
 # With real translations:
-DEEPL_API_KEY=your_key SPOTIFY_URI=spotify:track:… python generate_song_data.py
+DEEPL_API_KEY=your_key python generate_song_data.py --artist "Кино" --title "Группа крови"
 
 # Without DeepL key (mock translations):
-python generate_song_data.py
+python generate_song_data.py --artist "Кино" --title "Группа крови"
 
 # Copy output to the frontend:
 cp song_data.json ../frontend/src/data/song_data.json
@@ -142,8 +153,8 @@ npm install
 npm run dev          # http://localhost:5173
 ```
 
-1. Open the app → paste a Spotify access token → click **Connect Player**.
-2. Confirm the track URI (defaults to the sample track) → click **Load Track**.
+1. Open the app → sign in with Apple.
+2. Select a song from the browser → the player loads Apple Music (or YouTube as fallback).
 3. Press **Play**. Lyrics scroll automatically.
 4. Press **1–9** while a line is active to inspect that word.
 
@@ -159,20 +170,26 @@ npm run dev          # http://localhost:5173
 
 ### P1 — Auth & Distribution
 
-- [ ] **Full Spotify OAuth flow** — replace the token-paste with PKCE authorization code flow. Implement `/callback` redirect handler and token refresh. This is required before any real-user distribution.
+- [ ] **Login with Apple** — implement Sign in with Apple (OAuth 2.0 / OpenID Connect). Backend validates the Apple identity token (JWT, RS256) using Apple's public keys from `appleid.apple.com/auth/keys`. Requires an Apple Developer account, a Services ID, and an associated domain file at `/.well-known/apple-app-site-association`.
+- [ ] **Apple Music developer token** — generate a signed ES256 JWT from the Apple Music key and serve it from `/api/music-token`. Rotate before expiry (max 6 months).
 - [ ] **PWA manifest + service worker** — `manifest.json`, icons, `vite-plugin-pwa` for offline caching of the JSON data and pre-cached assets.
-- [ ] **Tauri wrapper** — add `src-tauri/` scaffold, configure `tauri.conf.json` with the correct CSP for Spotify SDK, and produce signed `.dmg`/`.exe`/`.AppImage` builds.
+- [ ] **Tauri wrapper** — add `src-tauri/` scaffold, configure `tauri.conf.json` with the correct CSP for MusicKit JS, and produce signed `.dmg`/`.exe`/`.AppImage` builds.
 
 ### P2 — Learning Features
 
-- [ ] **Vocabulary tracker** — persist inspected words (IndexedDB or Tauri's SQLite plugin) and expose a "My Words" review deck.
+- [ ] **Word tracker** — every word inspected via keyboard (1–9) is persisted to `IndexedDB` (or Tauri's SQLite plugin for desktop). Each entry stores:
+  - `inflected_form` and `lemma` (with stress marks)
+  - `song_id`, `line_index` — where the word was encountered
+  - `first_seen_at` / `last_seen_at` timestamps
+  - `lookup_count` — how many times the user has inspected this word
+  A **"My Words"** screen lists the accumulated vocabulary, filterable by song and sortable by frequency or recency.
 - [ ] **Spaced repetition (SRS)** — integrate SM-2 or FSRS for scheduled word review sessions between listening sessions.
 - [ ] **Romanization toggle** — optionally show a Cyrillic-to-Latin transliteration below the active line for absolute beginners.
 - [ ] **Difficulty filter** — tag words by CEFR level (A1–C2) using a Russian frequency wordlist and let learners highlight only words above their level.
 
 ### P3 — Content & Scale
 
-- [ ] **Song browser** — UI to search and queue tracks (calls Spotify Search API), then auto-runs the pipeline on demand (or checks a pre-built cache).
+- [ ] **Song browser** — UI to search and queue tracks (YouTube search or Apple Music catalog API), then auto-runs the pipeline on demand (or checks a pre-built cache).
 - [ ] **Batch pipeline** — extend `generate_song_data.py` to accept a playlist URI and process all tracks, writing one JSON file per track into a `data/` directory.
 - [ ] **Community corrections** — crowdsource stress-mark and definition corrections via a simple GitHub-backed PR flow or a lightweight editor UI.
 
