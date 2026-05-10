@@ -53,7 +53,7 @@ cd "$ROOT/frontend"
 npm run build
 
 echo "→ Syncing frontend…"
-rsync -az "$ROOT/frontend/dist/" "$SERVER:$FRONTEND_REMOTE/"
+rsync -az --delete "$ROOT/frontend/dist/" "$SERVER:$FRONTEND_REMOTE/"
 
 # ── 6. Restart backend service ────────────────────────────────────────────────
 echo "→ Restarting backend service…"

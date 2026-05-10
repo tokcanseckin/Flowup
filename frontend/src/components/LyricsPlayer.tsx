@@ -531,6 +531,18 @@ export default function LyricsPlayer({
     }
   }, [])
 
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+
+    if (scrollAnimRef.current !== null) {
+      cancelAnimationFrame(scrollAnimRef.current)
+      scrollAnimRef.current = null
+    }
+
+    container.scrollTop = 0
+  }, [songData.id])
+
   const setLineRef = useCallback((index: number, el: HTMLDivElement | null) => {
     if (el) lineRefs.current.set(index, el)
     else lineRefs.current.delete(index)
