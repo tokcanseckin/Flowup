@@ -55,6 +55,20 @@ function isRealDefinition(def: string | null | undefined): def is string {
   return !(t.startsWith('[') && t.endsWith(']'))
 }
 
+function stripBoundaryPunctuation(value: string): string {
+  // Keep inner punctuation (e.g. don't -> don't), remove noisy edge punctuation.
+  return value.replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, '').trim()
+}
+
+function parseHueFromColor(color: string | undefined): number | null {
+  if (!color) return null
+  const m = color.match(/hsla?\(\s*([0-9.]+)/i)
+  if (!m) return null
+  const hue = Number(m[1])
+  if (!Number.isFinite(hue)) return null
+  return ((hue % 360) + 360) % 360
+}
+
 /** Returns the word.key values of the indexable (non-stop, has-definition) words in a line, max 9. */
 function computeIndexedKeys(words: WordType[], langCode: string, filterStopWords: boolean): number[] {
   const result: number[] = []
@@ -348,6 +362,7 @@ export default function LyricsPlayer({
   const inspectInfo = resolveInspectInfo(lines, inspectState)
   const panelBackground = themeBackground ?? 'linear-gradient(180deg, #1a57bf 0%, #0f46a8 100%)'
   const asideBackground = themeAsideBackground ?? '#184f9b'
+  const auraHue = parseHueFromColor(accentTextColor) ?? 320
   const panelBgAnim = useAnimatedBackground(panelBackground)
   const asideBgAnim = useAnimatedBackground(asideBackground)
 
@@ -607,17 +622,17 @@ export default function LyricsPlayer({
             }}
           />
           <div
-            className="absolute -inset-[22%] opacity-45 blur-3xl animate-aurora-one"
+            className="absolute -inset-[22%] opacity-60 blur-3xl animate-aurora-one"
             style={{
               background:
-                'radial-gradient(circle at 26% 28%, rgba(146, 220, 255, 0.48) 0%, rgba(146, 220, 255, 0) 42%), radial-gradient(circle at 76% 72%, rgba(255, 194, 143, 0.34) 0%, rgba(255, 194, 143, 0) 40%)',
+                `radial-gradient(circle at 26% 28%, hsla(${auraHue}, 100%, 62%, 0.55) 0%, hsla(${auraHue}, 100%, 62%, 0) 44%), radial-gradient(circle at 76% 72%, hsla(${auraHue}, 90%, 50%, 0.38) 0%, hsla(${auraHue}, 90%, 50%, 0) 42%)`,
             }}
           />
           <div
-            className="absolute -inset-[18%] opacity-38 blur-3xl animate-aurora-two"
+            className="absolute -inset-[18%] opacity-52 blur-3xl animate-aurora-two"
             style={{
               background:
-                'radial-gradient(circle at 70% 18%, rgba(171, 191, 255, 0.44) 0%, rgba(171, 191, 255, 0) 46%), radial-gradient(circle at 14% 78%, rgba(173, 245, 220, 0.3) 0%, rgba(173, 245, 220, 0) 40%)',
+                `radial-gradient(circle at 70% 18%, hsla(${auraHue}, 92%, 55%, 0.32) 0%, hsla(${auraHue}, 92%, 55%, 0) 48%), radial-gradient(circle at 14% 78%, hsla(${auraHue}, 85%, 48%, 0.25) 0%, hsla(${auraHue}, 85%, 48%, 0) 42%)`,
             }}
           />
         </div>
@@ -743,17 +758,17 @@ export default function LyricsPlayer({
               }}
             />
             <div
-              className="absolute -inset-[20%] opacity-34 blur-3xl animate-aurora-two"
+              className="absolute -inset-[20%] opacity-50 blur-3xl animate-aurora-two"
               style={{
                 background:
-                  'radial-gradient(circle at 82% 14%, rgba(158, 219, 255, 0.4) 0%, rgba(158, 219, 255, 0) 46%), radial-gradient(circle at 16% 74%, rgba(255, 194, 143, 0.26) 0%, rgba(255, 194, 143, 0) 40%)',
+                  `radial-gradient(circle at 82% 14%, hsla(${auraHue}, 100%, 61%, 0.42) 0%, hsla(${auraHue}, 100%, 61%, 0) 48%), radial-gradient(circle at 16% 74%, hsla(${auraHue}, 90%, 52%, 0.30) 0%, hsla(${auraHue}, 90%, 52%, 0) 42%)`,
               }}
             />
             <div
-              className="absolute -inset-[16%] opacity-28 blur-3xl animate-aurora-one"
+              className="absolute -inset-[16%] opacity-44 blur-3xl animate-aurora-one"
               style={{
                 background:
-                  'radial-gradient(circle at 24% 24%, rgba(172, 193, 255, 0.34) 0%, rgba(172, 193, 255, 0) 48%), radial-gradient(circle at 78% 70%, rgba(171, 245, 220, 0.24) 0%, rgba(171, 245, 220, 0) 42%)',
+                  `radial-gradient(circle at 24% 24%, hsla(${auraHue}, 88%, 54%, 0.26) 0%, hsla(${auraHue}, 88%, 54%, 0) 50%), radial-gradient(circle at 78% 70%, hsla(${auraHue}, 82%, 48%, 0.20) 0%, hsla(${auraHue}, 82%, 48%, 0) 44%)`,
               }}
             />
           </div>
@@ -855,6 +870,7 @@ interface InspectPanelProps {
 
 function InspectPanel({ info, onClose, compact = false, accentTextColor = 'hsl(320, 88%, 62%)' }: InspectPanelProps) {
   const isWord = info.kind === 'word'
+  const cleanDisplayForm = isWord ? stripBoundaryPunctuation(info.word.display_form) : null
 
   return (
     <div
@@ -883,15 +899,18 @@ function InspectPanel({ info, onClose, compact = false, accentTextColor = 'hsl(3
         <>
           {/* ── Definition — most prominent ── */}
           {isRealDefinition(info.word.dictionary_definition) ? (() => {
-            const meanings = info.word.dictionary_definition!.split(';').map(s => s.trim()).filter(Boolean)
+            const meanings = info.word.dictionary_definition!
+              .split(';')
+              .map(s => stripBoundaryPunctuation(s.trim()))
+              .filter(Boolean)
             return meanings.length === 1
-              ? <p className="text-lg leading-snug font-semibold mt-2" style={{ color: accentTextColor }}>{meanings[0]}</p>
+              ? <p className="text-2xl leading-tight font-bold mt-2" style={{ color: accentTextColor }}>{meanings[0]}</p>
               : (
                 <ol className="mt-2 space-y-1 list-none pl-0">
                   {meanings.map((m, i) => (
-                    <li key={i} className="flex gap-2 text-base leading-snug font-semibold" style={{ color: accentTextColor }}>
-                      <span className="text-sm leading-tight font-semibold shrink-0" style={{ color: accentTextColor }}>{i + 1}.</span>
-                      <span>{m}</span>
+                    <li key={i} className="grid grid-cols-[1.75rem_minmax(0,1fr)] items-start gap-1.5 text-xl leading-tight font-bold" style={{ color: accentTextColor }}>
+                      <span className="leading-tight font-bold text-right tabular-nums" style={{ color: accentTextColor }}>{i + 1}.</span>
+                      <span className="leading-tight">{m}</span>
                     </li>
                   ))}
                 </ol>
@@ -901,7 +920,7 @@ function InspectPanel({ info, onClose, compact = false, accentTextColor = 'hsl(3
           <div className="my-4 border-t border-zinc-300" />
 
           {/* ── Tapped word form ── */}
-          <p className="stressed text-3xl leading-tight font-bold text-black">{info.word.display_form}</p>
+          <p className="stressed text-xl leading-tight font-semibold text-black">{cleanDisplayForm || info.word.display_form}</p>
 
           {/* ── POS + morphological details ── */}
           {info.word.grammar && (() => {

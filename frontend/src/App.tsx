@@ -802,10 +802,28 @@ function rgbToHsl(r: number, g: number, b: number): [number, number, number] {
   return [Math.round(h * 360), Math.round(s * 100), Math.round(l * 100)]
 }
 
+function toPaletteSampleUrl(rawUrl: string | null): string | null {
+  if (!rawUrl) return null
+  if (rawUrl.startsWith('/api/image-proxy?url=')) return rawUrl
+  if (rawUrl.startsWith('data:') || rawUrl.startsWith('blob:')) return rawUrl
+
+  try {
+    const parsed = new URL(rawUrl, window.location.origin)
+    if (parsed.origin === window.location.origin) return parsed.toString()
+    if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+      return `/api/image-proxy?url=${encodeURIComponent(parsed.toString())}`
+    }
+    return rawUrl
+  } catch {
+    return rawUrl
+  }
+}
+
 function useAlbumBg(albumArtUrl: string | null): string {
   const [bg, setBg] = useState('#0d0d14')
   useEffect(() => {
-    if (!albumArtUrl) { setBg('#0d0d14'); return }
+    const sampleUrl = toPaletteSampleUrl(albumArtUrl)
+    if (!sampleUrl) { setBg('#0d0d14'); return }
     const img = new Image()
     img.crossOrigin = 'anonymous'
     img.onload = () => {
@@ -832,17 +850,18 @@ function useAlbumBg(albumArtUrl: string | null): string {
       } catch { setBg('#0d0d14') }
     }
     img.onerror = () => setBg('#0d0d14')
-    img.src = albumArtUrl
+    img.src = sampleUrl
   }, [albumArtUrl])
   return bg
 }
 
-function useAlbumLyricsTheme(albumArtUrl: string | null): { panelGradient: string; asideGradient: string; accentTextColor: string } {
+function useAlbumLyricsTheme(albumArtUrl: string | null): [{ panelGradient: string; asideGradient: string; accentTextColor: string }, string | null] {
   const [theme, setTheme] = useState({
     panelGradient: 'linear-gradient(180deg, hsl(215, 64%, 26%) 0%, hsl(215, 60%, 17%) 100%)',
     asideGradient: 'linear-gradient(180deg, hsl(215, 58%, 22%) 0%, hsl(215, 56%, 13%) 100%)',
     accentTextColor: 'hsl(320, 88%, 62%)',
   })
+  const [paletteError, setPaletteError] = useState<string | null>(null)
   const requestSeqRef = useRef(0)
 
   useEffect(() => {
@@ -850,14 +869,17 @@ function useAlbumLyricsTheme(albumArtUrl: string | null): { panelGradient: strin
     const applyTheme = (next: { panelGradient: string; asideGradient: string; accentTextColor: string }) => {
       if (requestSeqRef.current !== reqId) return
       setTheme(next)
+      setPaletteError(null)
     }
 
-    if (!albumArtUrl) {
+    const sampleUrl = toPaletteSampleUrl(albumArtUrl)
+    if (!sampleUrl) {
       applyTheme({
         panelGradient: 'linear-gradient(180deg, hsl(215, 64%, 26%) 0%, hsl(215, 60%, 17%) 100%)',
         asideGradient: 'linear-gradient(180deg, hsl(215, 58%, 22%) 0%, hsl(215, 56%, 13%) 100%)',
         accentTextColor: 'hsl(320, 88%, 62%)',
       })
+      setPaletteError('No album art URL')
       return
     }
 
@@ -871,59 +893,88 @@ function useAlbumLyricsTheme(albumArtUrl: string | null): { panelGradient: strin
         const ctx = canvas.getContext('2d')
         if (!ctx) return
         ctx.drawImage(img, 0, 0, SIZE, SIZE)
-        const data = ctx.getImageData(0, 0, SIZE, SIZE).data
+        let data: Uint8ClampedArray
+        try {
+          data = ctx.getImageData(0, 0, SIZE, SIZE).data
+        } catch (err) {
+          setPaletteError('getImageData failed: ' + (err instanceof Error ? err.message : String(err)))
+          console.error('Palette extraction getImageData error:', err)
+          applyTheme({
+            panelGradient: 'linear-gradient(180deg, hsl(215, 64%, 26%) 0%, hsl(215, 60%, 17%) 100%)',
+            asideGradient: 'linear-gradient(180deg, hsl(215, 58%, 22%) 0%, hsl(215, 56%, 13%) 100%)',
+            accentTextColor: 'hsl(320, 88%, 62%)',
+          })
+          return
+        }
 
-        let chosenHue = 215
-        let chosenSat = 55
-        let chosenLight = 35
-        let bestScore = -1
-        let avgR = 0, avgG = 0, avgB = 0
-        let count = 0
+        // Two-pass: always find the most vivid pixel available.
+        // Pass 1: prefer pixels with decent saturation and mid lightness.
+        // Pass 2 (fallback): take the most saturated pixel from ALL pixels.
+        let bestVividScore = -1
+        let bestVividH = 0, bestVividS = 0, bestVividL = 0
+        let bestAnyScore = -1
+        let bestAnyH = 215, bestAnyS = 0, bestAnyL = 35
+        let totalR = 0, totalG = 0, totalB = 0, totalCount = 0
 
         for (let i = 0; i < data.length; i += 4) {
           const r = data[i]
           const g = data[i + 1]
           const b = data[i + 2]
           const a = data[i + 3]
-          if (a < 16) continue
-          avgR += r; avgG += g; avgB += b; count++
-
+          if (a < 32) continue
           const [h, s, l] = rgbToHsl(r, g, b)
-          // Ignore near-neutrals; keep both dark and bright saturated hues.
-          if (s < 20) continue
+          totalR += r; totalG += g; totalB += b; totalCount++
 
-          // Prefer saturated colors near mid-lightness, but still allow dark reds.
-          const midLightnessWeight = 1 - Math.min(1, Math.abs(l - 42) / 42)
-          const score = s * (0.55 + 0.45 * midLightnessWeight)
-          if (score > bestScore) {
-            bestScore = score
-            chosenHue = h
-            chosenSat = s
-            chosenLight = l
+          // "Any pixel" best: most saturated, favoring mid-lightness over extremes
+          const anyScore = s * 2 + Math.min(l, 100 - l)
+          if (anyScore > bestAnyScore) {
+            bestAnyScore = anyScore
+            bestAnyH = h; bestAnyS = s; bestAnyL = l
+          }
+
+          // "Vivid" best: must be reasonably saturated and not near-black/near-white
+          if (s >= 20 && l >= 15 && l <= 88) {
+            const vividScore = s * 3 + Math.min(l, 85) * 0.4
+            if (vividScore > bestVividScore) {
+              bestVividScore = vividScore
+              bestVividH = h; bestVividS = s; bestVividL = l
+            }
           }
         }
 
-        if (bestScore < 0 && count > 0) {
-          const [h, s, l] = rgbToHsl(avgR / count, avgG / count, avgB / count)
-          chosenHue = h
-          chosenSat = s
-          chosenLight = l
+        let chosenHue: number, chosenSat: number, chosenLight: number
+        if (bestVividScore >= 0) {
+          // Found a vivid pixel — use it
+          chosenHue = bestVividH; chosenSat = bestVividS; chosenLight = bestVividL
+        } else if (bestAnyScore >= 0) {
+          // No vivid pixel, but use most saturated overall
+          chosenHue = bestAnyH; chosenSat = bestAnyS; chosenLight = bestAnyL
+        } else if (totalCount > 0) {
+          // Totally blank/transparent — use average
+          ;[chosenHue, chosenSat, chosenLight] = rgbToHsl(totalR / totalCount, totalG / totalCount, totalB / totalCount)
+        } else {
+          chosenHue = 215; chosenSat = 55; chosenLight = 35
         }
 
-        const sat = Math.max(40, Math.min(chosenSat, 76))
-        // Keep value low for white lyric readability while reflecting cover hue.
-        const topL = Math.max(21, Math.min(30, chosenLight * 0.65))
-        const bottomL = Math.max(12, topL - 10)
-        const asideL = Math.max(15, topL - 6)
-        const asideBottomL = Math.max(10, asideL - 9)
-        const accentSat = Math.max(46, Math.min(sat, 78))
-        const accentLight = 62
+        // Pure single-hue gradient — NO hue rotation, no color-family drift.
+        // Only saturation and lightness vary, so orange stays orange, red stays red, etc.
+        // This mirrors how Spotify's Now Playing screen stays true to album color.
+        const bgSat  = Math.min(72, Math.max(30, chosenSat * 0.72))
+        const topL   = Math.min(30, Math.max(14, chosenLight * 0.20 + 10))
+        const midL   = Math.max(8,  topL * 0.55)
+        const btmL   = Math.max(4,  midL * 0.55)
+        const midSat = Math.max(24, bgSat * 0.70)
+        const btmSat = Math.max(16, bgSat * 0.48)
+        // Accent: saturated and bright enough to read on the dark bg
+        const accentSat   = Math.min(100, Math.max(88, chosenSat))
+        const accentLight = Math.min(76, Math.max(60, 100 - chosenLight * 0.30))
         applyTheme({
-          panelGradient: `linear-gradient(180deg, hsl(${chosenHue}, ${sat}%, ${topL}%) 0%, hsl(${chosenHue}, ${Math.max(sat - 12, 32)}%, ${bottomL}%) 100%)`,
-          asideGradient: `linear-gradient(180deg, hsl(${chosenHue}, ${Math.max(sat - 10, 28)}%, ${asideL}%) 0%, hsl(${chosenHue}, ${Math.max(sat - 14, 24)}%, ${asideBottomL}%) 100%)`,
+          panelGradient: `linear-gradient(160deg, hsl(${chosenHue}, ${bgSat}%, ${topL}%) 0%, hsl(${chosenHue}, ${midSat}%, ${midL}%) 62%, hsl(${chosenHue}, ${btmSat}%, ${btmL}%) 100%)`,
+          asideGradient: `linear-gradient(150deg, hsl(${chosenHue}, ${Math.max(midSat - 4, 20)}%, ${Math.max(topL - 3, 11)}%) 0%, hsl(${chosenHue}, ${Math.max(btmSat - 4, 12)}%, ${Math.max(btmL - 1, 3)}%) 100%)`,
           accentTextColor: `hsl(${chosenHue}, ${accentSat}%, ${accentLight}%)`,
         })
       } catch {
+        setPaletteError('Extraction failed: fallback used')
         applyTheme({
           panelGradient: 'linear-gradient(180deg, hsl(215, 64%, 26%) 0%, hsl(215, 60%, 17%) 100%)',
           asideGradient: 'linear-gradient(180deg, hsl(215, 58%, 22%) 0%, hsl(215, 56%, 13%) 100%)',
@@ -938,10 +989,38 @@ function useAlbumLyricsTheme(albumArtUrl: string | null): { panelGradient: strin
         accentTextColor: 'hsl(320, 88%, 62%)',
       })
     }
-    img.src = albumArtUrl
+    img.src = sampleUrl
   }, [albumArtUrl])
 
-  return theme
+  return [theme, paletteError]
+}
+
+// Debug overlay for palette extraction
+function PaletteDebugOverlay({ song, coverArtUrl, lyricsTheme, paletteError }: { song: any, coverArtUrl: string | null, lyricsTheme: { panelGradient: string, asideGradient: string, accentTextColor: string }, paletteError: string | null }) {
+  const [show, setShow] = useState(false)
+  const sampleUrl = toPaletteSampleUrl(coverArtUrl)
+  return (
+    <div style={{ position: 'fixed', bottom: 12, right: 12, zIndex: 9999, pointerEvents: 'none' }}>
+      <button
+        style={{ pointerEvents: 'auto', background: '#222', color: '#fff', border: 'none', borderRadius: 6, padding: '4px 10px', fontSize: 13, opacity: 0.7 }}
+        onClick={() => setShow(s => !s)}
+        tabIndex={-1}
+      >
+        Palette Debug
+      </button>
+      {show && (
+        <div style={{ marginTop: 8, background: '#18181b', color: '#fff', borderRadius: 8, boxShadow: '0 2px 12px #0008', padding: 16, minWidth: 340, maxWidth: 420, fontSize: 13, pointerEvents: 'auto' }}>
+          <div style={{ marginBottom: 8, fontWeight: 600, fontSize: 15 }}>{song?.title} <span style={{ color: '#aaa', fontWeight: 400 }}>by {song?.artist}</span></div>
+          <div style={{ marginBottom: 6 }}><b>Sampled image URL:</b><br /><span style={{ wordBreak: 'break-all', color: '#aaf' }}>{sampleUrl}</span></div>
+          <div style={{ marginBottom: 6 }}><b>Accent color:</b> <span style={{ color: lyricsTheme.accentTextColor }}>{lyricsTheme.accentTextColor}</span></div>
+          <div style={{ marginBottom: 6 }}><b>Panel gradient:</b><br /><span style={{ color: '#afa' }}>{lyricsTheme.panelGradient}</span></div>
+          <div style={{ marginBottom: 6 }}><b>Aside gradient:</b><br /><span style={{ color: '#ffa' }}>{lyricsTheme.asideGradient}</span></div>
+          {paletteError && <div style={{ color: '#f88', margin: '8px 0', fontWeight: 600 }}>Palette error: {paletteError}</div>}
+          {sampleUrl && <img src={sampleUrl} alt="Sampled" style={{ marginTop: 10, maxWidth: 120, maxHeight: 120, borderRadius: 6, border: '1px solid #333', background: '#222' }} />}
+        </div>
+      )}
+    </div>
+  )
 }
 
 // ── Player view ────────────────────────────────────────────────────────────────
@@ -1201,10 +1280,13 @@ function PlayerView({
       return null
     }
   }, [effectiveSource, player.albumArtUrl, amArtworkUrl, song.youtube_url])
-  const lyricsTheme = useAlbumLyricsTheme(coverArtUrl)
+  const [lyricsTheme, paletteError] = useAlbumLyricsTheme(coverArtUrl)
+  const hasYouTubePanel = !!song.youtube_url
+  const showRightMediaPanel = effectiveSource === 'youtube' && !!song.youtube_url
 
   return (
     <div className="h-screen flex flex-col overflow-hidden" style={{ background: effectiveSource === 'spotify' ? albumBg : '#050608', transition: 'background 1.2s ease' }}>
+      <PaletteDebugOverlay song={song} coverArtUrl={coverArtUrl} lyricsTheme={lyricsTheme} paletteError={paletteError} />
 
       {/* Header */}
       <header className="sticky top-0 z-20 flex items-center justify-between px-4 sm:px-6 py-4 border-b border-gray-900" style={{ background: '#050608' }}>
@@ -1276,10 +1358,16 @@ function PlayerView({
       <main className="flex-1 min-h-0 p-4 max-w-[1360px] mx-auto w-full flex flex-col gap-3">
 
         {/* Controls + YouTube row */}
-        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_410px] gap-3 items-stretch flex-shrink-0">
+        <div
+          className="controls-media-row"
+          style={{
+            ['--media-col' as string]: hasYouTubePanel ? (showRightMediaPanel ? '410px' : '0px') : '0px',
+            ['--media-gap' as string]: showRightMediaPanel ? '0.75rem' : '0px',
+          }}
+        >
 
           {/* Player controls — takes remaining width */}
-          <section className="rounded-md border border-zinc-700/70 p-6 min-w-0" style={{ background: '#25262b' }}>
+          <section className="rounded-md border border-zinc-700/70 p-6 min-w-0 min-h-[210px] lg:min-h-[240px]" style={{ background: '#25262b' }}>
           <div className="flex items-center gap-4 mb-5">
             {coverArtUrl ? (
               <img src={coverArtUrl} alt="Album art" className="w-16 h-16 rounded object-cover border border-black/40" />
@@ -1350,24 +1438,25 @@ function PlayerView({
           </div>
         </section>
 
-          {effectiveSource === 'youtube' && song.youtube_url ? (
-            <aside className="rounded-md border border-zinc-700/70 overflow-hidden bg-black min-h-[210px] lg:min-h-[240px]">
-              <YouTubePlayer
-                ref={ytRef}
-                youtubeUrl={song.youtube_url}
-                onReady={handleYtReady}
-                onTimeUpdate={setYtPositionMs}
-                onDurationChange={setYtDurationMs}
-                onPlayStateChange={handleYtPlayStateChange}
-              />
-            </aside>
-          ) : (
-            <aside className="rounded-md border border-zinc-700/70 overflow-hidden bg-black min-h-[210px] lg:min-h-[240px]">
-              {coverArtUrl ? (
-                <img src={coverArtUrl} alt="Cover art" className="w-full h-full object-cover" />
-              ) : (
-                <div className="h-full min-h-[210px] lg:min-h-[240px] flex items-center justify-center text-zinc-500">No artwork</div>
-              )}
+          {hasYouTubePanel && (
+            <aside
+              className={`overflow-hidden bg-black min-h-[210px] lg:min-h-[240px] min-w-0 transition-[opacity,transform,border-color] duration-300 ease-out ${
+                showRightMediaPanel
+                  ? 'rounded-md border border-zinc-700/70 opacity-100 translate-x-0'
+                  : 'rounded-md border border-zinc-700/0 opacity-0 translate-x-2 pointer-events-none'
+              }`}
+              aria-hidden={!showRightMediaPanel}
+            >
+              {showRightMediaPanel ? (
+                <YouTubePlayer
+                  ref={ytRef}
+                  youtubeUrl={song.youtube_url!}
+                  onReady={handleYtReady}
+                  onTimeUpdate={setYtPositionMs}
+                  onDurationChange={setYtDurationMs}
+                  onPlayStateChange={handleYtPlayStateChange}
+                />
+              ) : null}
             </aside>
           )}
 

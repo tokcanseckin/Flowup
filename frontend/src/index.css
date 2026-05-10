@@ -89,6 +89,23 @@
 }
 
 @layer utilities {
+  .controls-media-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--media-gap, 0.75rem);
+    align-items: stretch;
+    flex-shrink: 0;
+  }
+
+  @media (min-width: 1024px) {
+    .controls-media-row {
+      grid-template-columns: minmax(0, 1fr) var(--media-col, 0px);
+      transition:
+        grid-template-columns 300ms cubic-bezier(0.22, 1, 0.36, 1),
+        gap 300ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+  }
+
   /* Stress-mark accent (U+0301) renders sharply */
   .stressed {
     font-variant-ligatures: none;
