@@ -7,6 +7,69 @@
   to   { width: 100% }
 }
 
+@keyframes ambient-drift {
+  0% {
+    transform: translate3d(-2%, -1.5%, 0);
+  }
+  50% {
+    transform: translate3d(2%, 1.5%, 0);
+  }
+  100% {
+    transform: translate3d(-2%, -1.5%, 0);
+  }
+}
+
+@keyframes ambient-drift-reverse {
+  0% {
+    transform: translate3d(1.8%, -1.8%, 0);
+  }
+  50% {
+    transform: translate3d(-1.8%, 1.8%, 0);
+  }
+  100% {
+    transform: translate3d(1.8%, -1.8%, 0);
+  }
+}
+
+@keyframes aurora-one {
+  0% {
+    transform: translate3d(-2.5%, -2%, 0) rotate(0deg) scale(1.02);
+  }
+  50% {
+    transform: translate3d(2.2%, 1.8%, 0) rotate(5deg) scale(1.06);
+  }
+  100% {
+    transform: translate3d(-2.5%, -2%, 0) rotate(0deg) scale(1.02);
+  }
+}
+
+@keyframes aurora-two {
+  0% {
+    transform: translate3d(2.4%, -2.2%, 0) rotate(0deg) scale(1.03);
+  }
+  50% {
+    transform: translate3d(-2.2%, 2%, 0) rotate(-4deg) scale(1.07);
+  }
+  100% {
+    transform: translate3d(2.4%, -2.2%, 0) rotate(0deg) scale(1.03);
+  }
+}
+
+@keyframes panel-in {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.986);
+  }
+  70% {
+    opacity: 1;
+    transform: translateY(-1px) scale(1.003);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 @layer base {
   html {
     background-color: #0d0d14;
@@ -40,5 +103,30 @@
     background: rgba(18, 18, 31, 0.8);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
+  }
+
+  .animate-ambient-drift {
+    animation: ambient-drift 18s linear infinite;
+    will-change: transform;
+  }
+
+  .animate-ambient-drift-reverse {
+    animation: ambient-drift-reverse 22s linear infinite;
+    will-change: transform;
+  }
+
+  .animate-panel-in {
+    animation: panel-in 300ms cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform, opacity;
+  }
+
+  .animate-aurora-one {
+    animation: aurora-one 14s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  .animate-aurora-two {
+    animation: aurora-two 18s ease-in-out infinite;
+    will-change: transform;
   }
 }

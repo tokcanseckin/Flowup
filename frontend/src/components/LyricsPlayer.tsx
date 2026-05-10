@@ -85,7 +85,7 @@ type InspectInfo =
 const HOLD_DELAY_MS = 220
 const BREAK_THRESHOLD_MS = 5_000
 
-function useAnimatedBackground(background: string, durationMs = 800) {
+function useAnimatedBackground(background: string, durationMs = 420) {
   const [baseBg, setBaseBg] = useState(background)
   const [nextBg, setNextBg] = useState(background)
   const [showNext, setShowNext] = useState(false)
@@ -193,22 +193,22 @@ function BreakIndicator({ startMs, endMs, currentPositionMs, isPlaying, label }:
   }, [isPlaying])
 
   return (
-    <div className={`px-6 py-2 transition-opacity duration-300 ${isPast ? 'opacity-30' : isActive ? 'opacity-100' : 'opacity-40'}`}>
+    <div className="px-6 py-[0.9rem]">
       <div className="flex items-center gap-3">
         <div className="w-4 shrink-0" />
         <div className="flex items-center gap-3 flex-1 min-w-0">
           {label && (
-            <span className="text-[11px] text-white/55 shrink-0 font-mono uppercase tracking-[0.18em]">{label}</span>
+            <span className={`text-[11px] shrink-0 font-mono uppercase tracking-[0.18em] ${isActive ? 'text-white/75' : isPast ? 'text-white/45' : 'text-white/70'}`}>{label}</span>
           )}
-          <div className="relative flex-1 h-0.5 rounded-full bg-white/20 overflow-hidden">
+          <div className="relative flex-1 h-1 rounded-full bg-white/20 overflow-hidden">
             {isPast && (
-              <div className="absolute inset-0 rounded-full bg-cyan-200/65" />
+              <div className="absolute inset-0 rounded-full bg-white/45" />
             )}
             {isActive && (
               <div
                 key={seekKeyRef.current}
                 ref={fillRefCallback}
-                className="absolute inset-y-0 left-0 rounded-full bg-cyan-100/85"
+                className="absolute inset-y-0 left-0 rounded-full bg-white"
               />
             )}
           </div>
@@ -435,6 +435,13 @@ export default function LyricsPlayer({
         (e.target instanceof HTMLElement && e.target.isContentEditable)
       ) return
 
+      // Escape = close inspect panel
+      if (e.key === 'Escape') {
+        e.preventDefault()
+        clearInspect()
+        return
+      }
+
       // Space = toggle playback
       if (e.key === ' ' || e.key === 'Spacebar' || e.code === 'Space') {
         e.preventDefault()
@@ -552,10 +559,24 @@ export default function LyricsPlayer({
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute inset-0" style={{ background: panelBgAnim.baseBg }} />
           <div
-            className="absolute inset-0 transition-opacity duration-700 ease-out"
+            className="absolute inset-0 transition-opacity duration-300 ease-out"
             style={{
               background: panelBgAnim.nextBg,
               opacity: panelBgAnim.showNext ? 1 : 0,
+            }}
+          />
+          <div
+            className="absolute -inset-[22%] opacity-45 blur-3xl animate-aurora-one"
+            style={{
+              background:
+                'radial-gradient(circle at 26% 28%, rgba(146, 220, 255, 0.48) 0%, rgba(146, 220, 255, 0) 42%), radial-gradient(circle at 76% 72%, rgba(255, 194, 143, 0.34) 0%, rgba(255, 194, 143, 0) 40%)',
+            }}
+          />
+          <div
+            className="absolute -inset-[18%] opacity-38 blur-3xl animate-aurora-two"
+            style={{
+              background:
+                'radial-gradient(circle at 70% 18%, rgba(171, 191, 255, 0.44) 0%, rgba(171, 191, 255, 0) 46%), radial-gradient(circle at 14% 78%, rgba(173, 245, 220, 0.3) 0%, rgba(173, 245, 220, 0) 40%)',
             }}
           />
         </div>
@@ -564,9 +585,11 @@ export default function LyricsPlayer({
           ref={containerRef}
           className="relative z-10 h-full min-h-0 select-none overflow-y-auto no-scrollbar"
         >
-          <div className="flex flex-col gap-1 py-3 px-0">
+          <div className="flex flex-col gap-1 pt-8 pb-8 px-0">
           {lines.map((line, idx) => {
             const isActive = idx === activeIndex
+            const isPrev = idx === activeIndex - 1
+            const isNext = idx === activeIndex + 1
             const lineTarget: InspectTarget = { type: 'line', lineIndex: idx }
             const circleActive = !!inspectState && inspectState.target.type === 'line' && inspectState.target.lineIndex === idx
             const breakBefore = breakSlots.find(b => b.beforeLineIndex === idx)
@@ -584,7 +607,7 @@ export default function LyricsPlayer({
                 )}
                 <div
                 ref={el => setLineRef(idx, el)}
-                className={`transition-colors duration-200 ${isActive ? 'bg-white/12' : ''}`}
+                className={`transition-colors duration-200 ${isActive ? 'bg-white/12' : ''} ${isPrev ? 'opacity-75' : ''} ${isNext ? 'opacity-90' : ''}`}
               >
                 <div className="flex items-start gap-3 px-6 py-3">
                   <div className="mt-1.5 h-4 w-4 shrink-0">
@@ -619,8 +642,8 @@ export default function LyricsPlayer({
                     ) : (
                       <span
                         className={`stressed lyrics-text text-lg leading-tight ${
-                          activeIndex === -1 || idx < activeIndex ? 'text-white/45' : 'text-white/70'
-                        } ${onSeek ? 'cursor-pointer hover:text-gray-200 transition-colors duration-150' : ''}`}
+                          isPrev ? 'text-white/60' : isNext ? 'text-white/80' : (activeIndex === -1 || idx < activeIndex ? 'text-white/45' : 'text-white/70')
+                        } ${onSeek ? 'cursor-pointer hover:text-gray-200 transition-colors duration-120' : ''}`}
                         onClick={() => onSeek?.(line.start_time_ms)}
                       >
                         {line.original_line}
@@ -656,7 +679,13 @@ export default function LyricsPlayer({
 
         {isPhone && inspectInfo && (
           <div className="absolute inset-x-3 bottom-3 z-40">
-            <InspectPanel info={inspectInfo} compact onClose={clearInspect} accentTextColor={accentTextColor} />
+            <InspectPanel
+              key={inspectInfo.kind === 'word' ? `w-${inspectInfo.line.start_time_ms}-${inspectInfo.word.key}` : `l-${inspectInfo.line.start_time_ms}`}
+              info={inspectInfo}
+              compact
+              onClose={clearInspect}
+              accentTextColor={accentTextColor}
+            />
           </div>
         )}
       </div>
@@ -666,19 +695,38 @@ export default function LyricsPlayer({
           <div className="pointer-events-none absolute inset-0">
             <div className="absolute inset-0" style={{ background: asideBgAnim.baseBg }} />
             <div
-              className="absolute inset-0 transition-opacity duration-700 ease-out"
+              className="absolute inset-0 transition-opacity duration-300 ease-out"
               style={{
                 background: asideBgAnim.nextBg,
                 opacity: asideBgAnim.showNext ? 1 : 0,
+              }}
+            />
+            <div
+              className="absolute -inset-[20%] opacity-34 blur-3xl animate-aurora-two"
+              style={{
+                background:
+                  'radial-gradient(circle at 82% 14%, rgba(158, 219, 255, 0.4) 0%, rgba(158, 219, 255, 0) 46%), radial-gradient(circle at 16% 74%, rgba(255, 194, 143, 0.26) 0%, rgba(255, 194, 143, 0) 40%)',
+              }}
+            />
+            <div
+              className="absolute -inset-[16%] opacity-28 blur-3xl animate-aurora-one"
+              style={{
+                background:
+                  'radial-gradient(circle at 24% 24%, rgba(172, 193, 255, 0.34) 0%, rgba(172, 193, 255, 0) 48%), radial-gradient(circle at 78% 70%, rgba(171, 245, 220, 0.24) 0%, rgba(171, 245, 220, 0) 42%)',
               }}
             />
           </div>
 
           <div className="relative z-10">
             {inspectInfo ? (
-              <InspectPanel info={inspectInfo} onClose={clearInspect} accentTextColor={accentTextColor} />
+              <InspectPanel
+                key={inspectInfo.kind === 'word' ? `w-${inspectInfo.line.start_time_ms}-${inspectInfo.word.key}` : `l-${inspectInfo.line.start_time_ms}`}
+                info={inspectInfo}
+                onClose={clearInspect}
+                accentTextColor={accentTextColor}
+              />
             ) : (
-              <div className="rounded-xl border border-white/20 px-10 py-8 text-sm text-white/85 leading-relaxed">
+              <div className="rounded-xl border border-white/20 px-10 py-8 text-sm text-white/85 leading-relaxed animate-panel-in">
                 <p className="text-white font-semibold mb-2 uppercase tracking-wide text-xs">Inspect lyrics</p>
                 <p>Click a word or press 1-9 to inspect a word.</p>
                 <p className="mt-1">Click a circle or press 0 for sentence translation.</p>
@@ -728,7 +776,7 @@ function ActiveLineContent({
             <button
               type="button"
               key={word.key}
-              className="relative inline-flex items-start group cursor-pointer rounded-md px-0.5"
+              className="relative inline-flex items-start group cursor-pointer rounded-md px-0.5 transition-transform duration-150 hover:-translate-y-[1px]"
               onPointerDown={() => startPointerPress(target)}
               onPointerUp={() => endPointerPress(false)}
               onPointerCancel={() => endPointerPress(true)}
@@ -769,7 +817,7 @@ function InspectPanel({ info, onClose, compact = false, accentTextColor = 'hsl(3
 
   return (
     <div
-      className={`rounded-xl border shadow-2xl ${compact ? 'px-4 py-3' : 'px-10 py-8'}`}
+      className={`rounded-xl border shadow-2xl animate-panel-in ${compact ? 'px-4 py-3' : 'px-10 py-8'}`}
       style={{
         background: '#f2f2f2',
         borderColor: 'rgba(0,0,0,0.16)',
