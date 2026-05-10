@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import asyncio
 import base64
+import ipaddress
 import json
 import os
 import re
@@ -43,7 +44,7 @@ load_dotenv()
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.responses import JSONResponse, Response, StreamingResponse
 from sqlalchemy.orm import Session
 
 from database import AlignmentTask, Line, Playlist, PlaylistSong, Song, User, Word, create_tables, get_db
@@ -639,6 +640,64 @@ def _require_admin(
 @app.get("/api/health")
 def health():
     return {"status": "ok"}
+
+
+@app.get("/api/image-proxy")
+def image_proxy(url: str = Query(..., min_length=8, max_length=2048)):
+    """Fetch a remote image and serve it from same-origin for safe canvas sampling."""
+    parsed = urllib.parse.urlparse(url)
+    if parsed.scheme not in {"http", "https"}:
+        raise HTTPException(status_code=400, detail="Only http(s) image URLs are allowed")
+
+    host = (parsed.hostname or "").strip().lower()
+    if not host:
+        raise HTTPException(status_code=400, detail="Image URL host is required")
+    if host == "localhost" or host.endswith(".local"):
+        raise HTTPException(status_code=400, detail="Local hosts are not allowed")
+
+    try:
+        host_ip = ipaddress.ip_address(host)
+        if (
+            host_ip.is_private
+            or host_ip.is_loopback
+            or host_ip.is_link_local
+            or host_ip.is_multicast
+            or host_ip.is_reserved
+            or host_ip.is_unspecified
+        ):
+            raise HTTPException(status_code=400, detail="Private hosts are not allowed")
+    except ValueError:
+        # Host is a domain name; allow and rely on standard outbound network controls.
+        pass
+
+    req = urllib.request.Request(
+        url,
+        headers={
+            "User-Agent": "FlowupImageProxy/1.0",
+            "Accept": "image/*",
+        },
+    )
+
+    try:
+        with urllib.request.urlopen(req, timeout=8) as upstream:
+            content_type = (upstream.headers.get("Content-Type") or "").split(";", 1)[0].strip().lower()
+            if not content_type.startswith("image/"):
+                raise HTTPException(status_code=415, detail="URL did not return an image")
+
+            max_bytes = 5 * 1024 * 1024
+            payload = upstream.read(max_bytes + 1)
+            if len(payload) > max_bytes:
+                raise HTTPException(status_code=413, detail="Image is too large")
+
+            return Response(
+                content=payload,
+                media_type=content_type,
+                headers={"Cache-Control": "public, max-age=86400"},
+            )
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"Failed to fetch image: {exc}") from exc
 
 
 # ── Songs ──────────────────────────────────────────────────────────────────────
