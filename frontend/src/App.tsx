@@ -1,6 +1,4 @@
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react'
-import { useSpotifyAuth }   from './hooks/useSpotifyAuth'
-import { useSpotifyPlayer } from './hooks/useSpotifyPlayer'
 import AdminPanel          from './components/AdminPanel'
 import LyricsPlayer         from './components/LyricsPlayer'
 import YouTubePlayer, { YouTubePlayerHandle } from './components/YouTubePlayer'
@@ -8,7 +6,7 @@ import AppleMusicPlayer, { AppleMusicPlayerHandle } from './components/AppleMusi
 import { api, BackendUser, PlaylistDetail, PlaylistSummary, SongDetail, SongSummary, UserSettings as ApiUserSettings, clearAdminSession, setAdminSession } from './api/client'
 
 // ── Module-level song cache (survives re-renders, cleared on logout) ──────────
-// Key: `{id}:{source}` where source is '' for default/spotify.
+// Key: `{id}:{source}` where source is 'youtube' or 'apple_music'.
 const _songCache = new Map<string, SongDetail>()
 const _inFlight  = new Map<string, Promise<SongDetail>>()
 
@@ -64,7 +62,7 @@ interface AppSettings {
   pauseOnInspect: boolean
   lastPlaylistId: number | null
   lastSongId: number | null
-  preferredSource: 'spotify' | 'youtube' | 'apple_music'
+  preferredSource: 'youtube' | 'apple_music'
 }
 
 const DEFAULT_SETTINGS: AppSettings = {
@@ -232,9 +230,6 @@ function LoginScreen({
               {[
                 (import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined) && 'Google',
                 'email + password',
-                (import.meta.env.VITE_SPOTIFY_CLIENT_ID as string | undefined) &&
-                  (import.meta.env.VITE_SPOTIFY_CLIENT_ID as string) !== 'your_spotify_client_id_here' &&
-                  'Spotify',
               ].filter(Boolean).join(', or ')}.
             </p>
           </div>
@@ -289,7 +284,6 @@ function LoginScreen({
             </button>
           </form>
 
-          {/* Spotify login — hidden; access is managed per-user via spotify_enabled flag */}
         </div>
       </div>
     </div>
@@ -297,7 +291,6 @@ function LoginScreen({
 }
 
 const SOURCE_OPTIONS: { value: AppSettings['preferredSource']; label: string; description: string }[] = [
-  { value: 'spotify', label: 'Spotify', description: 'Use the Spotify Web Player (requires Premium)' },
   { value: 'youtube', label: 'YouTube', description: 'Embed YouTube videos when available' },
   { value: 'apple_music', label: 'Apple Music', description: 'Use Apple Music (requires subscription)' },
 ]
@@ -305,13 +298,11 @@ const SOURCE_OPTIONS: { value: AppSettings['preferredSource']; label: string; de
 function SourcePicker({
   value,
   onChange,
-  spotifyEnabled = false,
 }: {
   value: AppSettings['preferredSource']
   onChange: (v: AppSettings['preferredSource']) => void
-  spotifyEnabled?: boolean
 }) {
-  const options = SOURCE_OPTIONS.filter(o => o.value !== 'spotify' || spotifyEnabled)
+  const options = SOURCE_OPTIONS
   return (
     <div className="space-y-2">
       {options.map(opt => (
@@ -339,151 +330,10 @@ function SourcePicker({
   )
 }
 
-function OnboardingScreen({
-  spotifyId,
-  initialEmail,
-  onSubmit,
-  error,
-  busy,
-  onLogout,
-}: {
-  spotifyId: string
-  initialEmail: string
-  onSubmit: (email: string, password: string, source: AppSettings['preferredSource']) => Promise<void>
-  error: string | null
-  busy: boolean
-  onLogout: () => void
-}) {
-  const [step, setStep] = useState<'account' | 'source'>('account')
-  const [email, setEmail] = useState(initialEmail)
-  const [password, setPassword] = useState('')
-  const [source, setSource] = useState<AppSettings['preferredSource']>('youtube')
-
-  const handleAccountSubmit = useCallback((e: React.FormEvent) => {
-    e.preventDefault()
-    setStep('source')
-  }, [])
-
-  const handleFinish = useCallback(() => {
-    void onSubmit(email.trim(), password, source)
-  }, [email, password, source, onSubmit])
-
-  return (
-    <div className="min-h-screen flex items-center justify-center p-4" style={{ background: '#0d0d14' }}>
-      <div className="w-full max-w-md rounded-2xl border border-gray-800/80 p-8" style={{ background: '#12121f' }}>
-
-        {step === 'account' ? (
-          <>
-            <h2 className="text-white font-semibold text-lg">Complete your onboarding</h2>
-            <p className="text-gray-500 text-sm mt-1 leading-relaxed">
-              We need your email and a password to secure your SingoLing account.
-            </p>
-            <p className="text-[11px] text-gray-600 mt-2 font-mono">Spotify ID: {spotifyId}</p>
-
-            {error && (
-              <div className="mt-4 rounded-xl border border-red-900/50 bg-red-950/30 px-4 py-3 text-sm text-red-400">
-                {error}
-              </div>
-            )}
-
-            <form onSubmit={handleAccountSubmit} className="space-y-3 mt-5">
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                placeholder="Email"
-                className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500"
-              />
-              <input
-                type="password"
-                required
-                minLength={8}
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                placeholder="Choose a password (min 8 chars)"
-                className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500"
-              />
-              <button
-                type="submit"
-                className="w-full py-2.5 rounded-xl font-semibold text-sm bg-indigo-600 hover:bg-indigo-500 text-white transition-all duration-150"
-              >
-                Next →
-              </button>
-            </form>
-          </>
-        ) : (
-          <>
-            <h2 className="text-white font-semibold text-lg">Choose your music source</h2>
-            <p className="text-gray-500 text-sm mt-1 leading-relaxed">
-              Pick where you want music to play from. You can change this later in Settings.
-            </p>
-
-            {error && (
-              <div className="mt-4 rounded-xl border border-red-900/50 bg-red-950/30 px-4 py-3 text-sm text-red-400">
-                {error}
-              </div>
-            )}
-
-            <div className="mt-5">
-              <SourcePicker value={source} onChange={setSource} spotifyEnabled={true} />
-            </div>
-
-            <button
-              type="button"
-              disabled={busy}
-              onClick={handleFinish}
-              className="mt-5 w-full py-2.5 rounded-xl font-semibold text-sm bg-indigo-600 hover:bg-indigo-500 disabled:bg-gray-800 disabled:text-gray-500 text-white transition-all duration-150"
-            >
-              {busy ? 'Saving…' : 'Finish onboarding'}
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setStep('account')}
-              className="mt-3 w-full text-xs text-gray-600 hover:text-gray-400 transition-colors"
-            >
-              ← Back
-            </button>
-          </>
-        )}
-
-        <button
-          type="button"
-          onClick={onLogout}
-          className="mt-4 w-full text-xs text-gray-600 hover:text-gray-400 transition-colors"
-        >
-          Cancel and sign out
-        </button>
-      </div>
-    </div>
-  )
-}
-
-// ── Loading screen ────────────────────────────────────────────────────────────
-
-function LoadingScreen({ message }: { message: string }) {
-  return (
-    <div className="min-h-screen flex items-center justify-center" style={{ background: '#0d0d14' }}>
-      <div className="text-center">
-        <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-        <p className="text-gray-500 text-sm">{message}</p>
-      </div>
-    </div>
-  )
-}
-
 // ── Song browser ──────────────────────────────────────────────────────────────
 
-function SourceAvailabilityIcons({
-  song,
-  spotifyEnabled,
-}: {
-  song: SongSummary
-  spotifyEnabled: boolean
-}) {
+function SourceAvailabilityIcons({ song }: { song: SongSummary }) {
   const sources = [
-    spotifyEnabled ? { key: 'spotify', label: 'Spotify', className: 'text-emerald-500 bg-white' } : null,
     song.youtube_url ? { key: 'youtube', label: 'YouTube', className: 'text-red-500 bg-white' } : null,
     song.apple_music_url ? { key: 'apple_music', label: 'Apple Music', className: 'text-black bg-white' } : null,
   ].filter(Boolean) as { key: string; label: string; className: string }[]
@@ -499,11 +349,7 @@ function SourceAvailabilityIcons({
           aria-label={source.label}
           className={`inline-flex h-6 w-6 items-center justify-center rounded-full ${source.className}`}
         >
-          {source.key === 'spotify' ? (
-            <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 fill-current" aria-hidden>
-              <path d="M16.84 15.33c-.2 0-.33-.07-.53-.2-1.47-.87-3.33-1.07-5.59-.53-.27.07-.47.13-.73.13-.6 0-1-.47-1-1 0-.47.33-.87.8-1 .27-.07.6-.13.87-.2 2.8-.6 5.13-.33 7 1 .4.2.6.53.6.93 0 .47-.47.87-.87.87Zm1.2-2.93c-.27 0-.47-.07-.73-.2-1.73-1-4.47-1.27-6.8-.67-.27.07-.53.13-.8.13-.67 0-1.13-.53-1.13-1.13 0-.53.33-1 .87-1.13.33-.07.67-.2 1.07-.27 2.73-.6 5.86-.27 8 1 .47.27.73.67.73 1.13 0 .6-.53 1.13-1.2 1.13Zm.87-3.13c-.33 0-.6-.07-.87-.2-2-.93-5.4-1.33-7.73-.73-.33.07-.73.2-1.07.2-.73 0-1.33-.6-1.33-1.33 0-.67.4-1.2 1.07-1.33.4-.13.8-.2 1.27-.33 2.8-.6 6.73-.13 9.13 1 .6.27.93.73.93 1.33 0 .73-.6 1.4-1.4 1.4Z" />
-            </svg>
-          ) : source.key === 'youtube' ? (
+          {source.key === 'youtube' ? (
             <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 fill-current" aria-hidden>
               <path d="M21.58 7.19a2.8 2.8 0 0 0-1.97-1.98C17.86 4.75 12 4.75 12 4.75s-5.86 0-7.61.46A2.8 2.8 0 0 0 2.42 7.2 29.4 29.4 0 0 0 2 12a29.4 29.4 0 0 0 .42 4.81 2.8 2.8 0 0 0 1.97 1.98c1.75.46 7.61.46 7.61.46s5.86 0 7.61-.46a2.8 2.8 0 0 0 1.97-1.98A29.4 29.4 0 0 0 22 12a29.4 29.4 0 0 0-.42-4.81ZM10 15.5v-7l6 3.5-6 3.5Z" />
             </svg>
@@ -519,7 +365,7 @@ function SourceAvailabilityIcons({
 }
 
 function SongBrowser({
-  songs, playlists, activePlaylistId, loading, error, onSelect, onPrefetch, onSelectPlaylist, onLogout, onOpenSettings, onOpenAdmin, isAdmin, user, spotifyEnabled, openedSongIds,
+  songs, playlists, activePlaylistId, loading, error, onSelect, onPrefetch, onSelectPlaylist, onLogout, onOpenSettings, onOpenAdmin, isAdmin, user, openedSongIds,
 }: {
   songs: SongSummary[]
   playlists: PlaylistSummary[]
@@ -534,7 +380,6 @@ function SongBrowser({
   onOpenAdmin: () => void
   isAdmin: boolean
   user: { display_name: string | null } | null
-  spotifyEnabled: boolean
   openedSongIds: Set<number>
 }) {
   return (
@@ -645,7 +490,7 @@ function SongBrowser({
                   <p className="text-white font-semibold truncate">{song.title}</p>
                   <p className="text-gray-500 text-sm truncate">{song.artist ?? 'Unknown artist'}</p>
                 </div>
-                <SourceAvailabilityIcons song={song} spotifyEnabled={spotifyEnabled} />
+                <SourceAvailabilityIcons song={song} />
                 <span className="text-[10px] font-mono font-medium text-indigo-400 bg-indigo-950/60 border border-indigo-900/50 px-1.5 py-0.5 rounded-md uppercase tracking-wider shrink-0">
                   {song.language_name}
                 </span>
@@ -704,14 +549,12 @@ function SettingsPage({
   onBack,
   onLogout,
   user,
-  spotifyEnabled,
 }: {
   settings: AppSettings
   onUpdate: (patch: Partial<AppSettings>) => void
   onBack: () => void
   onLogout: () => void
   user: { display_name: string | null } | null
-  spotifyEnabled: boolean
 }) {
   return (
     <div className="min-h-screen p-6 max-w-2xl mx-auto" style={{ background: '#0d0d14' }}>
@@ -738,8 +581,8 @@ function SettingsPage({
       <div className="space-y-3">
         <div className="rounded-2xl border border-gray-800/80 p-4" style={{ background: '#12121f' }}>
           <p className="text-white font-medium mb-1">Music source</p>
-          <p className="text-xs text-gray-500 mb-3 leading-relaxed">Choose where songs play from. YouTube is used as fallback when Spotify is unavailable.</p>
-          <SourcePicker value={settings.preferredSource} onChange={v => onUpdate({ preferredSource: v })} spotifyEnabled={spotifyEnabled} />
+          <p className="text-xs text-gray-500 mb-3 leading-relaxed">Choose whether to use YouTube or Apple Music.</p>
+          <SourcePicker value={settings.preferredSource} onChange={v => onUpdate({ preferredSource: v })} />
         </div>
 
         <SettingRow
@@ -817,42 +660,6 @@ function toPaletteSampleUrl(rawUrl: string | null): string | null {
   } catch {
     return rawUrl
   }
-}
-
-function useAlbumBg(albumArtUrl: string | null): string {
-  const [bg, setBg] = useState('#0d0d14')
-  useEffect(() => {
-    const sampleUrl = toPaletteSampleUrl(albumArtUrl)
-    if (!sampleUrl) { setBg('#0d0d14'); return }
-    const img = new Image()
-    img.crossOrigin = 'anonymous'
-    img.onload = () => {
-      try {
-        const SIZE = 30
-        const canvas = document.createElement('canvas')
-        canvas.width = canvas.height = SIZE
-        const ctx = canvas.getContext('2d')
-        if (!ctx) return
-        ctx.drawImage(img, 0, 0, SIZE, SIZE)
-        const data = ctx.getImageData(0, 0, SIZE, SIZE).data
-        let r = 0, g = 0, b = 0
-        const count = SIZE * SIZE
-        for (let i = 0; i < data.length; i += 4) {
-          r += data[i]; g += data[i + 1]; b += data[i + 2]
-        }
-        const [h, s] = rgbToHsl(r / count, g / count, b / count)
-        const sat = Math.min(s, 70)
-        setBg(
-          `radial-gradient(ellipse 140% 90% at 50% 115%, ` +
-          `hsl(${h},${sat}%,10%) 0%, ` +
-          `hsl(${h},${Math.max(sat - 30, 5)}%,5%) 65%)`
-        )
-      } catch { setBg('#0d0d14') }
-    }
-    img.onerror = () => setBg('#0d0d14')
-    img.src = sampleUrl
-  }, [albumArtUrl])
-  return bg
 }
 
 function useAlbumLyricsTheme(albumArtUrl: string | null): [{ panelGradient: string; asideGradient: string; accentTextColor: string }, string | null] {
@@ -1026,10 +833,10 @@ function PaletteDebugOverlay({ song, coverArtUrl, lyricsTheme, paletteError }: {
 // ── Player view ────────────────────────────────────────────────────────────────
 
 function PlayerView({
-  song, user, onBack, onLogout, onOpenSettings, onOpenAdmin, isAdmin, onPrev, onNext, canPrev, canNext, settings, onUpdate, spotifyEnabled,
+  song, user, onBack, onLogout, onOpenSettings, onOpenAdmin, isAdmin, onPrev, onNext, canPrev, canNext, settings, onUpdate,
 }: {
   song: SongDetail
-  user: { display_name: string | null; images: { url: string }[] } | null
+  user: { display_name: string | null } | null
   onBack: () => void
   onLogout: () => void
   onOpenSettings: () => void
@@ -1041,7 +848,6 @@ function PlayerView({
   canNext: boolean
   settings: AppSettings
   onUpdate: (patch: Partial<AppSettings>) => void
-  spotifyEnabled: boolean
 }) {
   const [infoVisible, setInfoVisible] = useState(false)
   const autoPausedRef = useRef(false)
@@ -1057,10 +863,11 @@ function PlayerView({
   }
 
   // Determine which source to actually use for this song
-  const effectiveSource = useMemo((): 'spotify' | 'youtube' | 'apple_music' => {
-    if (settings.preferredSource === 'youtube' && song.youtube_url) return 'youtube'
+  const effectiveSource = useMemo((): 'youtube' | 'apple_music' => {
     if (settings.preferredSource === 'apple_music' && song.apple_music_url) return 'apple_music'
-    return 'spotify'
+    if (song.youtube_url) return 'youtube'
+    if (song.apple_music_url) return 'apple_music'
+    return 'youtube'
   }, [settings.preferredSource, song.youtube_url, song.apple_music_url])
 
   useEffect(() => {
@@ -1074,10 +881,6 @@ function PlayerView({
       hasAppleMusicUrl: Boolean(song.apple_music_url),
     })
   }, [song.id, song.title, song.artist, settings.preferredSource, effectiveSource, song.youtube_url, song.apple_music_url])
-
-  // ── Spotify player ───────────────────────────────────────────────────────────
-  const player = useSpotifyPlayer(localStorage.getItem('sp_access_token'))
-  const albumBg = useAlbumBg(player.albumArtUrl)
 
   // ── YouTube player ───────────────────────────────────────────────────────────
   const ytRef = useRef<YouTubePlayerHandle>(null)
@@ -1151,10 +954,10 @@ function PlayerView({
   }, [song.apple_music_url])
 
   // Combined values depending on active source
-  const isPlaying  = effectiveSource === 'youtube' ? ytPlaying  : effectiveSource === 'apple_music' ? amPlaying  : player.isPlaying
-  const positionMs = effectiveSource === 'youtube' ? ytPositionMs : effectiveSource === 'apple_music' ? amPositionMs : player.currentPositionMs
-  const durationMs = effectiveSource === 'youtube' ? ytDurationMs : effectiveSource === 'apple_music' ? amDurationMs : player.durationMs
-  const isReady    = effectiveSource === 'youtube' ? ytReady    : effectiveSource === 'apple_music' ? amReady    : player.isReady
+  const isPlaying  = effectiveSource === 'apple_music' ? amPlaying  : ytPlaying
+  const positionMs = effectiveSource === 'apple_music' ? amPositionMs : ytPositionMs
+  const durationMs = effectiveSource === 'apple_music' ? amDurationMs : ytDurationMs
+  const isReady    = effectiveSource === 'apple_music' ? amReady    : ytReady
 
   const [pendingPlay, setPendingPlay] = useState(false)
 
@@ -1175,37 +978,21 @@ function PlayerView({
   }, [song.id])
 
   const togglePlay = useCallback(() => {
-    logPlaybackDebug('Toggle play requested', {
-      effectiveSource,
-      ytPlaying,
-      amPlaying,
-      spotifyPlaying: player.isPlaying,
-    })
-    if (effectiveSource === 'youtube') {
-      if (ytPlaying) ytRef.current?.pause()
-      else { setPendingPlay(true); ytRef.current?.play() }
-    } else if (effectiveSource === 'apple_music') {
+    logPlaybackDebug('Toggle play requested', { effectiveSource, ytPlaying, amPlaying })
+    if (effectiveSource === 'apple_music') {
       if (amPlaying) amRef.current?.pause()
       else { setPendingPlay(true); amRef.current?.play() }
     } else {
-      player.togglePlay()
+      if (ytPlaying) ytRef.current?.pause()
+      else { setPendingPlay(true); ytRef.current?.play() }
     }
-  }, [effectiveSource, ytPlaying, amPlaying, player])
+  }, [effectiveSource, ytPlaying, amPlaying])
 
   const seekTo = useCallback((ms: number) => {
     logPlaybackDebug('Seek requested', { effectiveSource, ms })
-    if (effectiveSource === 'youtube') ytRef.current?.seekTo(ms)
-    else if (effectiveSource === 'apple_music') amRef.current?.seekTo(ms)
-    else player.seekTo(ms)
-  }, [effectiveSource, player])
-
-  // Auto-load Spotify track when player is ready
-  useEffect(() => {
-    if (effectiveSource !== 'spotify' || !player.isReady) return
-    let cancelled = false
-    void player.loadAndPlayTrack(song.spotify_uri).catch(() => { if (!cancelled) {} })
-    return () => { cancelled = true }
-  }, [effectiveSource, player.isReady, player.loadAndPlayTrack, song.spotify_uri])
+    if (effectiveSource === 'apple_music') amRef.current?.seekTo(ms)
+    else ytRef.current?.seekTo(ms)
+  }, [effectiveSource])
 
   // Pause-on-inspect
   useEffect(() => {
@@ -1216,21 +1003,19 @@ function PlayerView({
 
     if (infoVisible) {
       if (isPlaying) {
-        if (effectiveSource === 'youtube') ytRef.current?.pause()
-        else if (effectiveSource === 'apple_music') amRef.current?.pause()
-        else player.pause()
+        if (effectiveSource === 'apple_music') amRef.current?.pause()
+        else ytRef.current?.pause()
         autoPausedRef.current = true
       }
       return
     }
 
     if (autoPausedRef.current) {
-      if (effectiveSource === 'youtube') ytRef.current?.play()
-      else if (effectiveSource === 'apple_music') amRef.current?.play()
-      else player.resume()
+      if (effectiveSource === 'apple_music') amRef.current?.play()
+      else ytRef.current?.play()
       autoPausedRef.current = false
     }
-  }, [infoVisible, isPlaying, effectiveSource, player, settings.pauseOnInspect])
+  }, [infoVisible, isPlaying, effectiveSource, settings.pauseOnInspect])
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -1267,7 +1052,6 @@ function PlayerView({
   }, [handlePrev, handleNext, canPrev, canNext, togglePlay, isReady])
 
   const coverArtUrl = useMemo(() => {
-    if (effectiveSource === 'spotify' && player.albumArtUrl) return player.albumArtUrl
     if (effectiveSource === 'apple_music' && amArtworkUrl) return amArtworkUrl
     if (!song.youtube_url) return null
     try {
@@ -1279,13 +1063,13 @@ function PlayerView({
     } catch {
       return null
     }
-  }, [effectiveSource, player.albumArtUrl, amArtworkUrl, song.youtube_url])
+  }, [effectiveSource, amArtworkUrl, song.youtube_url])
   const [lyricsTheme, paletteError] = useAlbumLyricsTheme(coverArtUrl)
   const hasYouTubePanel = !!song.youtube_url
   const showRightMediaPanel = effectiveSource === 'youtube' && !!song.youtube_url
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden" style={{ background: effectiveSource === 'spotify' ? albumBg : '#050608', transition: 'background 1.2s ease' }}>
+    <div className="h-screen flex flex-col overflow-hidden" style={{ background: '#050608', transition: 'background 1.2s ease' }}>
       <PaletteDebugOverlay song={song} coverArtUrl={coverArtUrl} lyricsTheme={lyricsTheme} paletteError={paletteError} />
 
       {/* Header */}
@@ -1325,7 +1109,6 @@ function PlayerView({
             const opts: { value: AppSettings['preferredSource']; label: string; activeClass: string }[] = []
             if (song.youtube_url) opts.push({ value: 'youtube', label: 'YT', activeClass: 'bg-red-500/20 text-red-400' })
             if (song.apple_music_url) opts.push({ value: 'apple_music', label: 'AM', activeClass: 'bg-pink-500/20 text-pink-400' })
-            if (spotifyEnabled && song.spotify_uri) opts.push({ value: 'spotify', label: 'SP', activeClass: 'bg-green-500/20 text-green-400' })
             if (opts.length < 2) return null
             return (
               <div className="flex items-center gap-0.5 rounded-lg bg-gray-800/70 p-0.5">
@@ -1348,12 +1131,6 @@ function PlayerView({
           <button onClick={onLogout} className="text-xs text-gray-600 hover:text-gray-400 transition-colors">Sign out</button>
         </div>
       </header>
-
-      {player.error && effectiveSource === 'spotify' && (
-        <div className="mx-4 mt-4 rounded-xl border border-red-900/50 bg-red-950/20 px-4 py-3 text-sm text-red-400">
-          {player.error}
-        </div>
-      )}
 
       <main className="flex-1 min-h-0 p-4 max-w-[1360px] mx-auto w-full flex flex-col gap-3">
 
@@ -1380,12 +1157,10 @@ function PlayerView({
             )}
             <div className="min-w-0">
               <p className="text-zinc-100 text-2xl leading-tight font-semibold truncate">
-                {effectiveSource === 'spotify' ? (player.currentTrackName ?? song.title) : song.title}
+                {song.title}
               </p>
               <p className="text-zinc-300 text-lg leading-tight truncate">
-                {effectiveSource === 'spotify'
-                  ? (player.currentTrackArtist ?? (song.artist ?? 'Load a track to begin'))
-                  : (song.artist ?? '')}
+                {song.artist ?? ''}
               </p>
             </div>
           </div>
@@ -1501,7 +1276,6 @@ function PlayerView({
 // ── Root App ──────────────────────────────────────────────────────────────────
 
 export default function App() {
-  const auth = useSpotifyAuth()
   const [currentPath, setCurrentPath] = useState(() => (typeof window === 'undefined' ? '/browse' : (window.location.pathname || '/browse')))
   const [adminOpen, setAdminOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
@@ -1514,11 +1288,8 @@ export default function App() {
       return null
     }
   })
-  const [syncedSpotifyUser, setSyncedSpotifyUser] = useState<BackendUser | null>(null)
   const [loginBusy, setLoginBusy] = useState(false)
   const [loginError, setLoginError] = useState<string | null>(null)
-  const [onboardingBusy, setOnboardingBusy] = useState(false)
-  const [onboardingError, setOnboardingError] = useState<string | null>(null)
 
   const [songs,        setSongs]        = useState<SongSummary[]>([])
   const [playlists,    setPlaylists]    = useState<PlaylistSummary[]>([])
@@ -1559,15 +1330,11 @@ export default function App() {
     return () => window.removeEventListener('popstate', onPopState)
   }, [])
 
-  const appUser = useMemo(
-    () => auth.user ?? (credentialUser ? { display_name: credentialUser.display_name, images: [] } : null),
-    [auth.user, credentialUser]
-  )
+  const appUser = credentialUser ? { display_name: credentialUser.display_name } : null
 
-  const settingsOwnerSpotifyId = auth.user?.id ?? credentialUser?.spotify_id ?? null
-  const isAuthenticated = auth.isAuthenticated || !!credentialUser
-  const isAdmin = Boolean(credentialUser?.is_admin || syncedSpotifyUser?.is_admin)
-  const isSpotifyEnabled = Boolean(credentialUser?.spotify_enabled || syncedSpotifyUser?.spotify_enabled || auth.isAuthenticated)
+  const settingsOwnerSpotifyId = credentialUser?.spotify_id ?? null
+  const isAuthenticated = !!credentialUser
+  const isAdmin = Boolean(credentialUser?.is_admin)
 
   const loadSongs = useCallback(async () => {
     setSongsLoading(true)
@@ -1616,7 +1383,6 @@ export default function App() {
       }
       setCredentialUser(user)
       localStorage.setItem(PASSWORD_SESSION_KEY, JSON.stringify(user))
-      setSyncedSpotifyUser(user)
     } catch (e) {
       setLoginError(e instanceof Error ? e.message : 'Failed to sign in with email/password')
     } finally {
@@ -1632,7 +1398,6 @@ export default function App() {
       clearAdminSession()
       setCredentialUser(user)
       localStorage.setItem(PASSWORD_SESSION_KEY, JSON.stringify(user))
-      setSyncedSpotifyUser(user)
     } catch (e) {
       setLoginError(e instanceof Error ? e.message : 'Google sign-in failed')
     } finally {
@@ -1640,40 +1405,17 @@ export default function App() {
     }
   }, [])
 
-  const handleCompleteOnboarding = useCallback(async (email: string, password: string, source: AppSettings['preferredSource']) => {
-    if (!auth.user?.id) return
-    setOnboardingBusy(true)
-    setOnboardingError(null)
-    try {
-      const user = await api.completeOnboarding({
-        spotify_id: auth.user.id,
-        email,
-        password,
-      })
-      setSyncedSpotifyUser(user)
-      localStorage.setItem(PASSWORD_SESSION_KEY, JSON.stringify(user))
-      // Persist chosen source
-      updateSettings({ preferredSource: source })
-    } catch (e) {
-      setOnboardingError(e instanceof Error ? e.message : 'Failed to complete onboarding')
-    } finally {
-      setOnboardingBusy(false)
-    }
-  }, [auth.user?.id, updateSettings])
-
   const handleLogout = useCallback(() => {
-    auth.logout()
     clearAdminSession()
     setAdminOpen(false)
     setCredentialUser(null)
-    setSyncedSpotifyUser(null)
     setSettingsOpen(false)
     setActiveSong(null)
     _songCache.clear()
     _inFlight.clear()
     localStorage.removeItem(PASSWORD_SESSION_KEY)
     navigateToPath('/browse', true)
-  }, [auth, navigateToPath])
+  }, [navigateToPath])
 
   const handleSelectSong = useCallback(async (id: number, options?: { updateRoute?: boolean }) => {
     setOpenedSongIds(prev => {
@@ -1687,7 +1429,7 @@ export default function App() {
     if (options?.updateRoute !== false) {
       navigateToPath(songPath(id))
     }
-    const source = settings.preferredSource !== 'spotify' ? settings.preferredSource : undefined
+    const source = settings.preferredSource
     const key = _songCacheKey(id, source)
     const cached = _songCache.get(key)
     if (cached) {
@@ -1712,7 +1454,7 @@ export default function App() {
   }, [settings.preferredSource, navigateToPath])
 
   const handlePrefetchSong = useCallback((id: number) => {
-    const source = settings.preferredSource !== 'spotify' ? settings.preferredSource : undefined
+    const source = settings.preferredSource
     void _fetchSong(id, source).catch(() => {})
   }, [settings.preferredSource])
 
@@ -1720,7 +1462,7 @@ export default function App() {
   // immediately gets the right per-source timestamps. Invalidate stale cache entry.
   useEffect(() => {
     if (!activeSong) return
-    const source = settings.preferredSource !== 'spotify' ? settings.preferredSource : undefined
+    const source = settings.preferredSource
     const key = _songCacheKey(activeSong.id, source)
     _songCache.delete(key)  // force fresh fetch for new source
     void _fetchSong(activeSong.id, source).then(d => { setActiveSong(d) }).catch(() => {})
@@ -1754,35 +1496,7 @@ export default function App() {
 
   // Sync user to backend (non-fatal if backend is down)
   useEffect(() => {
-    if (!auth.isAuthenticated || !auth.user || !auth.accessToken) return
-    const spotifyUserId = auth.user.id
-    const refresh   = localStorage.getItem('sp_refresh_token') ?? ''
-    const expiresAt = Number(localStorage.getItem('sp_expires_at') ?? 0)
-    const expiresIn = Math.max(60, Math.floor((expiresAt - Date.now()) / 1000))
-    api.syncUser({
-      spotify_id:    auth.user.id,
-      display_name:  auth.user.display_name,
-      email:         auth.user.email,
-      access_token:  auth.accessToken,
-      refresh_token: refresh,
-      expires_in:    expiresIn,
-    })
-      .then((synced) => {
-        setSyncedSpotifyUser(synced)
-        return api.getUserSettings(spotifyUserId)
-      })
-      .then((loaded) => {
-        setSettings(fromApiSettings(loaded))
-        setSettingsHydrated(true)
-      })
-      .catch(() => {
-        setSettingsHydrated(true)
-        /* backend may not be running */
-      })
-  }, [auth.isAuthenticated, auth.user, auth.accessToken])
-
-  useEffect(() => {
-    if (auth.isAuthenticated || !credentialUser?.spotify_id) return
+    if (!credentialUser?.spotify_id) return
     api.getUserSettings(credentialUser.spotify_id)
       .then((loaded) => {
         setSettings(fromApiSettings(loaded))
@@ -1790,9 +1504,8 @@ export default function App() {
       })
       .catch(() => {
         setSettingsHydrated(true)
-        /* backend may not be running */
       })
-  }, [auth.isAuthenticated, credentialUser?.spotify_id])
+  }, [credentialUser?.spotify_id])
 
   useEffect(() => {
     if (!isAuthenticated || !settingsHydrated || restoreDoneRef.current) return
@@ -1917,35 +1630,20 @@ export default function App() {
     prefetchedSongRef.current = activeSong.id
     const next = displayedSongs[activeSongIndex + 1]
     if (!next) return
-    const source = settings.preferredSource !== 'spotify' ? settings.preferredSource : undefined
+    const source = settings.preferredSource
     const timer = window.setTimeout(() => {
       void _fetchSong(next.id, source).catch(() => {})
     }, 2000)
     return () => window.clearTimeout(timer)
   }, [activeSong, activeSongIndex, displayedSongs, settings.preferredSource])
 
-  if (auth.isLoading) return <LoadingScreen message="Restoring session..." />
-
   if (!isAuthenticated) {
     return (
       <LoginScreen
         onEmailLogin={handleEmailLogin}
         onGoogleLogin={handleGoogleLogin}
-        error={loginError ?? auth.error}
+        error={loginError}
         busy={loginBusy}
-      />
-    )
-  }
-
-  if (auth.isAuthenticated && syncedSpotifyUser?.needs_onboarding && auth.user) {
-    return (
-      <OnboardingScreen
-        spotifyId={auth.user.id}
-        initialEmail={auth.user.email ?? ''}
-        onSubmit={handleCompleteOnboarding}
-        error={onboardingError}
-        busy={onboardingBusy}
-        onLogout={handleLogout}
       />
     )
   }
@@ -1958,7 +1656,6 @@ export default function App() {
         onBack={() => navigateToPath(activeSong ? songPath(activeSong.id) : '/browse')}
         onLogout={handleLogout}
         user={appUser}
-        spotifyEnabled={isSpotifyEnabled}
       />
     )
   }
@@ -2011,7 +1708,6 @@ export default function App() {
         canNext={activeSongIndex >= 0 && activeSongIndex < displayedSongs.length - 1}
         settings={settings}
         onUpdate={updateSettings}
-        spotifyEnabled={isSpotifyEnabled}
       />
     )
   }
@@ -2031,7 +1727,6 @@ export default function App() {
       onOpenSettings={() => navigateToPath('/settings')}
       onLogout={handleLogout}
       user={appUser}
-      spotifyEnabled={isSpotifyEnabled}
       openedSongIds={openedSongIds}
     />
   )
