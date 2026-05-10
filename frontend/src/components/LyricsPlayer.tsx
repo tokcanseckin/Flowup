@@ -85,6 +85,53 @@ type InspectInfo =
 const HOLD_DELAY_MS = 220
 const BREAK_THRESHOLD_MS = 5_000
 
+function useAnimatedBackground(background: string, durationMs = 800) {
+  const [baseBg, setBaseBg] = useState(background)
+  const [nextBg, setNextBg] = useState(background)
+  const [showNext, setShowNext] = useState(false)
+  const activeBgRef = useRef(background)
+  const timerRef = useRef<number | null>(null)
+
+  useEffect(() => {
+    if (background === activeBgRef.current) return
+
+    if (timerRef.current !== null) {
+      window.clearTimeout(timerRef.current)
+      timerRef.current = null
+    }
+
+    setBaseBg(activeBgRef.current)
+    setNextBg(background)
+    setShowNext(false)
+
+    const raf = requestAnimationFrame(() => setShowNext(true))
+    timerRef.current = window.setTimeout(() => {
+      setBaseBg(background)
+      setShowNext(false)
+      activeBgRef.current = background
+      timerRef.current = null
+    }, durationMs)
+
+    return () => {
+      cancelAnimationFrame(raf)
+      if (timerRef.current !== null) {
+        window.clearTimeout(timerRef.current)
+        timerRef.current = null
+      }
+    }
+  }, [background, durationMs])
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current !== null) {
+        window.clearTimeout(timerRef.current)
+      }
+    }
+  }, [])
+
+  return { baseBg, nextBg, showNext }
+}
+
 // ── Break indicator ───────────────────────────────────────────────────────────
 
 interface BreakProps {
@@ -146,21 +193,26 @@ function BreakIndicator({ startMs, endMs, currentPositionMs, isPlaying, label }:
   }, [isPlaying])
 
   return (
-    <div className={`flex items-center gap-3 px-3 py-2 transition-opacity duration-300 ${isPast ? 'opacity-30' : isActive ? 'opacity-100' : 'opacity-40'}`}>
-      {label && (
-        <span className="text-xs text-gray-500 shrink-0 font-mono uppercase tracking-widest">{label}</span>
-      )}
-      <div className="relative flex-1 h-0.5 rounded-full bg-gray-800 overflow-hidden">
-        {isPast && (
-          <div className="absolute inset-0 rounded-full bg-indigo-600/70" />
-        )}
-        {isActive && (
-          <div
-            key={seekKeyRef.current}
-            ref={fillRefCallback}
-            className="absolute inset-y-0 left-0 rounded-full bg-indigo-600/70"
-          />
-        )}
+    <div className={`px-6 py-2 transition-opacity duration-300 ${isPast ? 'opacity-30' : isActive ? 'opacity-100' : 'opacity-40'}`}>
+      <div className="flex items-center gap-3">
+        <div className="w-4 shrink-0" />
+        <div className="flex items-center gap-3 flex-1 min-w-0">
+          {label && (
+            <span className="text-[11px] text-white/55 shrink-0 font-mono uppercase tracking-[0.18em]">{label}</span>
+          )}
+          <div className="relative flex-1 h-0.5 rounded-full bg-white/20 overflow-hidden">
+            {isPast && (
+              <div className="absolute inset-0 rounded-full bg-cyan-200/65" />
+            )}
+            {isActive && (
+              <div
+                key={seekKeyRef.current}
+                ref={fillRefCallback}
+                className="absolute inset-y-0 left-0 rounded-full bg-cyan-100/85"
+              />
+            )}
+          </div>
+        </div>
       </div>
     </div>
   )
@@ -202,6 +254,9 @@ interface Props {
   durationMs?: number
   isPlaying: boolean
   songData: SongDetail
+  themeBackground?: string
+  themeAsideBackground?: string
+  accentTextColor?: string
   filterStopWordsForIndexing?: boolean
   onInfoVisibilityChange?: (visible: boolean) => void
   onSeek?: (ms: number) => void
@@ -213,6 +268,9 @@ export default function LyricsPlayer({
   durationMs = 0,
   isPlaying,
   songData,
+  themeBackground,
+  themeAsideBackground,
+  accentTextColor,
   filterStopWordsForIndexing = true,
   onInfoVisibilityChange,
   onSeek,
@@ -287,6 +345,10 @@ export default function LyricsPlayer({
   }>({ timer: null, key: null, holdShown: false, target: null })
 
   const inspectInfo = resolveInspectInfo(lines, inspectState)
+  const panelBackground = themeBackground ?? 'linear-gradient(180deg, #1a57bf 0%, #0f46a8 100%)'
+  const asideBackground = themeAsideBackground ?? '#184f9b'
+  const panelBgAnim = useAnimatedBackground(panelBackground)
+  const asideBgAnim = useAnimatedBackground(asideBackground)
 
   const clearInspect = useCallback(() => {
     setInspectState(null)
@@ -481,14 +543,28 @@ export default function LyricsPlayer({
   }, [activeIndex])
 
   return (
-    <div className={isPhone ? 'relative h-full' : 'grid grid-cols-[minmax(0,1fr)_300px] gap-4 h-full'}>
+    <div className={isPhone ? 'relative h-full min-h-0' : 'grid grid-cols-[minmax(0,1fr)_420px] gap-0 h-full min-h-0'}>
       <div
-        ref={containerRef}
-        className="relative select-none overflow-y-auto h-full"
+        className="relative h-full min-h-0"
         dir={language.direction}
         lang={language.code}
       >
-        <div className="flex flex-col gap-1 py-4 px-3">
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute inset-0" style={{ background: panelBgAnim.baseBg }} />
+          <div
+            className="absolute inset-0 transition-opacity duration-700 ease-out"
+            style={{
+              background: panelBgAnim.nextBg,
+              opacity: panelBgAnim.showNext ? 1 : 0,
+            }}
+          />
+        </div>
+
+        <div
+          ref={containerRef}
+          className="relative z-10 h-full min-h-0 select-none overflow-y-auto no-scrollbar"
+        >
+          <div className="flex flex-col gap-1 py-3 px-0">
           {lines.map((line, idx) => {
             const isActive = idx === activeIndex
             const lineTarget: InspectTarget = { type: 'line', lineIndex: idx }
@@ -508,22 +584,26 @@ export default function LyricsPlayer({
                 )}
                 <div
                 ref={el => setLineRef(idx, el)}
-                className={`rounded-xl transition-colors duration-200 ${isActive ? 'bg-indigo-900/30' : ''}`}
+                className={`transition-colors duration-200 ${isActive ? 'bg-white/12' : ''}`}
               >
-                <div className="flex items-start gap-3 px-3 py-3">
-                  <button
-                    type="button"
-                    className={`mt-1 h-5 w-5 shrink-0 rounded-full border transition-colors ${
-                      circleActive
-                        ? 'border-indigo-300 bg-indigo-500/30'
-                        : 'border-gray-600 bg-gray-800/30 hover:border-indigo-500/70'
-                    }`}
-                    aria-label={`Inspect translation for line ${idx + 1}`}
-                    onPointerDown={() => startPointerPress(lineTarget)}
-                    onPointerUp={() => endPointerPress(false)}
-                    onPointerCancel={() => endPointerPress(true)}
-                    onPointerLeave={() => endPointerPress(true)}
-                  />
+                <div className="flex items-start gap-3 px-6 py-3">
+                  <div className="mt-1.5 h-4 w-4 shrink-0">
+                    {isActive && (
+                      <button
+                        type="button"
+                        className={`h-4 w-4 rounded-full transition-colors ${
+                          circleActive
+                            ? 'bg-white shadow-[0_0_0_2px_rgba(255,255,255,0.35)]'
+                            : 'bg-white/90 hover:bg-white'
+                        }`}
+                        aria-label={`Inspect translation for line ${idx + 1}`}
+                        onPointerDown={() => startPointerPress(lineTarget)}
+                        onPointerUp={() => endPointerPress(false)}
+                        onPointerCancel={() => endPointerPress(true)}
+                        onPointerLeave={() => endPointerPress(true)}
+                      />
+                    )}
+                  </div>
 
                   <div className="min-w-0 flex-1">
                     {isActive ? (
@@ -539,7 +619,7 @@ export default function LyricsPlayer({
                     ) : (
                       <span
                         className={`stressed lyrics-text text-lg leading-tight ${
-                          activeIndex === -1 || idx < activeIndex ? 'text-gray-600' : 'text-gray-400'
+                          activeIndex === -1 || idx < activeIndex ? 'text-white/45' : 'text-white/70'
                         } ${onSeek ? 'cursor-pointer hover:text-gray-200 transition-colors duration-150' : ''}`}
                         onClick={() => onSeek?.(line.start_time_ms)}
                       >
@@ -564,34 +644,48 @@ export default function LyricsPlayer({
               />
             ) : null
           })()}
-        </div>
-
-        {lines.length === 0 && (
-          <div className="flex flex-col items-center justify-center gap-2 py-16">
-            <p className="text-gray-600 text-sm">Waiting for playback...</p>
-            <p className="text-gray-700 text-xs">Load a track and press Play</p>
           </div>
-        )}
+
+          {lines.length === 0 && (
+            <div className="flex flex-col items-center justify-center gap-2 py-16">
+              <p className="text-gray-600 text-sm">Waiting for playback...</p>
+              <p className="text-gray-700 text-xs">Load a track and press Play</p>
+            </div>
+          )}
+        </div>
 
         {isPhone && inspectInfo && (
           <div className="absolute inset-x-3 bottom-3 z-40">
-            <InspectPanel info={inspectInfo} compact onClose={clearInspect} />
+            <InspectPanel info={inspectInfo} compact onClose={clearInspect} accentTextColor={accentTextColor} />
           </div>
         )}
       </div>
 
       {!isPhone && (
-        <aside className="rounded-2xl border border-gray-800/80 p-4 h-fit sticky top-3" style={{ background: '#12121f' }}>
-          {inspectInfo ? (
-            <InspectPanel info={inspectInfo} onClose={clearInspect} />
-          ) : (
-            <div className="text-sm text-gray-500 leading-relaxed">
-              <p className="text-gray-400 font-medium mb-2">Inspect lyrics</p>
-              <p>Click a word or press 1-9 to inspect a word.</p>
-              <p className="mt-1">Click a circle or press 0 for sentence translation.</p>
-              <p className="mt-1">Hold tap/click/key for temporary peek.</p>
-            </div>
-          )}
+        <aside className="relative p-6 h-full min-h-0 overflow-hidden">
+          <div className="pointer-events-none absolute inset-0">
+            <div className="absolute inset-0" style={{ background: asideBgAnim.baseBg }} />
+            <div
+              className="absolute inset-0 transition-opacity duration-700 ease-out"
+              style={{
+                background: asideBgAnim.nextBg,
+                opacity: asideBgAnim.showNext ? 1 : 0,
+              }}
+            />
+          </div>
+
+          <div className="relative z-10">
+            {inspectInfo ? (
+              <InspectPanel info={inspectInfo} onClose={clearInspect} accentTextColor={accentTextColor} />
+            ) : (
+              <div className="rounded-xl border border-white/20 px-10 py-8 text-sm text-white/85 leading-relaxed">
+                <p className="text-white font-semibold mb-2 uppercase tracking-wide text-xs">Inspect lyrics</p>
+                <p>Click a word or press 1-9 to inspect a word.</p>
+                <p className="mt-1">Click a circle or press 0 for sentence translation.</p>
+                <p className="mt-1">Hold tap/click/key for temporary peek.</p>
+              </div>
+            )}
+          </div>
         </aside>
       )}
     </div>
@@ -647,7 +741,7 @@ function ActiveLineContent({
                 <sup
                   className="
                     ml-0.5 text-[10px] font-mono font-medium leading-none
-                    text-indigo-400/70 group-hover:text-indigo-300
+                    text-yellow-200/95 group-hover:text-yellow-100
                     transition-colors duration-150
                   "
                 >
@@ -667,28 +761,29 @@ interface InspectPanelProps {
   info: InspectInfo
   onClose: () => void
   compact?: boolean
+  accentTextColor?: string
 }
 
-function InspectPanel({ info, onClose, compact = false }: InspectPanelProps) {
+function InspectPanel({ info, onClose, compact = false, accentTextColor = 'hsl(320, 88%, 62%)' }: InspectPanelProps) {
   const isWord = info.kind === 'word'
 
   return (
     <div
-      className={`rounded-2xl border shadow-2xl ${compact ? 'px-4 py-3' : 'px-5 py-4'}`}
+      className={`rounded-xl border shadow-2xl ${compact ? 'px-4 py-3' : 'px-10 py-8'}`}
       style={{
-        background: '#1e1e35',
-        borderColor: 'rgba(99,102,241,0.35)',
-        boxShadow: '0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(99,102,241,0.1)',
+        background: '#f2f2f2',
+        borderColor: 'rgba(0,0,0,0.16)',
+        boxShadow: '0 12px 32px rgba(0,0,0,0.28)',
       }}
     >
       <div className="flex items-start justify-between gap-3">
-        <p className="text-[10px] font-mono font-medium text-indigo-500 uppercase tracking-wider">
+        <p className="text-xs leading-none font-bold text-zinc-900 uppercase tracking-wide">
           {isWord ? 'Definition' : 'Translation'}
         </p>
         <button
           type="button"
           onClick={onClose}
-          className="text-xs text-gray-400 hover:text-gray-200 transition-colors"
+          className="text-xs text-gray-500 hover:text-gray-700 transition-colors"
           aria-label="Close inspector"
         >
           Close
@@ -701,12 +796,12 @@ function InspectPanel({ info, onClose, compact = false }: InspectPanelProps) {
           {isRealDefinition(info.word.dictionary_definition) ? (() => {
             const meanings = info.word.dictionary_definition!.split(';').map(s => s.trim()).filter(Boolean)
             return meanings.length === 1
-              ? <p className="text-lg font-semibold text-yellow-200 leading-snug mt-1">{meanings[0]}</p>
+              ? <p className="text-lg leading-snug font-semibold mt-2" style={{ color: accentTextColor }}>{meanings[0]}</p>
               : (
-                <ol className="mt-1 space-y-0.5 list-none pl-0">
+                <ol className="mt-2 space-y-1 list-none pl-0">
                   {meanings.map((m, i) => (
-                    <li key={i} className="flex gap-1.5 text-base font-semibold text-yellow-200 leading-snug">
-                      <span className="text-[11px] font-mono text-yellow-500/70 mt-0.5 shrink-0">{i + 1}.</span>
+                    <li key={i} className="flex gap-2 text-base leading-snug font-semibold" style={{ color: accentTextColor }}>
+                      <span className="text-sm leading-tight font-semibold shrink-0" style={{ color: accentTextColor }}>{i + 1}.</span>
                       <span>{m}</span>
                     </li>
                   ))}
@@ -714,10 +809,10 @@ function InspectPanel({ info, onClose, compact = false }: InspectPanelProps) {
               )
           })() : <p className="text-gray-500 italic text-base font-normal mt-1">No definition yet</p>}
 
-          <div className="my-3 border-t border-indigo-900/50" />
+          <div className="my-4 border-t border-zinc-300" />
 
           {/* ── Tapped word form ── */}
-          <p className="stressed text-2xl font-bold text-white leading-tight">{info.word.display_form}</p>
+          <p className="stressed text-3xl leading-tight font-bold text-black">{info.word.display_form}</p>
 
           {/* ── POS + morphological details ── */}
           {info.word.grammar && (() => {
@@ -728,25 +823,25 @@ function InspectPanel({ info, onClose, compact = false }: InspectPanelProps) {
             const aspect = parts.find(p => ASPECTS.has(p)) ?? null
             const detail = parts.slice(1).filter(p => !ASPECTS.has(p)).join(' · ')
             return (
-              <div className="mt-2 flex flex-wrap items-baseline gap-2">
-                <span className="rounded-md bg-indigo-900/50 px-2 py-0.5 text-[11px] font-semibold text-indigo-300 uppercase tracking-wide">
+              <div className="mt-3 flex flex-wrap items-baseline gap-2">
+                <span className="px-0 py-0 text-base leading-none font-bold text-sky-500 uppercase tracking-wide">
                   {pos}
                 </span>
                 {aspect && (
-                  <span className="rounded-md bg-violet-900/50 px-2 py-0.5 text-[11px] font-semibold text-violet-300 uppercase tracking-wide">
+                  <span className="px-0 py-0 text-base leading-none font-semibold text-emerald-400 uppercase tracking-wide">
                     {aspect}
                   </span>
                 )}
                 {detail && (
-                  <span className="text-xs text-gray-400">{detail}</span>
+                  <span className="text-sm text-zinc-700">{detail}</span>
                 )}
               </div>
             )
           })()}
 
           {/* ── Nominative / infinitive (lemma) ── */}
-          <p className="text-sm text-violet-300 font-medium mt-2">
-            <span className="text-[10px] font-mono text-gray-600 uppercase tracking-wide mr-1.5">
+          <p className="text-base leading-tight font-semibold mt-3" style={{ color: accentTextColor }}>
+            <span className="text-[11px] leading-tight font-medium text-zinc-500 uppercase tracking-wide mr-2">
               {info.word.grammar?.startsWith('Verb') ? 'infinitive' : 'nominative'}
             </span>
             {info.word.lemma}
@@ -754,11 +849,11 @@ function InspectPanel({ info, onClose, compact = false }: InspectPanelProps) {
         </>
       ) : (
         <>
-          <p className="text-indigo-200 text-lg font-semibold leading-snug mt-1">
+          <p className="text-lg font-semibold leading-snug mt-1" style={{ color: accentTextColor }}>
             {info.line.translation || 'No translation available for this line yet'}
           </p>
-          <div className="my-3 border-t border-indigo-900/50" />
-          <p className="stressed text-white text-sm leading-relaxed opacity-70">{info.line.original_line}</p>
+          <div className="my-3 border-t border-zinc-300" />
+          <p className="stressed text-zinc-700 text-base leading-relaxed opacity-80">{info.line.original_line}</p>
         </>
       )}
     </div>
