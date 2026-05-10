@@ -771,14 +771,14 @@ function ProgressBar({ posMs, durMs, onSeek }: { posMs: number; durMs: number; o
   }, [durMs, onSeek])
   return (
     <div className="flex items-center gap-3">
-      <span className="text-xs font-mono text-gray-500 w-9 text-right shrink-0">{formatMs(posMs)}</span>
-      <div className="flex-1 h-1.5 bg-gray-800 rounded-full cursor-pointer group" onClick={handleClick}>
-        <div className="h-full bg-indigo-500 rounded-full relative transition-all duration-100 group-hover:bg-indigo-400"
+      <span className="text-xs font-mono text-zinc-400 w-10 text-right shrink-0">{formatMs(posMs)}</span>
+      <div className="flex-1 h-2 bg-black rounded-full cursor-pointer group" onClick={handleClick}>
+        <div className="h-full bg-zinc-100 rounded-full relative transition-all duration-100 group-hover:bg-white"
              style={{ width: `${pct}%` }}>
           <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-white opacity-0 group-hover:opacity-100 translate-x-1/2 transition-opacity" />
         </div>
       </div>
-      <span className="text-xs font-mono text-gray-500 w-9 shrink-0">{formatMs(durMs)}</span>
+      <span className="text-xs font-mono text-zinc-400 w-10 shrink-0">{formatMs(durMs)}</span>
     </div>
   )
 }
@@ -835,6 +835,113 @@ function useAlbumBg(albumArtUrl: string | null): string {
     img.src = albumArtUrl
   }, [albumArtUrl])
   return bg
+}
+
+function useAlbumLyricsTheme(albumArtUrl: string | null): { panelGradient: string; asideGradient: string; accentTextColor: string } {
+  const [theme, setTheme] = useState({
+    panelGradient: 'linear-gradient(180deg, hsl(215, 64%, 26%) 0%, hsl(215, 60%, 17%) 100%)',
+    asideGradient: 'linear-gradient(180deg, hsl(215, 58%, 22%) 0%, hsl(215, 56%, 13%) 100%)',
+    accentTextColor: 'hsl(320, 88%, 62%)',
+  })
+  const requestSeqRef = useRef(0)
+
+  useEffect(() => {
+    const reqId = ++requestSeqRef.current
+    const applyTheme = (next: { panelGradient: string; asideGradient: string; accentTextColor: string }) => {
+      if (requestSeqRef.current !== reqId) return
+      setTheme(next)
+    }
+
+    if (!albumArtUrl) {
+      applyTheme({
+        panelGradient: 'linear-gradient(180deg, hsl(215, 64%, 26%) 0%, hsl(215, 60%, 17%) 100%)',
+        asideGradient: 'linear-gradient(180deg, hsl(215, 58%, 22%) 0%, hsl(215, 56%, 13%) 100%)',
+        accentTextColor: 'hsl(320, 88%, 62%)',
+      })
+      return
+    }
+
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.onload = () => {
+      try {
+        const SIZE = 48
+        const canvas = document.createElement('canvas')
+        canvas.width = canvas.height = SIZE
+        const ctx = canvas.getContext('2d')
+        if (!ctx) return
+        ctx.drawImage(img, 0, 0, SIZE, SIZE)
+        const data = ctx.getImageData(0, 0, SIZE, SIZE).data
+
+        let chosenHue = 215
+        let chosenSat = 55
+        let chosenLight = 35
+        let bestScore = -1
+        let avgR = 0, avgG = 0, avgB = 0
+        let count = 0
+
+        for (let i = 0; i < data.length; i += 4) {
+          const r = data[i]
+          const g = data[i + 1]
+          const b = data[i + 2]
+          const a = data[i + 3]
+          if (a < 16) continue
+          avgR += r; avgG += g; avgB += b; count++
+
+          const [h, s, l] = rgbToHsl(r, g, b)
+          // Ignore near-neutrals; keep both dark and bright saturated hues.
+          if (s < 20) continue
+
+          // Prefer saturated colors near mid-lightness, but still allow dark reds.
+          const midLightnessWeight = 1 - Math.min(1, Math.abs(l - 42) / 42)
+          const score = s * (0.55 + 0.45 * midLightnessWeight)
+          if (score > bestScore) {
+            bestScore = score
+            chosenHue = h
+            chosenSat = s
+            chosenLight = l
+          }
+        }
+
+        if (bestScore < 0 && count > 0) {
+          const [h, s, l] = rgbToHsl(avgR / count, avgG / count, avgB / count)
+          chosenHue = h
+          chosenSat = s
+          chosenLight = l
+        }
+
+        const sat = Math.max(40, Math.min(chosenSat, 76))
+        // Keep value low for white lyric readability while reflecting cover hue.
+        const topL = Math.max(21, Math.min(30, chosenLight * 0.65))
+        const bottomL = Math.max(12, topL - 10)
+        const asideL = Math.max(15, topL - 6)
+        const asideBottomL = Math.max(10, asideL - 9)
+        const accentSat = Math.max(46, Math.min(sat, 78))
+        const accentLight = 62
+        applyTheme({
+          panelGradient: `linear-gradient(180deg, hsl(${chosenHue}, ${sat}%, ${topL}%) 0%, hsl(${chosenHue}, ${Math.max(sat - 12, 32)}%, ${bottomL}%) 100%)`,
+          asideGradient: `linear-gradient(180deg, hsl(${chosenHue}, ${Math.max(sat - 10, 28)}%, ${asideL}%) 0%, hsl(${chosenHue}, ${Math.max(sat - 14, 24)}%, ${asideBottomL}%) 100%)`,
+          accentTextColor: `hsl(${chosenHue}, ${accentSat}%, ${accentLight}%)`,
+        })
+      } catch {
+        applyTheme({
+          panelGradient: 'linear-gradient(180deg, hsl(215, 64%, 26%) 0%, hsl(215, 60%, 17%) 100%)',
+          asideGradient: 'linear-gradient(180deg, hsl(215, 58%, 22%) 0%, hsl(215, 56%, 13%) 100%)',
+          accentTextColor: 'hsl(320, 88%, 62%)',
+        })
+      }
+    }
+    img.onerror = () => {
+      applyTheme({
+        panelGradient: 'linear-gradient(180deg, hsl(215, 64%, 26%) 0%, hsl(215, 60%, 17%) 100%)',
+        asideGradient: 'linear-gradient(180deg, hsl(215, 58%, 22%) 0%, hsl(215, 56%, 13%) 100%)',
+        accentTextColor: 'hsl(320, 88%, 62%)',
+      })
+    }
+    img.src = albumArtUrl
+  }, [albumArtUrl])
+
+  return theme
 }
 
 // ── Player view ────────────────────────────────────────────────────────────────
@@ -1080,23 +1187,39 @@ function PlayerView({
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [handlePrev, handleNext, canPrev, canNext, togglePlay, isReady])
 
+  const coverArtUrl = useMemo(() => {
+    if (effectiveSource === 'spotify' && player.albumArtUrl) return player.albumArtUrl
+    if (effectiveSource === 'apple_music' && amArtworkUrl) return amArtworkUrl
+    if (!song.youtube_url) return null
+    try {
+      const u = new URL(song.youtube_url)
+      const id = u.hostname === 'youtu.be'
+        ? u.pathname.slice(1).split('?')[0]
+        : (u.searchParams.get('v') ?? u.pathname.split('/').pop() ?? '')
+      return id ? `https://img.youtube.com/vi/${id}/mqdefault.jpg` : null
+    } catch {
+      return null
+    }
+  }, [effectiveSource, player.albumArtUrl, amArtworkUrl, song.youtube_url])
+  const lyricsTheme = useAlbumLyricsTheme(coverArtUrl)
+
   return (
-    <div className="h-screen flex flex-col overflow-hidden" style={{ background: effectiveSource === 'spotify' ? albumBg : '#0d0d14', transition: 'background 1.2s ease' }}>
+    <div className="h-screen flex flex-col overflow-hidden" style={{ background: effectiveSource === 'spotify' ? albumBg : '#050608', transition: 'background 1.2s ease' }}>
 
       {/* Header */}
-      <header className="glass sticky top-0 z-20 flex items-center justify-between px-6 py-3 border-b border-gray-800/60">
+      <header className="sticky top-0 z-20 flex items-center justify-between px-4 sm:px-6 py-4 border-b border-gray-900" style={{ background: '#050608' }}>
         <div className="flex items-center gap-3">
           <button onClick={onBack} className="text-gray-500 hover:text-gray-300 transition-colors mr-1" aria-label="Back">
             <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">
               <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
             </svg>
           </button>
-          <div className="w-7 h-7 rounded-lg bg-indigo-600 flex items-center justify-center">
+          <div className="w-7 h-7 rounded-full border border-white/20 flex items-center justify-center">
             <svg viewBox="0 0 24 24" className="w-4 h-4 fill-white">
               <path d="M12 3a9 9 0 100 18A9 9 0 0012 3zm-1 13V8l6 4-6 4z"/>
             </svg>
           </div>
-          <span className="font-bold text-white text-sm">Singo<span className="text-indigo-400">Ling</span></span>
+          <span className="font-bold text-white text-xl leading-none">SingoLingo</span>
         </div>
         <div className="flex items-center gap-3">
           {isAdmin && (
@@ -1111,9 +1234,9 @@ function PlayerView({
           <button
             type="button"
             onClick={onOpenSettings}
-            className="text-xs text-gray-600 hover:text-gray-300 transition-colors"
+            className="text-xs text-gray-500 hover:text-gray-200 transition-colors"
           >
-            Settings
+            Preferences
           </button>
           {/* Inline source switcher — only shows sources available for this song */}
           {(() => {
@@ -1150,44 +1273,28 @@ function PlayerView({
         </div>
       )}
 
-      <main className="flex-1 min-h-0 p-4 max-w-[1080px] mx-auto w-full flex flex-col gap-4">
+      <main className="flex-1 min-h-0 p-4 max-w-[1360px] mx-auto w-full flex flex-col gap-3">
 
         {/* Controls + YouTube row */}
-        <div className="flex flex-col sm:flex-row gap-4 items-stretch flex-shrink-0">
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_410px] gap-3 items-stretch flex-shrink-0">
 
           {/* Player controls — takes remaining width */}
-          <section className="rounded-2xl border border-gray-800/80 p-5 flex-1 min-w-0" style={{ background: '#12121f' }}>
+          <section className="rounded-md border border-zinc-700/70 p-6 min-w-0" style={{ background: '#25262b' }}>
           <div className="flex items-center gap-4 mb-5">
-            {(() => {
-              let artUrl: string | null = null
-              if (effectiveSource === 'spotify' && player.albumArtUrl) {
-                artUrl = player.albumArtUrl
-              } else if (effectiveSource === 'apple_music' && amArtworkUrl) {
-                artUrl = amArtworkUrl
-              } else if (song.youtube_url) {
-                try {
-                  const u = new URL(song.youtube_url)
-                  const id = u.hostname === 'youtu.be'
-                    ? u.pathname.slice(1).split('?')[0]
-                    : (u.searchParams.get('v') ?? u.pathname.split('/').pop() ?? '')
-                  if (id) artUrl = `https://img.youtube.com/vi/${id}/mqdefault.jpg`
-                } catch { /* noop */ }
-              }
-              return artUrl ? (
-                <img src={artUrl} alt="Album art" className="w-14 h-14 rounded-xl object-cover shadow-lg" />
-              ) : (
-                <div className="w-14 h-14 rounded-xl bg-gray-800 flex items-center justify-center">
-                  <svg viewBox="0 0 24 24" className="w-6 h-6 fill-gray-600">
-                    <path d="M12 3a9 9 0 100 18A9 9 0 0012 3zm-1 13V8l6 4-6 4z"/>
-                  </svg>
-                </div>
-              )
-            })()}
+            {coverArtUrl ? (
+              <img src={coverArtUrl} alt="Album art" className="w-16 h-16 rounded object-cover border border-black/40" />
+            ) : (
+              <div className="w-16 h-16 rounded bg-black/40 flex items-center justify-center">
+                <svg viewBox="0 0 24 24" className="w-7 h-7 fill-gray-500">
+                  <path d="M12 3a9 9 0 100 18A9 9 0 0012 3zm-1 13V8l6 4-6 4z"/>
+                </svg>
+              </div>
+            )}
             <div className="min-w-0">
-              <p className="text-white font-semibold truncate">
+              <p className="text-zinc-100 text-2xl leading-tight font-semibold truncate">
                 {effectiveSource === 'spotify' ? (player.currentTrackName ?? song.title) : song.title}
               </p>
-              <p className="text-gray-500 text-sm truncate">
+              <p className="text-zinc-300 text-lg leading-tight truncate">
                 {effectiveSource === 'spotify'
                   ? (player.currentTrackArtist ?? (song.artist ?? 'Load a track to begin'))
                   : (song.artist ?? '')}
@@ -1195,14 +1302,14 @@ function PlayerView({
             </div>
           </div>
           <ProgressBar posMs={positionMs} durMs={durationMs} onSeek={seekTo} />
-          <div className="flex items-center justify-center gap-3 mt-5">
+          <div className="flex items-center justify-center gap-5 mt-6">
             <button
               onClick={handlePrev}
               disabled={!canPrev}
               aria-label="Previous song"
-              className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-800 hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed text-gray-200 transition-all"
+              className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-black/20 disabled:opacity-40 disabled:cursor-not-allowed text-gray-100 transition-all"
             >
-              <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">
+              <svg viewBox="0 0 24 24" className="w-6 h-6 fill-current">
                 <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
               </svg>
             </button>
@@ -1212,13 +1319,13 @@ function PlayerView({
               aria-label={isPlaying ? 'Pause' : 'Play'}
               className="
                 w-14 h-14 rounded-full flex items-center justify-center
-                bg-indigo-600 hover:bg-indigo-500 active:scale-95
-                disabled:bg-gray-800 disabled:text-gray-600
-                text-white shadow-lg shadow-indigo-900/40 transition-all duration-150
+                bg-white hover:bg-zinc-200 active:scale-95
+                disabled:bg-zinc-700 disabled:text-zinc-500
+                text-black shadow-lg transition-all duration-150
               "
             >
               {pendingPlay && !isPlaying ? (
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <div className="w-5 h-5 border-2 border-zinc-400/60 border-t-black rounded-full animate-spin" />
               ) : isPlaying ? (
                 <svg viewBox="0 0 24 24" className="w-6 h-6 fill-current">
                   <rect x="6" y="5" width="4" height="14" rx="1.5"/>
@@ -1234,18 +1341,17 @@ function PlayerView({
               onClick={handleNext}
               disabled={!canNext}
               aria-label="Next song"
-              className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-800 hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed text-gray-200 transition-all"
+              className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-black/20 disabled:opacity-40 disabled:cursor-not-allowed text-gray-100 transition-all"
             >
-              <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">
+              <svg viewBox="0 0 24 24" className="w-6 h-6 fill-current">
                 <path d="M16 6h2v12h-2zM6 6v12l8.5-6z"/>
               </svg>
             </button>
           </div>
         </section>
 
-          {/* YouTube embed — fixed video width, only shown in YouTube mode */}
-          {effectiveSource === 'youtube' && song.youtube_url && (
-            <div className="sm:w-[480px] flex-shrink-0 rounded-2xl border border-gray-800/80 overflow-hidden bg-black">
+          {effectiveSource === 'youtube' && song.youtube_url ? (
+            <aside className="rounded-md border border-zinc-700/70 overflow-hidden bg-black min-h-[210px] lg:min-h-[240px]">
               <YouTubePlayer
                 ref={ytRef}
                 youtubeUrl={song.youtube_url}
@@ -1254,7 +1360,15 @@ function PlayerView({
                 onDurationChange={setYtDurationMs}
                 onPlayStateChange={handleYtPlayStateChange}
               />
-            </div>
+            </aside>
+          ) : (
+            <aside className="rounded-md border border-zinc-700/70 overflow-hidden bg-black min-h-[210px] lg:min-h-[240px]">
+              {coverArtUrl ? (
+                <img src={coverArtUrl} alt="Cover art" className="w-full h-full object-cover" />
+              ) : (
+                <div className="h-full min-h-[210px] lg:min-h-[240px] flex items-center justify-center text-zinc-500">No artwork</div>
+              )}
+            </aside>
           )}
 
         </div>{/* end controls + media row */}
@@ -1275,12 +1389,15 @@ function PlayerView({
         )}
 
         {/* Lyrics panel */}
-        <section className="rounded-2xl border border-gray-800/80 overflow-hidden flex-1 min-h-0 flex flex-col" style={{ background: '#12121f' }}>
+        <section className="rounded-md overflow-hidden flex-1 min-h-0 flex flex-col" style={{ background: lyricsTheme.panelGradient }}>
           <LyricsPlayer
             currentPositionMs={positionMs}
             durationMs={durationMs}
             isPlaying={isPlaying}
             songData={song}
+            themeBackground={lyricsTheme.panelGradient}
+            themeAsideBackground={lyricsTheme.asideGradient}
+            accentTextColor={lyricsTheme.accentTextColor}
             filterStopWordsForIndexing={settings.excludeStopWordsFromShortcuts}
             onInfoVisibilityChange={setInfoVisible}
             onSeek={seekTo}
