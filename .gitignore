@@ -22,7 +22,11 @@ frontend/.vite/
 
 # Local databases
 flowup.db
+flowup.db-wal
+flowup.db-shm
 backend/flowup.db
+backend/flowup.db-wal
+backend/flowup.db-shm
 
 # OS
 .DS_Store
