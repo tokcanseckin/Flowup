@@ -57,7 +57,7 @@ rsync -az --delete "$ROOT/frontend/dist/" "$SERVER:$FRONTEND_REMOTE/"
 
 # ── 6. Restart backend service ────────────────────────────────────────────────
 echo "→ Restarting backend service…"
-ssh "$SERVER" "systemctl restart flowup-backend && systemctl is-active flowup-backend"
+ssh "$SERVER" "systemctl stop flowup-backend && rm -f $BACKEND_REMOTE/flowup.db-wal $BACKEND_REMOTE/flowup.db-shm && systemctl start flowup-backend && systemctl is-active flowup-backend"
 
 echo ""
 echo "✓ Deployed to singoling.com"
