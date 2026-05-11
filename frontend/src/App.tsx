@@ -849,13 +849,12 @@ function toPaletteSampleUrl(rawUrl: string | null): string | null {
   }
 }
 
-function useAlbumLyricsTheme(albumArtUrl: string | null): [{ panelGradient: string; asideGradient: string; accentTextColor: string }, string | null] {
+function useAlbumLyricsTheme(albumArtUrl: string | null): [{ panelGradient: string; asideGradient: string; accentTextColor: string }] {
   const [theme, setTheme] = useState({
     panelGradient: 'linear-gradient(180deg, hsl(215, 64%, 26%) 0%, hsl(215, 60%, 17%) 100%)',
     asideGradient: 'linear-gradient(180deg, hsl(215, 58%, 22%) 0%, hsl(215, 56%, 13%) 100%)',
     accentTextColor: 'hsl(320, 88%, 38%)',
   })
-  const [paletteError, setPaletteError] = useState<string | null>(null)
   const requestSeqRef = useRef(0)
 
   useEffect(() => {
@@ -863,7 +862,6 @@ function useAlbumLyricsTheme(albumArtUrl: string | null): [{ panelGradient: stri
     const applyTheme = (next: { panelGradient: string; asideGradient: string; accentTextColor: string }) => {
       if (requestSeqRef.current !== reqId) return
       setTheme(next)
-      setPaletteError(null)
     }
 
     const sampleUrl = toPaletteSampleUrl(albumArtUrl)
@@ -873,7 +871,6 @@ function useAlbumLyricsTheme(albumArtUrl: string | null): [{ panelGradient: stri
         asideGradient: 'linear-gradient(180deg, hsl(215, 58%, 22%) 0%, hsl(215, 56%, 13%) 100%)',
         accentTextColor: 'hsl(320, 88%, 38%)',
       })
-      setPaletteError('No album art URL')
       return
     }
 
@@ -891,7 +888,6 @@ function useAlbumLyricsTheme(albumArtUrl: string | null): [{ panelGradient: stri
         try {
           data = ctx.getImageData(0, 0, SIZE, SIZE).data
         } catch (err) {
-          setPaletteError('getImageData failed: ' + (err instanceof Error ? err.message : String(err)))
           console.error('Palette extraction getImageData error:', err)
           applyTheme({
             panelGradient: 'linear-gradient(180deg, hsl(215, 64%, 26%) 0%, hsl(215, 60%, 17%) 100%)',
@@ -968,7 +964,6 @@ function useAlbumLyricsTheme(albumArtUrl: string | null): [{ panelGradient: stri
           accentTextColor: `hsl(${chosenHue}, ${accentSat}%, ${accentLight}%)`,
         })
       } catch {
-        setPaletteError('Extraction failed: fallback used')
         applyTheme({
           panelGradient: 'linear-gradient(180deg, hsl(215, 64%, 26%) 0%, hsl(215, 60%, 17%) 100%)',
           asideGradient: 'linear-gradient(180deg, hsl(215, 58%, 22%) 0%, hsl(215, 56%, 13%) 100%)',
