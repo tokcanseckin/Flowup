@@ -154,6 +154,17 @@ class PlaylistSong(Base):
     song     = relationship("Song")
 
 
+class UserFavorite(Base):
+    """A user's favorited song."""
+    __tablename__ = "user_favorites"
+    __table_args__ = (UniqueConstraint("user_id", "song_id", name="uq_user_favorite"),)
+
+    id         = Column(Integer, primary_key=True)
+    user_id    = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    song_id    = Column(Integer, ForeignKey("songs.id", ondelete="CASCADE"), nullable=False)
+    created_at = Column(Integer, default=lambda: int(time.time()))
+
+
 class AlignmentTask(Base):
     """
     A queued request for the Mac Mini alignment worker to process one song.
@@ -217,6 +228,17 @@ def _migrate_users_table() -> None:
         line_cols = {str(row[1]) for row in conn.execute(text("PRAGMA table_info(lines)")).fetchall()}
         if "source" not in line_cols:
             conn.execute(text("ALTER TABLE lines ADD COLUMN source VARCHAR(32)"))
+
+        # user_favorites table — create if not present (SQLite has no CREATE TABLE IF NOT EXISTS for columns)
+        conn.execute(text("""
+            CREATE TABLE IF NOT EXISTS user_favorites (
+                id         INTEGER PRIMARY KEY,
+                user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                song_id    INTEGER NOT NULL REFERENCES songs(id) ON DELETE CASCADE,
+                created_at INTEGER,
+                UNIQUE(user_id, song_id)
+            )
+        """))
 
 
 def get_db() -> Generator[Session, None, None]:

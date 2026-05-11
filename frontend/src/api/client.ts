@@ -146,6 +146,23 @@ export function setAdminSession(token: string) {
   window.localStorage.setItem(ADMIN_SESSION_KEY, token)
 }
 
+/** Returns auth headers for any authenticated user (uses stored admin_token from BackendUser). */
+export function getUserAuthHeaders(): HeadersInit {
+  if (typeof window === 'undefined') return {}
+  // Try Bearer token first (stored at login for all users)
+  const adminToken = window.localStorage.getItem(ADMIN_SESSION_KEY)
+  if (adminToken) return { Authorization: `Bearer ${adminToken}` }
+  // Fall back to stored user object's admin_token (non-admin users)
+  try {
+    const raw = window.localStorage.getItem('flowup.password_user.v1')
+    if (raw) {
+      const user = JSON.parse(raw) as { admin_token?: string | null }
+      if (user.admin_token) return { Authorization: `Bearer ${user.admin_token}` }
+    }
+  } catch { /* ignore */ }
+  return {}
+}
+
 export function clearAdminSession() {
   if (typeof window === 'undefined') return
   window.localStorage.removeItem(ADMIN_SESSION_KEY)
@@ -477,4 +494,23 @@ export const api = {
 
   getAppleMusicToken: (): Promise<{ token: string }> =>
     apiFetch('/apple-music/token'),
+
+  getFavorites: (headers: HeadersInit): Promise<{ song_ids: number[] }> =>
+    apiFetch('/me/favorites', { headers }),
+
+  addFavorite: (songId: number, headers: HeadersInit): Promise<void> =>
+    fetch(`/api/me/favorites/${songId}`, { method: 'POST', headers }).then(async r => {
+      if (!r.ok && r.status !== 204) {
+        const body = await r.json().catch(() => ({ detail: r.statusText })) as { detail?: string }
+        throw new Error(body.detail ?? `API error ${r.status}`)
+      }
+    }),
+
+  removeFavorite: (songId: number, headers: HeadersInit): Promise<void> =>
+    fetch(`/api/me/favorites/${songId}`, { method: 'DELETE', headers }).then(async r => {
+      if (!r.ok && r.status !== 204) {
+        const body = await r.json().catch(() => ({ detail: r.statusText })) as { detail?: string }
+        throw new Error(body.detail ?? `API error ${r.status}`)
+      }
+    }),
 }

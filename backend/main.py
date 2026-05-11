@@ -48,7 +48,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response, StreamingResponse
 from sqlalchemy.orm import Session
 
-from database import AlignmentTask, Line, Playlist, PlaylistSong, Song, User, Word, create_tables, get_db
+from database import AlignmentTask, Line, Playlist, PlaylistSong, Song, User, UserFavorite, Word, create_tables, get_db
 from models import (
     AdminLyricsUpdate,
     AdminSongDetailResponse,
@@ -653,6 +653,46 @@ def _require_admin(
             raise HTTPException(status_code=401, detail="Invalid admin credentials")
         if not user.is_admin:
             raise HTTPException(status_code=403, detail="Admin access required")
+        return user
+
+    raise HTTPException(status_code=401, detail="Unsupported authentication scheme")
+
+
+def _get_current_user(
+    authorization: str | None = Header(default=None),
+    db: Session = Depends(get_db),
+) -> User:
+    """Dependency: any authenticated user (password or Bearer token). Returns 401 if not authenticated."""
+    if not authorization:
+        raise HTTPException(status_code=401, detail="Authentication required")
+
+    try:
+        scheme, credential = authorization.split(" ", 1)
+    except ValueError as exc:
+        raise HTTPException(status_code=401, detail="Invalid Authorization header") from exc
+
+    scheme = scheme.lower()
+
+    if scheme == "bearer":
+        try:
+            user_id_str, _ = credential.split(".", 1)
+            user_id = int(user_id_str)
+        except Exception as exc:
+            raise HTTPException(status_code=401, detail="Invalid token format") from exc
+        user = db.query(User).filter(User.id == user_id).first()
+        if not user or not _verify_admin_token(credential, user):
+            raise HTTPException(status_code=401, detail="Invalid token")
+        return user
+
+    if scheme == "basic":
+        try:
+            decoded = base64.b64decode(credential).decode("utf-8")
+            email, password = decoded.split(":", 1)
+        except Exception as exc:
+            raise HTTPException(status_code=401, detail="Invalid basic auth credentials") from exc
+        user = db.query(User).filter(User.email == email.strip().lower()).first()
+        if not user or not _verify_password(password, user.password_hash):
+            raise HTTPException(status_code=401, detail="Invalid credentials")
         return user
 
     raise HTTPException(status_code=401, detail="Unsupported authentication scheme")
@@ -1401,6 +1441,51 @@ def remove_song_from_playlist(playlist_id: int, song_id: int, db: Session = Depe
     return _playlist_response(pl)
 
 
+# ── Favorites ──────────────────────────────────────────────────────────────────
+
+@app.get("/api/me/favorites")
+def get_favorites(
+    current_user: User = Depends(_get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Return the list of song IDs favorited by the current user."""
+    rows = db.query(UserFavorite.song_id).filter(UserFavorite.user_id == current_user.id).all()
+    return {"song_ids": [r.song_id for r in rows]}
+
+
+@app.post("/api/me/favorites/{song_id}", status_code=204)
+def add_favorite(
+    song_id: int,
+    current_user: User = Depends(_get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Add a song to the current user's favorites (idempotent)."""
+    song = db.query(Song).filter(Song.id == song_id).first()
+    if not song:
+        raise HTTPException(status_code=404, detail="Song not found")
+    existing = db.query(UserFavorite).filter(
+        UserFavorite.user_id == current_user.id,
+        UserFavorite.song_id == song_id,
+    ).first()
+    if not existing:
+        db.add(UserFavorite(user_id=current_user.id, song_id=song_id))
+        db.commit()
+
+
+@app.delete("/api/me/favorites/{song_id}", status_code=204)
+def remove_favorite(
+    song_id: int,
+    current_user: User = Depends(_get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Remove a song from the current user's favorites (idempotent)."""
+    db.query(UserFavorite).filter(
+        UserFavorite.user_id == current_user.id,
+        UserFavorite.song_id == song_id,
+    ).delete()
+    db.commit()
+
+
 # ── Users ──────────────────────────────────────────────────────────────────────
 
 @app.post("/api/users/sync", response_model=UserResponse)
@@ -1430,7 +1515,7 @@ async def sync_user(body: UserSyncRequest, db: Session = Depends(get_db)):
         is_admin=bool(user.is_admin),
         spotify_enabled=bool(user.spotify_enabled),
         apple_music_user_token=user.apple_music_user_token,
-        admin_token=_make_admin_token(user) if user.is_admin else None,
+        admin_token=_make_admin_token(user),
     )
 
 
@@ -1450,7 +1535,7 @@ async def login_with_credentials(body: CredentialLoginRequest, db: Session = Dep
         is_admin=bool(user.is_admin),
         spotify_enabled=bool(user.spotify_enabled),
         apple_music_user_token=user.apple_music_user_token,
-        admin_token=_make_admin_token(user) if user.is_admin else None,
+        admin_token=_make_admin_token(user),
     )
 
 
@@ -1490,7 +1575,7 @@ async def register_with_credentials(body: RegisterRequest, db: Session = Depends
         is_admin=bool(user.is_admin),
         spotify_enabled=bool(user.spotify_enabled),
         apple_music_user_token=user.apple_music_user_token,
-        admin_token=_make_admin_token(user) if user.is_admin else None,
+        admin_token=_make_admin_token(user),
     )
 
 
@@ -1525,7 +1610,7 @@ async def complete_onboarding(body: CompleteOnboardingRequest, db: Session = Dep
         is_admin=bool(user.is_admin),
         spotify_enabled=bool(user.spotify_enabled),
         apple_music_user_token=user.apple_music_user_token,
-        admin_token=_make_admin_token(user) if user.is_admin else None,
+        admin_token=_make_admin_token(user),
     )
 
 
@@ -1639,7 +1724,7 @@ async def login_with_google(body: GoogleLoginRequest, db: Session = Depends(get_
         is_admin=bool(user.is_admin),
         spotify_enabled=bool(user.spotify_enabled),
         apple_music_user_token=user.apple_music_user_token,
-        admin_token=_make_admin_token(user) if user.is_admin else None,
+        admin_token=_make_admin_token(user),
     )
 
 
