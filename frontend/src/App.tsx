@@ -633,7 +633,7 @@ function SongBrowser({
                 onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(160,160,160,0.4)'; e.currentTarget.style.background = '#323438' }}
                 onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(63,63,70,0.7)'; e.currentTarget.style.background = '#25262b' }}
               >
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-4">
                   {/* dot indicator */}
                   <svg width="8" height="8" viewBox="0 0 8 8" aria-hidden className="shrink-0">
                     {openedSongIds.has(song.id)
