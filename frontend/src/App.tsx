@@ -986,35 +986,7 @@ function useAlbumLyricsTheme(albumArtUrl: string | null): [{ panelGradient: stri
     img.src = sampleUrl
   }, [albumArtUrl])
 
-  return [theme, paletteError]
-}
-
-// Debug overlay for palette extraction
-function PaletteDebugOverlay({ song, coverArtUrl, lyricsTheme, paletteError }: { song: any, coverArtUrl: string | null, lyricsTheme: { panelGradient: string, asideGradient: string, accentTextColor: string }, paletteError: string | null }) {
-  const [show, setShow] = useState(false)
-  const sampleUrl = toPaletteSampleUrl(coverArtUrl)
-  return (
-    <div style={{ position: 'fixed', bottom: 12, right: 12, zIndex: 9999, pointerEvents: 'none' }}>
-      <button
-        style={{ pointerEvents: 'auto', background: '#222', color: '#fff', border: 'none', borderRadius: 6, padding: '4px 10px', fontSize: 13, opacity: 0.7 }}
-        onClick={() => setShow(s => !s)}
-        tabIndex={-1}
-      >
-        Palette Debug
-      </button>
-      {show && (
-        <div style={{ marginTop: 8, background: '#18181b', color: '#fff', borderRadius: 8, boxShadow: '0 2px 12px #0008', padding: 16, minWidth: 340, maxWidth: 420, fontSize: 13, pointerEvents: 'auto' }}>
-          <div style={{ marginBottom: 8, fontWeight: 600, fontSize: 15 }}>{song?.title} <span style={{ color: '#aaa', fontWeight: 400 }}>by {song?.artist}</span></div>
-          <div style={{ marginBottom: 6 }}><b>Sampled image URL:</b><br /><span style={{ wordBreak: 'break-all', color: '#aaf' }}>{sampleUrl}</span></div>
-          <div style={{ marginBottom: 6 }}><b>Accent color:</b> <span style={{ color: lyricsTheme.accentTextColor }}>{lyricsTheme.accentTextColor}</span></div>
-          <div style={{ marginBottom: 6 }}><b>Panel gradient:</b><br /><span style={{ color: '#afa' }}>{lyricsTheme.panelGradient}</span></div>
-          <div style={{ marginBottom: 6 }}><b>Aside gradient:</b><br /><span style={{ color: '#ffa' }}>{lyricsTheme.asideGradient}</span></div>
-          {paletteError && <div style={{ color: '#f88', margin: '8px 0', fontWeight: 600 }}>Palette error: {paletteError}</div>}
-          {sampleUrl && <img src={sampleUrl} alt="Sampled" style={{ marginTop: 10, maxWidth: 120, maxHeight: 120, borderRadius: 6, border: '1px solid #333', background: '#222' }} />}
-        </div>
-      )}
-    </div>
-  )
+  return [theme]
 }
 
 // ── Player view ────────────────────────────────────────────────────────────────
@@ -1253,14 +1225,12 @@ function PlayerView({
       return null
     }
   }, [effectiveSource, amArtworkUrl, song.youtube_url])
-  const [lyricsTheme, paletteError] = useAlbumLyricsTheme(coverArtUrl)
+  const [lyricsTheme] = useAlbumLyricsTheme(coverArtUrl)
   const hasYouTubePanel = !!song.youtube_url
   const showRightMediaPanel = effectiveSource === 'youtube' && !!song.youtube_url
 
   return (
     <div className="h-screen flex flex-col overflow-hidden" style={{ background: '#050608', transition: 'background 1.2s ease' }}>
-      <PaletteDebugOverlay song={song} coverArtUrl={coverArtUrl} lyricsTheme={lyricsTheme} paletteError={paletteError} />
-
       {/* Header */}
       <header className="sticky top-0 z-20 flex items-center justify-between px-4 sm:px-6 py-4 border-b border-gray-900" style={{ background: '#050608' }}>
         <div className="flex items-center gap-3">
