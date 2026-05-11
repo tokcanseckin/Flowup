@@ -97,6 +97,12 @@ class Line(Base):
         cascade="all, delete-orphan",
         lazy="selectin",
     )
+    translations = relationship(
+        "LineTranslation",
+        back_populates="line",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+    )
 
 
 class Word(Base):
@@ -111,6 +117,38 @@ class Word(Base):
     dictionary_definition = Column(Text,    nullable=True)
 
     line = relationship("Line", back_populates="words")
+    definitions = relationship(
+        "WordDefinition",
+        back_populates="word",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+    )
+
+
+class LineTranslation(Base):
+    """Per-target-language translation of a lyric line."""
+    __tablename__ = "line_translations"
+    __table_args__ = (UniqueConstraint("line_id", "target_lang", name="uq_line_translation"),)
+
+    id          = Column(Integer, primary_key=True)
+    line_id     = Column(Integer, ForeignKey("lines.id", ondelete="CASCADE"), nullable=False)
+    target_lang = Column(String(16), nullable=False)   # e.g. "RU", "EN-US"
+    text        = Column(Text,       nullable=False)
+
+    line = relationship("Line", back_populates="translations")
+
+
+class WordDefinition(Base):
+    """Per-target-language dictionary definition of a word."""
+    __tablename__ = "word_definitions"
+    __table_args__ = (UniqueConstraint("word_id", "target_lang", name="uq_word_definition"),)
+
+    id          = Column(Integer, primary_key=True)
+    word_id     = Column(Integer, ForeignKey("words.id", ondelete="CASCADE"), nullable=False)
+    target_lang = Column(String(16), nullable=False)
+    definition  = Column(Text,       nullable=True)
+
+    word = relationship("Word", back_populates="definitions")
 
 
 class Playlist(Base):
@@ -125,6 +163,8 @@ class Playlist(Base):
     # CEFR-style level: A1, A2, B1, B2, C1, C2
     difficulty_level    = Column(String(8),   nullable=True)
     language_code       = Column(String(8),   nullable=True)
+    # Target language for translations/definitions in this playlist (e.g. "RU")
+    target_lang         = Column(String(16),  nullable=True)
     created_at          = Column(Integer,     default=lambda: int(time.time()))
 
     playlist_songs = relationship(
@@ -248,6 +288,33 @@ def _migrate_users_table() -> None:
                 song_id    INTEGER NOT NULL REFERENCES songs(id) ON DELETE CASCADE,
                 created_at INTEGER,
                 UNIQUE(user_id, song_id)
+            )
+        """))
+
+        # playlists table — add target_lang if missing
+        pl_cols = {str(row[1]) for row in conn.execute(text("PRAGMA table_info(playlists)")).fetchall()}
+        if "target_lang" not in pl_cols:
+            conn.execute(text("ALTER TABLE playlists ADD COLUMN target_lang VARCHAR(16)"))
+
+        # line_translations table
+        conn.execute(text("""
+            CREATE TABLE IF NOT EXISTS line_translations (
+                id          INTEGER PRIMARY KEY,
+                line_id     INTEGER NOT NULL REFERENCES lines(id) ON DELETE CASCADE,
+                target_lang VARCHAR(16) NOT NULL,
+                text        TEXT NOT NULL,
+                UNIQUE(line_id, target_lang)
+            )
+        """))
+
+        # word_definitions table
+        conn.execute(text("""
+            CREATE TABLE IF NOT EXISTS word_definitions (
+                id          INTEGER PRIMARY KEY,
+                word_id     INTEGER NOT NULL REFERENCES words(id) ON DELETE CASCADE,
+                target_lang VARCHAR(16) NOT NULL,
+                definition  TEXT,
+                UNIQUE(word_id, target_lang)
             )
         """))
 

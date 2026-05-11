@@ -113,6 +113,9 @@ LANGUAGES: dict[str, LanguageConfig] = {
     # ── Right-to-left ─────────────────────────────────────────────────────────
     "ar": LanguageConfig("Arabic",     "Arabic",   "rtl", "AR",  GenericBackend),
     "he": LanguageConfig("Hebrew",     "Hebrew",   "rtl", "HE",  GenericBackend),
+
+    # ── English ───────────────────────────────────────────────────────────────
+    "en": LanguageConfig("English",    "Latin",    "ltr", "EN",  lambda: _make_spacy_or_generic("en")),
 }
 
 # ── CLI ───────────────────────────────────────────────────────────────────────
@@ -126,8 +129,8 @@ def build_arg_parser() -> argparse.ArgumentParser:
                    metavar="LANG",  help=f"Source language code. One of: {', '.join(LANGUAGES)}")
     p.add_argument("--artist",      required=True, help="Artist name (used for LRCLIB search)")
     p.add_argument("--title",       required=True, help="Track title (used for LRCLIB search)")
-    p.add_argument("--spotify-uri", required=True, dest="spotify_uri",
-                   help="Spotify track URI, e.g. spotify:track:4uLU6hMCjMI75M1A2tKUQC")
+    p.add_argument("--spotify-uri", required=False, default="", dest="spotify_uri",
+                   help="Spotify track URI. Optional — a local:... ID is auto-generated if omitted.")
     p.add_argument("--display-title", dest="display_title",
                    help="Song title shown in the UI (defaults to --title)")
     p.add_argument("--target-lang", dest="target_lang", default="EN-US",
@@ -139,6 +142,12 @@ def build_arg_parser() -> argparse.ArgumentParser:
     p.add_argument("--api-url",     dest="api_url", default="",
                    help="FlowUp backend URL (e.g. http://localhost:8000). "
                         "When set, the processed song is also pushed to the backend database.")
+    p.add_argument("--playlist-id", dest="playlist_id", type=int, default=None,
+                   help="Backend playlist ID to assign the song to after push (requires --admin-token).")
+    p.add_argument("--admin-token", dest="admin_token",
+                   default=os.environ.get("FLOWUP_ADMIN_TOKEN", ""),
+                   help="Admin Bearer token for playlist assignment. "
+                        "Can also be set via FLOWUP_ADMIN_TOKEN env var.")
     p.add_argument("--lrc-file",    dest="lrc_file", default="",
                    help="Path to a local .lrc file to use instead of fetching from LRCLIB.")
     p.add_argument("--youtube-url", dest="youtube_url", default="",
@@ -823,12 +832,23 @@ def _resolve_definition(lemma: str, lang_code: str, translation: str = "",
 
 # ── Backend push ──────────────────────────────────────────────────────────────
 
-def push_to_backend(api_url: str, payload: dict, replace_id: int | None = None) -> None:
+def push_to_backend(
+    api_url: str,
+    payload: dict,
+    replace_id: int | None = None,
+    playlist_id: int | None = None,
+    admin_token: str = "",
+) -> int | None:
     """POST the processed song JSON to the FlowUp backend API.
 
     If replace_id is given, the existing song is deleted first so the new
     version takes its place (playlist associations are preserved on the
     new song ID — callers should re-add if needed).
+
+    If playlist_id and admin_token are given, the song is added to that
+    playlist after being pushed.
+
+    Returns the new song ID, or None on error.
     """
     base = api_url.rstrip("/")
     if replace_id is not None:
@@ -844,15 +864,38 @@ def push_to_backend(api_url: str, payload: dict, replace_id: int | None = None) 
 
     url = base + "/api/songs"
     print(f"\n[6/5] Pushing to backend: {url} …")
+    song_id: int | None = None
     try:
         r = requests.post(url, json=payload, timeout=90)
         if not r.ok:
             print(f"  [Backend] Error {r.status_code}: {r.text[:200]}")
         else:
             data = r.json()
-            print(f"  [Backend] Song stored (id={data.get('id')}).")
+            song_id = data.get("id")
+            print(f"  [Backend] Song stored (id={song_id}).")
     except requests.RequestException as exc:
         print(f"  [Backend] Network error: {exc}")
+        return None
+
+    # Assign to playlist if requested
+    if song_id and playlist_id and admin_token:
+        pl_url = f"{base}/api/playlists/{playlist_id}/songs"
+        print(f"  [Backend] Assigning song {song_id} to playlist {playlist_id} …")
+        try:
+            pr = requests.post(
+                pl_url,
+                json={"song_id": song_id},
+                headers={"Authorization": f"Bearer {admin_token}"},
+                timeout=15,
+            )
+            if pr.ok:
+                print(f"  [Backend] Song added to playlist {playlist_id}.")
+            else:
+                print(f"  [Backend] Playlist assignment {pr.status_code}: {pr.text[:200]}")
+        except requests.RequestException as exc:
+            print(f"  [Backend] Playlist assignment error: {exc}")
+
+    return song_id
 
 
 # ── Line processor ────────────────────────────────────────────────────────────
@@ -865,6 +908,7 @@ def process_line(
     end_ms: int,
     backend: NLPBackend,
     lang_code: str = "",
+    target_lang: str = "",
 ) -> dict:
     phonetic_line = backend.annotate_line(text)  # None for languages with no annotation
 
@@ -881,12 +925,15 @@ def process_line(
 
         analysis = backend.analyze_token(raw_tok, annot_tok)
 
+        definition = _resolve_definition(analysis.lemma, lang_code, translation, raw_tok)
         words.append({
             "key":                  key,
             "display_form":         analysis.display_form,
             "lemma":                analysis.lemma,
             "grammar":              analysis.grammar,
-            "dictionary_definition": _resolve_definition(analysis.lemma, lang_code, translation, raw_tok),
+            "dictionary_definition": definition,
+            # Normalized per-target-lang definitions (new format)
+            "definitions": {target_lang: definition} if target_lang else {},
         })
         key += 1
 
@@ -896,6 +943,8 @@ def process_line(
         "original_line": text,
         "phonetic_line": phonetic_line,   # null when backend returns None
         "translation":   translation,
+        # Normalized per-target-lang translations (new format)
+        "translations": {target_lang: translation} if target_lang else {},
         "words":         words,
     }
 
@@ -905,6 +954,16 @@ def main() -> None:
     args   = build_arg_parser().parse_args()
     lang   = LANGUAGES[args.lang]
     sep    = "─" * 60
+
+    # Auto-generate local URI if --spotify-uri was omitted
+    if not args.spotify_uri:
+        import unicodedata as _ud
+        def _slugify(s: str) -> str:
+            s = _ud.normalize("NFKD", s).encode("ascii", "ignore").decode()
+            s = re.sub(r"[^\w\s-]", "", s.lower())
+            return re.sub(r"[\s_-]+", "-", s).strip("-")
+        args.spotify_uri = f"local:{_slugify(args.artist)}-{_slugify(args.title)}"
+        print(f"  [Info] Auto-generated URI: {args.spotify_uri}")
 
     print(sep)
     print(f"  FlowUp — Data Pipeline  [{lang.name}]")
@@ -962,6 +1021,7 @@ def main() -> None:
             row["start_ms"], row["end_ms"],
             backend,
             lang_code=args.lang,
+            target_lang=args.target_lang,
         ))
         time.sleep(0.02)
 
@@ -977,6 +1037,8 @@ def main() -> None:
             "script":    lang.script,
             "direction": lang.direction,
         },
+        "youtube_url":     args.youtube_url or None,
+        "apple_music_url": None,
         "lines": lines,
     }
     out_path = os.path.join(os.path.dirname(__file__), args.output)
@@ -986,7 +1048,13 @@ def main() -> None:
 
     # ── 6. Push to backend (optional)
     if args.api_url:
-        push_to_backend(args.api_url, output, replace_id=args.replace_id)
+        push_to_backend(
+            args.api_url,
+            output,
+            replace_id=args.replace_id,
+            playlist_id=args.playlist_id,
+            admin_token=args.admin_token,
+        )
 
     print(f"\n✓  Done — {len(lines)} lines.")
     print(sep)

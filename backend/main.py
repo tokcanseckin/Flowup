@@ -48,7 +48,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response, StreamingResponse
 from sqlalchemy.orm import Session
 
-from database import AlignmentTask, Line, Playlist, PlaylistSong, Song, User, UserFavorite, UserListenedSong, Word, create_tables, get_db
+from database import AlignmentTask, Line, LineTranslation, Playlist, PlaylistSong, Song, User, UserFavorite, UserListenedSong, Word, WordDefinition, create_tables, get_db
 from models import (
     AdminLyricsUpdate,
     AdminSongDetailResponse,
@@ -306,18 +306,34 @@ def _enrich_definition(raw_def: Optional[str], lemma: str, lang_code: str = "ru"
     return raw_def or _or_lookup_local(bare_lemma)
 
 
-def _word_response(word: Word, lang_code: str = "ru") -> WordResponse:
+def _word_response(word: Word, lang_code: str = "ru", target_lang: Optional[str] = None) -> WordResponse:
+    # Check normalized WordDefinition table first (multi-lang support)
+    definition: Optional[str] = None
+    if target_lang and word.definitions:
+        for wd in word.definitions:
+            if wd.target_lang == target_lang:
+                definition = wd.definition
+                break
+    if definition is None:
+        definition = word.dictionary_definition
     return WordResponse(
         key=word.key_index,
         display_form=word.display_form,
         lemma=word.lemma,
         grammar=word.grammar,
-        dictionary_definition=_enrich_definition(word.dictionary_definition, word.lemma, lang_code, word.display_form or ""),
+        dictionary_definition=_enrich_definition(definition, word.lemma, lang_code, word.display_form or ""),
     )
 
 
-def _line_response(line: Line, override_words: Optional[list] = None, lang_code: str = "ru") -> LineResponse:
+def _line_response(line: Line, override_words: Optional[list] = None, lang_code: str = "ru", target_lang: Optional[str] = None) -> LineResponse:
     words = override_words if override_words is not None else line.words
+    # Check normalized LineTranslation table first (multi-lang support)
+    translation: str = line.translation
+    if target_lang and line.translations:
+        for lt in line.translations:
+            if lt.target_lang == target_lang:
+                translation = lt.text
+                break
     return LineResponse(
         id=line.id,
         position=line.position,
@@ -325,13 +341,13 @@ def _line_response(line: Line, override_words: Optional[list] = None, lang_code:
         end_time_ms=line.end_time_ms,
         original_line=line.original_line,
         phonetic_line=line.phonetic_line,
-        translation=line.translation,
-        words=[_word_response(w, lang_code) for w in words],
+        translation=translation,
+        words=[_word_response(w, lang_code, target_lang) for w in words],
         source=line.source,
     )
 
 
-def _song_detail(song: Song, source: Optional[str] = None) -> SongDetailResponse:
+def _song_detail(song: Song, source: Optional[str] = None, target_lang: Optional[str] = None) -> SongDetailResponse:
     default_lines = [l for l in song.lines if l.source is None]
     lang_code = song.language_code or "ru"
 
@@ -340,13 +356,13 @@ def _song_detail(song: Song, source: Optional[str] = None) -> SongDetailResponse
         if source_lines:
             default_words_by_pos = {l.position: l.words for l in default_lines}
             lines = [
-                _line_response(sl, override_words=default_words_by_pos.get(sl.position, []), lang_code=lang_code)
+                _line_response(sl, override_words=default_words_by_pos.get(sl.position, []), lang_code=lang_code, target_lang=target_lang)
                 for sl in sorted(source_lines, key=lambda l: l.position)
             ]
         else:
-            lines = [_line_response(l, lang_code=lang_code) for l in default_lines]
+            lines = [_line_response(l, lang_code=lang_code, target_lang=target_lang) for l in default_lines]
     else:
-        lines = [_line_response(l, lang_code=lang_code) for l in default_lines]
+        lines = [_line_response(l, lang_code=lang_code, target_lang=target_lang) for l in default_lines]
 
     return SongDetailResponse(
         id=song.id,
@@ -418,6 +434,8 @@ def _ingest_song(body: SongIngest, db: Session) -> Song:
     db.flush()  # get song.id
 
     for pos, line_data in enumerate(body.lines):
+        # Use legacy `translation` field OR first value from `translations` dict
+        legacy_translation = line_data.translation or (next(iter(line_data.translations.values()), "") if line_data.translations else "")
         line = Line(
             song_id=song.id,
             position=pos,
@@ -425,21 +443,33 @@ def _ingest_song(body: SongIngest, db: Session) -> Song:
             end_time_ms=line_data.end_time_ms,
             original_line=line_data.original_line,
             phonetic_line=line_data.phonetic_line,
-            translation=line_data.translation,
+            translation=legacy_translation,
         )
         db.add(line)
         db.flush()  # get line.id
 
+        # Write normalized per-target-language translations
+        for tl_lang, tl_text in line_data.translations.items():
+            db.add(LineTranslation(line_id=line.id, target_lang=tl_lang, text=tl_text))
+
         for word_data in line_data.words:
-            db.add(Word(
+            # Use legacy `dictionary_definition` OR first value from `definitions` dict
+            legacy_def = word_data.dictionary_definition or (next(iter(word_data.definitions.values()), None) if word_data.definitions else None)
+            word = Word(
                 line_id=line.id,
                 key_index=word_data.key,
                 display_form=word_data.display_form,
                 lemma=word_data.lemma,
                 grammar=word_data.grammar,
                 # Resolve stubs at ingest time so the DB always has clean values.
-                dictionary_definition=_enrich_definition(word_data.dictionary_definition, word_data.lemma, body.language.code, word_data.display_form or ""),
-            ))
+                dictionary_definition=_enrich_definition(legacy_def, word_data.lemma, body.language.code, word_data.display_form or ""),
+            )
+            db.add(word)
+            db.flush()  # get word.id for WordDefinition FK
+
+            # Write normalized per-target-language definitions
+            for def_lang, def_text in word_data.definitions.items():
+                db.add(WordDefinition(word_id=word.id, target_lang=def_lang, definition=def_text))
 
     db.commit()
     db.refresh(song)
@@ -784,20 +814,23 @@ def list_songs(db: Session = Depends(get_db)):
 
 
 @app.get("/api/songs/{song_id}", response_model=SongDetailResponse)
-def get_song(song_id: int, source: Optional[str] = Query(default=None), db: Session = Depends(get_db)):
-    cache_key = (song_id, source or None)
-    cached = _song_response_cache.get(cache_key)
-    if cached is not None:
-        return JSONResponse(
-            content=cached,
-            headers={"Cache-Control": "private, max-age=3600"},
-        )
+def get_song(song_id: int, source: Optional[str] = Query(default=None), target_lang: Optional[str] = Query(default=None), db: Session = Depends(get_db)):
+    # Cache keyed by (song_id, source, target_lang) — skip cache when target_lang specified (varies per user preference)
+    cache_key = (song_id, source or None) if not target_lang else None
+    if cache_key is not None:
+        cached = _song_response_cache.get(cache_key)
+        if cached is not None:
+            return JSONResponse(
+                content=cached,
+                headers={"Cache-Control": "private, max-age=3600"},
+            )
     song = db.get(Song, song_id)
     if not song:
         raise HTTPException(status_code=404, detail="Song not found")
-    detail = _song_detail(song, source=source)
+    detail = _song_detail(song, source=source, target_lang=target_lang)
     data = detail.model_dump()
-    _song_response_cache[cache_key] = data
+    if cache_key is not None:
+        _song_response_cache[cache_key] = data
     return JSONResponse(
         content=data,
         headers={"Cache-Control": "private, max-age=3600"},
@@ -1279,6 +1312,7 @@ def _playlist_response(pl: Playlist) -> PlaylistResponse:
         cover_image_url=f"/api/playlists/{pl.id}/cover" if pl.cover_image_type is not None else None,
         difficulty_level=pl.difficulty_level,
         language_code=pl.language_code,
+        target_lang=pl.target_lang,
         song_count=pl.song_count,
         songs=songs,
     )
@@ -1293,13 +1327,17 @@ def _playlist_summary(pl: Playlist) -> PlaylistSummaryResponse:
         cover_image_url=f"/api/playlists/{pl.id}/cover" if pl.cover_image_type is not None else None,
         difficulty_level=pl.difficulty_level,
         language_code=pl.language_code,
+        target_lang=pl.target_lang,
         song_count=pl.song_count,
     )
 
 
 @app.get("/api/playlists", response_model=list[PlaylistSummaryResponse])
-def list_playlists(db: Session = Depends(get_db)):
-    playlists = db.query(Playlist).order_by(Playlist.created_at.desc()).all()
+def list_playlists(target_lang: Optional[str] = Query(None), db: Session = Depends(get_db)):
+    q = db.query(Playlist)
+    if target_lang:
+        q = q.filter(Playlist.target_lang == target_lang)
+    playlists = q.order_by(Playlist.created_at.desc()).all()
     return [_playlist_summary(pl) for pl in playlists]
 
 
@@ -1311,6 +1349,7 @@ def create_playlist(body: PlaylistCreate, db: Session = Depends(get_db), _: User
         description=body.description,
         difficulty_level=body.difficulty_level,
         language_code=body.language_code,
+        target_lang=body.target_lang,
     )
     db.add(pl)
     db.flush()
@@ -1347,6 +1386,8 @@ def update_playlist(playlist_id: int, body: PlaylistUpdate, db: Session = Depend
         pl.difficulty_level = body.difficulty_level
     if body.language_code is not None:
         pl.language_code = body.language_code
+    if body.target_lang is not None:
+        pl.target_lang = body.target_lang
     db.commit()
     db.refresh(pl)
     return _playlist_response(pl)

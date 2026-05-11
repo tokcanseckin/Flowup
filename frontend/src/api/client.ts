@@ -72,6 +72,7 @@ export interface PlaylistSummary {
   cover_image_url: string | null
   difficulty_level: string | null
   language_code: string | null
+  target_lang: string | null
   song_count: number
 }
 
@@ -194,11 +195,18 @@ export const api = {
   listSongs: (): Promise<SongSummary[]> =>
     apiFetch('/songs'),
 
-  getSong: (id: number, source?: string): Promise<SongDetail> =>
-    apiFetch(`/songs/${id}${source && source !== 'spotify' ? `?source=${encodeURIComponent(source)}` : ''}`),
+  getSong: (id: number, source?: string, targetLang?: string): Promise<SongDetail> => {
+    const params = new URLSearchParams()
+    if (source && source !== 'spotify') params.set('source', source)
+    if (targetLang) params.set('target_lang', targetLang)
+    const qs = params.toString()
+    return apiFetch(`/songs/${id}${qs ? `?${qs}` : ''}`)
+  },
 
-  listPlaylists: (): Promise<PlaylistSummary[]> =>
-    apiFetch('/playlists'),
+  listPlaylists: (targetLang?: string): Promise<PlaylistSummary[]> => {
+    const qs = targetLang ? `?target_lang=${encodeURIComponent(targetLang)}` : ''
+    return apiFetch(`/playlists${qs}`)
+  },
 
   getPlaylist: (id: number): Promise<PlaylistDetail> =>
     apiFetch(`/playlists/${id}`),

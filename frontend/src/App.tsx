@@ -20,21 +20,24 @@ function _songCacheKey(id: number, source?: string): string {
 }
 
 /** Fetch a song, using the module-level cache. Deduplicates concurrent requests. */
-function _fetchSong(id: number, source?: string): Promise<SongDetail> {
+function _fetchSong(id: number, source?: string, targetLang?: string): Promise<SongDetail> {
   const key = _songCacheKey(id, source)
-  const cached = _songCache.get(key)
-  if (cached) return Promise.resolve(cached)
-  const inflight = _inFlight.get(key)
-  if (inflight) return inflight
-  const p = api.getSong(id, source).then(detail => {
-    _songCache.set(key, detail)
+  // When targetLang is set, skip cache (translations vary per preference)
+  if (!targetLang) {
+    const cached = _songCache.get(key)
+    if (cached) return Promise.resolve(cached)
+    const inflight = _inFlight.get(key)
+    if (inflight) return inflight
+  }
+  const p = api.getSong(id, source, targetLang || undefined).then(detail => {
+    if (!targetLang) _songCache.set(key, detail)
     _inFlight.delete(key)
     return detail
   }).catch(err => {
     _inFlight.delete(key)
     throw err
   })
-  _inFlight.set(key, p)
+  if (!targetLang) _inFlight.set(key, p)
   return p
 }
 
@@ -2105,8 +2108,9 @@ export default function App() {
       navigateToPath(songPath(id))
     }
     const source = settings.preferredSource
+    const targetLang = activePlaylist?.target_lang ?? undefined
     const key = _songCacheKey(id, source)
-    const cached = _songCache.get(key)
+    const cached = !targetLang ? _songCache.get(key) : undefined
     if (cached) {
       // Instant render from cache.
       setActiveSong(cached)
@@ -2117,7 +2121,7 @@ export default function App() {
     setSongLoading(true)
     setActiveSong(null)
     try {
-      const detail = await _fetchSong(id, source)
+      const detail = await _fetchSong(id, source, targetLang)
       setActiveSong(detail)
       setLastSelectedSongId(detail.id)
     } catch (e) {
@@ -2126,7 +2130,7 @@ export default function App() {
     } finally {
       setSongLoading(false)
     }
-  }, [settings.preferredSource, navigateToPath])
+  }, [settings.preferredSource, navigateToPath, activePlaylist?.target_lang])
 
   const handlePrefetchSong = useCallback((id: number) => {
     const source = settings.preferredSource
@@ -2138,9 +2142,10 @@ export default function App() {
   useEffect(() => {
     if (!activeSong) return
     const source = settings.preferredSource
+    const targetLang = activePlaylist?.target_lang ?? undefined
     const key = _songCacheKey(activeSong.id, source)
     _songCache.delete(key)  // force fresh fetch for new source
-    void _fetchSong(activeSong.id, source).then(d => { setActiveSong(d) }).catch(() => {})
+    void _fetchSong(activeSong.id, source, targetLang).then(d => { setActiveSong(d) }).catch(() => {})
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [settings.preferredSource])
 
