@@ -115,16 +115,22 @@ function formatMs(ms: number): string {
   return `${min}:${sec.toString().padStart(2, '0')}`
 }
 
+type SettingsTab = 'preferences' | 'account' | 'subscription' | 'support'
+
 type AppRoute =
   | { page: 'browse' }
   | { page: 'song'; songId: number }
-  | { page: 'settings' }
+  | { page: 'settings'; tab: SettingsTab }
   | { page: 'admin'; tab: 'songs' | 'playlists' | 'users' | 'tasks'; id: number | null }
 
 function parseAppRoute(pathname: string): AppRoute {
   const path = pathname || '/browse'
 
-  if (path === '/settings') return { page: 'settings' }
+  const settingsMatch = path.match(/^\/settings(?:\/(preferences|account|subscription|support))?$/)
+  if (settingsMatch) {
+    const tab = (settingsMatch[1] as SettingsTab) ?? 'preferences'
+    return { page: 'settings', tab }
+  }
   const adminMatch = path.match(/^\/admin(?:\/(song|playlist|user|task)(?:\/(\d+))?)?$/)
   if (adminMatch) {
     const seg = adminMatch[1]
@@ -150,6 +156,10 @@ function adminPath(tab: 'songs' | 'playlists' | 'users' | 'tasks', id: number | 
   const seg = tab === 'playlists' ? 'playlist' : tab === 'users' ? 'user' : tab === 'tasks' ? 'task' : 'song'
   if (id === null) return `/admin/${seg}`
   return `/admin/${seg}/${id}`
+}
+
+function settingsPath(tab: SettingsTab = 'preferences'): string {
+  return `/settings/${tab}`
 }
 
 // ── Login screen ──────────────────────────────────────────────────────────────
@@ -553,14 +563,17 @@ function SettingsPage({
   onBack,
   onLogout,
   user,
+  activeTab,
+  onTabChange,
 }: {
   settings: AppSettings
   onUpdate: (patch: Partial<AppSettings>) => void
   onBack: () => void
   onLogout: () => void
   user: { display_name: string | null; email: string | null } | null
+  activeTab: SettingsTab
+  onTabChange: (tab: SettingsTab) => void
 }) {
-  const [tab, setTab] = useState<'preferences' | 'account' | 'subscription' | 'support'>('preferences')
   const [supportForm, setSupportForm] = useState({ subject: '', message: '' })
   const [supportSent, setSupportSent] = useState(false)
 
@@ -627,9 +640,9 @@ function SettingsPage({
             <button
               key={t.key}
               type="button"
-              onClick={() => setTab(t.key)}
+              onClick={() => onTabChange(t.key)}
               className={`flex items-center gap-2.5 w-full px-3 py-2 rounded-lg text-sm transition-colors text-left ${
-                tab === t.key
+                activeTab === t.key
                   ? 'bg-gray-800 text-white'
                   : 'text-gray-500 hover:text-gray-300 hover:bg-gray-900'
               }`}
@@ -642,7 +655,7 @@ function SettingsPage({
 
         {/* Content */}
         <main className="flex-1 overflow-y-auto px-6 py-6 flex flex-col">
-          {tab === 'preferences' && (
+          {activeTab === 'preferences' && (
             <div className="max-w-xl space-y-3">
               <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-4">Preferences</h2>
               <div className="rounded-2xl border border-gray-800/80 p-4" style={{ background: '#12121f' }}>
@@ -665,7 +678,7 @@ function SettingsPage({
             </div>
           )}
 
-          {tab === 'account' && (
+          {activeTab === 'account' && (
             <div className="max-w-xl flex flex-col min-h-full">
               <div className="space-y-3 flex-1">
               <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-4">Account</h2>
@@ -711,7 +724,7 @@ function SettingsPage({
             </div>
           )}
 
-          {tab === 'subscription' && (
+          {activeTab === 'subscription' && (
             <div className="max-w-xl space-y-3">
               <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-4">Subscription</h2>
               <div className="rounded-2xl border border-gray-800/80 p-8 flex flex-col items-center text-center" style={{ background: '#12121f' }}>
@@ -726,7 +739,7 @@ function SettingsPage({
             </div>
           )}
 
-          {tab === 'support' && (
+          {activeTab === 'support' && (
             <div className="max-w-xl space-y-3">
               <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-4">Support</h2>
               {supportSent ? (
@@ -1822,6 +1835,8 @@ export default function App() {
         onBack={() => navigateToPath(activeSong ? songPath(activeSong.id) : '/browse')}
         onLogout={handleLogout}
         user={appUser}
+        activeTab={route.page === 'settings' ? route.tab : 'preferences'}
+        onTabChange={(t) => navigateToPath(settingsPath(t))}
       />
     )
   }
