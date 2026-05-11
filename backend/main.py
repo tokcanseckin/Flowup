@@ -54,6 +54,7 @@ from models import (
     AdminSongDetailResponse,
     AdminSourceLyricsUpdate,
     AdminSourceLineUpdate,
+    AdminTranslationsUpdate,
     AdminUserResponse,
     AdminUserUpdate,
     AdminSongCreate,
@@ -1073,6 +1074,50 @@ def update_source_lyrics(
     db.refresh(song)
     _cache_invalidate(song_id)
     return _admin_song_detail(song, db)
+
+
+@app.get("/api/admin/songs/{song_id}/target-langs")
+def get_song_target_langs(song_id: int, db: Session = Depends(get_db), _: User = Depends(_require_admin)):
+    """Return the list of distinct target_lang codes that have LineTranslation rows for this song."""
+    song = db.get(Song, song_id)
+    if not song:
+        raise HTTPException(status_code=404, detail="Song not found")
+    langs: list[str] = []
+    seen: set[str] = set()
+    for line in song.lines:
+        if line.source is not None:
+            continue
+        for lt in line.translations:
+            if lt.target_lang not in seen:
+                seen.add(lt.target_lang)
+                langs.append(lt.target_lang)
+    return {"target_langs": sorted(langs)}
+
+
+@app.put("/api/admin/songs/{song_id}/translations")
+def update_song_translations(
+    song_id: int,
+    target_lang: str = Query(..., description="Target language code, e.g. RU"),
+    body: AdminTranslationsUpdate = ...,
+    db: Session = Depends(get_db),
+    _: User = Depends(_require_admin),
+):
+    """Upsert LineTranslation rows for the given target_lang."""
+    song = db.get(Song, song_id)
+    if not song:
+        raise HTTPException(status_code=404, detail="Song not found")
+    default_line_ids = {line.id for line in song.lines if line.source is None}
+    for item in body.lines:
+        if item.id not in default_line_ids:
+            raise HTTPException(status_code=400, detail=f"Line id={item.id} not found on song")
+        existing = db.query(LineTranslation).filter_by(line_id=item.id, target_lang=target_lang).first()
+        if existing:
+            existing.text = item.text
+        else:
+            db.add(LineTranslation(line_id=item.id, target_lang=target_lang, text=item.text))
+    db.commit()
+    _cache_invalidate(song_id)
+    return {"ok": True}
 
 
 @app.post("/api/admin/songs/{song_id}/regenerate")

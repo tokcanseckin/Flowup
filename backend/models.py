@@ -323,6 +323,15 @@ class AdminSourceLyricsUpdate(BaseModel):
     lines: list[AdminSourceLineUpdate]
 
 
+class AdminLineTranslationUpdate(BaseModel):
+    id: int
+    text: str
+
+
+class AdminTranslationsUpdate(BaseModel):
+    lines: list[AdminLineTranslationUpdate]
+
+
 # ── Alignment task (worker queue) ──────────────────────────────────────────────
 
 

@@ -157,6 +157,7 @@ export default function AdminPanel({
   const [songSaving, setSongSaving] = useState(false)
   const [lyricsSaving, setLyricsSaving] = useState(false)
   const [songError, setSongError] = useState<string | null>(null)
+  const [availableTargetLangs, setAvailableTargetLangs] = useState<string[]>([])
   const [lyricsTargetLang, setLyricsTargetLang] = useState('')
   const [lyricsTranslations, setLyricsTranslations] = useState<Record<number, string>>({})
   const [lyricsTranslationsLoading, setLyricsTranslationsLoading] = useState(false)
@@ -311,6 +312,7 @@ export default function AdminPanel({
   useEffect(() => {
     if (!selectedSongId) {
       setAdminSong(null)
+      setAvailableTargetLangs([])
       setLyricsTargetLang('')
       setLyricsTranslations({})
       return
@@ -337,6 +339,12 @@ export default function AdminPanel({
           ? detail.lines
           : (sourceLinesEntry?.lines ?? detail.lines)
         setLyricsDraft(linesToLoad.map(line => ({ ...line })))
+        // Fetch available target langs and auto-select the first one.
+        void api.getSongTargetLangs(selectedSongId).then(({ target_langs }) => {
+          if (cancelled) return
+          setAvailableTargetLangs(target_langs)
+          setLyricsTargetLang(target_langs[0] ?? '')
+        }).catch(() => {})
       })
       .catch((error: unknown) => {
         if (cancelled) return
@@ -502,8 +510,9 @@ export default function AdminPanel({
     void api.getSong(selectedSongId, undefined, lyricsTargetLang)
       .then(detail => {
         if (cancelled) return
+        // Build map: line id → translation text (empty string if no translation stored)
         const map: Record<number, string> = {}
-        detail.lines.forEach(line => { map[line.id] = line.translation })
+        detail.lines.forEach(line => { map[line.id] = line.translation === line.original_line ? '' : line.translation })
         setLyricsTranslations(map)
       })
       .catch(() => {})
@@ -614,6 +623,18 @@ export default function AdminPanel({
     setLyricsSaving(true)
     setSongError(null)
     try {
+      // If a target lang is active, save translations to LineTranslation table.
+      if (lyricsTargetLang && Object.keys(lyricsTranslations).length > 0) {
+        await api.updateSongTranslations(
+          selectedSongId,
+          lyricsTargetLang,
+          Object.entries(lyricsTranslations).map(([id, text]) => ({ id: Number(id), text })),
+        )
+        // Check if this is a new target lang and update available list.
+        setAvailableTargetLangs(prev => prev.includes(lyricsTargetLang) ? prev : [...prev, lyricsTargetLang].sort())
+      }
+
+      // Always save timing/original/phonetic changes via the default endpoint.
       let updated: AdminSongDetail
       if (lyricsSource === 'default') {
         updated = await api.updateAdminLyrics(selectedSongId, {
@@ -652,7 +673,7 @@ export default function AdminPanel({
     } finally {
       setLyricsSaving(false)
     }
-  }, [lyricsDraft, lyricsSource, selectedSongId])
+  }, [lyricsDraft, lyricsSource, lyricsTargetLang, lyricsTranslations, selectedSongId])
 
   // Atomic: shift all timestamps by offsetMs then save — avoids stale-state race
   // that happens when onApplyOffset (setState) and onSave (reads state) are separate.
@@ -1156,9 +1177,15 @@ export default function AdminPanel({
                           onChange={e => setLyricsTargetLang(e.target.value)}
                           className="rounded-lg border border-indigo-700/50 bg-indigo-950/20 px-2 py-1 text-xs text-indigo-200 focus:outline-none focus:border-indigo-400"
                         >
-                          <option value="">— none —</option>
-                          {LANGUAGE_PRESETS.map(p => (
-                            <option key={p.code} value={p.code.toUpperCase()}>{p.name} ({p.code.toUpperCase()})</option>
+                          <option value="">— default —</option>
+                          {availableTargetLangs.map(lang => {
+                            const preset = LANGUAGE_PRESETS.find(p => p.code.toUpperCase() === lang)
+                            return (
+                              <option key={lang} value={lang}>{preset ? `${preset.name} (${lang})` : lang}</option>
+                            )
+                          })}
+                          {LANGUAGE_PRESETS.filter(p => !availableTargetLangs.includes(p.code.toUpperCase())).map(p => (
+                            <option key={p.code} value={p.code.toUpperCase()}>+ {p.name} ({p.code.toUpperCase()})</option>
                           ))}
                         </select>
                         {lyricsTranslationsLoading && <span className="text-[10px] text-indigo-400 animate-pulse">loading…</span>}
@@ -1196,12 +1223,22 @@ export default function AdminPanel({
                         </div>
                         <textarea value={line.original_line} onChange={e => setLyricsDraft(prev => prev.map((item, itemIndex) => itemIndex === index ? { ...item, original_line: e.target.value } : item))} rows={2} className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
                         <textarea value={line.phonetic_line ?? ''} onChange={e => setLyricsDraft(prev => prev.map((item, itemIndex) => itemIndex === index ? { ...item, phonetic_line: e.target.value || null } : item))} rows={2} placeholder="Phonetic line" className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500" />
-                        <textarea value={line.translation} onChange={e => setLyricsDraft(prev => prev.map((item, itemIndex) => itemIndex === index ? { ...item, translation: e.target.value } : item))} rows={2} placeholder="Translation" className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500" />
-                        {lyricsTargetLang && lyricsTranslations[line.id] !== undefined && (
-                          <div className="rounded-xl border border-indigo-800/50 bg-indigo-950/20 px-3 py-2 text-sm text-indigo-200">
-                            <span className="text-[10px] font-semibold uppercase tracking-wider text-indigo-500 mr-2">{lyricsTargetLang}</span>
-                            {lyricsTranslations[line.id] || <span className="text-indigo-700 italic">no translation</span>}
-                          </div>
+                        {lyricsTargetLang ? (
+                          <textarea
+                            value={lyricsTranslations[line.id] ?? ''}
+                            onChange={e => setLyricsTranslations(prev => ({ ...prev, [line.id]: e.target.value }))}
+                            rows={2}
+                            placeholder={`${lyricsTargetLang} translation…`}
+                            className="w-full rounded-xl border border-indigo-700/60 bg-indigo-950/20 px-3 py-2 text-sm text-indigo-100 placeholder-indigo-800 focus:outline-none focus:border-indigo-400"
+                          />
+                        ) : (
+                          <textarea
+                            value={line.translation}
+                            onChange={e => setLyricsDraft(prev => prev.map((item, itemIndex) => itemIndex === index ? { ...item, translation: e.target.value } : item))}
+                            rows={2}
+                            placeholder="Translation"
+                            className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500"
+                          />
                         )}
                       </div>
                     ))}

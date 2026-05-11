@@ -433,6 +433,20 @@ export const api = {
       headers: getAdminHeaders(),
     }),
 
+  getSongTargetLangs: (songId: number): Promise<{ target_langs: string[] }> =>
+    apiFetch(`/admin/songs/${songId}/target-langs`, { headers: getAdminHeaders() }),
+
+  updateSongTranslations: (
+    songId: number,
+    targetLang: string,
+    lines: Array<{ id: number; text: string }>,
+  ): Promise<{ ok: boolean }> =>
+    apiFetch(`/admin/songs/${songId}/translations?target_lang=${encodeURIComponent(targetLang)}`, {
+      method: 'PUT',
+      body: JSON.stringify({ lines }),
+      headers: getAdminHeaders(),
+    }),
+
   listAdminUsers: (): Promise<AdminUser[]> =>
     apiFetch('/admin/users', { headers: getAdminHeaders() }),
 
