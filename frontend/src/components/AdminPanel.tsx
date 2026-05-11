@@ -505,6 +505,11 @@ export default function AdminPanel({
       setLyricsTranslations({})
       return
     }
+    // If this lang has no stored translations yet, show empty fields without fetching
+    if (!availableTargetLangs.includes(lyricsTargetLang)) {
+      setLyricsTranslations({})
+      return
+    }
     let cancelled = false
     setLyricsTranslationsLoading(true)
     void api.getSong(selectedSongId, undefined, lyricsTargetLang)
@@ -518,7 +523,7 @@ export default function AdminPanel({
       .catch(() => {})
       .finally(() => { if (!cancelled) setLyricsTranslationsLoading(false) })
     return () => { cancelled = true }
-  }, [selectedSongId, lyricsTargetLang])
+  }, [selectedSongId, lyricsTargetLang, availableTargetLangs])
 
   const handleCreateSong = useCallback(async () => {
     if (!newSongDraft.title.trim()) {
