@@ -136,18 +136,18 @@ const ADMIN_SESSION_KEY = 'flowup.admin.basic.v1'
 
 export function getAdminHeaders(): HeadersInit {
   if (typeof window === 'undefined') return {}
-  const encoded = window.sessionStorage.getItem(ADMIN_SESSION_KEY)
+  const encoded = window.localStorage.getItem(ADMIN_SESSION_KEY)
   return encoded ? { Authorization: `Basic ${encoded}` } : {}
 }
 
 export function setAdminSession(email: string, password: string) {
   if (typeof window === 'undefined') return
-  window.sessionStorage.setItem(ADMIN_SESSION_KEY, btoa(`${email}:${password}`))
+  window.localStorage.setItem(ADMIN_SESSION_KEY, btoa(`${email}:${password}`))
 }
 
 export function clearAdminSession() {
   if (typeof window === 'undefined') return
-  window.sessionStorage.removeItem(ADMIN_SESSION_KEY)
+  window.localStorage.removeItem(ADMIN_SESSION_KEY)
 }
 
 // ── Client ────────────────────────────────────────────────────────────────────
