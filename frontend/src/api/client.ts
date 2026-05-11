@@ -265,6 +265,16 @@ export const api = {
       body: JSON.stringify(body),
     }),
 
+  register: (body: {
+    display_name: string
+    email: string
+    password: string
+  }): Promise<BackendUser> =>
+    apiFetch('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    }),
+
   loginWithGoogle: (idToken: string): Promise<BackendUser> =>
     apiFetch('/auth/google', {
       method: 'POST',

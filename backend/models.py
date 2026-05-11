@@ -171,6 +171,12 @@ class CredentialLoginRequest(BaseModel):
     password: str
 
 
+class RegisterRequest(BaseModel):
+    display_name: str
+    email: str
+    password: str
+
+
 class GoogleLoginRequest(BaseModel):
     id_token: str
 
