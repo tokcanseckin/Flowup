@@ -72,14 +72,32 @@ function parseHueFromColor(color: string | undefined): number | null {
 }
 
 /** Returns the word.key values of the indexable (non-stop, has-definition) words in a line, max 9. */
-function computeIndexedKeys(words: WordType[], langCode: string, filterStopWords: boolean): number[] {
-  const result: number[] = []
-  for (const w of words) {
-    if (!isRealDefinition(w.dictionary_definition)) continue
-    if (!filterStopWords || !isStopWord(w.lemma, langCode)) result.push(w.key)
-    if (result.length === 9) break
+function computeIndexedKeys(words: WordType[], langCode: string, _filterStopWords: boolean): number[] {
+  // Collect all words that have a real definition, preserving original order.
+  const candidates = words.filter(w => isRealDefinition(w.dictionary_definition))
+
+  // If 9 or fewer words have definitions, index them all — no stop words skipped.
+  if (candidates.length <= 9) return candidates.slice(0, 9).map(w => w.key)
+
+  // More than 9: we need to drop some. Sacrifice stop words one-by-one, shortest
+  // lemma first (ties broken by position), until we're at 9.
+  const stopSet = candidates
+    .filter(w => isStopWord(w.lemma, langCode))
+    // Sort stops: shorter stripped lemma first, then by original position.
+    .sort((a, b) => {
+      const la = a.lemma.normalize('NFD').replace(/[\u0300-\u036f]/g, '').length
+      const lb = b.lemma.normalize('NFD').replace(/[\u0300-\u036f]/g, '').length
+      return la - lb
+    })
+
+  const sacrificed = new Set<number>()
+  let idx = 0
+  while (candidates.length - sacrificed.size > 9 && idx < stopSet.length) {
+    sacrificed.add(stopSet[idx].key)
+    idx++
   }
-  return result
+
+  return candidates.filter(w => !sacrificed.has(w.key)).slice(0, 9).map(w => w.key)
 }
 
 type LineType = SongDetail['lines'][number]
@@ -680,8 +698,8 @@ export default function LyricsPlayer({
                         onPointerLeave={() => endPointerPress(true)}
                       >
                         <img src={translateIconImg} className="w-full h-full object-contain" alt="" />
-                        <sup className="absolute -top-1.5 -right-1.5 text-[8px] font-mono font-medium leading-none text-yellow-200/95">
-                          {idx}
+                        <sup className="absolute -top-3.5 -right-2.5 text-[10px] font-mono font-medium leading-none text-yellow-200/95">
+                          {0}
                         </sup>
                       </button>
                     )}
@@ -785,11 +803,38 @@ export default function LyricsPlayer({
                 accentTextColor={accentTextColor}
               />
             ) : (
-              <div className="rounded-xl border border-white/20 px-10 py-8 text-sm text-white/85 leading-relaxed animate-panel-in">
-                <p className="text-white font-semibold mb-2 uppercase tracking-wide text-xs">Inspect lyrics</p>
-                <p>Click a word or press 1-9 to inspect a word.</p>
-                <p className="mt-1">Click a circle or press 0 for sentence translation.</p>
-                <p className="mt-1">Hold tap/click/key for temporary peek.</p>
+              <div className="rounded-xl border border-white/20 px-8 py-7 text-white/85 animate-panel-in">
+                <p className="text-white/50 font-semibold uppercase tracking-widest text-[12px] mb-4">Inspect lyrics</p>
+                <div className="flex flex-col gap-3 text-[13px] leading-snug">
+                  <div className="flex items-start gap-3">
+                    <div className="flex gap-1 shrink-0 mt-0.5">
+                      {['1','–','9'].map(k => (
+                        <kbd key={k} className={`inline-flex items-center justify-center rounded px-1.5 py-0.5 text-[11px] font-mono font-medium leading-none ${k === '–' ? 'bg-transparent text-white/30 px-0' : 'bg-white/10 text-white/70 border border-white/15'}`}>{k}</kbd>
+                      ))}
+                    </div>
+                    <span className="text-white/60">Inspect a numbered word</span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <kbd className="shrink-0 mt-0.5 inline-flex items-center justify-center rounded px-1.5 py-0.5 text-[11px] font-mono font-medium leading-none bg-white/10 text-white/70 border border-white/15">0</kbd>
+                    <span className="text-white/60">Sentence translation</span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <kbd className="shrink-0 mt-0.5 inline-flex items-center justify-center rounded px-2 py-0.5 text-[11px] font-mono font-medium leading-none bg-white/10 text-white/70 border border-white/15">Space</kbd>
+                    <span className="text-white/60">Play / pause</span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="flex gap-1 shrink-0 mt-0.5">
+                      {['Q','E'].map(k => (
+                        <kbd key={k} className="inline-flex items-center justify-center rounded px-1.5 py-0.5 text-[11px] font-mono font-medium leading-none bg-white/10 text-white/70 border border-white/15">{k}</kbd>
+                      ))}
+                    </div>
+                    <span className="text-white/60">Seek to prev / next line</span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="shrink-0 mt-0.5 text-white/30 text-[11px] font-medium leading-none">hold</span>
+                    <span className="text-white/60">Peek without pinning</span>
+                  </div>
+                </div>
               </div>
             )}
           </div>
