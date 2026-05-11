@@ -672,7 +672,7 @@ export default function LyricsPlayer({
                     {isActive && (
                       <button
                         type="button"
-                        className={`h-4 w-4 transition-opacity ${circleActive ? 'opacity-100' : 'opacity-60 hover:opacity-100'}`}
+                        className={`relative h-4 w-4 transition-opacity ${circleActive ? 'opacity-100' : 'opacity-60 hover:opacity-100'}`}
                         aria-label={`Inspect translation for line ${idx + 1}`}
                         onPointerDown={() => startPointerPress(lineTarget)}
                         onPointerUp={() => endPointerPress(false)}
@@ -680,6 +680,9 @@ export default function LyricsPlayer({
                         onPointerLeave={() => endPointerPress(true)}
                       >
                         <img src={translateIconImg} className="w-full h-full object-contain" alt="" />
+                        <sup className="absolute -top-1.5 -right-1.5 text-[8px] font-mono font-medium leading-none text-yellow-200/95">
+                          {idx}
+                        </sup>
                       </button>
                     )}
                   </div>
