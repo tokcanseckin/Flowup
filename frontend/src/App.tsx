@@ -846,10 +846,10 @@ function SongBrowser({
                     key={pl.id}
                     type="button"
                     onClick={() => onSelectPlaylist(pl.id)}
-                    className="w-full text-left rounded-xl border border-zinc-700/70 px-4 py-3 hover:border-green-800/60 active:scale-[0.99] transition-all" style={{ '--tw-bg-opacity': 1 } as React.CSSProperties}
-                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(0,109,54,0.08)' }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#25262b' }}
+                    className="w-full text-left rounded-xl border border-zinc-700/70 px-4 py-3 active:scale-[0.99] transition-all"
                     style={{ background: '#25262b' }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(0,109,54,0.08)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(0,109,54,0.5)' }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#25262b'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(63,63,70,0.7)' }}
                   >
                     <div className="flex items-center gap-3">
                       {pl.cover_image_url ? (
