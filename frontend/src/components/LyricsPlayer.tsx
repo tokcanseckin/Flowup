@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { SongDetail } from '../api/client'
+import { useWordHistory } from '../hooks/useWordHistory'
 import translateIconImg from '../../images/translate_icon@2x.png'
 
 // ── Stop-word sets (keyed by language code) ─────────────────────────────────
@@ -380,6 +381,8 @@ export default function LyricsPlayer({
   }>({ timer: null, key: null, holdShown: false, target: null })
 
   const inspectInfo = resolveInspectInfo(lines, inspectState)
+  const { lookedUpLemmas, recordLookup } = useWordHistory()
+  const prevInspectStateRef = useRef<InspectState | null>(null)
   const panelBackground = themeBackground ?? 'linear-gradient(180deg, #1a57bf 0%, #0f46a8 100%)'
   const asideBackground = themeAsideBackground ?? '#184f9b'
   const auraHue = parseHueFromColor(accentTextColor) ?? 320
@@ -461,6 +464,24 @@ export default function LyricsPlayer({
     if (!inspectState) return
     if (inspectState.target.lineIndex !== activeIndex) clearInspect()
   }, [activeIndex, inspectState, clearInspect])
+
+  // Record word lookups when a word becomes pinned
+  useEffect(() => {
+    const prev = prevInspectStateRef.current
+    prevInspectStateRef.current = inspectState
+    if (!inspectState || inspectState.mode !== 'pinned' || inspectState.target.type !== 'word') return
+    // Skip if same word is already pinned (no change)
+    if (
+      prev?.mode === 'pinned' &&
+      prev.target.type === 'word' &&
+      prev.target.lineIndex === inspectState.target.lineIndex &&
+      prev.target.wordKey === inspectState.target.wordKey
+    ) return
+    const line = lines[inspectState.target.lineIndex]
+    const wordTarget = inspectState.target
+    const word = wordTarget.type === 'word' ? line?.words.find(w => w.key === wordTarget.wordKey) : undefined
+    if (word) recordLookup(word, songData)
+  }, [inspectState, lines, songData, recordLookup])
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -715,6 +736,7 @@ export default function LyricsPlayer({
                         indexedWordKeys={indexedWordKeys}
                         startPointerPress={startPointerPress}
                         endPointerPress={endPointerPress}
+                        lookedUpLemmas={lookedUpLemmas}
                       />
                     ) : (
                       <span
@@ -852,6 +874,7 @@ interface ActiveLineProps {
   indexedWordKeys: number[]
   startPointerPress: (target: InspectTarget) => void
   endPointerPress: (cancelOnly?: boolean) => void
+  lookedUpLemmas: Set<string>
 }
 
 function ActiveLineContent({
@@ -862,6 +885,7 @@ function ActiveLineContent({
   indexedWordKeys,
   startPointerPress,
   endPointerPress,
+  lookedUpLemmas,
 }: ActiveLineProps) {
   return (
     <div className="animate-line-pop">
@@ -875,6 +899,7 @@ function ActiveLineContent({
         {line.words.map(word => {
           const target: InspectTarget = { type: 'word', lineIndex, wordKey: word.key }
           const displayIdx = indexedWordKeys.indexOf(word.key)  // -1 for stop words
+          const isLooked = lookedUpLemmas.has(word.lemma)
 
           return (
             <button
@@ -886,7 +911,15 @@ function ActiveLineContent({
               onPointerCancel={() => endPointerPress(true)}
               onPointerLeave={() => endPointerPress(true)}
             >
-              <span className="stressed lyrics-text text-white text-2xl font-semibold tracking-wide">
+              <span
+                className="stressed lyrics-text text-white text-2xl font-semibold tracking-wide"
+                style={isLooked ? {
+                  textDecorationLine: 'underline',
+                  textDecorationColor: 'rgba(74,222,128,0.55)',
+                  textDecorationThickness: '1.5px',
+                  textUnderlineOffset: '4px',
+                } : undefined}
+              >
                 {word.display_form}
               </span>
               {!hideWordIndexes && displayIdx >= 0 && (
