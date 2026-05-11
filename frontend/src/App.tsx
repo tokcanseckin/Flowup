@@ -437,7 +437,7 @@ function SongBrowser({
           <span className="text-sm">Loading songs...</span>
         </div>
       ) : songs.length === 0 && !error ? (
-        <div className="rounded-2xl border border-gray-800/80 p-8 text-center" style={{ background: '#12121f' }}>
+        <div className="rounded-2xl border border-zinc-700/70 p-8 text-center" style={{ background: '#25262b' }}>
           <p className="text-gray-500 text-sm mb-2">No songs in the database yet.</p>
           <p className="text-gray-700 text-xs">
             Run the pipeline to add songs:<br/>
@@ -454,11 +454,11 @@ function SongBrowser({
               onClick={() => onSelect(song.id)}
               onPointerEnter={() => onPrefetch(song.id)}
               className="
-                w-full text-left rounded-2xl border border-gray-800/80 p-4
-                hover:border-indigo-800/80 hover:bg-indigo-950/20
+                w-full text-left rounded-2xl border border-zinc-700/70 p-4
+                hover:border-indigo-700/60 hover:bg-indigo-950/10
                 active:scale-[0.99] transition-all duration-150
               "
-              style={{ background: '#12121f' }}
+              style={{ background: '#25262b' }}
             >
               <div className="flex items-center gap-3">
                 <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden className="shrink-0">
@@ -483,44 +483,53 @@ function SongBrowser({
   )
 
   return (
-    <div className="min-h-screen" style={{ background: '#0d0d14' }}>
+    <div className="min-h-screen" style={{ background: '#050608' }}>
       {/* Header */}
-      <div className="px-6 py-6 max-w-[1200px] mx-auto flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <img src={singolingLogo} className="h-8 object-contain" alt="SingoLing" />
-        </div>
-        <div className="flex items-center gap-3">
-          {isAdmin && (
+      <header className="sticky top-0 z-20 border-b border-gray-900" style={{ background: '#050608' }}>
+        <div className="max-w-[1200px] mx-auto w-full px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            {activePlaylist && (
+              <button onClick={() => onSelectPlaylist(null)} className="text-gray-500 hover:text-gray-300 transition-colors mr-1" aria-label="Back to all playlists">
+                <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">
+                  <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                </svg>
+              </button>
+            )}
+            <img src={singolingLogo} className="h-7 object-contain" alt="SingoLing" />
+          </div>
+          <div className="flex items-center gap-3">
+            {isAdmin && (
+              <button
+                type="button"
+                onClick={onOpenAdmin}
+                className="text-xs text-amber-500 hover:text-amber-300 transition-colors"
+              >
+                Admin
+              </button>
+            )}
             <button
               type="button"
-              onClick={onOpenAdmin}
-              className="text-xs text-amber-500 hover:text-amber-300 transition-colors"
+              onClick={onOpenSettings}
+              className="text-xs text-gray-500 hover:text-gray-200 transition-colors"
             >
-              Admin
+              Preferences
             </button>
-          )}
-          <button
-            type="button"
-            onClick={onOpenSettings}
-            className="text-xs text-gray-600 hover:text-gray-300 transition-colors"
-          >
-            Settings
-          </button>
-          {user?.display_name && (
-            <button type="button" onClick={onOpenAccount} className="text-xs text-gray-500 hover:text-gray-300 transition-colors">{user.display_name}</button>
-          )}
-          <button onClick={onLogout} className="text-xs text-gray-600 hover:text-gray-400 transition-colors">
-            Sign out
-          </button>
+            {user?.display_name && (
+              <button type="button" onClick={onOpenAccount} className="text-xs text-gray-500 hover:text-gray-300 transition-colors">{user.display_name}</button>
+            )}
+            <button onClick={onLogout} className="text-xs text-gray-600 hover:text-gray-400 transition-colors">
+              Sign out
+            </button>
+          </div>
         </div>
-      </div>
+      </header>
 
       {/* Content */}
-      <div className="px-6 pb-10 max-w-[1200px] mx-auto">
+      <div className="px-4 pt-6 pb-10 max-w-[1200px] mx-auto">
         {activePlaylist ? (
           <div className="flex gap-8 items-start">
             {/* Left column — playlist detail */}
-            <div className="w-72 shrink-0 sticky top-6">
+            <div className="w-72 shrink-0 sticky top-20">
               {/* Cover image */}
               {activePlaylist.cover_image_url ? (
                 <img
@@ -576,7 +585,7 @@ function SongBrowser({
               )}
 
               {/* Stats */}
-              <div className="rounded-2xl border border-gray-800/80 divide-y divide-gray-800/80" style={{ background: '#12121f' }}>
+              <div className="rounded-2xl border border-zinc-700/70 divide-y divide-zinc-700/70" style={{ background: '#25262b' }}>
                 <div className="px-4 py-3 flex items-center justify-between">
                   <span className="text-xs text-gray-500">Songs</span>
                   <span className="text-sm text-white font-medium">{activePlaylist.song_count}</span>
@@ -622,25 +631,37 @@ function SongBrowser({
           </div>
         ) : (
           <div className="max-w-2xl mx-auto">
-            <div className="mb-4 flex items-center justify-between gap-3">
-              <h2 className="text-white font-semibold text-lg">Choose a song</h2>
-              <div className="flex items-center gap-2">
-                <label className="text-xs text-gray-500" htmlFor="playlist-select">Playlist</label>
-                <select
-                  id="playlist-select"
-                  value={activePlaylistId ?? ''}
-                  onChange={e => onSelectPlaylist(e.target.value ? Number(e.target.value) : null)}
-                  className="rounded-lg border border-gray-700 bg-gray-900/80 px-2 py-1.5 text-xs text-gray-200 focus:outline-none focus:border-indigo-500"
-                >
-                  <option value="">All songs</option>
-                  {playlists.map(pl => (
-                    <option key={pl.id} value={pl.id}>
-                      {pl.name} ({pl.song_count})
-                    </option>
-                  ))}
-                </select>
+            {playlists.length > 0 && (
+              <div className="mb-6 grid grid-cols-1 gap-2">
+                <p className="text-xs text-gray-600 uppercase tracking-wider font-medium mb-1">Playlists</p>
+                {playlists.map(pl => (
+                  <button
+                    key={pl.id}
+                    type="button"
+                    onClick={() => onSelectPlaylist(pl.id)}
+                    className="w-full text-left rounded-xl border border-zinc-700/70 px-4 py-3 hover:border-indigo-700/60 hover:bg-indigo-950/10 active:scale-[0.99] transition-all"
+                    style={{ background: '#25262b' }}
+                  >
+                    <div className="flex items-center gap-3">
+                      {pl.cover_image_url ? (
+                        <img src={pl.cover_image_url} alt={pl.name} className="w-10 h-10 rounded-lg object-cover shrink-0" />
+                      ) : (
+                        <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 select-none" style={{ background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 100%)' }}>
+                          <span className="text-white/40 text-sm font-bold uppercase">{pl.name.charAt(0)}</span>
+                        </div>
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <p className="text-white font-medium truncate">{pl.name}</p>
+                        <p className="text-gray-500 text-xs truncate">{pl.song_count} songs{pl.language_code ? ` · ${pl.language_code.toUpperCase()}` : ''}{pl.difficulty_level ? ` · ${pl.difficulty_level}` : ''}</p>
+                      </div>
+                      <svg viewBox="0 0 24 24" className="w-4 h-4 fill-gray-600 shrink-0">
+                        <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/>
+                      </svg>
+                    </div>
+                  </button>
+                ))}
               </div>
-            </div>
+            )}
             {songList}
           </div>
         )}
@@ -2057,7 +2078,7 @@ export default function App() {
       onSelect={handleSelectSong}
       onPrefetch={handlePrefetchSong}
       onSelectPlaylist={(id) => navigateToPath(id !== null ? playlistPath(id) : '/browse')}
-      onOpenAdmin={() => navigateToPath('/admin')}
+      onOpenAdmin={() => navigateToPath(activePlaylistId !== null ? adminPath('playlists', activePlaylistId) : '/admin')}
       isAdmin={isAdmin}
       onOpenSettings={() => navigateToPath('/settings')}
       onOpenAccount={() => navigateToPath('/settings/account')}
