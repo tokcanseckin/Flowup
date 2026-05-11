@@ -165,6 +165,17 @@ class UserFavorite(Base):
     created_at = Column(Integer, default=lambda: int(time.time()))
 
 
+class UserListenedSong(Base):
+    """A song the user has opened/listened to."""
+    __tablename__ = "user_listened_songs"
+    __table_args__ = (UniqueConstraint("user_id", "song_id", name="uq_user_listened"),)
+
+    id         = Column(Integer, primary_key=True)
+    user_id    = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    song_id    = Column(Integer, ForeignKey("songs.id", ondelete="CASCADE"), nullable=False)
+    created_at = Column(Integer, default=lambda: int(time.time()))
+
+
 class AlignmentTask(Base):
     """
     A queued request for the Mac Mini alignment worker to process one song.

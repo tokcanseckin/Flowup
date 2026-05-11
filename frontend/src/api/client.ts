@@ -513,4 +513,23 @@ export const api = {
         throw new Error(body.detail ?? `API error ${r.status}`)
       }
     }),
+
+  getListened: (headers: HeadersInit): Promise<{ song_ids: number[] }> =>
+    apiFetch('/me/listened', { headers }),
+
+  addListened: (songId: number, headers: HeadersInit): Promise<void> =>
+    fetch(`/api/me/listened/${songId}`, { method: 'POST', headers }).then(async r => {
+      if (!r.ok && r.status !== 204) {
+        const body = await r.json().catch(() => ({ detail: r.statusText })) as { detail?: string }
+        throw new Error(body.detail ?? `API error ${r.status}`)
+      }
+    }),
+
+  removeListened: (songId: number, headers: HeadersInit): Promise<void> =>
+    fetch(`/api/me/listened/${songId}`, { method: 'DELETE', headers }).then(async r => {
+      if (!r.ok && r.status !== 204) {
+        const body = await r.json().catch(() => ({ detail: r.statusText })) as { detail?: string }
+        throw new Error(body.detail ?? `API error ${r.status}`)
+      }
+    }),
 }
