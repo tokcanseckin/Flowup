@@ -185,16 +185,95 @@ function settingsPath(tab: SettingsTab = 'preferences'): string {
   return `/settings/${tab}`
 }
 
+// ── Shared auth helpers ────────────────────────────────────────────────────────
+
+function AppLogo() {
+  return (
+    <div className="text-center mb-10">
+      <div className="inline-flex items-center gap-2 mb-4">
+        <div className="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-900/50">
+          <svg viewBox="0 0 24 24" className="w-5 h-5 fill-white">
+            <path d="M12 3a9 9 0 100 18A9 9 0 0012 3zm-1 13V8l6 4-6 4z"/>
+          </svg>
+        </div>
+        <h1 className="text-2xl font-bold tracking-tight text-white">
+          Singo<span className="text-indigo-400">Ling</span>
+        </h1>
+      </div>
+      <p className="text-gray-500 text-sm leading-relaxed max-w-xs mx-auto">
+        Learn languages through music.<br/>
+        Real lyrics. Real grammar. Real context.
+      </p>
+    </div>
+  )
+}
+
+function AppleButton({ disabled }: { disabled?: boolean }) {
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      title="Apple Sign-In coming soon"
+      className="
+        w-full flex items-center justify-center gap-2.5 py-2.5 rounded-xl
+        border border-gray-700 bg-gray-900/60 text-white text-sm font-medium
+        opacity-50 cursor-not-allowed select-none
+      "
+    >
+      <svg viewBox="0 0 24 24" className="w-4.5 h-4.5 fill-current shrink-0" aria-hidden>
+        <path d="M16.462 1.184a4.694 4.694 0 01-3.293 3.574 4.21 4.21 0 01-3.18-3.38 4.693 4.693 0 013.38-.49 4.23 4.23 0 013.093.296zM20.5 17.6c-.41.94-.886 1.808-1.43 2.602-.755 1.077-1.374 1.822-1.85 2.232-.74.68-1.53 1.027-2.374 1.047-.607 0-1.34-.173-2.19-.524-.855-.35-1.64-.524-2.357-.524-.752 0-1.559.174-2.424.524-.866.35-1.562.533-2.094.55-.81.035-1.617-.32-2.424-1.065-.517-.453-1.163-1.225-1.936-2.316C.713 18.925.06 17.374.06 15.774c0-1.457.314-2.713.946-3.762A5.538 5.538 0 013.12 9.956a5.27 5.27 0 012.651-.747c.657 0 1.52.203 2.595.602 1.073.4 1.762.603 2.064.603.226 0 .993-.237 2.293-.71 1.23-.438 2.268-.62 3.12-.548 2.307.186 4.04 1.097 5.19 2.736-2.063 1.25-3.082 3-3.054 5.244.025 1.748.65 3.202 1.872 4.357.556.529 1.176.937 1.862 1.226-.15.434-.308.85-.476 1.24l.013-.36z"/>
+      </svg>
+      Continue with Apple
+    </button>
+  )
+}
+
+function useGoogleButton(
+  ref: React.RefObject<HTMLDivElement | null>,
+  onGoogleLogin: (credential: string) => Promise<void>,
+  text: 'continue_with' | 'signup_with' = 'continue_with',
+) {
+  useEffect(() => {
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined
+    if (!clientId || !ref.current) return
+
+    const init = () => {
+      if (!window.google || !ref.current) return
+      window.google.accounts.id.initialize({
+        client_id: clientId,
+        callback: (response) => { void onGoogleLogin(response.credential) },
+        auto_select: false,
+      })
+      window.google.accounts.id.renderButton(ref.current, {
+        theme: 'filled_black',
+        size: 'large',
+        width: 360,
+        text,
+      })
+    }
+
+    if (window.google) {
+      init()
+    } else {
+      const script = document.querySelector('script[src*="accounts.google.com/gsi"]')
+      script?.addEventListener('load', init, { once: true })
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+}
+
 // ── Login screen ──────────────────────────────────────────────────────────────
 
 function LoginScreen({
   onEmailLogin,
   onGoogleLogin,
+  onShowSignUp,
   error,
   busy,
 }: {
   onEmailLogin: (email: string, password: string) => Promise<void>
   onGoogleLogin: (credential: string) => Promise<void>
+  onShowSignUp: () => void
   error: string | null
   busy: boolean
 }) {
@@ -202,86 +281,40 @@ function LoginScreen({
   const [password, setPassword] = useState('')
   const googleBtnRef = useRef<HTMLDivElement>(null)
 
+  useGoogleButton(googleBtnRef, onGoogleLogin, 'continue_with')
+
   const handleSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault()
     void onEmailLogin(email.trim(), password)
   }, [email, password, onEmailLogin])
 
-  // Initialise Google Identity Services once the GSI script has loaded.
-  useEffect(() => {
-    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined
-    if (!clientId || !googleBtnRef.current) return
-
-    const init = () => {
-      if (!window.google || !googleBtnRef.current) return
-      window.google.accounts.id.initialize({
-        client_id: clientId,
-        callback: (response) => { void onGoogleLogin(response.credential) },
-        auto_select: false,
-      })
-      window.google.accounts.id.renderButton(googleBtnRef.current, {
-        theme: 'filled_black',
-        size: 'large',
-        width: 360,
-        text: 'continue_with',
-      })
-    }
-
-    if (window.google) {
-      init()
-    } else {
-      // Wait for the async GSI script to finish loading.
-      const script = document.querySelector('script[src*="accounts.google.com/gsi"]')
-      script?.addEventListener('load', init, { once: true })
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
   return (
     <div className="min-h-screen flex items-center justify-center p-4"
          style={{ background: 'radial-gradient(ellipse 120% 80% at 50% 110%, #1a1040 0%, #0d0d14 60%)' }}>
       <div className="w-full max-w-md">
-        <div className="text-center mb-10">
-          <div className="inline-flex items-center gap-2 mb-4">
-            <div className="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-900/50">
-              <svg viewBox="0 0 24 24" className="w-5 h-5 fill-white">
-                <path d="M12 3a9 9 0 100 18A9 9 0 0012 3zm-1 13V8l6 4-6 4z"/>
-              </svg>
-            </div>
-            <h1 className="text-2xl font-bold tracking-tight text-white">
-              Singo<span className="text-indigo-400">Ling</span>
-            </h1>
-          </div>
-          <p className="text-gray-500 text-sm leading-relaxed max-w-xs mx-auto">
-            Learn languages through music.<br/>
-            Real lyrics. Real grammar. Real context.
-          </p>
-        </div>
+        <AppLogo />
 
-        <div className="rounded-2xl border border-gray-800/80 p-8 shadow-2xl space-y-6"
+        <div className="rounded-2xl border border-gray-800/80 p-8 shadow-2xl space-y-5"
              style={{ background: '#12121f' }}>
           <div>
-            <h2 className="text-white font-semibold text-base mb-1">Sign in</h2>
-            <p className="text-gray-500 text-sm leading-relaxed">
-              {[
-                (import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined) && 'Google',
-                'email + password',
-              ].filter(Boolean).join(', or ')}.
-            </p>
+            <h2 className="text-white font-semibold text-lg mb-1">Sign in</h2>
           </div>
 
           {error && (
-            <div className="mb-4 rounded-xl border border-red-900/50 bg-red-950/30 px-4 py-3 text-sm text-red-400">
+            <div className="rounded-xl border border-red-900/50 bg-red-950/30 px-4 py-3 text-sm text-red-400">
               {error}
             </div>
           )}
 
-          {/* Google Sign-In button — rendered by GSI SDK; hidden if no client ID */}
-          {(import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined) && (
-            <div className="flex justify-center">
-              <div ref={googleBtnRef} />
-            </div>
-          )}
+          {/* Social buttons */}
+          <div className="space-y-2.5">
+            {(import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined) && (
+              <div className="flex justify-center">
+                <div ref={googleBtnRef} />
+              </div>
+            )}
+            <AppleButton disabled />
+          </div>
 
           <div className="flex items-center gap-3 text-xs text-gray-600">
             <div className="h-px flex-1 bg-gray-800" />
@@ -316,10 +349,154 @@ function LoginScreen({
                 text-white transition-all duration-150
               "
             >
-              {busy ? 'Signing in…' : 'Continue with email'}
+              {busy ? 'Signing in…' : 'Sign in'}
             </button>
           </form>
 
+          <p className="text-center text-sm text-gray-500">
+            Don't have an account?{' '}
+            <button
+              type="button"
+              onClick={onShowSignUp}
+              className="text-indigo-400 hover:text-indigo-300 font-medium transition-colors"
+            >
+              Sign up
+            </button>
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ── Sign-up screen ────────────────────────────────────────────────────────────
+
+function SignUpScreen({
+  onRegister,
+  onGoogleLogin,
+  onShowSignIn,
+  error,
+  busy,
+}: {
+  onRegister: (displayName: string, email: string, password: string) => Promise<void>
+  onGoogleLogin: (credential: string) => Promise<void>
+  onShowSignIn: () => void
+  error: string | null
+  busy: boolean
+}) {
+  const [displayName, setDisplayName] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [confirm, setConfirm] = useState('')
+  const [localError, setLocalError] = useState<string | null>(null)
+  const googleBtnRef = useRef<HTMLDivElement>(null)
+
+  useGoogleButton(googleBtnRef, onGoogleLogin, 'signup_with')
+
+  const handleSubmit = useCallback((e: React.FormEvent) => {
+    e.preventDefault()
+    setLocalError(null)
+    if (password !== confirm) {
+      setLocalError('Passwords do not match')
+      return
+    }
+    void onRegister(displayName.trim(), email.trim(), password)
+  }, [displayName, email, password, confirm, onRegister])
+
+  const shownError = localError ?? error
+
+  return (
+    <div className="min-h-screen flex items-center justify-center p-4"
+         style={{ background: 'radial-gradient(ellipse 120% 80% at 50% 110%, #1a1040 0%, #0d0d14 60%)' }}>
+      <div className="w-full max-w-md">
+        <AppLogo />
+
+        <div className="rounded-2xl border border-gray-800/80 p-8 shadow-2xl space-y-5"
+             style={{ background: '#12121f' }}>
+          <div>
+            <h2 className="text-white font-semibold text-lg mb-1">Create an account</h2>
+          </div>
+
+          {shownError && (
+            <div className="rounded-xl border border-red-900/50 bg-red-950/30 px-4 py-3 text-sm text-red-400">
+              {shownError}
+            </div>
+          )}
+
+          {/* Social buttons */}
+          <div className="space-y-2.5">
+            {(import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined) && (
+              <div className="flex justify-center">
+                <div ref={googleBtnRef} />
+              </div>
+            )}
+            <AppleButton disabled />
+          </div>
+
+          <div className="flex items-center gap-3 text-xs text-gray-600">
+            <div className="h-px flex-1 bg-gray-800" />
+            <span>or</span>
+            <div className="h-px flex-1 bg-gray-800" />
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-3">
+            <input
+              type="text"
+              required
+              value={displayName}
+              onChange={e => setDisplayName(e.target.value)}
+              placeholder="Your name"
+              className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500"
+            />
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder="Email"
+              className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500"
+            />
+            <input
+              type="password"
+              required
+              minLength={8}
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              placeholder="Password (min. 8 characters)"
+              className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500"
+            />
+            <input
+              type="password"
+              required
+              minLength={8}
+              value={confirm}
+              onChange={e => setConfirm(e.target.value)}
+              placeholder="Confirm password"
+              className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500"
+            />
+            <button
+              type="submit"
+              disabled={busy}
+              className="
+                w-full py-2.5 rounded-xl font-semibold text-sm
+                bg-indigo-600 hover:bg-indigo-500 disabled:bg-gray-800 disabled:text-gray-500
+                text-white transition-all duration-150
+              "
+            >
+              {busy ? 'Creating account…' : 'Create account'}
+            </button>
+          </form>
+
+          <p className="text-center text-sm text-gray-500">
+            Already have an account?{' '}
+            <button
+              type="button"
+              onClick={onShowSignIn}
+              className="text-indigo-400 hover:text-indigo-300 font-medium transition-colors"
+            >
+              Sign in
+            </button>
+          </p>
         </div>
       </div>
     </div>
@@ -1656,6 +1833,7 @@ export default function App() {
   })
   const [loginBusy, setLoginBusy] = useState(false)
   const [loginError, setLoginError] = useState<string | null>(null)
+  const [showSignUp, setShowSignUp] = useState(false)
 
   const [songs,        setSongs]        = useState<SongSummary[]>([])
   const [playlists,    setPlaylists]    = useState<PlaylistSummary[]>([])
@@ -1769,6 +1947,25 @@ export default function App() {
       localStorage.setItem(PASSWORD_SESSION_KEY, JSON.stringify(user))
     } catch (e) {
       setLoginError(e instanceof Error ? e.message : 'Google sign-in failed')
+    } finally {
+      setLoginBusy(false)
+    }
+  }, [])
+
+  const handleRegister = useCallback(async (displayName: string, email: string, password: string) => {
+    setLoginBusy(true)
+    setLoginError(null)
+    try {
+      const user = await api.register({ display_name: displayName, email, password })
+      if (user.is_admin && user.admin_token) {
+        setAdminSession(user.admin_token)
+      } else {
+        clearAdminSession()
+      }
+      setCredentialUser(user)
+      localStorage.setItem(PASSWORD_SESSION_KEY, JSON.stringify(user))
+    } catch (e) {
+      setLoginError(e instanceof Error ? e.message : 'Failed to create account')
     } finally {
       setLoginBusy(false)
     }
@@ -2026,10 +2223,22 @@ export default function App() {
   }, [activeSong, activeSongIndex, displayedSongs, settings.preferredSource])
 
   if (!isAuthenticated) {
+    if (showSignUp) {
+      return (
+        <SignUpScreen
+          onRegister={handleRegister}
+          onGoogleLogin={handleGoogleLogin}
+          onShowSignIn={() => { setShowSignUp(false); setLoginError(null) }}
+          error={loginError}
+          busy={loginBusy}
+        />
+      )
+    }
     return (
       <LoginScreen
         onEmailLogin={handleEmailLogin}
         onGoogleLogin={handleGoogleLogin}
+        onShowSignUp={() => { setShowSignUp(true); setLoginError(null) }}
         error={loginError}
         busy={loginBusy}
       />

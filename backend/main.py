@@ -64,6 +64,7 @@ from models import (
     BulkSongSourcesUpdate,
     CompleteOnboardingRequest,
     CredentialLoginRequest,
+    RegisterRequest,
     GoogleLoginRequest,
     LanguageIngest,
     LanguageResponse,
@@ -1446,6 +1447,46 @@ async def login_with_credentials(body: CredentialLoginRequest, db: Session = Dep
         email=user.email,
         has_password=bool(user.password_hash),
         needs_onboarding=_is_onboarding_required(user),
+        is_admin=bool(user.is_admin),
+        spotify_enabled=bool(user.spotify_enabled),
+        apple_music_user_token=user.apple_music_user_token,
+        admin_token=_make_admin_token(user) if user.is_admin else None,
+    )
+
+
+@app.post("/api/auth/register", response_model=UserResponse)
+async def register_with_credentials(body: RegisterRequest, db: Session = Depends(get_db)):
+    email = body.email.strip().lower()
+    display_name = body.display_name.strip()
+    if not email:
+        raise HTTPException(status_code=400, detail="Email is required")
+    if not display_name:
+        raise HTTPException(status_code=400, detail="Display name is required")
+    if len(body.password) < 8:
+        raise HTTPException(status_code=400, detail="Password must be at least 8 characters")
+
+    existing = db.query(User).filter(User.email == email).first()
+    if existing:
+        raise HTTPException(status_code=409, detail="An account with that email already exists")
+
+    synthetic_id = f"email:{uuid.uuid4().hex}"
+    user = User(
+        spotify_id=synthetic_id,
+        display_name=display_name,
+        email=email,
+        password_hash=_hash_password(body.password),
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+
+    return UserResponse(
+        id=user.id,
+        spotify_id=user.spotify_id,
+        display_name=user.display_name,
+        email=user.email,
+        has_password=True,
+        needs_onboarding=False,
         is_admin=bool(user.is_admin),
         spotify_enabled=bool(user.spotify_enabled),
         apple_music_user_token=user.apple_music_user_token,
