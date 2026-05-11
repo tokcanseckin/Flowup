@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { SongDetail } from '../api/client'
+import translateIconImg from '../../images/translate_icon@2x.png'
 
 // ── Stop-word sets (keyed by language code) ─────────────────────────────────
 // These words are still clickable, but don't consume a keyboard index (1-9).
@@ -57,7 +58,8 @@ function isRealDefinition(def: string | null | undefined): def is string {
 
 function stripBoundaryPunctuation(value: string): string {
   // Keep inner punctuation (e.g. don't -> don't), remove noisy edge punctuation.
-  return value.replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, '').trim()
+  // Preserve leading ( and trailing ) since they appear in dictionary definitions like "(new) settlement".
+  return value.replace(/^[^\p{L}\p{N}(]+|[^\p{L}\p{N})]+$/gu, '').trim()
 }
 
 function parseHueFromColor(color: string | undefined): number | null {
@@ -670,17 +672,15 @@ export default function LyricsPlayer({
                     {isActive && (
                       <button
                         type="button"
-                        className={`h-4 w-4 rounded-full transition-colors ${
-                          circleActive
-                            ? 'bg-white shadow-[0_0_0_2px_rgba(255,255,255,0.35)]'
-                            : 'bg-white/90 hover:bg-white'
-                        }`}
+                        className={`h-4 w-4 transition-opacity ${circleActive ? 'opacity-100' : 'opacity-60 hover:opacity-100'}`}
                         aria-label={`Inspect translation for line ${idx + 1}`}
                         onPointerDown={() => startPointerPress(lineTarget)}
                         onPointerUp={() => endPointerPress(false)}
                         onPointerCancel={() => endPointerPress(true)}
                         onPointerLeave={() => endPointerPress(true)}
-                      />
+                      >
+                        <img src={translateIconImg} className="w-full h-full object-contain" alt="" />
+                      </button>
                     )}
                   </div>
 

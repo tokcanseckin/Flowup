@@ -1,6 +1,9 @@
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react'
 import AdminPanel          from './components/AdminPanel'
 import LyricsPlayer         from './components/LyricsPlayer'
+import singolingLogo from '../images/singoling_logo@2x.png'
+import prevIconImg   from '../images/previous_icon@2x.png'
+import nextIconImg   from '../images/next_icon@2x.png'
 import YouTubePlayer, { YouTubePlayerHandle } from './components/YouTubePlayer'
 import AppleMusicPlayer, { AppleMusicPlayerHandle } from './components/AppleMusicPlayer'
 import { api, BackendUser, PlaylistDetail, PlaylistSummary, SongDetail, SongSummary, UserSettings as ApiUserSettings, clearAdminSession, setAdminSession } from './api/client'
@@ -386,14 +389,7 @@ function SongBrowser({
     <div className="min-h-screen p-6 max-w-2xl mx-auto" style={{ background: '#0d0d14' }}>
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-xl bg-indigo-600 flex items-center justify-center">
-            <svg viewBox="0 0 24 24" className="w-4 h-4 fill-white">
-              <path d="M12 3a9 9 0 100 18A9 9 0 0012 3zm-1 13V8l6 4-6 4z"/>
-            </svg>
-          </div>
-          <h1 className="text-xl font-bold text-white">
-            Singo<span className="text-indigo-400">Ling</span>
-          </h1>
+          <img src={singolingLogo} className="h-8 object-contain" alt="SingoLing" />
         </div>
         <div className="flex items-center gap-3">
           {isAdmin && (
@@ -557,48 +553,47 @@ function SettingsPage({
   user: { display_name: string | null } | null
 }) {
   return (
-    <div className="min-h-screen p-6 max-w-2xl mx-auto" style={{ background: '#0d0d14' }}>
-      <div className="flex items-center justify-between mb-8">
+    <div className="h-screen flex flex-col overflow-hidden" style={{ background: '#050608' }}>
+      <header className="sticky top-0 z-20 flex items-center justify-between px-4 sm:px-6 py-4 border-b border-gray-900 shrink-0" style={{ background: '#050608' }}>
         <div className="flex items-center gap-3">
           <button onClick={onBack} className="text-gray-500 hover:text-gray-300 transition-colors mr-1" aria-label="Back">
             <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">
               <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
             </svg>
           </button>
-          <div className="w-8 h-8 rounded-xl bg-indigo-600 flex items-center justify-center">
-            <svg viewBox="0 0 24 24" className="w-4 h-4 fill-white">
-              <path d="M19.14 12.94a7.43 7.43 0 000-1.88l2.03-1.58a.5.5 0 00.12-.64l-1.92-3.32a.5.5 0 00-.6-.22l-2.39.96a7.36 7.36 0 00-1.63-.94l-.36-2.54A.5.5 0 0013.9 2h-3.8a.5.5 0 00-.49.42l-.36 2.54a7.36 7.36 0 00-1.63.94l-2.39-.96a.5.5 0 00-.6.22L2.71 8.48a.5.5 0 00.12.64l2.03 1.58a7.43 7.43 0 000 1.88l-2.03 1.58a.5.5 0 00-.12.64l1.92 3.32a.5.5 0 00.6.22l2.39-.96c.5.39 1.05.71 1.63.94l.36 2.54a.5.5 0 00.49.42h3.8a.5.5 0 00.49-.42l.36-2.54c.58-.23 1.13-.55 1.63-.94l2.39.96a.5.5 0 00.6-.22l1.92-3.32a.5.5 0 00-.12-.64l-2.03-1.58zM12 15.5A3.5 3.5 0 1112 8a3.5 3.5 0 010 7.5z"/>
-            </svg>
-          </div>
-          <h1 className="text-xl font-bold text-white">Settings</h1>
+          <img src={singolingLogo} className="h-7 object-contain" alt="SingoLing" />
         </div>
         <div className="flex items-center gap-3">
           {user?.display_name && <span className="text-xs text-gray-500">{user.display_name}</span>}
           <button onClick={onLogout} className="text-xs text-gray-600 hover:text-gray-400 transition-colors">Sign out</button>
         </div>
-      </div>
+      </header>
 
-      <div className="space-y-3">
-        <div className="rounded-2xl border border-gray-800/80 p-4" style={{ background: '#12121f' }}>
-          <p className="text-white font-medium mb-1">Music source</p>
-          <p className="text-xs text-gray-500 mb-3 leading-relaxed">Choose whether to use YouTube or Apple Music.</p>
-          <SourcePicker value={settings.preferredSource} onChange={v => onUpdate({ preferredSource: v })} />
+      <main className="flex-1 overflow-y-auto px-4 sm:px-6 py-6">
+        <div className="max-w-2xl mx-auto space-y-3">
+          <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-4">Preferences</h2>
+
+          <div className="rounded-2xl border border-gray-800/80 p-4" style={{ background: '#12121f' }}>
+            <p className="text-white font-medium mb-1">Music source</p>
+            <p className="text-xs text-gray-500 mb-3 leading-relaxed">Choose whether to use YouTube or Apple Music.</p>
+            <SourcePicker value={settings.preferredSource} onChange={v => onUpdate({ preferredSource: v })} />
+          </div>
+
+          <SettingRow
+            title="Prioritize content words for 1-9 shortcuts"
+            description="When on, shortcut numbers skip common stop words (pronouns, prepositions, conjunctions) and target more meaningful words first."
+            value={settings.excludeStopWordsFromShortcuts}
+            onChange={(next) => onUpdate({ excludeStopWordsFromShortcuts: next })}
+          />
+
+          <SettingRow
+            title="Pause playback while inspecting lyrics"
+            description="When on, playback pauses while definition/translation panels are open and resumes when you close them."
+            value={settings.pauseOnInspect}
+            onChange={(next) => onUpdate({ pauseOnInspect: next })}
+          />
         </div>
-
-        <SettingRow
-          title="Prioritize content words for 1-9 shortcuts"
-          description="When on, shortcut numbers skip common stop words (pronouns, prepositions, conjunctions) and target more meaningful words first."
-          value={settings.excludeStopWordsFromShortcuts}
-          onChange={(next) => onUpdate({ excludeStopWordsFromShortcuts: next })}
-        />
-
-        <SettingRow
-          title="Pause playback while inspecting lyrics"
-          description="When on, playback pauses while definition/translation panels are open and resumes when you close them."
-          value={settings.pauseOnInspect}
-          onChange={(next) => onUpdate({ pauseOnInspect: next })}
-        />
-      </div>
+      </main>
     </div>
   )
 }
@@ -1080,12 +1075,7 @@ function PlayerView({
               <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
             </svg>
           </button>
-          <div className="w-7 h-7 rounded-full border border-white/20 flex items-center justify-center">
-            <svg viewBox="0 0 24 24" className="w-4 h-4 fill-white">
-              <path d="M12 3a9 9 0 100 18A9 9 0 0012 3zm-1 13V8l6 4-6 4z"/>
-            </svg>
-          </div>
-          <span className="font-bold text-white text-xl leading-none">SingoLingo</span>
+          <img src={singolingLogo} className="h-7 object-contain" alt="SingoLing" />
         </div>
         <div className="flex items-center gap-3">
           {isAdmin && (
@@ -1106,9 +1096,9 @@ function PlayerView({
           </button>
           {/* Inline source switcher — always visible; unavailable sources are dimmed */}
           {(() => {
-            const opts: { value: AppSettings['preferredSource']; label: string; activeClass: string; available: boolean }[] = [
-              { value: 'youtube',     label: 'YT', activeClass: 'bg-red-500/20 text-red-400',  available: !!song.youtube_url },
-              { value: 'apple_music', label: 'AM', activeClass: 'bg-pink-500/20 text-pink-400', available: !!song.apple_music_url },
+            const opts: { value: AppSettings['preferredSource']; activeClass: string; available: boolean; label: string }[] = [
+              { value: 'youtube',     label: 'YouTube',     activeClass: 'text-red-400',  available: !!song.youtube_url },
+              { value: 'apple_music', label: 'Apple Music', activeClass: 'text-gray-200', available: !!song.apple_music_url },
             ]
             return (
               <div className="flex items-center gap-0.5 rounded-lg bg-gray-800/70 p-0.5">
@@ -1118,13 +1108,23 @@ function PlayerView({
                     type="button"
                     onClick={() => opt.available && onUpdate({ preferredSource: opt.value })}
                     disabled={!opt.available}
-                    className={`px-2.5 py-1 rounded-md text-xs font-medium transition-all ${
-                      effectiveSource === opt.value ? opt.activeClass
-                      : opt.available ? 'text-gray-500 hover:text-gray-300'
-                      : 'text-gray-700 cursor-not-allowed'
+                    aria-label={opt.label}
+                    className={`px-2 py-1 rounded-md transition-all ${
+                      effectiveSource === opt.value
+                        ? `${opt.activeClass} bg-white/10`
+                        : opt.available ? 'text-gray-500 hover:text-gray-300'
+                        : 'text-gray-700 cursor-not-allowed'
                     }`}
                   >
-                    {opt.label}
+                    {opt.value === 'youtube' ? (
+                      <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current" aria-hidden>
+                        <path d="M21.58 7.19a2.8 2.8 0 0 0-1.97-1.98C17.86 4.75 12 4.75 12 4.75s-5.86 0-7.61.46A2.8 2.8 0 0 0 2.42 7.2 29.4 29.4 0 0 0 2 12a29.4 29.4 0 0 0 .42 4.81 2.8 2.8 0 0 0 1.97 1.98c1.75.46 7.61.46 7.61.46s5.86 0 7.61-.46a2.8 2.8 0 0 0 1.97-1.98A29.4 29.4 0 0 0 22 12a29.4 29.4 0 0 0-.42-4.81ZM10 15.5v-7l6 3.5-6 3.5Z" />
+                      </svg>
+                    ) : (
+                      <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current" aria-hidden>
+                        <path d="M16.37 1.43c0 1.14-.47 2.24-1.22 3.04-.76.79-1.8 1.35-2.94 1.27-.15-1.09.36-2.23 1.09-3 .76-.8 2.01-1.37 3.07-1.31ZM19.08 17.22c-.42.97-.63 1.4-1.18 2.26-.77 1.2-1.86 2.7-3.21 2.71-1.2.01-1.5-.78-3.13-.77-1.62.01-1.95.79-3.15.78-1.35-.01-2.37-1.36-3.14-2.56-2.16-3.34-2.38-7.27-1.06-9.29.94-1.44 2.43-2.28 3.84-2.28 1.44 0 2.35.8 3.54.8 1.15 0 1.85-.8 3.53-.8 1.26 0 2.6.69 3.54 1.89-3.11 1.71-2.61 6.18.42 7.26Z" />
+                      </svg>
+                    )}
                   </button>
                 ))}
               </div>
@@ -1175,9 +1175,7 @@ function PlayerView({
               aria-label="Previous song"
               className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-black/20 disabled:opacity-40 disabled:cursor-not-allowed text-gray-100 transition-all"
             >
-              <svg viewBox="0 0 24 24" className="w-6 h-6 fill-current">
-                <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
-              </svg>
+              <img src={prevIconImg} className="w-6 h-6 object-contain" alt="" />
             </button>
             <button
               onClick={togglePlay}
@@ -1193,13 +1191,13 @@ function PlayerView({
               {pendingPlay && !isPlaying ? (
                 <div className="w-5 h-5 border-2 border-zinc-400/60 border-t-black rounded-full animate-spin" />
               ) : isPlaying ? (
-                <svg viewBox="0 0 24 24" className="w-6 h-6 fill-current">
+                <svg viewBox="0 0 24 24" className="w-8 h-8 fill-current">
                   <rect x="6" y="5" width="4" height="14" rx="1.5"/>
                   <rect x="14" y="5" width="4" height="14" rx="1.5"/>
                 </svg>
               ) : (
-                <svg viewBox="0 0 24 24" className="w-6 h-6 fill-current translate-x-0.5">
-                  <path d="M8 5.14v14l11-7-11-7z"/>
+                <svg viewBox="0 0 24 24" className="w-8 h-8 fill-current">
+                  <path d="M6 3.5v17l14-8.5z"/>
                 </svg>
               )}
             </button>
@@ -1209,9 +1207,7 @@ function PlayerView({
               aria-label="Next song"
               className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-black/20 disabled:opacity-40 disabled:cursor-not-allowed text-gray-100 transition-all"
             >
-              <svg viewBox="0 0 24 24" className="w-6 h-6 fill-current">
-                <path d="M16 6h2v12h-2zM6 6v12l8.5-6z"/>
-              </svg>
+              <img src={nextIconImg} className="w-6 h-6 object-contain" alt="" />
             </button>
           </div>
         </section>
@@ -1240,19 +1236,17 @@ function PlayerView({
 
         </div>{/* end controls + media row */}
 
-        {/* Apple Music player — rendered hidden so audio context stays alive */}
+        {/* Apple Music player — audio-only when playing; visible when auth/error UI is needed */}
         {effectiveSource === 'apple_music' && song.apple_music_url && (
-          <div className="hidden">
-            <AppleMusicPlayer
-              ref={amRef}
-              appleMusicUrl={song.apple_music_url}
-              onReady={() => setAmReady(true)}
-              onTimeUpdate={(posMs, durMs) => { setAmPositionMs(posMs); setAmDurationMs(durMs) }}
-              onPlayStateChange={setAmPlaying}
-              onArtworkUrl={setAmArtworkUrl}
-              autoPlay={amAutoPlay}
-            />
-          </div>
+          <AppleMusicPlayer
+            ref={amRef}
+            appleMusicUrl={song.apple_music_url}
+            onReady={() => setAmReady(true)}
+            onTimeUpdate={(posMs, durMs) => { setAmPositionMs(posMs); setAmDurationMs(durMs) }}
+            onPlayStateChange={setAmPlaying}
+            onArtworkUrl={setAmArtworkUrl}
+            autoPlay={amAutoPlay}
+          />
         )}
 
         {/* Lyrics panel */}
