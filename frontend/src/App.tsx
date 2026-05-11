@@ -8,6 +8,7 @@ import YouTubePlayer, { YouTubePlayerHandle } from './components/YouTubePlayer'
 import AppleMusicPlayer, { AppleMusicPlayerHandle, isAppleMusicAuthorized } from './components/AppleMusicPlayer'
 import { api, BackendUser, PlaylistDetail, PlaylistSummary, SongDetail, SongSummary, UserSettings as ApiUserSettings, clearAdminSession, setAdminSession, getAdminHeaders } from './api/client'
 import { useFavorites } from './hooks/useFavorites'
+import { useListened } from './hooks/useListened'
 
 // ── Module-level song cache (survives re-renders, cleared on logout) ──────────
 // Key: `{id}:{source}` where source is 'youtube' or 'apple_music'.
@@ -551,7 +552,7 @@ function SourcePicker({
 // ── Song browser ──────────────────────────────────────────────────────────────
 
 function SongBrowser({
-  songs, playlists, activePlaylistId, activePlaylist, loading, error, onSelect, onPrefetch, onSelectPlaylist, onLogout, onOpenSettings, onOpenAdmin, onOpenAccount, isAdmin, user, openedSongIds, favoriteSongIds, toggleFavorite,
+  songs, playlists, activePlaylistId, activePlaylist, loading, error, onSelect, onPrefetch, onSelectPlaylist, onLogout, onOpenSettings, onOpenAdmin, onOpenAccount, isAdmin, user, openedSongIds, favoriteSongIds, toggleFavorite, markAsNotListened,
 }: {
   songs: SongSummary[]
   playlists: PlaylistSummary[]
@@ -571,6 +572,7 @@ function SongBrowser({
   openedSongIds: Set<number>
   favoriteSongIds: Set<number>
   toggleFavorite: (id: number) => void
+  markAsNotListened: (id: number) => void
 }) {
   const listenedCount = activePlaylist
     ? activePlaylist.songs.filter(s => openedSongIds.has(s.song_id)).length
@@ -637,8 +639,8 @@ function SongBrowser({
                   {/* dot indicator */}
                   <svg width="8" height="8" viewBox="0 0 8 8" aria-hidden className="shrink-0">
                     {openedSongIds.has(song.id)
-                      ? <circle cx="4" cy="4" r="4" fill="#374151" />
-                      : <circle cx="4" cy="4" r="4" fill="#006D36" />}
+                      ? <circle cx="4" cy="4" r="4" fill="#006D36" />
+                      : <circle cx="4" cy="4" r="4" fill="white" />}
                   </svg>
                   {/* thumbnail */}
                   <div className="shrink-0 w-12 h-12 rounded-lg overflow-hidden bg-zinc-800 flex items-center justify-center">
@@ -694,15 +696,17 @@ function SongBrowser({
                     </svg>
                     {favoriteSongIds.has(song.id) ? 'Remove from favorites' : 'Add to favorites'}
                   </button>
-                  <button
-                    onClick={() => { setOpenMenuSongId(null) }}
-                    className="w-full text-left flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-300 hover:bg-white/5 transition-colors"
-                  >
-                    <svg viewBox="0 0 24 24" className="w-4 h-4 shrink-0 fill-none stroke-current" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="9 11 12 14 22 4" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
-                    </svg>
-                    Mark as not listened
-                  </button>
+                  {openedSongIds.has(song.id) && (
+                    <button
+                      onClick={() => { markAsNotListened(song.id); setOpenMenuSongId(null) }}
+                      className="w-full text-left flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-300 hover:bg-white/5 transition-colors"
+                    >
+                      <svg viewBox="0 0 24 24" className="w-4 h-4 shrink-0 fill-none stroke-current" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="9 11 12 14 22 4" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+                      </svg>
+                      Mark as not listened
+                    </button>
+                  )}
                   <div className="border-t border-zinc-700/60 mx-3" />
                   <button
                     onClick={() => { setOpenMenuSongId(null) }}
@@ -1942,6 +1946,7 @@ export default function App() {
   const [showSignUp, setShowSignUp] = useState(false)
 
   const { favoriteSongIds, toggleFavorite } = useFavorites(!!credentialUser)
+  const { listenedSongIds, markListened, unmarkListened } = useListened(!!credentialUser)
 
   const [songs,        setSongs]        = useState<SongSummary[]>([])
   const [playlists,    setPlaylists]    = useState<PlaylistSummary[]>([])
@@ -1954,12 +1959,6 @@ export default function App() {
   const [activeSong,   setActiveSong]   = useState<SongDetail | null>(null)
   const [songLoading,  setSongLoading]  = useState(false)
   const [lastSelectedSongId, setLastSelectedSongId] = useState<number | null>(null)
-  const [openedSongIds, setOpenedSongIds] = useState<Set<number>>(() => {
-    try {
-      const raw = localStorage.getItem('flowup.openedSongs.v1')
-      return raw ? new Set<number>(JSON.parse(raw)) : new Set<number>()
-    } catch { return new Set<number>() }
-  })
   const [settingsHydrated, setSettingsHydrated] = useState(false)
   const restoreDoneRef = useRef(false)
   const route = useMemo(() => parseAppRoute(currentPath), [currentPath])
@@ -2100,13 +2099,7 @@ export default function App() {
   }, [credentialUser])
 
   const handleSelectSong = useCallback(async (id: number, options?: { updateRoute?: boolean }) => {
-    setOpenedSongIds(prev => {
-      if (prev.has(id)) return prev
-      const next = new Set(prev)
-      next.add(id)
-      try { localStorage.setItem('flowup.openedSongs.v1', JSON.stringify([...next])) } catch {}
-      return next
-    })
+    markListened(id)
     // Navigate immediately so the UI responds at once; song data loads in background.
     if (options?.updateRoute !== false) {
       navigateToPath(songPath(id))
@@ -2456,9 +2449,10 @@ export default function App() {
       onOpenAccount={() => navigateToPath('/settings/account')}
       onLogout={handleLogout}
       user={appUser}
-      openedSongIds={openedSongIds}
+      openedSongIds={listenedSongIds}
       favoriteSongIds={favoriteSongIds}
       toggleFavorite={toggleFavorite}
+      markAsNotListened={unmarkListened}
     />
   )
 }

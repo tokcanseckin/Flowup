@@ -48,7 +48,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response, StreamingResponse
 from sqlalchemy.orm import Session
 
-from database import AlignmentTask, Line, Playlist, PlaylistSong, Song, User, UserFavorite, Word, create_tables, get_db
+from database import AlignmentTask, Line, Playlist, PlaylistSong, Song, User, UserFavorite, UserListenedSong, Word, create_tables, get_db
 from models import (
     AdminLyricsUpdate,
     AdminSongDetailResponse,
@@ -1482,6 +1482,49 @@ def remove_favorite(
     db.query(UserFavorite).filter(
         UserFavorite.user_id == current_user.id,
         UserFavorite.song_id == song_id,
+    ).delete()
+    db.commit()
+
+
+@app.get("/api/me/listened")
+def get_listened(
+    current_user: User = Depends(_get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Return the list of song IDs the current user has listened to."""
+    rows = db.query(UserListenedSong.song_id).filter(UserListenedSong.user_id == current_user.id).all()
+    return {"song_ids": [r.song_id for r in rows]}
+
+
+@app.post("/api/me/listened/{song_id}", status_code=204)
+def add_listened(
+    song_id: int,
+    current_user: User = Depends(_get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Mark a song as listened (idempotent)."""
+    song = db.query(Song).filter(Song.id == song_id).first()
+    if not song:
+        raise HTTPException(status_code=404, detail="Song not found")
+    existing = db.query(UserListenedSong).filter(
+        UserListenedSong.user_id == current_user.id,
+        UserListenedSong.song_id == song_id,
+    ).first()
+    if not existing:
+        db.add(UserListenedSong(user_id=current_user.id, song_id=song_id))
+        db.commit()
+
+
+@app.delete("/api/me/listened/{song_id}", status_code=204)
+def remove_listened(
+    song_id: int,
+    current_user: User = Depends(_get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Unmark a song as listened (idempotent)."""
+    db.query(UserListenedSong).filter(
+        UserListenedSong.user_id == current_user.id,
+        UserListenedSong.song_id == song_id,
     ).delete()
     db.commit()
 
