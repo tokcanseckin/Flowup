@@ -171,6 +171,8 @@ export default function AdminPanel({
   const [playlistSaving, setPlaylistSaving] = useState(false)
   const [playlistError, setPlaylistError] = useState<string | null>(null)
   const [playlistSongQuery, setPlaylistSongQuery] = useState('')
+  const [coverUploading, setCoverUploading] = useState(false)
+  const [coverKey, setCoverKey] = useState(0)
 
   const [users, setUsers] = useState<AdminUser[]>([])
   const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null)
@@ -759,6 +761,40 @@ export default function AdminPanel({
     }
   }, [onNavigateRoute, onRefreshPlaylists, playlists, selectedPlaylistId])
 
+  const handleUploadCover = useCallback(async (file: File) => {
+    if (!selectedPlaylistId) return
+    setCoverUploading(true)
+    setPlaylistError(null)
+    try {
+      await api.uploadPlaylistCover(selectedPlaylistId, file)
+      setCoverKey(k => k + 1)
+      const refreshed = await api.getPlaylist(selectedPlaylistId)
+      setPlaylistDetail(refreshed)
+      await onRefreshPlaylists()
+    } catch (error) {
+      setPlaylistError(error instanceof Error ? error.message : 'Failed to upload cover')
+    } finally {
+      setCoverUploading(false)
+    }
+  }, [selectedPlaylistId, onRefreshPlaylists])
+
+  const handleDeleteCover = useCallback(async () => {
+    if (!selectedPlaylistId) return
+    setCoverUploading(true)
+    setPlaylistError(null)
+    try {
+      await api.deletePlaylistCover(selectedPlaylistId)
+      setCoverKey(k => k + 1)
+      const refreshed = await api.getPlaylist(selectedPlaylistId)
+      setPlaylistDetail(refreshed)
+      await onRefreshPlaylists()
+    } catch (error) {
+      setPlaylistError(error instanceof Error ? error.message : 'Failed to remove cover')
+    } finally {
+      setCoverUploading(false)
+    }
+  }, [selectedPlaylistId, onRefreshPlaylists])
+
   const handleSaveUser = useCallback(async () => {
     if (!selectedUserId || !userDraft) return
     setUserSaving(true)
@@ -1193,6 +1229,19 @@ export default function AdminPanel({
                     <div className="space-y-4">
                       <input value={playlistDraft.name} onChange={e => setPlaylistDraft(prev => ({ ...prev, name: e.target.value }))} placeholder="Playlist name" className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
                       <textarea value={playlistDraft.description} onChange={e => setPlaylistDraft(prev => ({ ...prev, description: e.target.value }))} rows={3} placeholder="Description" className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
+                      {/* Cover image upload */}
+                      <div className="flex items-center gap-3">
+                        {playlistDetail?.cover_image_url && (
+                          <img src={`${playlistDetail.cover_image_url}?k=${coverKey}`} alt="Cover" className="w-12 h-12 rounded-lg object-cover shrink-0" />
+                        )}
+                        <label className="flex-1 cursor-pointer rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-gray-400 hover:border-indigo-500 text-center select-none" style={{ opacity: coverUploading ? 0.5 : 1, pointerEvents: coverUploading ? 'none' : 'auto' }}>
+                          {coverUploading ? 'Uploading…' : playlistDetail?.cover_image_url ? 'Replace Cover' : 'Upload Cover'}
+                          <input type="file" accept="image/*" className="hidden" disabled={coverUploading} onChange={e => { const f = e.target.files?.[0]; if (f) void handleUploadCover(f); e.target.value = '' }} />
+                        </label>
+                        {playlistDetail?.cover_image_url && (
+                          <button type="button" onClick={() => void handleDeleteCover()} disabled={coverUploading} className="rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-red-400 hover:border-red-500 disabled:opacity-50">Remove</button>
+                        )}
+                      </div>
                       <div className="grid gap-3 md:grid-cols-2">
                         <input value={playlistDraft.difficulty_level} onChange={e => setPlaylistDraft(prev => ({ ...prev, difficulty_level: e.target.value }))} placeholder="Difficulty level" className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
                         <input value={playlistDraft.language_code} onChange={e => setPlaylistDraft(prev => ({ ...prev, language_code: e.target.value }))} placeholder="Language code" className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />

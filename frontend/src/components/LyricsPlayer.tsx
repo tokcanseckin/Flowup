@@ -234,7 +234,7 @@ function BreakIndicator({ startMs, endMs, currentPositionMs, isPlaying, label }:
           {label && (
             <span className={`text-[11px] shrink-0 font-mono uppercase tracking-[0.18em] ${isActive ? 'text-white/75' : isPast ? 'text-white/45' : 'text-white/70'}`}>{label}</span>
           )}
-          <div className="relative flex-1 h-1 rounded-full bg-white/20 overflow-hidden">
+          <div className="relative flex-1 h-1 rounded-full bg-white/20 overflow-hidden mr-7">
             {isPast && (
               <div className="absolute inset-0 rounded-full bg-white/45" />
             )}

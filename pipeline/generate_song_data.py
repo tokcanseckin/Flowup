@@ -519,7 +519,27 @@ def align_with_stable_ts(
 
 # ── LRCLIB ────────────────────────────────────────────────────────────────────
 
-def _fetch_lrclib_candidate(artist: str, title: str) -> dict | None:
+_CYRILLIC_LANGS = {"ru", "uk", "bg", "sr", "mk"}
+
+
+def _is_cyrillic(text: str) -> bool:
+    """Return True if text contains enough Cyrillic characters."""
+    return sum(1 for c in text if '\u0400' <= c <= '\u04FF') >= 15
+
+
+def _fetch_lrclib_candidate(artist: str, title: str, lang: str = "") -> dict | None:
+    require_cyrillic = lang in _CYRILLIC_LANGS
+
+    def _hit_ok(hit: dict) -> bool:
+        if not (hit.get("syncedLyrics") or hit.get("plainLyrics")):
+            return False
+        if require_cyrillic:
+            text = hit.get("syncedLyrics") or hit.get("plainLyrics") or ""
+            if not _is_cyrillic(text):
+                print(f"  [LRCLIB] Skipping non-Cyrillic result (id={hit.get('id', '?')})")
+                return False
+        return True
+
     try:
         r = requests.get(
             "https://lrclib.net/api/search",
@@ -528,7 +548,7 @@ def _fetch_lrclib_candidate(artist: str, title: str) -> dict | None:
         )
         r.raise_for_status()
         for hit in r.json():
-            if hit.get("syncedLyrics") or hit.get("plainLyrics"):
+            if _hit_ok(hit):
                 return hit
 
         r2 = requests.get(
@@ -538,15 +558,15 @@ def _fetch_lrclib_candidate(artist: str, title: str) -> dict | None:
         )
         if r2.status_code == 200:
             body = r2.json()
-            if isinstance(body, dict) and (body.get("syncedLyrics") or body.get("plainLyrics")):
+            if isinstance(body, dict) and _hit_ok(body):
                 return body
     except requests.RequestException as exc:
         print(f"  [LRCLIB] Network error: {exc}")
     return None
 
-def fetch_synced_lyrics(artist: str, title: str) -> str | None:
+def fetch_synced_lyrics(artist: str, title: str, lang: str = "") -> str | None:
     print(f"  [LRCLIB] Searching '{title}' by '{artist}' …")
-    candidate = _fetch_lrclib_candidate(artist, title)
+    candidate = _fetch_lrclib_candidate(artist, title, lang)
     if candidate and candidate.get("syncedLyrics"):
         print(f"  [LRCLIB] Found (id={candidate.get('id', '?')}, title={candidate.get('trackName', '?')})")
         return candidate["syncedLyrics"]
@@ -555,9 +575,9 @@ def fetch_synced_lyrics(artist: str, title: str) -> str | None:
     return None
 
 
-def fetch_plain_lyrics(artist: str, title: str) -> str | None:
+def fetch_plain_lyrics(artist: str, title: str, lang: str = "") -> str | None:
     print(f"  [LRCLIB] Looking for plain lyrics for '{title}' by '{artist}' …")
-    candidate = _fetch_lrclib_candidate(artist, title)
+    candidate = _fetch_lrclib_candidate(artist, title, lang)
     if candidate and candidate.get("plainLyrics"):
         print("  [LRCLIB] Found plain lyrics.")
         return candidate["plainLyrics"]
@@ -896,9 +916,9 @@ def main() -> None:
         lrc = load_local_lrc(args.lrc_file)
     else:
         print("\n[1/5] Fetching lyrics from LRCLIB …")
-        lrc = fetch_synced_lyrics(args.artist, args.title)
+        lrc = fetch_synced_lyrics(args.artist, args.title, args.lang)
         if lrc is None:
-            plain_lyrics = fetch_plain_lyrics(args.artist, args.title)
+            plain_lyrics = fetch_plain_lyrics(args.artist, args.title, args.lang)
             if plain_lyrics and args.youtube_url:
                 print("  [stable-ts] Falling back to forced alignment …")
                 lrc = align_with_stable_ts(

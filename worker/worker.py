@@ -62,8 +62,18 @@ _HEADERS = {
 # ── LRCLIB fallback ────────────────────────────────────────────────────────────
 
 
-def _fetch_plain_lyrics(artist: str, title: str) -> str | None:
+def _fetch_plain_lyrics(artist: str, title: str, lang: str = "") -> str | None:
     """Try to retrieve plain lyrics from LRCLIB when the task doesn't include them."""
+    _CYRILLIC_LANGS = {"ru", "uk", "bg", "sr", "mk"}
+    require_cyrillic = lang in _CYRILLIC_LANGS
+
+    def _ok(text: str) -> bool:
+        if not text:
+            return False
+        if require_cyrillic:
+            return sum(1 for c in text if '\u0400' <= c <= '\u04FF') >= 15
+        return True
+
     try:
         r = requests.get(
             "https://lrclib.net/api/search",
@@ -72,7 +82,7 @@ def _fetch_plain_lyrics(artist: str, title: str) -> str | None:
         )
         r.raise_for_status()
         for hit in r.json():
-            if hit.get("plainLyrics"):
+            if _ok(hit.get("plainLyrics", "")):
                 return hit["plainLyrics"]
 
         r2 = requests.get(
@@ -82,7 +92,7 @@ def _fetch_plain_lyrics(artist: str, title: str) -> str | None:
         )
         if r2.status_code == 200:
             body = r2.json()
-            if isinstance(body, dict) and body.get("plainLyrics"):
+            if isinstance(body, dict) and _ok(body.get("plainLyrics", "")):
                 return body["plainLyrics"]
     except requests.RequestException as exc:
         log.warning(f"LRCLIB error: {exc}")
@@ -155,7 +165,7 @@ def process_task(task: dict) -> None:
 
     if not lyrics:
         log.info(f"Task {task_id}: no lyrics in payload — fetching from LRCLIB …")
-        lyrics = _fetch_plain_lyrics(artist, title) or ""
+        lyrics = _fetch_plain_lyrics(artist, title, lang) or ""
 
     if not lyrics:
         raise RuntimeError(
