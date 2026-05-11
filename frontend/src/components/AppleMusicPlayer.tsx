@@ -224,10 +224,20 @@ const AppleMusicPlayer = forwardRef<AppleMusicPlayerHandle, Props>(function Appl
   const handleTimeChange = useCallback((ev: Record<string, unknown>) => {
     const posS = (ev.currentPlaybackTime as number | undefined) ?? _mkInstance?.currentPlaybackTime ?? 0
     const durS = _mkInstance?.currentPlaybackDuration ?? 0
-    // Anchor the base; the 100 ms ticker will extrapolate from here
-    basePositionMsRef.current = Math.floor(posS * 1000)
-    baseTimestampRef.current  = Date.now()
-    amDurMsRef.current        = Math.floor(durS * 1000)
+    const reportedMs = Math.floor(posS * 1000)
+    // Only move the anchor forward (or jump on a seek/skip > 1 s).
+    // If the reported position is behind our current extrapolation, discard
+    // the stale sample — letting the ticker continue smoothly prevents the
+    // active-line from flickering back across a boundary.
+    const extrapolatedNow = amIsPlayingRef.current
+      ? basePositionMsRef.current + (Date.now() - baseTimestampRef.current)
+      : basePositionMsRef.current
+    const diff = reportedMs - extrapolatedNow
+    if (diff >= 0 || Math.abs(diff) > 1_000) {
+      basePositionMsRef.current = reportedMs
+      baseTimestampRef.current  = Date.now()
+    }
+    amDurMsRef.current = Math.floor(durS * 1000)
   }, [])
 
   // ── Load + configure + authorise ─────────────────────────────────────────────
