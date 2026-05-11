@@ -271,7 +271,8 @@ export const api = {
       method: 'PUT',
       body: JSON.stringify({ token }),
     }),
- (
+
+  updateSongSources: (
     songId: number,
     body: { youtube_url?: string | null; apple_music_url?: string | null },
   ): Promise<SongSummary> =>
