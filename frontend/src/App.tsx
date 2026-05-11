@@ -633,8 +633,8 @@ function SettingsPage({
         </div>
       </header>
 
-      <div className="flex flex-1 min-h-0">
-        <div className="flex flex-1 min-h-0">
+      <div className="flex flex-1 min-h-0 justify-center">
+        <div className="flex w-full max-w-4xl min-h-0">
         {/* Left sidebar */}
         <nav className="w-48 shrink-0 border-r border-gray-900 py-4 px-2 flex flex-col gap-0.5" style={{ background: '#050608' }}>
           {tabs.map(t => (
@@ -657,7 +657,7 @@ function SettingsPage({
         {/* Content */}
         <main className="flex-1 overflow-y-auto px-6 py-6 flex flex-col">
           {activeTab === 'preferences' && (
-            <div className="max-w-xl space-y-3">
+            <div className="max-w-xl w-full space-y-3">
               <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-4">Preferences</h2>
               <div className="rounded-2xl border border-gray-800/80 p-4" style={{ background: '#12121f' }}>
                 <p className="text-white font-medium mb-1">Music source</p>
@@ -680,7 +680,7 @@ function SettingsPage({
           )}
 
           {activeTab === 'account' && (
-            <div className="max-w-xl flex flex-col min-h-full">
+            <div className="max-w-xl w-full flex flex-col min-h-full">
               <div className="space-y-3 flex-1">
               <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-4">Account</h2>
               <div className="rounded-2xl border border-gray-800/80 p-5" style={{ background: '#12121f' }}>
@@ -726,7 +726,7 @@ function SettingsPage({
           )}
 
           {activeTab === 'subscription' && (
-            <div className="max-w-xl space-y-3">
+            <div className="max-w-xl w-full space-y-3">
               <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-4">Subscription</h2>
               <div className="rounded-2xl border border-gray-800/80 p-8 flex flex-col items-center text-center" style={{ background: '#12121f' }}>
                 <div className="w-14 h-14 rounded-2xl bg-gray-800 flex items-center justify-center mb-4">
@@ -741,7 +741,7 @@ function SettingsPage({
           )}
 
           {activeTab === 'support' && (
-            <div className="max-w-xl space-y-3">
+            <div className="max-w-xl w-full space-y-3">
               <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-4">Support</h2>
               {supportSent ? (
                 <div className="rounded-2xl border border-gray-800/80 p-8 flex flex-col items-center text-center" style={{ background: '#12121f' }}>
