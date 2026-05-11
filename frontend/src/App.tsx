@@ -6,7 +6,7 @@ import prevIconImg   from '../images/previous_icon@2x.png'
 import nextIconImg   from '../images/next_icon@2x.png'
 import YouTubePlayer, { YouTubePlayerHandle } from './components/YouTubePlayer'
 import AppleMusicPlayer, { AppleMusicPlayerHandle, isAppleMusicAuthorized } from './components/AppleMusicPlayer'
-import { api, BackendUser, PlaylistDetail, PlaylistSummary, SongDetail, SongSummary, UserSettings as ApiUserSettings, clearAdminSession, setAdminSession } from './api/client'
+import { api, BackendUser, PlaylistDetail, PlaylistSummary, SongDetail, SongSummary, UserSettings as ApiUserSettings, clearAdminSession, setAdminSession, getAdminHeaders } from './api/client'
 
 // ── Module-level song cache (survives re-renders, cleared on logout) ──────────
 // Key: `{id}:{source}` where source is 'youtube' or 'apple_music'.
@@ -59,6 +59,19 @@ declare global {
 }
 
 const PASSWORD_SESSION_KEY = 'flowup.password_user.v1'
+
+function youtubeThumbnail(youtubeUrl: string | null): string | null {
+  if (!youtubeUrl) return null
+  try {
+    const u = new URL(youtubeUrl)
+    const id = u.hostname === 'youtu.be'
+      ? u.pathname.slice(1).split('?')[0]
+      : (u.searchParams.get('v') ?? u.pathname.split('/').pop() ?? '')
+    return id ? `https://img.youtube.com/vi/${id}/mqdefault.jpg` : null
+  } catch {
+    return null
+  }
+}
 
 interface AppSettings {
   excludeStopWordsFromShortcuts: boolean
@@ -454,17 +467,32 @@ function SongBrowser({
               onClick={() => onSelect(song.id)}
               onPointerEnter={() => onPrefetch(song.id)}
               className="
-                w-full text-left rounded-2xl border border-zinc-700/70 p-4
+                w-full text-left rounded-2xl border border-zinc-700/70 p-3
                 hover:border-indigo-700/60 hover:bg-indigo-950/10
                 active:scale-[0.99] transition-all duration-150
               "
               style={{ background: '#25262b' }}
             >
               <div className="flex items-center gap-3">
-                <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden className="shrink-0">
+                {/* thumbnail */}
+                <div className="shrink-0 w-12 h-12 rounded-lg overflow-hidden bg-zinc-800 flex items-center justify-center">
+                  {youtubeThumbnail(song.youtube_url)
+                    ? <img
+                        src={youtubeThumbnail(song.youtube_url)!}
+                        alt=""
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                    : <svg className="w-5 h-5 text-zinc-600" fill="currentColor" viewBox="0 0 20 20" aria-hidden>
+                        <path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z" />
+                      </svg>
+                  }
+                </div>
+                {/* dot indicator */}
+                <svg width="8" height="8" viewBox="0 0 8 8" aria-hidden className="shrink-0">
                   {openedSongIds.has(song.id)
-                    ? <circle cx="6" cy="6" r="5" fill="none" stroke="#6366f1" strokeWidth="1.5" />
-                    : <circle cx="6" cy="6" r="6" fill="#6366f1" />}
+                    ? <circle cx="4" cy="4" r="3" fill="none" stroke="#6366f1" strokeWidth="1.5" />
+                    : <circle cx="4" cy="4" r="4" fill="#6366f1" />}
                 </svg>
                 <div className="min-w-0 flex-1">
                   <p className="text-white font-semibold truncate">{song.title}</p>
@@ -2013,6 +2041,21 @@ export default function App() {
   }
 
   if (adminOpen && isAdmin) {
+    const hasAdminSession = Object.keys(getAdminHeaders()).length > 0
+    if (!hasAdminSession) {
+      return (
+        <div className="min-h-screen flex flex-col items-center justify-center gap-6" style={{ background: '#050608' }}>
+          <p className="text-gray-300 text-base">Your admin session expired.</p>
+          <p className="text-gray-500 text-sm">Please log out and log back in to access the admin panel.</p>
+          <button
+            onClick={handleLogout}
+            className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium transition-colors"
+          >
+            Log out
+          </button>
+        </div>
+      )
+    }
     return (
       <AdminPanel
         songs={songs}
