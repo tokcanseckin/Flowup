@@ -1242,7 +1242,8 @@ function PlayerView({
   return (
     <div className="h-screen flex flex-col overflow-hidden" style={{ background: '#050608', transition: 'background 1.2s ease' }}>
       {/* Header */}
-      <header className="sticky top-0 z-20 flex items-center justify-between px-4 sm:px-6 py-4 border-b border-gray-900" style={{ background: '#050608' }}>
+      <header className="sticky top-0 z-20 border-b border-gray-900" style={{ background: '#050608' }}>
+        <div className="max-w-[1200px] mx-auto w-full px-4 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <button onClick={onBack} className="text-gray-500 hover:text-gray-300 transition-colors mr-1" aria-label="Back">
             <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">
@@ -1306,6 +1307,7 @@ function PlayerView({
           })()}
           {user?.display_name && <span className="text-xs text-gray-500">{user.display_name}</span>}
           <button onClick={onLogout} className="text-xs text-gray-600 hover:text-gray-400 transition-colors">Sign out</button>
+        </div>
         </div>
       </header>
 
