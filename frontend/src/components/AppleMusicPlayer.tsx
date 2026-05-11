@@ -140,6 +140,10 @@ interface Props {
    * user-gesture-initiated play() call (i.e. not on first ever playback).
    */
   autoPlay?: boolean
+  /** Previously saved MusicKit musicUserToken to restore auth without a popup. */
+  storedMusicUserToken?: string | null
+  /** Called with the musicUserToken after a successful authorize(), or null when cleared. */
+  onMusicUserToken?: (token: string | null) => void
 }
 
 type Status = 'loading' | 'needs-auth' | 'authorizing' | 'needs-play' | 'playing' | 'error'
@@ -157,7 +161,7 @@ function extractArtworkUrl(music: MusicKitInstance): string | null {
 }
 
 const AppleMusicPlayer = forwardRef<AppleMusicPlayerHandle, Props>(function AppleMusicPlayer(
-  { appleMusicUrl, onReady, onTimeUpdate, onPlayStateChange, onArtworkUrl, autoPlay },
+  { appleMusicUrl, onReady, onTimeUpdate, onPlayStateChange, onArtworkUrl, autoPlay, storedMusicUserToken, onMusicUserToken },
   ref,
 ) {
   const [status, setStatus] = useState<Status>('loading')
@@ -170,11 +174,15 @@ const AppleMusicPlayer = forwardRef<AppleMusicPlayerHandle, Props>(function Appl
   const onReadyRef = useRef(onReady)
   const onArtworkUrlRef = useRef(onArtworkUrl)
   const autoPlayRef = useRef(autoPlay)
+  const onMusicUserTokenRef = useRef(onMusicUserToken)
+  const storedTokenRef = useRef(storedMusicUserToken)
   useEffect(() => { onTimeUpdateRef.current = onTimeUpdate }, [onTimeUpdate])
   useEffect(() => { onPlayStateChangeRef.current = onPlayStateChange }, [onPlayStateChange])
   useEffect(() => { onReadyRef.current = onReady }, [onReady])
   useEffect(() => { onArtworkUrlRef.current = onArtworkUrl }, [onArtworkUrl])
   useEffect(() => { autoPlayRef.current = autoPlay }, [autoPlay])
+  useEffect(() => { onMusicUserTokenRef.current = onMusicUserToken }, [onMusicUserToken])
+  useEffect(() => { storedTokenRef.current = storedMusicUserToken }, [storedMusicUserToken])
 
   // ── Smooth extrapolation ticker (mirrors Spotify's approach) ─────────────────
   // MusicKit fires playbackTimeDidChange at irregular intervals (~1 s or less).
@@ -284,11 +292,21 @@ const AppleMusicPlayer = forwardRef<AppleMusicPlayerHandle, Props>(function Appl
       //    authorize() requires a user gesture to open the popup — calling it
       //    from useEffect causes browsers to silently hang the promise.
       //    So if not yet authorized, show the manual button immediately.
+      //    However, if we have a stored token, restore it first — MusicKit will
+      //    recognise the user as authorized without a popup.
       if (!music.isAuthorized) {
-        logAppleMusicDebug('Not authorized; showing manual auth button')
-        if (!mountedRef.current) return
-        setStatus('needs-auth')
-        return
+        const savedToken = storedTokenRef.current
+        if (savedToken) {
+          logAppleMusicDebug('Restoring saved musicUserToken')
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          ;(music as any).musicUserToken = savedToken
+        }
+        if (!music.isAuthorized) {
+          logAppleMusicDebug('Not authorized; showing manual auth button')
+          if (!mountedRef.current) return
+          setStatus('needs-auth')
+          return
+        }
       }
 
       // 5. Set queue.
@@ -331,6 +349,10 @@ const AppleMusicPlayer = forwardRef<AppleMusicPlayerHandle, Props>(function Appl
     try {
       await _mkInstance.authorize()
       if (!mountedRef.current) return
+      // Persist the token so it can be restored on next session
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const newToken = (_mkInstance as any).musicUserToken as string | null | undefined
+      if (newToken) onMusicUserTokenRef.current?.(newToken)
       // After authorize(), set the queue then show tap-to-play.
       // Never call play() here — Safari will block it after the async auth chain.
       await _mkInstance.setQueue({ url: appleMusicUrl })

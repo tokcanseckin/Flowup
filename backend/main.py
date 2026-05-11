@@ -1353,6 +1353,7 @@ async def sync_user(body: UserSyncRequest, db: Session = Depends(get_db)):
         needs_onboarding=_is_onboarding_required(user),
         is_admin=bool(user.is_admin),
         spotify_enabled=bool(user.spotify_enabled),
+        apple_music_user_token=user.apple_music_user_token,
     )
 
 
@@ -1371,6 +1372,7 @@ async def login_with_credentials(body: CredentialLoginRequest, db: Session = Dep
         needs_onboarding=_is_onboarding_required(user),
         is_admin=bool(user.is_admin),
         spotify_enabled=bool(user.spotify_enabled),
+        apple_music_user_token=user.apple_music_user_token,
     )
 
 
@@ -1404,6 +1406,7 @@ async def complete_onboarding(body: CompleteOnboardingRequest, db: Session = Dep
         needs_onboarding=_is_onboarding_required(user),
         is_admin=bool(user.is_admin),
         spotify_enabled=bool(user.spotify_enabled),
+        apple_music_user_token=user.apple_music_user_token,
     )
 
 
@@ -1448,6 +1451,27 @@ async def update_user_settings(spotify_id: str, body: UserSettingsUpdate, db: Se
     user.settings_json = merged.model_dump_json()
     db.commit()
     return merged
+
+
+# ── Apple Music user token persistence ────────────────────────────────────────
+
+class AppleMusicTokenRequest(BaseModel):
+    token: Optional[str] = None  # None = clear
+
+
+@app.put("/api/users/{spotify_id}/apple-music-token")
+async def save_apple_music_token(
+    spotify_id: str,
+    body: AppleMusicTokenRequest,
+    db: Session = Depends(get_db),
+):
+    """Persist (or clear) the user's MusicKit musicUserToken."""
+    user = db.query(User).filter(User.spotify_id == spotify_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    user.apple_music_user_token = body.token or None
+    db.commit()
+    return {"ok": True}
 
 
 # ── Auth ───────────────────────────────────────────────────────────────────────
@@ -1498,6 +1522,7 @@ async def login_with_google(body: GoogleLoginRequest, db: Session = Depends(get_
         needs_onboarding=False,
         is_admin=bool(user.is_admin),
         spotify_enabled=bool(user.spotify_enabled),
+        apple_music_user_token=user.apple_music_user_token,
     )
 
 
