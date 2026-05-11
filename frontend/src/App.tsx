@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useMemo, useRef } from 'react'
+import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react'
 import AdminPanel          from './components/AdminPanel'
 import LyricsPlayer         from './components/LyricsPlayer'
 import singolingLogo from '../images/singoling_logo@2x.png'
@@ -605,6 +605,15 @@ function SongBrowser({
     ? activePlaylist.songs.filter(s => openedSongIds.has(s.song_id)).length
     : 0
 
+  const [openMenuSongId, setOpenMenuSongId] = useState<number | null>(null)
+
+  useEffect(() => {
+    if (openMenuSongId === null) return
+    const close = () => setOpenMenuSongId(null)
+    window.addEventListener('click', close)
+    return () => window.removeEventListener('click', close)
+  }, [openMenuSongId])
+
   const songList = (
     <>
       {error && (
@@ -635,49 +644,103 @@ function SongBrowser({
       ) : (
         <div className="space-y-2">
           {songs.map(song => (
-            <button
+            <div
               key={song.id}
-              onClick={() => onSelect(song.id)}
-              onPointerEnter={() => onPrefetch(song.id)}
-              className="
-                w-full text-left rounded-2xl border border-zinc-700/70 p-3
-                active:scale-[0.99] transition-all duration-150
-              "
-              style={{ background: '#25262b' }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(160,160,160,0.4)'; e.currentTarget.style.background = '#323438' }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(63,63,70,0.7)'; e.currentTarget.style.background = '#25262b' }}
+              className="relative"
             >
-              <div className="flex items-center gap-3">
-                {/* dot indicator */}
-                <svg width="8" height="8" viewBox="0 0 8 8" aria-hidden className="shrink-0">
-                  {openedSongIds.has(song.id)
-                    ? <circle cx="4" cy="4" r="3" fill="none" stroke="#006D36" strokeWidth="1.5" />
-                    : <circle cx="4" cy="4" r="4" fill="#006D36" />}
-                </svg>
-                {/* thumbnail */}
-                <div className="shrink-0 w-12 h-12 rounded-lg overflow-hidden bg-zinc-800 flex items-center justify-center">
-                  {youtubeThumbnail(song.youtube_url)
-                    ? <img
-                        src={youtubeThumbnail(song.youtube_url)!}
-                        alt=""
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                      />
-                    : <svg className="w-5 h-5 text-zinc-600" fill="currentColor" viewBox="0 0 20 20" aria-hidden>
-                        <path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z" />
-                      </svg>
-                  }
+              <div
+                role="button"
+                tabIndex={0}
+                onClick={() => onSelect(song.id)}
+                onPointerEnter={() => onPrefetch(song.id)}
+                onKeyDown={e => e.key === 'Enter' && onSelect(song.id)}
+                className="
+                  w-full text-left rounded-2xl border border-zinc-700/70 p-3
+                  active:scale-[0.99] transition-all duration-150 cursor-pointer
+                "
+                style={{ background: '#25262b' }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(160,160,160,0.4)'; e.currentTarget.style.background = '#323438' }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(63,63,70,0.7)'; e.currentTarget.style.background = '#25262b' }}
+              >
+                <div className="flex items-center gap-3">
+                  {/* dot indicator */}
+                  <svg width="8" height="8" viewBox="0 0 8 8" aria-hidden className="shrink-0">
+                    {openedSongIds.has(song.id)
+                      ? <circle cx="4" cy="4" r="3" fill="none" stroke="#006D36" strokeWidth="1.5" />
+                      : <circle cx="4" cy="4" r="4" fill="#006D36" />}
+                  </svg>
+                  {/* thumbnail */}
+                  <div className="shrink-0 w-12 h-12 rounded-lg overflow-hidden bg-zinc-800 flex items-center justify-center">
+                    {youtubeThumbnail(song.youtube_url)
+                      ? <img
+                          src={youtubeThumbnail(song.youtube_url)!}
+                          alt=""
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                        />
+                      : <svg className="w-5 h-5 text-zinc-600" fill="currentColor" viewBox="0 0 20 20" aria-hidden>
+                          <path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z" />
+                        </svg>
+                    }
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-white font-semibold truncate">{song.title}</p>
+                    <p className="text-gray-500 text-sm truncate">{song.artist ?? 'Unknown artist'}</p>
+                  </div>
+                  <SourceAvailabilityIcons song={song} />
+                  <span className="text-[10px] font-mono font-medium px-1.5 py-0.5 rounded-md uppercase tracking-wider shrink-0" style={{ color: '#4ade80', background: 'rgba(0,109,54,0.25)', border: '1px solid rgba(0,109,54,0.45)' }}>
+                    {song.language_name}
+                  </span>
+                  {/* 3-dot menu button */}
+                  <button
+                    onClick={e => { e.stopPropagation(); setOpenMenuSongId(openMenuSongId === song.id ? null : song.id) }}
+                    className="shrink-0 p-1 rounded-lg text-gray-500 hover:text-gray-300 hover:bg-white/5 transition-colors"
+                    aria-label="More options"
+                  >
+                    <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current">
+                      <circle cx="5" cy="12" r="1.5" /><circle cx="12" cy="12" r="1.5" /><circle cx="19" cy="12" r="1.5" />
+                    </svg>
+                  </button>
                 </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-white font-semibold truncate">{song.title}</p>
-                  <p className="text-gray-500 text-sm truncate">{song.artist ?? 'Unknown artist'}</p>
-                </div>
-                <SourceAvailabilityIcons song={song} />
-                <span className="text-[10px] font-mono font-medium px-1.5 py-0.5 rounded-md uppercase tracking-wider shrink-0" style={{ color: '#4ade80', background: 'rgba(0,109,54,0.25)', border: '1px solid rgba(0,109,54,0.45)' }}>
-                  {song.language_name}
-                </span>
               </div>
-            </button>
+              {/* Dropdown menu */}
+              {openMenuSongId === song.id && (
+                <div
+                  onClick={e => e.stopPropagation()}
+                  className="absolute right-0 z-30 mt-1 w-52 rounded-xl border border-zinc-700 shadow-xl overflow-hidden"
+                  style={{ background: '#1c1d21' }}
+                >
+                  <button
+                    onClick={() => { setOpenMenuSongId(null) }}
+                    className="w-full text-left flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-300 hover:bg-white/5 transition-colors"
+                  >
+                    <svg viewBox="0 0 24 24" className="w-4 h-4 shrink-0 fill-none stroke-current" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                    </svg>
+                    Add to favorites
+                  </button>
+                  <button
+                    onClick={() => { setOpenMenuSongId(null) }}
+                    className="w-full text-left flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-300 hover:bg-white/5 transition-colors"
+                  >
+                    <svg viewBox="0 0 24 24" className="w-4 h-4 shrink-0 fill-none stroke-current" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="9 11 12 14 22 4" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+                    </svg>
+                    Mark as not listened
+                  </button>
+                  <div className="border-t border-zinc-700/60 mx-3" />
+                  <button
+                    onClick={() => { setOpenMenuSongId(null) }}
+                    className="w-full text-left flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition-colors"
+                  >
+                    <svg viewBox="0 0 24 24" className="w-4 h-4 shrink-0 fill-none stroke-current" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" /><line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" />
+                    </svg>
+                    Report a problem
+                  </button>
+                </div>
+              )}
+            </div>
           ))}
         </div>
       )}
@@ -1387,7 +1450,15 @@ function PlayerView({
   onMusicUserToken?: (token: string | null) => void
 }) {
   const [infoVisible, setInfoVisible] = useState(false)
+  const [playerMenuOpen, setPlayerMenuOpen] = useState(false)
   const autoPausedRef = useRef(false)
+
+  useEffect(() => {
+    if (!playerMenuOpen) return
+    const close = () => setPlayerMenuOpen(false)
+    window.addEventListener('click', close)
+    return () => window.removeEventListener('click', close)
+  }, [playerMenuOpen])
 
   const shouldLogPlaybackDebug = import.meta.env.DEV || localStorage.getItem('flowup_debug_playback') === '1'
   const logPlaybackDebug = (message: string, data?: unknown) => {
@@ -1689,7 +1760,61 @@ function PlayerView({
         >
 
           {/* Player controls — takes remaining width */}
-          <section className="rounded-md border border-zinc-700/70 p-6 min-w-0 min-h-[210px] lg:min-h-[240px]" style={{ background: '#25262b' }}>
+          <section className="relative rounded-md border border-zinc-700/70 p-6 min-w-0 min-h-[210px] lg:min-h-[240px]" style={{ background: '#25262b' }}>
+          {/* 3-dot options menu — upper right corner */}
+          <div className="absolute top-3 right-3 z-10">
+              <button
+                type="button"
+                aria-label="Song options"
+                onClick={e => { e.stopPropagation(); setPlayerMenuOpen(v => !v) }}
+                className="w-8 h-8 flex items-center justify-center rounded-full text-zinc-400 hover:text-zinc-100 hover:bg-white/10 transition-colors"
+              >
+                <svg viewBox="0 0 20 20" className="w-5 h-5 fill-current" aria-hidden>
+                  <circle cx="10" cy="4" r="1.5"/>
+                  <circle cx="10" cy="10" r="1.5"/>
+                  <circle cx="10" cy="16" r="1.5"/>
+                </svg>
+              </button>
+              {playerMenuOpen && (
+                <div
+                  className="absolute right-0 top-10 z-50 min-w-[200px] rounded-xl border border-zinc-700 py-1.5 shadow-2xl"
+                  style={{ background: '#1c1d21' }}
+                  onClick={e => e.stopPropagation()}
+                >
+                  <button
+                    type="button"
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-300 hover:bg-white/8 transition-colors"
+                    onClick={() => setPlayerMenuOpen(false)}
+                  >
+                    <svg viewBox="0 0 20 20" className="w-4 h-4 shrink-0 fill-current text-zinc-400" aria-hidden>
+                      <path d="M10 2a8 8 0 100 16A8 8 0 0010 2zm3.7 6.3a1 1 0 010 1.4l-4 4a1 1 0 01-1.4 0l-2-2a1 1 0 111.4-1.4L9 11.58l3.3-3.3a1 1 0 011.4 0z"/>
+                    </svg>
+                    Add to favorites
+                  </button>
+                  <button
+                    type="button"
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-300 hover:bg-white/8 transition-colors"
+                    onClick={() => setPlayerMenuOpen(false)}
+                  >
+                    <svg viewBox="0 0 20 20" className="w-4 h-4 shrink-0 fill-current text-zinc-400" aria-hidden>
+                      <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd"/>
+                    </svg>
+                    Mark as not listened
+                  </button>
+                  <div className="border-t border-zinc-700/60 mx-3 my-1" />
+                  <button
+                    type="button"
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition-colors"
+                    onClick={() => setPlayerMenuOpen(false)}
+                  >
+                    <svg viewBox="0 0 20 20" className="w-4 h-4 shrink-0 fill-current" aria-hidden>
+                      <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-3a1 1 0 00-1 1v.5a1 1 0 002 0V11a1 1 0 00-1-1z" clipRule="evenodd"/>
+                    </svg>
+                    Report a problem
+                  </button>
+                </div>
+              )}
+            </div>
           <div className="flex items-center gap-4 mb-5">
             {coverArtUrl ? (
               <img src={coverArtUrl} alt="Album art" className="w-16 h-16 rounded object-cover border border-black/40" />
@@ -1700,7 +1825,7 @@ function PlayerView({
                 </svg>
               </div>
             )}
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <p className="text-zinc-100 text-2xl leading-tight font-semibold truncate">
                 {song.title}
               </p>
