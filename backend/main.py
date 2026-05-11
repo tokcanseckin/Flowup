@@ -42,7 +42,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from fastapi import Depends, FastAPI, Header, HTTPException, Query
+from fastapi import Depends, FastAPI, File, Header, HTTPException, Query, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response, StreamingResponse
 from sqlalchemy.orm import Session
@@ -1008,7 +1008,7 @@ async def regenerate_song_lyrics(
 
     # Check LRCLIB before spawning the worker — if synced lyrics exist we can
     # skip Whisper entirely and pass --lrc-file to the pipeline.
-    synced_lrc = _lrclib_synced(artist, title)
+    synced_lrc = _lrclib_synced(artist, title, lang_code)
 
     async def event_stream():
         lrc_tmp_path: Optional[Path] = None
@@ -1203,6 +1203,10 @@ def _playlist_song_entry(ps: PlaylistSong) -> PlaylistSongEntry | None:
     )
 
 
+# In-process cover image cache {playlist_id: (bytes, content_type)}
+_cover_cache: dict[int, tuple[bytes, str]] = {}
+
+
 def _playlist_response(pl: Playlist) -> PlaylistResponse:
     songs = [e for ps in pl.playlist_songs if (e := _playlist_song_entry(ps)) is not None]
     return PlaylistResponse(
@@ -1210,6 +1214,7 @@ def _playlist_response(pl: Playlist) -> PlaylistResponse:
         spotify_playlist_id=pl.spotify_playlist_id,
         name=pl.name,
         description=pl.description,
+        cover_image_url=f"/api/playlists/{pl.id}/cover" if pl.cover_image_type is not None else None,
         difficulty_level=pl.difficulty_level,
         language_code=pl.language_code,
         song_count=pl.song_count,
@@ -1223,6 +1228,7 @@ def _playlist_summary(pl: Playlist) -> PlaylistSummaryResponse:
         spotify_playlist_id=pl.spotify_playlist_id,
         name=pl.name,
         description=pl.description,
+        cover_image_url=f"/api/playlists/{pl.id}/cover" if pl.cover_image_type is not None else None,
         difficulty_level=pl.difficulty_level,
         language_code=pl.language_code,
         song_count=pl.song_count,
@@ -1291,6 +1297,53 @@ def delete_playlist(playlist_id: int, db: Session = Depends(get_db), _: User = D
         raise HTTPException(status_code=404, detail="Playlist not found")
     db.delete(pl)
     db.commit()
+    _cover_cache.pop(playlist_id, None)
+
+
+@app.post("/api/playlists/{playlist_id}/cover", status_code=204)
+async def upload_playlist_cover(
+    playlist_id: int,
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    _: User = Depends(_require_admin),
+):
+    pl = db.get(Playlist, playlist_id)
+    if not pl:
+        raise HTTPException(status_code=404, detail="Playlist not found")
+    data = await file.read()
+    content_type = file.content_type or "image/jpeg"
+    pl.cover_image = data
+    pl.cover_image_type = content_type
+    db.commit()
+    _cover_cache[playlist_id] = (data, content_type)
+
+
+@app.get("/api/playlists/{playlist_id}/cover")
+async def get_playlist_cover(playlist_id: int, db: Session = Depends(get_db)):
+    if playlist_id in _cover_cache:
+        data, content_type = _cover_cache[playlist_id]
+        return Response(content=data, media_type=content_type)
+    pl = db.get(Playlist, playlist_id)
+    if not pl or pl.cover_image_type is None:
+        raise HTTPException(status_code=404, detail="No cover image")
+    data = pl.cover_image  # triggers deferred load
+    _cover_cache[playlist_id] = (data, pl.cover_image_type)
+    return Response(content=data, media_type=pl.cover_image_type)
+
+
+@app.delete("/api/playlists/{playlist_id}/cover", status_code=204)
+def delete_playlist_cover(
+    playlist_id: int,
+    db: Session = Depends(get_db),
+    _: User = Depends(_require_admin),
+):
+    pl = db.get(Playlist, playlist_id)
+    if not pl:
+        raise HTTPException(status_code=404, detail="Playlist not found")
+    pl.cover_image = None
+    pl.cover_image_type = None
+    db.commit()
+    _cover_cache.pop(playlist_id, None)
 
 
 @app.post("/api/playlists/{playlist_id}/songs", response_model=PlaylistResponse, status_code=201)
@@ -1692,8 +1745,18 @@ def worker_submit_result(
 # ── Admin: alignment task management ──────────────────────────────────────────
 
 
-def _lrclib_synced(artist: str, title: str) -> Optional[str]:
+def _lrclib_synced(artist: str, title: str, lang: str = "") -> Optional[str]:
     """Return synced LRC from LRCLIB if available, else None."""
+    _CYRILLIC_LANGS = {"ru", "uk", "bg", "sr", "mk"}
+    require_cyrillic = lang in _CYRILLIC_LANGS
+
+    def _ok(text: str) -> bool:
+        if not text:
+            return False
+        if require_cyrillic:
+            return sum(1 for c in text if '\u0400' <= c <= '\u04FF') >= 15
+        return True
+
     try:
         # 1. Try the exact-match GET endpoint first (most precise)
         params = urllib.parse.urlencode({"artist_name": artist, "track_name": title})
@@ -1704,7 +1767,7 @@ def _lrclib_synced(artist: str, title: str) -> Optional[str]:
         try:
             with urllib.request.urlopen(req, timeout=10) as resp:
                 body = json.loads(resp.read().decode())
-            if isinstance(body, dict) and body.get("syncedLyrics"):
+            if isinstance(body, dict) and _ok(body.get("syncedLyrics", "")):
                 return body["syncedLyrics"]
         except Exception:
             pass
@@ -1718,7 +1781,7 @@ def _lrclib_synced(artist: str, title: str) -> Optional[str]:
         with urllib.request.urlopen(req2, timeout=10) as resp2:
             hits = json.loads(resp2.read().decode())
         for hit in hits:
-            if hit.get("syncedLyrics"):
+            if _ok(hit.get("syncedLyrics", "")):
                 return hit["syncedLyrics"]
     except Exception:
         pass
@@ -1808,7 +1871,7 @@ def create_alignment_task(
     )
 
     # ── Check LRCLIB first ────────────────────────────────────────────────────
-    synced_lrc = _lrclib_synced(body.artist, body.title)
+    synced_lrc = _lrclib_synced(body.artist, body.title, body.lang or "")
     if synced_lrc:
         task.status = "done"
         task.result_lrc = synced_lrc

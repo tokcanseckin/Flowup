@@ -69,6 +69,7 @@ export interface PlaylistSummary {
   spotify_playlist_id: string | null
   name: string
   description: string | null
+  cover_image_url: string | null
   difficulty_level: string | null
   language_code: string | null
   song_count: number
@@ -210,6 +211,29 @@ export const api = {
 
   deletePlaylist: (playlistId: number): Promise<void> =>
     fetch(`/api/playlists/${playlistId}`, { method: 'DELETE', headers: getAdminHeaders() }).then(async r => {
+      if (!r.ok) {
+        const body = await r.json().catch(() => ({ detail: r.statusText })) as { detail?: string }
+        throw new Error(body.detail ?? `API error ${r.status}`)
+      }
+    }),
+
+  uploadPlaylistCover: (playlistId: number, file: File): Promise<void> => {
+    const form = new FormData()
+    form.append('file', file)
+    return fetch(`/api/playlists/${playlistId}/cover`, {
+      method: 'POST',
+      headers: getAdminHeaders(),
+      body: form,
+    }).then(async r => {
+      if (!r.ok) {
+        const body = await r.json().catch(() => ({ detail: r.statusText })) as { detail?: string }
+        throw new Error(body.detail ?? `API error ${r.status}`)
+      }
+    })
+  },
+
+  deletePlaylistCover: (playlistId: number): Promise<void> =>
+    fetch(`/api/playlists/${playlistId}/cover`, { method: 'DELETE', headers: getAdminHeaders() }).then(async r => {
       if (!r.ok) {
         const body = await r.json().catch(() => ({ detail: r.statusText })) as { detail?: string }
         throw new Error(body.detail ?? `API error ${r.status}`)

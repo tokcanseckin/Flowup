@@ -6,8 +6,8 @@ import os
 import time
 from collections.abc import Generator
 
-from sqlalchemy import Column, ForeignKey, Integer, String, Text, UniqueConstraint, create_engine, event, text
-from sqlalchemy.orm import DeclarativeBase, Session, relationship, sessionmaker
+from sqlalchemy import Column, ForeignKey, Integer, LargeBinary, String, Text, UniqueConstraint, create_engine, event, text
+from sqlalchemy.orm import DeclarativeBase, Session, deferred, relationship, sessionmaker
 
 DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///./flowup.db")
 
@@ -120,6 +120,8 @@ class Playlist(Base):
     spotify_playlist_id = Column(String(128), unique=True, nullable=True)
     name                = Column(String(512), nullable=False)
     description         = Column(Text,        nullable=True)
+    cover_image         = deferred(Column(LargeBinary, nullable=True))
+    cover_image_type    = Column(String(64),  nullable=True)
     # CEFR-style level: A1, A2, B1, B2, C1, C2
     difficulty_level    = Column(String(8),   nullable=True)
     language_code       = Column(String(8),   nullable=True)

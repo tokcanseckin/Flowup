@@ -80,6 +80,7 @@ class PlaylistResponse(BaseModel):
     spotify_playlist_id: Optional[str]
     name: str
     description: Optional[str]
+    cover_image_url: Optional[str] = None
     difficulty_level: Optional[str]
     language_code: Optional[str]
     song_count: int
@@ -93,6 +94,7 @@ class PlaylistSummaryResponse(BaseModel):
     spotify_playlist_id: Optional[str]
     name: str
     description: Optional[str]
+    cover_image_url: Optional[str] = None
     difficulty_level: Optional[str]
     language_code: Optional[str]
     song_count: int
