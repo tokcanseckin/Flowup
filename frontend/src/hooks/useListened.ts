@@ -43,7 +43,9 @@ export function useListened(isAuthenticated: boolean) {
         const local = loadIds()
         const merged = new Set([...serverSet, ...local])
         setListenedSongIds(merged)
-        saveIds(merged)
+        // Save only the server-authoritative set so orphaned IDs (e.g. deleted songs)
+        // are evicted from localStorage after this sync instead of retried forever.
+        saveIds(serverSet)
         // Push any local-only IDs to the backend
         const unsynced = [...local].filter(id => !serverSet.has(id))
         if (unsynced.length) {

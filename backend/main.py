@@ -1588,10 +1588,10 @@ def add_listened(
     current_user: User = Depends(_get_current_user),
     db: Session = Depends(get_db),
 ):
-    """Mark a song as listened (idempotent)."""
+    """Mark a song as listened (idempotent). Silently succeeds if song no longer exists."""
     song = db.query(Song).filter(Song.id == song_id).first()
     if not song:
-        raise HTTPException(status_code=404, detail="Song not found")
+        return  # song was deleted; treat as no-op
     existing = db.query(UserListenedSong).filter(
         UserListenedSong.user_id == current_user.id,
         UserListenedSong.song_id == song_id,
