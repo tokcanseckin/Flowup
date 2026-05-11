@@ -641,7 +641,7 @@ function SettingsPage({
         </nav>
 
         {/* Content */}
-        <main className="flex-1 overflow-y-auto px-6 py-6">
+        <main className="flex-1 overflow-y-auto px-6 py-6 flex flex-col">
           {tab === 'preferences' && (
             <div className="max-w-xl space-y-3">
               <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-4">Preferences</h2>
@@ -666,7 +666,8 @@ function SettingsPage({
           )}
 
           {tab === 'account' && (
-            <div className="max-w-xl space-y-3">
+            <div className="max-w-xl flex flex-col min-h-full">
+              <div className="space-y-3 flex-1">
               <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-4">Account</h2>
               <div className="rounded-2xl border border-gray-800/80 p-5" style={{ background: '#12121f' }}>
                 <div className="flex items-center gap-4 mb-5">
@@ -695,14 +696,17 @@ function SettingsPage({
                       <span className="text-xs text-gray-500">Not connected</span>
                     )}
                   </div>
-                  <button
-                    type="button"
-                    onClick={onLogout}
-                    className="w-full rounded-xl border border-gray-700 px-4 py-2.5 text-sm text-gray-400 hover:text-white hover:border-gray-500 transition-colors text-left"
-                  >
-                    Sign out
-                  </button>
                 </div>
+              </div>
+              </div>
+              <div className="pt-4 pb-2">
+                <button
+                  type="button"
+                  onClick={onLogout}
+                  className="w-full rounded-xl border border-gray-700 px-4 py-2.5 text-sm text-gray-400 hover:text-white hover:border-gray-500 transition-colors text-left"
+                >
+                  Sign out
+                </button>
               </div>
             </div>
           )}
