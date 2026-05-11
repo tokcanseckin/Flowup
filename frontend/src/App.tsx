@@ -1643,7 +1643,13 @@ export default function App() {
   const [credentialUser, setCredentialUser] = useState<BackendUser | null>(() => {
     try {
       const raw = localStorage.getItem(PASSWORD_SESSION_KEY)
-      return raw ? (JSON.parse(raw) as BackendUser) : null
+      if (!raw) return null
+      const user = JSON.parse(raw) as BackendUser
+      // Restore admin Bearer token if the stored user object has one
+      if (user.is_admin && user.admin_token) {
+        setAdminSession(user.admin_token)
+      }
+      return user
     } catch {
       return null
     }
@@ -1735,8 +1741,8 @@ export default function App() {
     setLoginError(null)
     try {
       const user = await api.loginWithEmailPassword({ email, password })
-      if (user.is_admin) {
-        setAdminSession(email.trim().toLowerCase(), password)
+      if (user.is_admin && user.admin_token) {
+        setAdminSession(user.admin_token)
       } else {
         clearAdminSession()
       }
@@ -1754,7 +1760,11 @@ export default function App() {
     setLoginError(null)
     try {
       const user = await api.loginWithGoogle(credential)
-      clearAdminSession()
+      if (user.is_admin && user.admin_token) {
+        setAdminSession(user.admin_token)
+      } else {
+        clearAdminSession()
+      }
       setCredentialUser(user)
       localStorage.setItem(PASSWORD_SESSION_KEY, JSON.stringify(user))
     } catch (e) {

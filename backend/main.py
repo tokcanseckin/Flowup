@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import asyncio
 import base64
+import hmac as _hmac
 import ipaddress
 import json
 import os
@@ -33,7 +34,7 @@ import urllib.parse
 import urllib.request
 import uuid
 from contextlib import asynccontextmanager
-from hashlib import pbkdf2_hmac
+from hashlib import pbkdf2_hmac, sha256
 from pathlib import Path
 from typing import Optional
 
@@ -595,42 +596,65 @@ def _is_onboarding_required(user: User) -> bool:
     return not bool(user.email and user.password_hash)
 
 
+# ── Admin token (HMAC-based, works for Google users who have no password) ─────
+_ADMIN_TOKEN_SECRET = os.environ.get("FLOWUP_ADMIN_SECRET", "flowup-dev-admin-secret-change-in-prod").encode()
+
+
+def _make_admin_token(user: User) -> str:
+    """Return a stable HMAC-SHA256 token tied to this user's identity."""
+    msg = f"{user.id}:{user.spotify_id}:{user.email or ''}".encode()
+    sig = _hmac.new(_ADMIN_TOKEN_SECRET, msg, sha256).hexdigest()
+    return f"{user.id}.{sig}"
+
+
+def _verify_admin_token(token: str, user: User) -> bool:
+    expected = _make_admin_token(user)
+    return secrets.compare_digest(token, expected)
+
+
 def _require_admin(
     authorization: str | None = Header(default=None),
     db: Session = Depends(get_db),
 ) -> User:
     if not authorization:
-        raise HTTPException(
-            status_code=401,
-            detail="Admin authentication required",
-        )
+        raise HTTPException(status_code=401, detail="Admin authentication required")
 
     try:
-        scheme, encoded = authorization.split(" ", 1)
+        scheme, credential = authorization.split(" ", 1)
     except ValueError as exc:
         raise HTTPException(status_code=401, detail="Invalid Authorization header") from exc
 
-    if scheme.lower() != "basic":
-        raise HTTPException(
-            status_code=401,
-            detail="Basic authentication required",
-        )
+    scheme = scheme.lower()
 
-    try:
-        decoded = base64.b64decode(encoded).decode("utf-8")
-        email, password = decoded.split(":", 1)
-    except Exception as exc:
-        raise HTTPException(status_code=401, detail="Invalid basic auth credentials") from exc
+    # ── Bearer (HMAC token) — works for both password and Google users ─────────
+    if scheme == "bearer":
+        try:
+            user_id_str, _ = credential.split(".", 1)
+            user_id = int(user_id_str)
+        except Exception as exc:
+            raise HTTPException(status_code=401, detail="Invalid admin token format") from exc
+        user = db.query(User).filter(User.id == user_id).first()
+        if not user or not _verify_admin_token(credential, user):
+            raise HTTPException(status_code=401, detail="Invalid admin token")
+        if not user.is_admin:
+            raise HTTPException(status_code=403, detail="Admin access required")
+        return user
 
-    user = db.query(User).filter(User.email == email.strip().lower()).first()
-    if not user or not _verify_password(password, user.password_hash):
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid admin credentials",
-        )
-    if not user.is_admin:
-        raise HTTPException(status_code=403, detail="Admin access required")
-    return user
+    # ── Basic (email:password) — legacy, kept for compatibility ───────────────
+    if scheme == "basic":
+        try:
+            decoded = base64.b64decode(credential).decode("utf-8")
+            email, password = decoded.split(":", 1)
+        except Exception as exc:
+            raise HTTPException(status_code=401, detail="Invalid basic auth credentials") from exc
+        user = db.query(User).filter(User.email == email.strip().lower()).first()
+        if not user or not _verify_password(password, user.password_hash):
+            raise HTTPException(status_code=401, detail="Invalid admin credentials")
+        if not user.is_admin:
+            raise HTTPException(status_code=403, detail="Admin access required")
+        return user
+
+    raise HTTPException(status_code=401, detail="Unsupported authentication scheme")
 
 
 # ── Health ─────────────────────────────────────────────────────────────────────
@@ -1405,6 +1429,7 @@ async def sync_user(body: UserSyncRequest, db: Session = Depends(get_db)):
         is_admin=bool(user.is_admin),
         spotify_enabled=bool(user.spotify_enabled),
         apple_music_user_token=user.apple_music_user_token,
+        admin_token=_make_admin_token(user) if user.is_admin else None,
     )
 
 
@@ -1424,6 +1449,7 @@ async def login_with_credentials(body: CredentialLoginRequest, db: Session = Dep
         is_admin=bool(user.is_admin),
         spotify_enabled=bool(user.spotify_enabled),
         apple_music_user_token=user.apple_music_user_token,
+        admin_token=_make_admin_token(user) if user.is_admin else None,
     )
 
 
@@ -1458,6 +1484,7 @@ async def complete_onboarding(body: CompleteOnboardingRequest, db: Session = Dep
         is_admin=bool(user.is_admin),
         spotify_enabled=bool(user.spotify_enabled),
         apple_music_user_token=user.apple_music_user_token,
+        admin_token=_make_admin_token(user) if user.is_admin else None,
     )
 
 
@@ -1571,6 +1598,7 @@ async def login_with_google(body: GoogleLoginRequest, db: Session = Depends(get_
         is_admin=bool(user.is_admin),
         spotify_enabled=bool(user.spotify_enabled),
         apple_music_user_token=user.apple_music_user_token,
+        admin_token=_make_admin_token(user) if user.is_admin else None,
     )
 
 

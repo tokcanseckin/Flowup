@@ -89,6 +89,7 @@ export interface BackendUser {
   is_admin: boolean
   spotify_enabled: boolean
   apple_music_user_token: string | null
+  admin_token: string | null
 }
 
 export interface AdminUser {
@@ -132,22 +133,24 @@ export interface AlignmentTask {
   created_at: number
 }
 
-const ADMIN_SESSION_KEY = 'flowup.admin.basic.v1'
+const ADMIN_SESSION_KEY = 'flowup.admin.token.v2'
 
 export function getAdminHeaders(): HeadersInit {
   if (typeof window === 'undefined') return {}
-  const encoded = window.localStorage.getItem(ADMIN_SESSION_KEY)
-  return encoded ? { Authorization: `Basic ${encoded}` } : {}
+  const token = window.localStorage.getItem(ADMIN_SESSION_KEY)
+  return token ? { Authorization: `Bearer ${token}` } : {}
 }
 
-export function setAdminSession(email: string, password: string) {
+export function setAdminSession(token: string) {
   if (typeof window === 'undefined') return
-  window.localStorage.setItem(ADMIN_SESSION_KEY, btoa(`${email}:${password}`))
+  window.localStorage.setItem(ADMIN_SESSION_KEY, token)
 }
 
 export function clearAdminSession() {
   if (typeof window === 'undefined') return
   window.localStorage.removeItem(ADMIN_SESSION_KEY)
+  // Also clear old Basic auth key if present
+  window.localStorage.removeItem('flowup.admin.basic.v1')
 }
 
 // ── Client ────────────────────────────────────────────────────────────────────
