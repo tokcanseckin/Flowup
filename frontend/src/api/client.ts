@@ -87,6 +87,7 @@ export interface BackendUser {
   needs_onboarding: boolean
   is_admin: boolean
   spotify_enabled: boolean
+  apple_music_user_token: string | null
 }
 
 export interface AdminUser {
@@ -265,7 +266,12 @@ export const api = {
       body: JSON.stringify(patch),
     }),
 
-  updateSongSources: (
+  saveAppleMusicToken: (spotifyId: string, token: string | null): Promise<void> =>
+    apiFetch(`/users/${encodeURIComponent(spotifyId)}/apple-music-token`, {
+      method: 'PUT',
+      body: JSON.stringify({ token }),
+    }),
+ (
     songId: number,
     body: { youtube_url?: string | null; apple_music_url?: string | null },
   ): Promise<SongSummary> =>

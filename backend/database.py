@@ -42,11 +42,12 @@ class User(Base):
     access_token     = Column(Text,        nullable=True)
     refresh_token    = Column(Text,        nullable=True)
     token_expires_at = Column(Integer,     nullable=True)  # Unix seconds
-    password_hash    = Column(Text,        nullable=True)
-    settings_json    = Column(Text,        nullable=True)
-    is_admin         = Column(Integer,     nullable=False, default=0)
-    spotify_enabled  = Column(Integer,     nullable=False, default=0)
-    created_at       = Column(Integer,     default=lambda: int(time.time()))
+    password_hash           = Column(Text,        nullable=True)
+    settings_json           = Column(Text,        nullable=True)
+    is_admin                = Column(Integer,     nullable=False, default=0)
+    spotify_enabled         = Column(Integer,     nullable=False, default=0)
+    apple_music_user_token  = Column(Text,        nullable=True)
+    created_at              = Column(Integer,     default=lambda: int(time.time()))
 
 
 class Song(Base):
@@ -199,6 +200,8 @@ def _migrate_users_table() -> None:
             conn.execute(text("ALTER TABLE users ADD COLUMN is_admin INTEGER NOT NULL DEFAULT 0"))
         if "spotify_enabled" not in user_cols:
             conn.execute(text("ALTER TABLE users ADD COLUMN spotify_enabled INTEGER NOT NULL DEFAULT 0"))
+        if "apple_music_user_token" not in user_cols:
+            conn.execute(text("ALTER TABLE users ADD COLUMN apple_music_user_token TEXT"))
 
         # songs table
         song_cols = {str(row[1]) for row in conn.execute(text("PRAGMA table_info(songs)")).fetchall()}

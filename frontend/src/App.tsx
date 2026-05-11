@@ -1016,7 +1016,7 @@ function PaletteDebugOverlay({ song, coverArtUrl, lyricsTheme, paletteError }: {
 // ── Player view ────────────────────────────────────────────────────────────────
 
 function PlayerView({
-  song, user, onBack, onLogout, onOpenSettings, onOpenAdmin, isAdmin, onPrev, onNext, canPrev, canNext, settings, onUpdate,
+  song, user, onBack, onLogout, onOpenSettings, onOpenAdmin, isAdmin, onPrev, onNext, canPrev, canNext, settings, onUpdate, storedMusicUserToken, onMusicUserToken,
 }: {
   song: SongDetail
   user: { display_name: string | null; email: string | null } | null
@@ -1031,6 +1031,8 @@ function PlayerView({
   canNext: boolean
   settings: AppSettings
   onUpdate: (patch: Partial<AppSettings>) => void
+  storedMusicUserToken?: string | null
+  onMusicUserToken?: (token: string | null) => void
 }) {
   const [infoVisible, setInfoVisible] = useState(false)
   const autoPausedRef = useRef(false)
@@ -1434,6 +1436,8 @@ function PlayerView({
             onPlayStateChange={setAmPlaying}
             onArtworkUrl={setAmArtworkUrl}
             autoPlay={amAutoPlay}
+            storedMusicUserToken={storedMusicUserToken}
+            onMusicUserToken={onMusicUserToken}
           />
         )}
 
@@ -1601,6 +1605,14 @@ export default function App() {
     localStorage.removeItem(PASSWORD_SESSION_KEY)
     navigateToPath('/browse', true)
   }, [navigateToPath])
+
+  const handleMusicUserToken = useCallback((token: string | null) => {
+    if (!credentialUser) return
+    const updated: BackendUser = { ...credentialUser, apple_music_user_token: token }
+    setCredentialUser(updated)
+    localStorage.setItem(PASSWORD_SESSION_KEY, JSON.stringify(updated))
+    api.saveAppleMusicToken(credentialUser.spotify_id, token).catch(console.error)
+  }, [credentialUser])
 
   const handleSelectSong = useCallback(async (id: number, options?: { updateRoute?: boolean }) => {
     setOpenedSongIds(prev => {
@@ -1893,6 +1905,8 @@ export default function App() {
         canNext={activeSongIndex >= 0 && activeSongIndex < displayedSongs.length - 1}
         settings={settings}
         onUpdate={updateSettings}
+        storedMusicUserToken={credentialUser?.apple_music_user_token ?? null}
+        onMusicUserToken={handleMusicUserToken}
       />
     )
   }
