@@ -217,6 +217,7 @@ export const api = {
     description?: string | null
     difficulty_level?: string | null
     language_code?: string | null
+    target_lang?: string | null
     song_ids?: number[]
   }): Promise<PlaylistDetail> =>
     apiFetch('/playlists', {
@@ -230,6 +231,7 @@ export const api = {
     description?: string | null
     difficulty_level?: string | null
     language_code?: string | null
+    target_lang?: string | null
   }): Promise<PlaylistDetail> =>
     apiFetch(`/playlists/${playlistId}`, {
       method: 'PATCH',

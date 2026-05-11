@@ -23,6 +23,7 @@ type PlaylistDraft = {
   description: string
   difficulty_level: string
   language_code: string
+  target_lang: string
 }
 
 type SongDraft = {
@@ -68,6 +69,7 @@ function emptyPlaylistDraft(): PlaylistDraft {
     description: '',
     difficulty_level: '',
     language_code: '',
+    target_lang: '',
   }
 }
 
@@ -155,6 +157,9 @@ export default function AdminPanel({
   const [songSaving, setSongSaving] = useState(false)
   const [lyricsSaving, setLyricsSaving] = useState(false)
   const [songError, setSongError] = useState<string | null>(null)
+  const [lyricsTargetLang, setLyricsTargetLang] = useState('')
+  const [lyricsTranslations, setLyricsTranslations] = useState<Record<number, string>>({})
+  const [lyricsTranslationsLoading, setLyricsTranslationsLoading] = useState(false)
 
   const [newSongDraft, setNewSongDraft] = useState<NewSongDraft>(emptyNewSongDraft())
   const [newSongSaving, setNewSongSaving] = useState(false)
@@ -306,6 +311,8 @@ export default function AdminPanel({
   useEffect(() => {
     if (!selectedSongId) {
       setAdminSong(null)
+      setLyricsTargetLang('')
+      setLyricsTranslations({})
       return
     }
 
@@ -392,6 +399,7 @@ export default function AdminPanel({
           description: detail.description ?? '',
           difficulty_level: detail.difficulty_level ?? '',
           language_code: detail.language_code ?? '',
+          target_lang: detail.target_lang ?? '',
         })
         setPlaylistSongIds(detail.songs.map(song => song.song_id))
       })
@@ -482,6 +490,26 @@ export default function AdminPanel({
       setLyricsDraft((sourceLinesEntry?.lines ?? adminSong.lines).map(line => ({ ...line })))
     }
   }, [adminSong, lyricsSource])
+
+  // When lyricsTargetLang changes, fetch translations for the selected song.
+  useEffect(() => {
+    if (!selectedSongId || !lyricsTargetLang) {
+      setLyricsTranslations({})
+      return
+    }
+    let cancelled = false
+    setLyricsTranslationsLoading(true)
+    void api.getSong(selectedSongId, undefined, lyricsTargetLang)
+      .then(detail => {
+        if (cancelled) return
+        const map: Record<number, string> = {}
+        detail.lines.forEach(line => { map[line.id] = line.translation })
+        setLyricsTranslations(map)
+      })
+      .catch(() => {})
+      .finally(() => { if (!cancelled) setLyricsTranslationsLoading(false) })
+    return () => { cancelled = true }
+  }, [selectedSongId, lyricsTargetLang])
 
   const handleCreateSong = useCallback(async () => {
     if (!newSongDraft.title.trim()) {
@@ -690,6 +718,7 @@ export default function AdminPanel({
         description: playlistDraft.description.trim() || null,
         difficulty_level: playlistDraft.difficulty_level.trim() || null,
         language_code: playlistDraft.language_code.trim() || null,
+        target_lang: playlistDraft.target_lang.trim() || null,
       })
 
       const existingSongIds = new Set(playlistDetail.songs.map(song => song.song_id))
@@ -730,6 +759,7 @@ export default function AdminPanel({
         description: newPlaylistDraft.description.trim() || null,
         difficulty_level: newPlaylistDraft.difficulty_level.trim() || null,
         language_code: newPlaylistDraft.language_code.trim() || null,
+        target_lang: newPlaylistDraft.target_lang.trim() || null,
       })
       await onRefreshPlaylists()
       setSelectedPlaylistId(created.id)
@@ -1118,7 +1148,20 @@ export default function AdminPanel({
                       <p className="text-white font-semibold">Lyrics + Sync</p>
                       <p className="text-xs text-gray-500">Edit line text and timestamps for the selected song.</p>
                     </div>
-                    <button type="button" onClick={() => void handleSaveLyrics()} disabled={!selectedSongId || lyricsSaving || !lyricsDraft.length} className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-500 disabled:bg-gray-800 disabled:text-gray-500">{lyricsSaving ? 'Saving...' : 'Save Lyrics'}</button>
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-xs text-gray-500">Trans preview:</span>
+                        <input
+                          value={lyricsTargetLang}
+                          onChange={e => setLyricsTargetLang(e.target.value.toUpperCase())}
+                          placeholder="e.g. RU"
+                          maxLength={8}
+                          className="w-20 rounded-lg border border-indigo-700/50 bg-indigo-950/20 px-2 py-1 text-xs text-indigo-200 placeholder-indigo-800 focus:outline-none focus:border-indigo-400"
+                        />
+                        {lyricsTranslationsLoading && <span className="text-[10px] text-indigo-400 animate-pulse">loading…</span>}
+                      </div>
+                      <button type="button" onClick={() => void handleSaveLyrics()} disabled={!selectedSongId || lyricsSaving || !lyricsDraft.length} className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-500 disabled:bg-gray-800 disabled:text-gray-500">{lyricsSaving ? 'Saving...' : 'Save Lyrics'}</button>
+                    </div>
                   </div>
                   <div className="flex gap-2 mb-4">
                     {(['default', 'youtube', 'apple_music'] as const).map(src => {
@@ -1151,6 +1194,12 @@ export default function AdminPanel({
                         <textarea value={line.original_line} onChange={e => setLyricsDraft(prev => prev.map((item, itemIndex) => itemIndex === index ? { ...item, original_line: e.target.value } : item))} rows={2} className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
                         <textarea value={line.phonetic_line ?? ''} onChange={e => setLyricsDraft(prev => prev.map((item, itemIndex) => itemIndex === index ? { ...item, phonetic_line: e.target.value || null } : item))} rows={2} placeholder="Phonetic line" className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500" />
                         <textarea value={line.translation} onChange={e => setLyricsDraft(prev => prev.map((item, itemIndex) => itemIndex === index ? { ...item, translation: e.target.value } : item))} rows={2} placeholder="Translation" className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500" />
+                        {lyricsTargetLang && lyricsTranslations[line.id] !== undefined && (
+                          <div className="rounded-xl border border-indigo-800/50 bg-indigo-950/20 px-3 py-2 text-sm text-indigo-200">
+                            <span className="text-[10px] font-semibold uppercase tracking-wider text-indigo-500 mr-2">{lyricsTargetLang}</span>
+                            {lyricsTranslations[line.id] || <span className="text-indigo-700 italic">no translation</span>}
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -1242,9 +1291,12 @@ export default function AdminPanel({
                           <button type="button" onClick={() => void handleDeleteCover()} disabled={coverUploading} className="rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-red-400 hover:border-red-500 disabled:opacity-50">Remove</button>
                         )}
                       </div>
-                      <div className="grid gap-3 md:grid-cols-2">
+                      <div className="grid gap-3 md:grid-cols-3">
                         <input value={playlistDraft.difficulty_level} onChange={e => setPlaylistDraft(prev => ({ ...prev, difficulty_level: e.target.value }))} placeholder="Difficulty level" className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
-                        <input value={playlistDraft.language_code} onChange={e => setPlaylistDraft(prev => ({ ...prev, language_code: e.target.value }))} placeholder="Language code" className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
+                        <input value={playlistDraft.language_code} onChange={e => setPlaylistDraft(prev => ({ ...prev, language_code: e.target.value }))} placeholder="Language code (e.g. ru)" className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
+                        <label className="block text-xs text-gray-500">Target lang
+                          <input value={playlistDraft.target_lang} onChange={e => setPlaylistDraft(prev => ({ ...prev, target_lang: e.target.value.toUpperCase() }))} placeholder="e.g. RU" maxLength={8} className="mt-1 w-full rounded-xl border border-indigo-700/60 bg-indigo-950/20 px-3 py-2 text-sm text-indigo-200 placeholder-indigo-800 focus:outline-none focus:border-indigo-400" />
+                        </label>
                       </div>
                       <div>
                         <div className="flex items-center justify-between gap-3 mb-2">
@@ -1270,9 +1322,12 @@ export default function AdminPanel({
                   <div className="space-y-3">
                     <input value={newPlaylistDraft.name} onChange={e => setNewPlaylistDraft(prev => ({ ...prev, name: e.target.value }))} placeholder="Playlist name" className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
                     <textarea value={newPlaylistDraft.description} onChange={e => setNewPlaylistDraft(prev => ({ ...prev, description: e.target.value }))} rows={3} placeholder="Description" className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
-                    <div className="grid gap-3 md:grid-cols-2">
+                    <div className="grid gap-3 md:grid-cols-3">
                       <input value={newPlaylistDraft.difficulty_level} onChange={e => setNewPlaylistDraft(prev => ({ ...prev, difficulty_level: e.target.value }))} placeholder="Difficulty level" className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
-                      <input value={newPlaylistDraft.language_code} onChange={e => setNewPlaylistDraft(prev => ({ ...prev, language_code: e.target.value }))} placeholder="Language code" className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
+                      <input value={newPlaylistDraft.language_code} onChange={e => setNewPlaylistDraft(prev => ({ ...prev, language_code: e.target.value }))} placeholder="Language code (e.g. ru)" className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
+                      <label className="block text-xs text-gray-500">Target lang
+                        <input value={newPlaylistDraft.target_lang} onChange={e => setNewPlaylistDraft(prev => ({ ...prev, target_lang: e.target.value.toUpperCase() }))} placeholder="e.g. RU" maxLength={8} className="mt-1 w-full rounded-xl border border-indigo-700/60 bg-indigo-950/20 px-3 py-2 text-sm text-indigo-200 placeholder-indigo-800 focus:outline-none focus:border-indigo-400" />
+                      </label>
                     </div>
                     <button type="button" onClick={() => void handleCreatePlaylist()} disabled={playlistSaving} className="w-full rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-500 disabled:bg-gray-800 disabled:text-gray-500">Create Playlist</button>
                   </div>
