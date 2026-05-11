@@ -113,6 +113,11 @@ async function fetchDeveloperToken(): Promise<string> {
 // Singleton MusicKit instance so we only configure it once per page load.
 let _mkInstance: MusicKitInstance | null = null
 
+/** Returns true if Apple Music has been authorized in this session. */
+export function isAppleMusicAuthorized(): boolean {
+  return _mkInstance?.isAuthorized ?? false
+}
+
 // ── component ──────────────────────────────────────────────────────────────────
 
 export interface AppleMusicPlayerHandle {

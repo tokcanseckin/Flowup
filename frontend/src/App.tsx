@@ -5,7 +5,7 @@ import singolingLogo from '../images/singoling_logo@2x.png'
 import prevIconImg   from '../images/previous_icon@2x.png'
 import nextIconImg   from '../images/next_icon@2x.png'
 import YouTubePlayer, { YouTubePlayerHandle } from './components/YouTubePlayer'
-import AppleMusicPlayer, { AppleMusicPlayerHandle } from './components/AppleMusicPlayer'
+import AppleMusicPlayer, { AppleMusicPlayerHandle, isAppleMusicAuthorized } from './components/AppleMusicPlayer'
 import { api, BackendUser, PlaylistDetail, PlaylistSummary, SongDetail, SongSummary, UserSettings as ApiUserSettings, clearAdminSession, setAdminSession } from './api/client'
 
 // ── Module-level song cache (survives re-renders, cleared on logout) ──────────
@@ -316,12 +316,20 @@ function SourcePicker({
           className={`
             w-full text-left rounded-xl border px-4 py-3 transition-all duration-150
             ${value === opt.value
-              ? 'border-indigo-500 bg-indigo-950/40'
+              ? opt.value === 'youtube' ? 'border-red-500/60 bg-red-950/20' : 'border-white/60 bg-gray-800/30'
               : 'border-gray-700 bg-gray-900/40 hover:border-gray-600'}
           `}
         >
           <div className="flex items-center gap-3">
-            <div className={`w-3.5 h-3.5 rounded-full border-2 shrink-0 ${value === opt.value ? 'border-indigo-400 bg-indigo-400' : 'border-gray-600'}`} />
+            {opt.value === 'youtube' ? (
+              <svg viewBox="0 0 24 24" className={`w-5 h-5 shrink-0 fill-current transition-colors ${value === opt.value ? 'text-red-400' : 'text-gray-600'}`} aria-hidden>
+                <path d="M21.58 7.19a2.8 2.8 0 0 0-1.97-1.98C17.86 4.75 12 4.75 12 4.75s-5.86 0-7.61.46A2.8 2.8 0 0 0 2.42 7.2 29.4 29.4 0 0 0 2 12a29.4 29.4 0 0 0 .42 4.81 2.8 2.8 0 0 0 1.97 1.98c1.75.46 7.61.46 7.61.46s5.86 0 7.61-.46a2.8 2.8 0 0 0 1.97-1.98A29.4 29.4 0 0 0 22 12a29.4 29.4 0 0 0-.42-4.81ZM10 15.5v-7l6 3.5-6 3.5Z" />
+              </svg>
+            ) : (
+              <svg viewBox="0 0 24 24" className={`w-5 h-5 shrink-0 fill-current transition-colors ${value === opt.value ? 'text-gray-200' : 'text-gray-600'}`} aria-hidden>
+                <path d="M16.37 1.43c0 1.14-.47 2.24-1.22 3.04-.76.79-1.8 1.35-2.94 1.27-.15-1.09.36-2.23 1.09-3 .76-.8 2.01-1.37 3.07-1.31ZM19.08 17.22c-.42.97-.63 1.4-1.18 2.26-.77 1.2-1.86 2.7-3.21 2.71-1.2.01-1.5-.78-3.13-.77-1.62.01-1.95.79-3.15.78-1.35-.01-2.37-1.36-3.14-2.56-2.16-3.34-2.38-7.27-1.06-9.29.94-1.44 2.43-2.28 3.84-2.28 1.44 0 2.35.8 3.54.8 1.15 0 1.85-.8 3.53-.8 1.26 0 2.6.69 3.54 1.89-3.11 1.71-2.61 6.18.42 7.26Z" />
+              </svg>
+            )}
             <div>
               <p className="text-white text-sm font-medium">{opt.label}</p>
               <p className="text-gray-500 text-xs mt-0.5">{opt.description}</p>
@@ -382,7 +390,7 @@ function SongBrowser({
   onOpenSettings: () => void
   onOpenAdmin: () => void
   isAdmin: boolean
-  user: { display_name: string | null } | null
+  user: { display_name: string | null; email: string | null } | null
   openedSongIds: Set<number>
 }) {
   return (
@@ -524,7 +532,7 @@ function SettingRow({
           onClick={() => onChange(!value)}
           className={`
             shrink-0 inline-flex h-7 w-12 items-center rounded-full transition-colors
-            ${value ? 'bg-indigo-500' : 'bg-gray-700'}
+            ${value ? 'bg-green-500' : 'bg-gray-700'}
           `}
         >
           <span
@@ -550,8 +558,51 @@ function SettingsPage({
   onUpdate: (patch: Partial<AppSettings>) => void
   onBack: () => void
   onLogout: () => void
-  user: { display_name: string | null } | null
+  user: { display_name: string | null; email: string | null } | null
 }) {
+  const [tab, setTab] = useState<'preferences' | 'account' | 'subscription' | 'support'>('preferences')
+  const [supportForm, setSupportForm] = useState({ subject: '', message: '' })
+  const [supportSent, setSupportSent] = useState(false)
+
+  const tabs: { key: typeof tab; label: string; icon: React.ReactNode }[] = [
+    {
+      key: 'preferences',
+      label: 'Preferences',
+      icon: (
+        <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current shrink-0">
+          <path d="M19.14 12.94a7.43 7.43 0 000-1.88l2.03-1.58a.5.5 0 00.12-.64l-1.92-3.32a.5.5 0 00-.6-.22l-2.39.96a7.36 7.36 0 00-1.63-.94l-.36-2.54A.5.5 0 0013.9 2h-3.8a.5.5 0 00-.49.42l-.36 2.54a7.36 7.36 0 00-1.63.94l-2.39-.96a.5.5 0 00-.6.22L2.71 8.48a.5.5 0 00.12.64l2.03 1.58a7.43 7.43 0 000 1.88l-2.03 1.58a.5.5 0 00-.12.64l1.92 3.32a.5.5 0 00.6.22l2.39-.96c.5.39 1.05.71 1.63.94l.36 2.54a.5.5 0 00.49.42h3.8a.5.5 0 00.49-.42l.36-2.54c.58-.23 1.13-.55 1.63-.94l2.39.96a.5.5 0 00.6-.22l1.92-3.32a.5.5 0 00-.12-.64l-2.03-1.58zM12 15.5A3.5 3.5 0 1112 8a3.5 3.5 0 010 7.5z"/>
+        </svg>
+      ),
+    },
+    {
+      key: 'account',
+      label: 'Account',
+      icon: (
+        <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current shrink-0">
+          <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
+        </svg>
+      ),
+    },
+    {
+      key: 'subscription',
+      label: 'Subscription',
+      icon: (
+        <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current shrink-0">
+          <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/>
+        </svg>
+      ),
+    },
+    {
+      key: 'support',
+      label: 'Support',
+      icon: (
+        <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current shrink-0">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/>
+        </svg>
+      ),
+    },
+  ]
+
   return (
     <div className="h-screen flex flex-col overflow-hidden" style={{ background: '#050608' }}>
       <header className="sticky top-0 z-20 flex items-center justify-between px-4 sm:px-6 py-4 border-b border-gray-900 shrink-0" style={{ background: '#050608' }}>
@@ -569,31 +620,168 @@ function SettingsPage({
         </div>
       </header>
 
-      <main className="flex-1 overflow-y-auto px-4 sm:px-6 py-6">
-        <div className="max-w-2xl mx-auto space-y-3">
-          <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-4">Preferences</h2>
+      <div className="flex flex-1 min-h-0">
+        {/* Left sidebar */}
+        <nav className="w-48 shrink-0 border-r border-gray-900 py-4 px-2 flex flex-col gap-0.5" style={{ background: '#050608' }}>
+          {tabs.map(t => (
+            <button
+              key={t.key}
+              type="button"
+              onClick={() => setTab(t.key)}
+              className={`flex items-center gap-2.5 w-full px-3 py-2 rounded-lg text-sm transition-colors text-left ${
+                tab === t.key
+                  ? 'bg-gray-800 text-white'
+                  : 'text-gray-500 hover:text-gray-300 hover:bg-gray-900'
+              }`}
+            >
+              {t.icon}
+              {t.label}
+            </button>
+          ))}
+        </nav>
 
-          <div className="rounded-2xl border border-gray-800/80 p-4" style={{ background: '#12121f' }}>
-            <p className="text-white font-medium mb-1">Music source</p>
-            <p className="text-xs text-gray-500 mb-3 leading-relaxed">Choose whether to use YouTube or Apple Music.</p>
-            <SourcePicker value={settings.preferredSource} onChange={v => onUpdate({ preferredSource: v })} />
-          </div>
+        {/* Content */}
+        <main className="flex-1 overflow-y-auto px-6 py-6">
+          {tab === 'preferences' && (
+            <div className="max-w-xl space-y-3">
+              <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-4">Preferences</h2>
+              <div className="rounded-2xl border border-gray-800/80 p-4" style={{ background: '#12121f' }}>
+                <p className="text-white font-medium mb-1">Music source</p>
+                <p className="text-xs text-gray-500 mb-3 leading-relaxed">Choose whether to use YouTube or Apple Music.</p>
+                <SourcePicker value={settings.preferredSource} onChange={v => onUpdate({ preferredSource: v })} />
+              </div>
+              <SettingRow
+                title="Prioritize content words for 1-9 shortcuts"
+                description="When on, shortcut numbers skip common stop words (pronouns, prepositions, conjunctions) and target more meaningful words first."
+                value={settings.excludeStopWordsFromShortcuts}
+                onChange={(next) => onUpdate({ excludeStopWordsFromShortcuts: next })}
+              />
+              <SettingRow
+                title="Pause playback while inspecting lyrics"
+                description="When on, playback pauses while definition/translation panels are open and resumes when you close them."
+                value={settings.pauseOnInspect}
+                onChange={(next) => onUpdate({ pauseOnInspect: next })}
+              />
+            </div>
+          )}
 
-          <SettingRow
-            title="Prioritize content words for 1-9 shortcuts"
-            description="When on, shortcut numbers skip common stop words (pronouns, prepositions, conjunctions) and target more meaningful words first."
-            value={settings.excludeStopWordsFromShortcuts}
-            onChange={(next) => onUpdate({ excludeStopWordsFromShortcuts: next })}
-          />
+          {tab === 'account' && (
+            <div className="max-w-xl space-y-3">
+              <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-4">Account</h2>
+              <div className="rounded-2xl border border-gray-800/80 p-5" style={{ background: '#12121f' }}>
+                <div className="flex items-center gap-4 mb-5">
+                  <div className="w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center shrink-0">
+                    <svg viewBox="0 0 24 24" className="w-6 h-6 fill-gray-400">
+                      <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-white font-medium">{user?.display_name ?? 'Unknown user'}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">{user?.email ?? ''}</p>
+                  </div>
+                </div>
+                <div className="border-t border-gray-800 pt-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      {/* Apple logo */}
+                      <svg viewBox="0 0 24 24" className="w-4 h-4 shrink-0 fill-gray-400">
+                        <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.7 9.05 7.4c1.4.07 2.38.79 3.19.8 1.21-.23 2.37-.97 3.67-.84 1.57.19 2.75.87 3.52 2.16-3.21 1.93-2.45 5.97.62 7.12-.58 1.53-1.34 3.05-3 3.64zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+                      </svg>
+                      <span className="text-sm text-gray-300">Apple Music</span>
+                    </div>
+                    {isAppleMusicAuthorized() ? (
+                      <span className="text-xs text-green-400 font-medium">Connected</span>
+                    ) : (
+                      <span className="text-xs text-gray-500">Not connected</span>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={onLogout}
+                    className="w-full rounded-xl border border-gray-700 px-4 py-2.5 text-sm text-gray-400 hover:text-white hover:border-gray-500 transition-colors text-left"
+                  >
+                    Sign out
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
-          <SettingRow
-            title="Pause playback while inspecting lyrics"
-            description="When on, playback pauses while definition/translation panels are open and resumes when you close them."
-            value={settings.pauseOnInspect}
-            onChange={(next) => onUpdate({ pauseOnInspect: next })}
-          />
-        </div>
-      </main>
+          {tab === 'subscription' && (
+            <div className="max-w-xl space-y-3">
+              <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-4">Subscription</h2>
+              <div className="rounded-2xl border border-gray-800/80 p-8 flex flex-col items-center text-center" style={{ background: '#12121f' }}>
+                <div className="w-14 h-14 rounded-2xl bg-gray-800 flex items-center justify-center mb-4">
+                  <svg viewBox="0 0 24 24" className="w-7 h-7 fill-gray-500">
+                    <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/>
+                  </svg>
+                </div>
+                <p className="text-white font-semibold mb-1">Subscription management</p>
+                <p className="text-gray-500 text-sm leading-relaxed">Subscription details and billing will be available here soon.</p>
+              </div>
+            </div>
+          )}
+
+          {tab === 'support' && (
+            <div className="max-w-xl space-y-3">
+              <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-4">Support</h2>
+              {supportSent ? (
+                <div className="rounded-2xl border border-gray-800/80 p-8 flex flex-col items-center text-center" style={{ background: '#12121f' }}>
+                  <svg viewBox="0 0 24 24" className="w-10 h-10 fill-green-500 mb-3">
+                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                  </svg>
+                  <p className="text-white font-semibold mb-1">Message sent</p>
+                  <p className="text-gray-500 text-sm">We'll get back to you as soon as possible.</p>
+                  <button
+                    type="button"
+                    onClick={() => { setSupportSent(false); setSupportForm({ subject: '', message: '' }) }}
+                    className="mt-4 text-xs text-gray-500 hover:text-gray-300 transition-colors"
+                  >
+                    Send another message
+                  </button>
+                </div>
+              ) : (
+                <div className="rounded-2xl border border-gray-800/80 p-5" style={{ background: '#12121f' }}>
+                  <p className="text-white font-medium mb-1">Contact us</p>
+                  <p className="text-xs text-gray-500 mb-4 leading-relaxed">Have a question or found an issue? We're happy to help.</p>
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1.5" htmlFor="support-subject">Subject</label>
+                      <input
+                        id="support-subject"
+                        type="text"
+                        value={supportForm.subject}
+                        onChange={e => setSupportForm(f => ({ ...f, subject: e.target.value }))}
+                        placeholder="e.g. Bug report, Feature request…"
+                        className="w-full rounded-xl border border-gray-700 bg-gray-900/60 px-3 py-2.5 text-sm text-white placeholder-gray-600 outline-none focus:border-gray-500 transition-colors"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1.5" htmlFor="support-message">Message</label>
+                      <textarea
+                        id="support-message"
+                        rows={5}
+                        value={supportForm.message}
+                        onChange={e => setSupportForm(f => ({ ...f, message: e.target.value }))}
+                        placeholder="Describe your issue or question…"
+                        className="w-full rounded-xl border border-gray-700 bg-gray-900/60 px-3 py-2.5 text-sm text-white placeholder-gray-600 outline-none focus:border-gray-500 transition-colors resize-none"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      disabled={!supportForm.subject.trim() || !supportForm.message.trim()}
+                      onClick={() => setSupportSent(true)}
+                      className="w-full rounded-xl bg-white text-black text-sm font-medium py-2.5 hover:bg-gray-100 disabled:bg-gray-800 disabled:text-gray-500 transition-colors"
+                    >
+                      Send message
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </main>
+      </div>
     </div>
   )
 }
@@ -831,7 +1019,7 @@ function PlayerView({
   song, user, onBack, onLogout, onOpenSettings, onOpenAdmin, isAdmin, onPrev, onNext, canPrev, canNext, settings, onUpdate,
 }: {
   song: SongDetail
-  user: { display_name: string | null } | null
+  user: { display_name: string | null; email: string | null } | null
   onBack: () => void
   onLogout: () => void
   onOpenSettings: () => void
@@ -1327,7 +1515,7 @@ export default function App() {
     return () => window.removeEventListener('popstate', onPopState)
   }, [])
 
-  const appUser = credentialUser ? { display_name: credentialUser.display_name } : null
+  const appUser = credentialUser ? { display_name: credentialUser.display_name, email: credentialUser.email } : null
 
   const settingsOwnerSpotifyId = credentialUser?.spotify_id ?? null
   const isAuthenticated = !!credentialUser
