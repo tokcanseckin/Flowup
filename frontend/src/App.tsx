@@ -7,6 +7,7 @@ import nextIconImg   from '../images/next_icon@2x.png'
 import YouTubePlayer, { YouTubePlayerHandle } from './components/YouTubePlayer'
 import AppleMusicPlayer, { AppleMusicPlayerHandle, isAppleMusicAuthorized } from './components/AppleMusicPlayer'
 import { api, BackendUser, PlaylistDetail, PlaylistSummary, SongDetail, SongSummary, UserSettings as ApiUserSettings, clearAdminSession, setAdminSession, getAdminHeaders } from './api/client'
+import { useFavorites } from './hooks/useFavorites'
 
 // ── Module-level song cache (survives re-renders, cleared on logout) ──────────
 // Key: `{id}:{source}` where source is 'youtube' or 'apple_music'.
@@ -582,7 +583,7 @@ function SourceAvailabilityIcons({ song }: { song: SongSummary }) {
 }
 
 function SongBrowser({
-  songs, playlists, activePlaylistId, activePlaylist, loading, error, onSelect, onPrefetch, onSelectPlaylist, onLogout, onOpenSettings, onOpenAdmin, onOpenAccount, isAdmin, user, openedSongIds,
+  songs, playlists, activePlaylistId, activePlaylist, loading, error, onSelect, onPrefetch, onSelectPlaylist, onLogout, onOpenSettings, onOpenAdmin, onOpenAccount, isAdmin, user, openedSongIds, favoriteSongIds, toggleFavorite,
 }: {
   songs: SongSummary[]
   playlists: PlaylistSummary[]
@@ -600,6 +601,8 @@ function SongBrowser({
   isAdmin: boolean
   user: { display_name: string | null; email: string | null } | null
   openedSongIds: Set<number>
+  favoriteSongIds: Set<number>
+  toggleFavorite: (id: number) => void
 }) {
   const listenedCount = activePlaylist
     ? activePlaylist.songs.filter(s => openedSongIds.has(s.song_id)).length
@@ -691,6 +694,11 @@ function SongBrowser({
                   <span className="text-[10px] font-mono font-medium px-1.5 py-0.5 rounded-md uppercase tracking-wider shrink-0" style={{ color: '#4ade80', background: 'rgba(0,109,54,0.25)', border: '1px solid rgba(0,109,54,0.45)' }}>
                     {song.language_name}
                   </span>
+                  {favoriteSongIds.has(song.id) && (
+                    <svg viewBox="0 0 24 24" className="shrink-0 w-4 h-4" fill="#f87171" aria-label="Favorited">
+                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                    </svg>
+                  )}
                   {/* 3-dot menu button */}
                   <button
                     onClick={e => { e.stopPropagation(); setOpenMenuSongId(openMenuSongId === song.id ? null : song.id) }}
@@ -711,13 +719,13 @@ function SongBrowser({
                   style={{ background: '#1c1d21' }}
                 >
                   <button
-                    onClick={() => { setOpenMenuSongId(null) }}
+                    onClick={() => { toggleFavorite(song.id); setOpenMenuSongId(null) }}
                     className="w-full text-left flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-300 hover:bg-white/5 transition-colors"
                   >
-                    <svg viewBox="0 0 24 24" className="w-4 h-4 shrink-0 fill-none stroke-current" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <svg viewBox="0 0 24 24" className="w-4 h-4 shrink-0" fill={favoriteSongIds.has(song.id) ? '#f87171' : 'none'} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                     </svg>
-                    Add to favorites
+                    {favoriteSongIds.has(song.id) ? 'Remove from favorites' : 'Add to favorites'}
                   </button>
                   <button
                     onClick={() => { setOpenMenuSongId(null) }}
@@ -1430,7 +1438,7 @@ function useAlbumLyricsTheme(albumArtUrl: string | null): [{ panelGradient: stri
 // ── Player view ────────────────────────────────────────────────────────────────
 
 function PlayerView({
-  song, user, onBack, onLogout, onOpenSettings, onOpenAdmin, onOpenAccount, isAdmin, onPrev, onNext, canPrev, canNext, settings, onUpdate, storedMusicUserToken, onMusicUserToken,
+  song, user, onBack, onLogout, onOpenSettings, onOpenAdmin, onOpenAccount, isAdmin, onPrev, onNext, canPrev, canNext, settings, onUpdate, storedMusicUserToken, onMusicUserToken, favoriteSongIds, toggleFavorite,
 }: {
   song: SongDetail
   user: { display_name: string | null; email: string | null } | null
@@ -1448,6 +1456,8 @@ function PlayerView({
   onUpdate: (patch: Partial<AppSettings>) => void
   storedMusicUserToken?: string | null
   onMusicUserToken?: (token: string | null) => void
+  favoriteSongIds: Set<number>
+  toggleFavorite: (id: number) => void
 }) {
   const [infoVisible, setInfoVisible] = useState(false)
   const [playerMenuOpen, setPlayerMenuOpen] = useState(false)
@@ -1784,12 +1794,12 @@ function PlayerView({
                   <button
                     type="button"
                     className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-300 hover:bg-white/8 transition-colors"
-                    onClick={() => setPlayerMenuOpen(false)}
+                    onClick={() => { toggleFavorite(song.id); setPlayerMenuOpen(false) }}
                   >
-                    <svg viewBox="0 0 20 20" className="w-4 h-4 shrink-0 fill-current text-zinc-400" aria-hidden>
-                      <path d="M10 2a8 8 0 100 16A8 8 0 0010 2zm3.7 6.3a1 1 0 010 1.4l-4 4a1 1 0 01-1.4 0l-2-2a1 1 0 111.4-1.4L9 11.58l3.3-3.3a1 1 0 011.4 0z"/>
+                    <svg viewBox="0 0 24 24" className="w-4 h-4 shrink-0" fill={favoriteSongIds.has(song.id) ? '#f87171' : 'none'} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                     </svg>
-                    Add to favorites
+                    {favoriteSongIds.has(song.id) ? 'Remove from favorites' : 'Add to favorites'}
                   </button>
                   <button
                     type="button"
@@ -1963,6 +1973,8 @@ export default function App() {
   const [loginBusy, setLoginBusy] = useState(false)
   const [loginError, setLoginError] = useState<string | null>(null)
   const [showSignUp, setShowSignUp] = useState(false)
+
+  const { favoriteSongIds, toggleFavorite } = useFavorites(!!credentialUser)
 
   const [songs,        setSongs]        = useState<SongSummary[]>([])
   const [playlists,    setPlaylists]    = useState<PlaylistSummary[]>([])
@@ -2454,6 +2466,8 @@ export default function App() {
         onUpdate={updateSettings}
         storedMusicUserToken={credentialUser?.apple_music_user_token ?? null}
         onMusicUserToken={handleMusicUserToken}
+        favoriteSongIds={favoriteSongIds}
+        toggleFavorite={toggleFavorite}
       />
     )
   }
@@ -2476,6 +2490,8 @@ export default function App() {
       onLogout={handleLogout}
       user={appUser}
       openedSongIds={openedSongIds}
+      favoriteSongIds={favoriteSongIds}
+      toggleFavorite={toggleFavorite}
     />
   )
 }
