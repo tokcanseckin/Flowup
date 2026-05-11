@@ -317,6 +317,9 @@ def _word_response(word: Word, lang_code: str = "ru", target_lang: Optional[str]
                 break
     if definition is None:
         definition = word.dictionary_definition
+    # Last resort: if still no definition, pick any entry from word_definitions
+    if definition is None and word.definitions:
+        definition = word.definitions[0].definition
     return WordResponse(
         key=word.key_index,
         display_form=word.display_form,
