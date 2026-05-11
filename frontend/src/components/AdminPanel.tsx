@@ -1150,14 +1150,17 @@ export default function AdminPanel({
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="flex items-center gap-1.5">
-                        <span className="text-xs text-gray-500">Trans preview:</span>
-                        <input
+                        <span className="text-xs text-gray-500">Target language:</span>
+                        <select
                           value={lyricsTargetLang}
-                          onChange={e => setLyricsTargetLang(e.target.value.toUpperCase())}
-                          placeholder="e.g. RU"
-                          maxLength={8}
-                          className="w-20 rounded-lg border border-indigo-700/50 bg-indigo-950/20 px-2 py-1 text-xs text-indigo-200 placeholder-indigo-800 focus:outline-none focus:border-indigo-400"
-                        />
+                          onChange={e => setLyricsTargetLang(e.target.value)}
+                          className="rounded-lg border border-indigo-700/50 bg-indigo-950/20 px-2 py-1 text-xs text-indigo-200 focus:outline-none focus:border-indigo-400"
+                        >
+                          <option value="">— none —</option>
+                          {LANGUAGE_PRESETS.map(p => (
+                            <option key={p.code} value={p.code.toUpperCase()}>{p.name} ({p.code.toUpperCase()})</option>
+                          ))}
+                        </select>
                         {lyricsTranslationsLoading && <span className="text-[10px] text-indigo-400 animate-pulse">loading…</span>}
                       </div>
                       <button type="button" onClick={() => void handleSaveLyrics()} disabled={!selectedSongId || lyricsSaving || !lyricsDraft.length} className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-500 disabled:bg-gray-800 disabled:text-gray-500">{lyricsSaving ? 'Saving...' : 'Save Lyrics'}</button>
