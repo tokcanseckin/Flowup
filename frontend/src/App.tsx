@@ -641,12 +641,19 @@ function SongBrowser({
               onPointerEnter={() => onPrefetch(song.id)}
               className="
                 w-full text-left rounded-2xl border border-zinc-700/70 p-3
-                hover:border-indigo-700/60 hover:bg-indigo-950/10
                 active:scale-[0.99] transition-all duration-150
               "
               style={{ background: '#25262b' }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(160,160,160,0.4)'; e.currentTarget.style.background = '#323438' }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(63,63,70,0.7)'; e.currentTarget.style.background = '#25262b' }}
             >
               <div className="flex items-center gap-3">
+                {/* dot indicator */}
+                <svg width="8" height="8" viewBox="0 0 8 8" aria-hidden className="shrink-0">
+                  {openedSongIds.has(song.id)
+                    ? <circle cx="4" cy="4" r="3" fill="none" stroke="#006D36" strokeWidth="1.5" />
+                    : <circle cx="4" cy="4" r="4" fill="#006D36" />}
+                </svg>
                 {/* thumbnail */}
                 <div className="shrink-0 w-12 h-12 rounded-lg overflow-hidden bg-zinc-800 flex items-center justify-center">
                   {youtubeThumbnail(song.youtube_url)
@@ -661,18 +668,12 @@ function SongBrowser({
                       </svg>
                   }
                 </div>
-                {/* dot indicator */}
-                <svg width="8" height="8" viewBox="0 0 8 8" aria-hidden className="shrink-0">
-                  {openedSongIds.has(song.id)
-                    ? <circle cx="4" cy="4" r="3" fill="none" stroke="#6366f1" strokeWidth="1.5" />
-                    : <circle cx="4" cy="4" r="4" fill="#6366f1" />}
-                </svg>
                 <div className="min-w-0 flex-1">
                   <p className="text-white font-semibold truncate">{song.title}</p>
                   <p className="text-gray-500 text-sm truncate">{song.artist ?? 'Unknown artist'}</p>
                 </div>
                 <SourceAvailabilityIcons song={song} />
-                <span className="text-[10px] font-mono font-medium text-indigo-400 bg-indigo-950/60 border border-indigo-900/50 px-1.5 py-0.5 rounded-md uppercase tracking-wider shrink-0">
+                <span className="text-[10px] font-mono font-medium px-1.5 py-0.5 rounded-md uppercase tracking-wider shrink-0" style={{ color: '#4ade80', background: 'rgba(0,109,54,0.25)', border: '1px solid rgba(0,109,54,0.45)' }}>
                   {song.language_name}
                 </span>
               </div>
@@ -743,7 +744,7 @@ function SongBrowser({
               ) : (
                 <div
                   className="w-full aspect-square rounded-2xl mb-5 flex items-center justify-center select-none"
-                  style={{ background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #1e1b4b 100%)' }}
+                  style={{ background: 'linear-gradient(135deg, #003d1f 0%, #006D36 50%, #003d1f 100%)' }}
                 >
                   <span className="text-white/30 text-6xl font-bold uppercase">
                     {activePlaylist.name.charAt(0)}
@@ -757,12 +758,12 @@ function SongBrowser({
               {/* Badges */}
               <div className="flex flex-wrap gap-1.5 mb-3">
                 {activePlaylist.language_code && (
-                  <span className="text-[10px] font-mono font-medium text-indigo-400 bg-indigo-950/60 border border-indigo-900/50 px-1.5 py-0.5 rounded-md uppercase tracking-wider">
+                  <span className="text-[10px] font-mono font-medium px-1.5 py-0.5 rounded-md uppercase tracking-wider" style={{ color: '#4ade80', background: 'rgba(0,109,54,0.25)', border: '1px solid rgba(0,109,54,0.45)' }}>
                     {activePlaylist.language_code}
                   </span>
                 )}
                 {activePlaylist.difficulty_level && (
-                  <span className="text-[10px] font-medium text-emerald-400 bg-emerald-950/60 border border-emerald-900/50 px-1.5 py-0.5 rounded-md uppercase tracking-wider">
+                  <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-md uppercase tracking-wider" style={{ color: '#fb923c', background: 'rgba(251,146,60,0.15)', border: '1px solid rgba(251,146,60,0.35)' }}>
                     {activePlaylist.difficulty_level}
                   </span>
                 )}
@@ -778,7 +779,10 @@ function SongBrowser({
                 <button
                   type="button"
                   onClick={() => onSelect(songs[0].id)}
-                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 active:scale-[0.98] transition-all text-white font-medium text-sm py-2.5 mb-5"
+                  className="w-full flex items-center justify-center gap-2 rounded-xl active:scale-[0.98] transition-all text-white font-medium text-sm py-2.5 mb-5"
+                  style={{ background: '#006D36' }}
+                  onMouseEnter={e => (e.currentTarget.style.background = '#008a44')}
+                  onMouseLeave={e => (e.currentTarget.style.background = '#006D36')}
                 >
                   <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current shrink-0">
                     <path d="M8 5v14l11-7z"/>
@@ -811,7 +815,7 @@ function SongBrowser({
                     id="playlist-select-col"
                     value={activePlaylistId ?? ''}
                     onChange={e => onSelectPlaylist(e.target.value ? Number(e.target.value) : null)}
-                    className="w-full rounded-lg border border-gray-700 bg-gray-900/80 px-2 py-1.5 text-xs text-gray-200 focus:outline-none focus:border-indigo-500"
+                    className="w-full rounded-lg border border-gray-700 bg-gray-900/80 px-2 py-1.5 text-xs text-gray-200 focus:outline-none" style={{ outlineColor: '#006D36' }}
                   >
                     <option value="">All songs</option>
                     {playlists.map(pl => (
@@ -842,14 +846,16 @@ function SongBrowser({
                     key={pl.id}
                     type="button"
                     onClick={() => onSelectPlaylist(pl.id)}
-                    className="w-full text-left rounded-xl border border-zinc-700/70 px-4 py-3 hover:border-indigo-700/60 hover:bg-indigo-950/10 active:scale-[0.99] transition-all"
+                    className="w-full text-left rounded-xl border border-zinc-700/70 px-4 py-3 hover:border-green-800/60 active:scale-[0.99] transition-all" style={{ '--tw-bg-opacity': 1 } as React.CSSProperties}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(0,109,54,0.08)' }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#25262b' }}
                     style={{ background: '#25262b' }}
                   >
                     <div className="flex items-center gap-3">
                       {pl.cover_image_url ? (
                         <img src={pl.cover_image_url} alt={pl.name} className="w-10 h-10 rounded-lg object-cover shrink-0" />
                       ) : (
-                        <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 select-none" style={{ background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 100%)' }}>
+                        <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 select-none" style={{ background: 'linear-gradient(135deg, #003d1f 0%, #006D36 100%)' }}>
                           <span className="text-white/40 text-sm font-bold uppercase">{pl.name.charAt(0)}</span>
                         </div>
                       )}
