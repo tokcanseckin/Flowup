@@ -666,7 +666,7 @@ function useAlbumLyricsTheme(albumArtUrl: string | null): [{ panelGradient: stri
   const [theme, setTheme] = useState({
     panelGradient: 'linear-gradient(180deg, hsl(215, 64%, 26%) 0%, hsl(215, 60%, 17%) 100%)',
     asideGradient: 'linear-gradient(180deg, hsl(215, 58%, 22%) 0%, hsl(215, 56%, 13%) 100%)',
-    accentTextColor: 'hsl(320, 88%, 62%)',
+    accentTextColor: 'hsl(320, 88%, 38%)',
   })
   const [paletteError, setPaletteError] = useState<string | null>(null)
   const requestSeqRef = useRef(0)
@@ -684,7 +684,7 @@ function useAlbumLyricsTheme(albumArtUrl: string | null): [{ panelGradient: stri
       applyTheme({
         panelGradient: 'linear-gradient(180deg, hsl(215, 64%, 26%) 0%, hsl(215, 60%, 17%) 100%)',
         asideGradient: 'linear-gradient(180deg, hsl(215, 58%, 22%) 0%, hsl(215, 56%, 13%) 100%)',
-        accentTextColor: 'hsl(320, 88%, 62%)',
+        accentTextColor: 'hsl(320, 88%, 38%)',
       })
       setPaletteError('No album art URL')
       return
@@ -709,7 +709,7 @@ function useAlbumLyricsTheme(albumArtUrl: string | null): [{ panelGradient: stri
           applyTheme({
             panelGradient: 'linear-gradient(180deg, hsl(215, 64%, 26%) 0%, hsl(215, 60%, 17%) 100%)',
             asideGradient: 'linear-gradient(180deg, hsl(215, 58%, 22%) 0%, hsl(215, 56%, 13%) 100%)',
-            accentTextColor: 'hsl(320, 88%, 62%)',
+            accentTextColor: 'hsl(320, 88%, 38%)',
           })
           return
         }
@@ -774,7 +774,7 @@ function useAlbumLyricsTheme(albumArtUrl: string | null): [{ panelGradient: stri
         const btmSat = Math.max(16, bgSat * 0.48)
         // Accent: saturated and bright enough to read on the dark bg
         const accentSat   = Math.min(100, Math.max(88, chosenSat))
-        const accentLight = Math.min(76, Math.max(60, 100 - chosenLight * 0.30))
+        const accentLight = Math.min(44, Math.max(34, chosenLight * 0.35 + 18))
         applyTheme({
           panelGradient: `linear-gradient(160deg, hsl(${chosenHue}, ${bgSat}%, ${topL}%) 0%, hsl(${chosenHue}, ${midSat}%, ${midL}%) 62%, hsl(${chosenHue}, ${btmSat}%, ${btmL}%) 100%)`,
           asideGradient: `linear-gradient(150deg, hsl(${chosenHue}, ${Math.max(midSat - 4, 20)}%, ${Math.max(topL - 3, 11)}%) 0%, hsl(${chosenHue}, ${Math.max(btmSat - 4, 12)}%, ${Math.max(btmL - 1, 3)}%) 100%)`,
@@ -785,7 +785,7 @@ function useAlbumLyricsTheme(albumArtUrl: string | null): [{ panelGradient: stri
         applyTheme({
           panelGradient: 'linear-gradient(180deg, hsl(215, 64%, 26%) 0%, hsl(215, 60%, 17%) 100%)',
           asideGradient: 'linear-gradient(180deg, hsl(215, 58%, 22%) 0%, hsl(215, 56%, 13%) 100%)',
-          accentTextColor: 'hsl(320, 88%, 62%)',
+          accentTextColor: 'hsl(320, 88%, 38%)',
         })
       }
     }
@@ -793,7 +793,7 @@ function useAlbumLyricsTheme(albumArtUrl: string | null): [{ panelGradient: stri
       applyTheme({
         panelGradient: 'linear-gradient(180deg, hsl(215, 64%, 26%) 0%, hsl(215, 60%, 17%) 100%)',
         asideGradient: 'linear-gradient(180deg, hsl(215, 58%, 22%) 0%, hsl(215, 56%, 13%) 100%)',
-        accentTextColor: 'hsl(320, 88%, 62%)',
+        accentTextColor: 'hsl(320, 88%, 38%)',
       })
     }
     img.src = sampleUrl
@@ -1104,21 +1104,24 @@ function PlayerView({
           >
             Preferences
           </button>
-          {/* Inline source switcher — only shows sources available for this song */}
+          {/* Inline source switcher — always visible; unavailable sources are dimmed */}
           {(() => {
-            const opts: { value: AppSettings['preferredSource']; label: string; activeClass: string }[] = []
-            if (song.youtube_url) opts.push({ value: 'youtube', label: 'YT', activeClass: 'bg-red-500/20 text-red-400' })
-            if (song.apple_music_url) opts.push({ value: 'apple_music', label: 'AM', activeClass: 'bg-pink-500/20 text-pink-400' })
-            if (opts.length < 2) return null
+            const opts: { value: AppSettings['preferredSource']; label: string; activeClass: string; available: boolean }[] = [
+              { value: 'youtube',     label: 'YT', activeClass: 'bg-red-500/20 text-red-400',  available: !!song.youtube_url },
+              { value: 'apple_music', label: 'AM', activeClass: 'bg-pink-500/20 text-pink-400', available: !!song.apple_music_url },
+            ]
             return (
               <div className="flex items-center gap-0.5 rounded-lg bg-gray-800/70 p-0.5">
                 {opts.map(opt => (
                   <button
                     key={opt.value}
                     type="button"
-                    onClick={() => onUpdate({ preferredSource: opt.value })}
+                    onClick={() => opt.available && onUpdate({ preferredSource: opt.value })}
+                    disabled={!opt.available}
                     className={`px-2.5 py-1 rounded-md text-xs font-medium transition-all ${
-                      effectiveSource === opt.value ? opt.activeClass : 'text-gray-500 hover:text-gray-300'
+                      effectiveSource === opt.value ? opt.activeClass
+                      : opt.available ? 'text-gray-500 hover:text-gray-300'
+                      : 'text-gray-700 cursor-not-allowed'
                     }`}
                   >
                     {opt.label}
@@ -1215,7 +1218,7 @@ function PlayerView({
 
           {hasYouTubePanel && (
             <aside
-              className={`overflow-hidden bg-black min-h-[210px] lg:min-h-[240px] min-w-0 transition-[opacity,transform,border-color] duration-300 ease-out ${
+              className={`overflow-hidden bg-black min-h-[210px] lg:min-h-[240px] min-w-0 transition-[opacity,transform,border-color] duration-300 ease-out flex flex-col ${
                 showRightMediaPanel
                   ? 'rounded-md border border-zinc-700/70 opacity-100 translate-x-0'
                   : 'rounded-md border border-zinc-700/0 opacity-0 translate-x-2 pointer-events-none'

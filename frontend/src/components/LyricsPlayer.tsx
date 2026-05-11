@@ -868,7 +868,7 @@ interface InspectPanelProps {
   accentTextColor?: string
 }
 
-function InspectPanel({ info, onClose, compact = false, accentTextColor = 'hsl(320, 88%, 62%)' }: InspectPanelProps) {
+function InspectPanel({ info, onClose, compact = false, accentTextColor = 'hsl(320, 88%, 38%)' }: InspectPanelProps) {
   const isWord = info.kind === 'word'
   const cleanDisplayForm = isWord ? stripBoundaryPunctuation(info.word.display_form) : null
 

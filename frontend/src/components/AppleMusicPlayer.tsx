@@ -302,6 +302,8 @@ const AppleMusicPlayer = forwardRef<AppleMusicPlayerHandle, Props>(function Appl
       if (!mountedRef.current) return
       setStatus('error')
       setErrorMsg(e instanceof Error ? e.message : 'Unknown error')
+      amIsPlayingRef.current = false
+      onPlayStateChangeRef.current?.(false)
       logAppleMusicDebug('Init failed', { error: e instanceof Error ? e.message : String(e) })
     }
   }, [appleMusicUrl, handleStateChange, handleTimeChange])
@@ -327,6 +329,8 @@ const AppleMusicPlayer = forwardRef<AppleMusicPlayerHandle, Props>(function Appl
       if (!mountedRef.current) return
       setStatus('error')
       setErrorMsg(e instanceof Error ? e.message : 'Authorization failed')
+      amIsPlayingRef.current = false
+      onPlayStateChangeRef.current?.(false)
       logAppleMusicDebug('Manual authorize failed', { error: e instanceof Error ? e.message : String(e) })
     }
   }, [appleMusicUrl])

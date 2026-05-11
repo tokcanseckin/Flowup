@@ -217,6 +217,7 @@ const YouTubePlayer = forwardRef<YouTubePlayerHandle, Props>(function YouTubePla
       clearTimers()
       readyTimerRef.current = setTimeout(() => {
         setError('Player timed out — the video may not be embeddable or your connection is slow.')
+        onPlayStateChange?.(false)
         logYouTubeDebug('Ready timeout', { videoId: resolvedVideoId })
       }, 15_000)
 
@@ -323,6 +324,8 @@ const YouTubePlayer = forwardRef<YouTubePlayerHandle, Props>(function YouTubePla
           onError: (e: YT.OnErrorEvent) => {
             const message = describeYouTubeError(e.data)
             setError(message)
+            onPlayStateChange?.(false)
+            if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null }
             logYouTubeDebug('Player error', { videoId: resolvedVideoId, code: e.data, message, youtubeUrl })
           },
         },
@@ -356,13 +359,13 @@ const YouTubePlayer = forwardRef<YouTubePlayerHandle, Props>(function YouTubePla
   }, [youtubeUrl])
 
   return (
-    <div className="w-full space-y-2">
+    <div className="w-full h-full flex flex-col space-y-2">
       {error ? (
         <div className="rounded-xl border border-red-900/50 bg-red-950/20 px-4 py-3 text-sm text-red-400">
           {error}
         </div>
       ) : (
-        <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+        <div className="relative flex-1 min-h-0">
           <div
             ref={containerRef}
             className="absolute inset-0 bg-black [&_iframe]:w-full [&_iframe]:h-full"
