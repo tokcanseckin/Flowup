@@ -603,7 +603,6 @@ def _require_admin(
         raise HTTPException(
             status_code=401,
             detail="Admin authentication required",
-            headers={"WWW-Authenticate": "Basic"},
         )
 
     try:
@@ -615,7 +614,6 @@ def _require_admin(
         raise HTTPException(
             status_code=401,
             detail="Basic authentication required",
-            headers={"WWW-Authenticate": "Basic"},
         )
 
     try:
@@ -629,7 +627,6 @@ def _require_admin(
         raise HTTPException(
             status_code=401,
             detail="Invalid admin credentials",
-            headers={"WWW-Authenticate": "Basic"},
         )
     if not user.is_admin:
         raise HTTPException(status_code=403, detail="Admin access required")
