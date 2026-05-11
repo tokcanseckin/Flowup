@@ -870,7 +870,7 @@ function toPaletteSampleUrl(rawUrl: string | null): string | null {
 function useAlbumLyricsTheme(albumArtUrl: string | null): [{ panelGradient: string; asideGradient: string; accentTextColor: string }] {
   const [theme, setTheme] = useState({
     panelGradient: 'linear-gradient(180deg, hsl(215, 64%, 26%) 0%, hsl(215, 60%, 17%) 100%)',
-    asideGradient: 'linear-gradient(180deg, hsl(215, 58%, 22%) 0%, hsl(215, 56%, 13%) 100%)',
+    asideGradient: 'linear-gradient(180deg, hsl(215, 64%, 17%) 0%, hsl(215, 60%, 11%) 100%)',
     accentTextColor: 'hsl(320, 88%, 38%)',
   })
   const requestSeqRef = useRef(0)
@@ -886,7 +886,7 @@ function useAlbumLyricsTheme(albumArtUrl: string | null): [{ panelGradient: stri
     if (!sampleUrl) {
       applyTheme({
         panelGradient: 'linear-gradient(180deg, hsl(215, 64%, 26%) 0%, hsl(215, 60%, 17%) 100%)',
-        asideGradient: 'linear-gradient(180deg, hsl(215, 58%, 22%) 0%, hsl(215, 56%, 13%) 100%)',
+        asideGradient: 'linear-gradient(180deg, hsl(215, 64%, 17%) 0%, hsl(215, 60%, 11%) 100%)',
         accentTextColor: 'hsl(320, 88%, 38%)',
       })
       return
@@ -909,7 +909,7 @@ function useAlbumLyricsTheme(albumArtUrl: string | null): [{ panelGradient: stri
           console.error('Palette extraction getImageData error:', err)
           applyTheme({
             panelGradient: 'linear-gradient(180deg, hsl(215, 64%, 26%) 0%, hsl(215, 60%, 17%) 100%)',
-            asideGradient: 'linear-gradient(180deg, hsl(215, 58%, 22%) 0%, hsl(215, 56%, 13%) 100%)',
+            asideGradient: 'linear-gradient(180deg, hsl(215, 64%, 17%) 0%, hsl(215, 60%, 11%) 100%)',
             accentTextColor: 'hsl(320, 88%, 38%)',
           })
           return
@@ -978,13 +978,14 @@ function useAlbumLyricsTheme(albumArtUrl: string | null): [{ panelGradient: stri
         const accentLight = Math.min(44, Math.max(34, chosenLight * 0.35 + 18))
         applyTheme({
           panelGradient: `linear-gradient(160deg, hsl(${chosenHue}, ${bgSat}%, ${topL}%) 0%, hsl(${chosenHue}, ${midSat}%, ${midL}%) 62%, hsl(${chosenHue}, ${btmSat}%, ${btmL}%) 100%)`,
-          asideGradient: `linear-gradient(150deg, hsl(${chosenHue}, ${Math.max(midSat - 4, 20)}%, ${Math.max(topL - 3, 11)}%) 0%, hsl(${chosenHue}, ${Math.max(btmSat - 4, 12)}%, ${Math.max(btmL - 1, 3)}%) 100%)`,
+          asideGradient: `linear-gradient(150deg, hsl(${chosenHue}, ${bgSat}%, ${Math.max(topL * 0.65, 6)}%) 0%, hsl(${chosenHue}, ${midSat}%, ${Math.max(midL * 0.65, 3)}%) 100%)`,
+
           accentTextColor: `hsl(${chosenHue}, ${accentSat}%, ${accentLight}%)`,
         })
       } catch {
         applyTheme({
           panelGradient: 'linear-gradient(180deg, hsl(215, 64%, 26%) 0%, hsl(215, 60%, 17%) 100%)',
-          asideGradient: 'linear-gradient(180deg, hsl(215, 58%, 22%) 0%, hsl(215, 56%, 13%) 100%)',
+          asideGradient: 'linear-gradient(180deg, hsl(215, 64%, 17%) 0%, hsl(215, 60%, 11%) 100%)',
           accentTextColor: 'hsl(320, 88%, 38%)',
         })
       }
@@ -992,7 +993,7 @@ function useAlbumLyricsTheme(albumArtUrl: string | null): [{ panelGradient: stri
     img.onerror = () => {
       applyTheme({
         panelGradient: 'linear-gradient(180deg, hsl(215, 64%, 26%) 0%, hsl(215, 60%, 17%) 100%)',
-        asideGradient: 'linear-gradient(180deg, hsl(215, 58%, 22%) 0%, hsl(215, 56%, 13%) 100%)',
+        asideGradient: 'linear-gradient(180deg, hsl(215, 64%, 17%) 0%, hsl(215, 60%, 11%) 100%)',
         accentTextColor: 'hsl(320, 88%, 38%)',
       })
     }
