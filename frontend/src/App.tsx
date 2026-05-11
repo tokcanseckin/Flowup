@@ -550,38 +550,6 @@ function SourcePicker({
 
 // ── Song browser ──────────────────────────────────────────────────────────────
 
-function SourceAvailabilityIcons({ song }: { song: SongSummary }) {
-  const sources = [
-    song.youtube_url ? { key: 'youtube', label: 'YouTube', className: 'text-red-500 bg-white' } : null,
-    song.apple_music_url ? { key: 'apple_music', label: 'Apple Music', className: 'text-black bg-white' } : null,
-  ].filter(Boolean) as { key: string; label: string; className: string }[]
-
-  if (sources.length === 0) return null
-
-  return (
-    <div className="flex items-center gap-1.5 shrink-0" aria-label="Available sources">
-      {sources.map(source => (
-        <span
-          key={source.key}
-          title={source.label}
-          aria-label={source.label}
-          className={`inline-flex h-6 w-6 items-center justify-center rounded-full ${source.className}`}
-        >
-          {source.key === 'youtube' ? (
-            <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 fill-current" aria-hidden>
-              <path d="M21.58 7.19a2.8 2.8 0 0 0-1.97-1.98C17.86 4.75 12 4.75 12 4.75s-5.86 0-7.61.46A2.8 2.8 0 0 0 2.42 7.2 29.4 29.4 0 0 0 2 12a29.4 29.4 0 0 0 .42 4.81 2.8 2.8 0 0 0 1.97 1.98c1.75.46 7.61.46 7.61.46s5.86 0 7.61-.46a2.8 2.8 0 0 0 1.97-1.98A29.4 29.4 0 0 0 22 12a29.4 29.4 0 0 0-.42-4.81ZM10 15.5v-7l6 3.5-6 3.5Z" />
-            </svg>
-          ) : (
-            <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 fill-current" aria-hidden>
-              <path d="M16.37 1.43c0 1.14-.47 2.24-1.22 3.04-.76.79-1.8 1.35-2.94 1.27-.15-1.09.36-2.23 1.09-3 .76-.8 2.01-1.37 3.07-1.31ZM19.08 17.22c-.42.97-.63 1.4-1.18 2.26-.77 1.2-1.86 2.7-3.21 2.71-1.2.01-1.5-.78-3.13-.77-1.62.01-1.95.79-3.15.78-1.35-.01-2.37-1.36-3.14-2.56-2.16-3.34-2.38-7.27-1.06-9.29.94-1.44 2.43-2.28 3.84-2.28 1.44 0 2.35.8 3.54.8 1.15 0 1.85-.8 3.53-.8 1.26 0 2.6.69 3.54 1.89-3.11 1.71-2.61 6.18.42 7.26Z" />
-            </svg>
-          )}
-        </span>
-      ))}
-    </div>
-  )
-}
-
 function SongBrowser({
   songs, playlists, activePlaylistId, activePlaylist, loading, error, onSelect, onPrefetch, onSelectPlaylist, onLogout, onOpenSettings, onOpenAdmin, onOpenAccount, isAdmin, user, openedSongIds, favoriteSongIds, toggleFavorite,
 }: {
@@ -690,15 +658,14 @@ function SongBrowser({
                     <p className="text-white font-semibold truncate">{song.title}</p>
                     <p className="text-gray-500 text-sm truncate">{song.artist ?? 'Unknown artist'}</p>
                   </div>
-                  <SourceAvailabilityIcons song={song} />
-                  <span className="text-[10px] font-mono font-medium px-1.5 py-0.5 rounded-md uppercase tracking-wider shrink-0" style={{ color: '#4ade80', background: 'rgba(0,109,54,0.25)', border: '1px solid rgba(0,109,54,0.45)' }}>
-                    {song.language_name}
-                  </span>
                   {favoriteSongIds.has(song.id) && (
                     <svg viewBox="0 0 24 24" className="shrink-0 w-4 h-4" fill="#f87171" aria-label="Favorited">
                       <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                     </svg>
                   )}
+                  <span className="text-[10px] font-mono font-medium px-1.5 py-0.5 rounded-md uppercase tracking-wider shrink-0" style={{ color: '#4ade80', background: 'rgba(0,109,54,0.25)', border: '1px solid rgba(0,109,54,0.45)' }}>
+                    {song.language_name}
+                  </span>
                   {/* 3-dot menu button */}
                   <button
                     onClick={e => { e.stopPropagation(); setOpenMenuSongId(openMenuSongId === song.id ? null : song.id) }}
