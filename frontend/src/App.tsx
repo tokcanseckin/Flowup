@@ -119,6 +119,7 @@ type SettingsTab = 'preferences' | 'account' | 'subscription' | 'support'
 
 type AppRoute =
   | { page: 'browse' }
+  | { page: 'playlist'; playlistId: number }
   | { page: 'song'; songId: number }
   | { page: 'settings'; tab: SettingsTab }
   | { page: 'admin'; tab: 'songs' | 'playlists' | 'users' | 'tasks'; id: number | null }
@@ -140,12 +141,21 @@ function parseAppRoute(pathname: string): AppRoute {
   }
   if (path === '/browse' || path === '/') return { page: 'browse' }
 
+  const playlistMatch = path.match(/^\/playlist\/(\d+)$/)
+  if (playlistMatch) {
+    return { page: 'playlist', playlistId: Number(playlistMatch[1]) }
+  }
+
   const songMatch = path.match(/^\/song\/(\d+)$/)
   if (songMatch) {
     return { page: 'song', songId: Number(songMatch[1]) }
   }
 
   return { page: 'browse' }
+}
+
+function playlistPath(playlistId: number): string {
+  return `/playlist/${playlistId}`
 }
 
 function songPath(songId: number): string {
@@ -1656,7 +1666,6 @@ export default function App() {
     try {
       const pls = await api.listPlaylists()
       setPlaylists(pls)
-      setActivePlaylistId(prev => prev ?? pls[0]?.id ?? null)
     } catch (e) {
       setSongsError(e instanceof Error ? e.message : 'Failed to load playlists')
     } finally {
@@ -1820,8 +1829,9 @@ export default function App() {
     if (!isAuthenticated || !settingsHydrated || restoreDoneRef.current) return
     restoreDoneRef.current = true
 
-    if (settings.lastPlaylistId !== null) {
-      setActivePlaylistId(settings.lastPlaylistId)
+    // Only restore last playlist when the URL doesn't already specify one
+    if (settings.lastPlaylistId !== null && route.page === 'browse') {
+      navigateToPath(playlistPath(settings.lastPlaylistId), true)
     }
 
     if (settings.lastSongId !== null && window.location.pathname === '/') {
@@ -1834,6 +1844,7 @@ export default function App() {
     settings.lastPlaylistId,
     settings.lastSongId,
     handleSelectSong,
+    navigateToPath,
     route,
   ])
 
@@ -1858,6 +1869,14 @@ export default function App() {
       return
     }
 
+    if (route.page === 'playlist') {
+      setSettingsOpen(false)
+      setAdminOpen(false)
+      setActiveSong(null)
+      setActivePlaylistId(route.playlistId)
+      return
+    }
+
     if (route.page === 'song') {
       setSettingsOpen(false)
       setAdminOpen(false)
@@ -1871,6 +1890,7 @@ export default function App() {
     setSettingsOpen(false)
     setAdminOpen(false)
     setActiveSong(null)
+    setActivePlaylistId(null)
   }, [isAuthenticated, isAdmin, activeSong?.id, handleSelectSong, navigateToPath, route])
 
   useEffect(() => {
@@ -1962,7 +1982,7 @@ export default function App() {
       <SettingsPage
         settings={settings}
         onUpdate={updateSettings}
-        onBack={() => navigateToPath(activeSong ? songPath(activeSong.id) : '/browse')}
+        onBack={() => navigateToPath(activeSong ? songPath(activeSong.id) : activePlaylistId !== null ? playlistPath(activePlaylistId) : '/browse')}
         onLogout={handleLogout}
         user={appUser}
         activeTab={route.page === 'settings' ? route.tab : 'preferences'}
@@ -1976,7 +1996,7 @@ export default function App() {
       <AdminPanel
         songs={songs}
         playlists={playlists}
-        onBack={() => navigateToPath(activeSong ? songPath(activeSong.id) : '/browse')}
+        onBack={() => navigateToPath(activeSong ? songPath(activeSong.id) : activePlaylistId !== null ? playlistPath(activePlaylistId) : '/browse')}
         onLogout={handleLogout}
         onRefreshSongs={loadSongs}
         onRefreshPlaylists={loadPlaylists}
@@ -2008,7 +2028,7 @@ export default function App() {
       <PlayerView
         song={activeSong}
         user={appUser}
-        onBack={() => navigateToPath('/browse')}
+        onBack={() => navigateToPath(activePlaylistId !== null ? playlistPath(activePlaylistId) : '/browse')}
         onLogout={handleLogout}
         onOpenSettings={() => navigateToPath('/settings')}
         onOpenAccount={() => navigateToPath('/settings/account')}
@@ -2036,7 +2056,7 @@ export default function App() {
       error={songsError}
       onSelect={handleSelectSong}
       onPrefetch={handlePrefetchSong}
-      onSelectPlaylist={setActivePlaylistId}
+      onSelectPlaylist={(id) => navigateToPath(id !== null ? playlistPath(id) : '/browse')}
       onOpenAdmin={() => navigateToPath('/admin')}
       isAdmin={isAdmin}
       onOpenSettings={() => navigateToPath('/settings')}
