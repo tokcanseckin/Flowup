@@ -386,7 +386,7 @@ function SourceAvailabilityIcons({ song }: { song: SongSummary }) {
 }
 
 function SongBrowser({
-  songs, playlists, activePlaylistId, loading, error, onSelect, onPrefetch, onSelectPlaylist, onLogout, onOpenSettings, onOpenAdmin, isAdmin, user, openedSongIds,
+  songs, playlists, activePlaylistId, loading, error, onSelect, onPrefetch, onSelectPlaylist, onLogout, onOpenSettings, onOpenAdmin, onOpenAccount, isAdmin, user, openedSongIds,
 }: {
   songs: SongSummary[]
   playlists: PlaylistSummary[]
@@ -399,6 +399,7 @@ function SongBrowser({
   onLogout: () => void
   onOpenSettings: () => void
   onOpenAdmin: () => void
+  onOpenAccount: () => void
   isAdmin: boolean
   user: { display_name: string | null; email: string | null } | null
   openedSongIds: Set<number>
@@ -427,7 +428,7 @@ function SongBrowser({
             Settings
           </button>
           {user?.display_name && (
-            <span className="text-xs text-gray-500">{user.display_name}</span>
+            <button type="button" onClick={onOpenAccount} className="text-xs text-gray-500 hover:text-gray-300 transition-colors">{user.display_name}</button>
           )}
           <button onClick={onLogout} className="text-xs text-gray-600 hover:text-gray-400 transition-colors">
             Sign out
@@ -629,7 +630,7 @@ function SettingsPage({
           <img src={singolingLogo} className="h-7 object-contain" alt="SingoLing" />
         </div>
         <div className="flex items-center gap-3">
-          {user?.display_name && <span className="text-xs text-gray-500">{user.display_name}</span>}
+          {user?.display_name && <button type="button" onClick={() => onTabChange('account')} className="text-xs text-gray-500 hover:text-gray-300 transition-colors">{user.display_name}</button>}
           <button onClick={onLogout} className="text-xs text-gray-600 hover:text-gray-400 transition-colors">Sign out</button>
         </div>
         </div>
@@ -1004,7 +1005,7 @@ function useAlbumLyricsTheme(albumArtUrl: string | null): [{ panelGradient: stri
 // ── Player view ────────────────────────────────────────────────────────────────
 
 function PlayerView({
-  song, user, onBack, onLogout, onOpenSettings, onOpenAdmin, isAdmin, onPrev, onNext, canPrev, canNext, settings, onUpdate, storedMusicUserToken, onMusicUserToken,
+  song, user, onBack, onLogout, onOpenSettings, onOpenAdmin, onOpenAccount, isAdmin, onPrev, onNext, canPrev, canNext, settings, onUpdate, storedMusicUserToken, onMusicUserToken,
 }: {
   song: SongDetail
   user: { display_name: string | null; email: string | null } | null
@@ -1012,6 +1013,7 @@ function PlayerView({
   onLogout: () => void
   onOpenSettings: () => void
   onOpenAdmin: () => void
+  onOpenAccount: () => void
   isAdmin: boolean
   onPrev: () => void
   onNext: () => void
@@ -1264,13 +1266,6 @@ function PlayerView({
               Admin
             </button>
           )}
-          <button
-            type="button"
-            onClick={onOpenSettings}
-            className="text-xs text-gray-500 hover:text-gray-200 transition-colors"
-          >
-            Preferences
-          </button>
           {/* Inline source switcher — always visible; unavailable sources are dimmed */}
           {(() => {
             const opts: { value: AppSettings['preferredSource']; activeClass: string; available: boolean; label: string }[] = [
@@ -1307,7 +1302,14 @@ function PlayerView({
               </div>
             )
           })()}
-          {user?.display_name && <span className="text-xs text-gray-500">{user.display_name}</span>}
+          <button
+            type="button"
+            onClick={onOpenSettings}
+            className="text-xs text-gray-500 hover:text-gray-200 transition-colors"
+          >
+            Preferences
+          </button>
+          {user?.display_name && <button type="button" onClick={onOpenAccount} className="text-xs text-gray-500 hover:text-gray-300 transition-colors">{user.display_name}</button>}
           <button onClick={onLogout} className="text-xs text-gray-600 hover:text-gray-400 transition-colors">Sign out</button>
         </div>
         </div>
@@ -1887,6 +1889,7 @@ export default function App() {
         onBack={() => navigateToPath('/browse')}
         onLogout={handleLogout}
         onOpenSettings={() => navigateToPath('/settings')}
+        onOpenAccount={() => navigateToPath('/settings/account')}
         onOpenAdmin={() => navigateToPath(adminPath('songs', activeSong.id))}
         isAdmin={isAdmin}
         onPrev={handlePrevSong}
@@ -1914,6 +1917,7 @@ export default function App() {
       onOpenAdmin={() => navigateToPath('/admin')}
       isAdmin={isAdmin}
       onOpenSettings={() => navigateToPath('/settings')}
+      onOpenAccount={() => navigateToPath('/settings/account')}
       onLogout={handleLogout}
       user={appUser}
       openedSongIds={openedSongIds}
