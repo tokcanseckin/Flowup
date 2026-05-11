@@ -577,7 +577,7 @@ function SettingsPage({
   const [supportForm, setSupportForm] = useState({ subject: '', message: '' })
   const [supportSent, setSupportSent] = useState(false)
 
-  const tabs: { key: typeof tab; label: string; icon: React.ReactNode }[] = [
+  const tabs: { key: SettingsTab; label: string; icon: React.ReactNode }[] = [
     {
       key: 'preferences',
       label: 'Preferences',
