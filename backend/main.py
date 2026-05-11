@@ -80,6 +80,7 @@ from models import (
     UserResponse,
     UserSettings,
     UserSettingsUpdate,
+    AppleMusicTokenRequest,
     UserSyncRequest,
     WordResponse,
     WorkerResultSubmit,
@@ -1454,9 +1455,6 @@ async def update_user_settings(spotify_id: str, body: UserSettingsUpdate, db: Se
 
 
 # ── Apple Music user token persistence ────────────────────────────────────────
-
-class AppleMusicTokenRequest(BaseModel):
-    token: Optional[str] = None  # None = clear
 
 
 @app.put("/api/users/{spotify_id}/apple-music-token")

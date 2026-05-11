@@ -194,6 +194,10 @@ class UserSettingsUpdate(BaseModel):
     preferred_source: Optional[str] = None
 
 
+class AppleMusicTokenRequest(BaseModel):
+    token: Optional[str] = None  # None = clear
+
+
 class WordIngest(BaseModel):
     key: int
     display_form: str
