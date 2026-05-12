@@ -294,8 +294,8 @@ def _seed_sample_data() -> None:
 
 _INITIAL_LOCALIZATIONS: list[dict] = [
     # Auth
-    {"key": "auth.tagline1",                "en": "Learn languages",            "tr": "Dil öğren",                 "ru": "Учи языки"},
-    {"key": "auth.tagline2",                "en": "through music",              "tr": "müzikle",                   "ru": "через музыку"},
+    {"key": "auth.tagline1",                "en": "Learn languages through music.", "tr": "Müzikle dil öğren.",           "ru": "Учи языки через музыку."},
+    {"key": "auth.tagline2",                "en": "Real lyrics. Real grammar. Real context.", "tr": "Gerçek sözler. Gerçek gramer. Gerçek bağlam.", "ru": "Настоящие тексты. Настоящая грамматика. Настоящий контекст."},
     {"key": "auth.signIn",                  "en": "Sign in",                    "tr": "Giriş yap",                 "ru": "Войти"},
     {"key": "auth.signingIn",               "en": "Signing in…",                "tr": "Giriş yapılıyor…",          "ru": "Вход…"},
     {"key": "auth.signUp",                  "en": "Sign up",                    "tr": "Kayıt ol",                  "ru": "Зарегистрироваться"},
@@ -354,6 +354,10 @@ _INITIAL_LOCALIZATIONS: list[dict] = [
     {"key": "settings.unknownUser",       "en": "Unknown user",               "tr": "Bilinmeyen kullanıcı",      "ru": "Неизвестный пользователь"},
     {"key": "settings.uiLanguage",        "en": "Interface language",         "tr": "Arayüz dili",               "ru": "Язык интерфейса"},
     {"key": "settings.uiLanguageDesc",    "en": "Choose the language used throughout the app UI.", "tr": "Uygulama genelinde kullanılan dili seçin.", "ru": "Выберите язык интерфейса."},
+    {"key": "settings.sourceYoutubeDesc",    "en": "Embed YouTube videos when available",          "tr": "Mevcut olduğunda YouTube videolarını göster",  "ru": "Встраивать YouTube-видео при наличии"},
+    {"key": "settings.sourceAppleMusicDesc", "en": "Use Apple Music (requires subscription)",       "tr": "Apple Music kullan (abonelik gerektirir)",     "ru": "Использовать Apple Music (нужна подписка)"},
+    {"key": "settings.subjectPlaceholder",   "en": "e.g. Bug report, Feature request\u2026",        "tr": "örn. Hata bildirimi, Özellik isteği\u2026",    "ru": "напр. Сообщение об ошибке, Пожелание\u2026"},
+    {"key": "settings.messagePlaceholder",   "en": "Describe your issue or question\u2026",         "tr": "Sorununuzu veya sorunuzu açıklayın\u2026",     "ru": "Опишите вашу проблему или вопрос\u2026"},
     # Inspect / Lyrics shortcuts
     {"key": "inspect.title",              "en": "INSPECT LYRICS",             "tr": "SÖZLERE BAK",               "ru": "ТЕКСТ ПЕСНИ"},
     {"key": "inspect.numberedWord",       "en": "Inspect a numbered word",    "tr": "Numaralı kelimeye bak",     "ru": "Изучить пронумерованное слово"},
@@ -363,6 +367,16 @@ _INITIAL_LOCALIZATIONS: list[dict] = [
     {"key": "inspect.playPause",          "en": "Play / pause",               "tr": "Oynat / duraklat",          "ru": "Воспроизведение / пауза"},
     {"key": "inspect.seekPrevNextLine",   "en": "Seek to prev / next line",   "tr": "Önceki / sonraki satıra git","ru": "К пред. / следующей строке"},
     {"key": "inspect.prevNextSong",       "en": "Prev / next song",           "tr": "Önceki / sonraki şarkı",    "ru": "Пред. / следующая песня"},
+    {"key": "inspect.definition",         "en": "Definition",                 "tr": "Tanım",                     "ru": "Определение"},
+    {"key": "inspect.translation",        "en": "Translation",                "tr": "Çeviri",                    "ru": "Перевод"},
+    {"key": "inspect.close",              "en": "Close",                      "tr": "Kapat",                     "ru": "Закрыть"},
+    {"key": "inspect.noDefinition",       "en": "No definition yet",          "tr": "Henüz tanım yok",           "ru": "Определение пока отсутствует"},
+    {"key": "inspect.infinitive",         "en": "infinitive",                 "tr": "mastar",                    "ru": "инфинитив"},
+    {"key": "inspect.nominative",         "en": "nominative",                 "tr": "yalın hal",                 "ru": "именительный"},
+    {"key": "inspect.noTranslation",      "en": "No translation available for this line yet", "tr": "Bu satır için henüz çeviri yok", "ru": "Перевод для этой строки пока недоступен"},
+    # Player empty state
+    {"key": "player.waitingForPlayback",  "en": "Waiting for playback...",    "tr": "Oynatma bekleniyor...",     "ru": "Ожидание воспроизведения..."},
+    {"key": "player.loadAndPlay",         "en": "Load a track and press Play","tr": "Bir parça yükle ve Oynat'a bas", "ru": "Загрузите трек и нажмите Воспроизвести"},
 ]
 
 

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { SongDetail } from '../api/client'
 import { useWordHistory } from '../hooks/useWordHistory'
 import translateIconImg from '../../images/translate_icon@2x.png'
+import { useT } from '../i18n/LocalizationContext'
 
 // ── Stop-word sets (keyed by language code) ─────────────────────────────────
 // These words are still clickable, but don't consume a keyboard index (1-9).
@@ -313,6 +314,7 @@ export default function LyricsPlayer({
   onSeek,
   onTogglePlayback,
 }: Props) {
+  const t = useT()
   const { lines, language } = songData
   const isRTL = language.direction === 'rtl'
   const langCode = language.code
@@ -777,8 +779,8 @@ export default function LyricsPlayer({
 
           {lines.length === 0 && (
             <div className="flex flex-col items-center justify-center gap-2 py-16">
-              <p className="text-gray-600 text-sm">Waiting for playback...</p>
-              <p className="text-gray-700 text-xs">Load a track and press Play</p>
+              <p className="text-gray-600 text-sm">{t('player.waitingForPlayback')}</p>
+              <p className="text-gray-700 text-xs">{t('player.loadAndPlay')}</p>
             </div>
           )}
         </div>
@@ -833,7 +835,7 @@ export default function LyricsPlayer({
               />
             ) : (
               <div className="rounded-xl border border-white/20 px-8 py-7 text-white/85 animate-panel-in">
-                <p className="text-white/50 font-semibold uppercase tracking-widest text-[12px] mb-4">Inspect lyrics</p>
+                <p className="text-white/50 font-semibold uppercase tracking-widest text-[12px] mb-4">{t('inspect.title')}</p>
                 <div className="flex flex-col gap-3 text-[13px] leading-snug">
                   <div className="flex items-start gap-3">
                     <div className="flex gap-1 shrink-0 mt-0.5">
@@ -841,19 +843,19 @@ export default function LyricsPlayer({
                         <kbd key={k} className={`inline-flex items-center justify-center rounded px-1.5 py-0.5 text-[11px] font-mono font-medium leading-none ${k === '–' ? 'bg-transparent text-white/30 px-0' : 'bg-white/10 text-white/70 border border-white/15'}`}>{k}</kbd>
                       ))}
                     </div>
-                    <span className="text-white/60">Inspect a numbered word</span>
+                    <span className="text-white/60">{t('inspect.numberedWord')}</span>
                   </div>
                   <div className="flex items-start gap-3">
                     <kbd className="shrink-0 mt-0.5 inline-flex items-center justify-center rounded px-1.5 py-0.5 text-[11px] font-mono font-medium leading-none bg-white/10 text-white/70 border border-white/15">0</kbd>
-                    <span className="text-white/60">Sentence translation</span>
+                    <span className="text-white/60">{t('inspect.sentenceTranslation')}</span>
                   </div>
                   <div className="flex items-start gap-3">
-                    <span className="shrink-0 mt-0.5 text-white/30 text-[11px] font-medium leading-none">hold</span>
-                    <span className="text-white/60">Peek without pinning</span>
+                    <span className="shrink-0 mt-0.5 text-white/30 text-[11px] font-medium leading-none">{t('inspect.hold')}</span>
+                    <span className="text-white/60">{t('inspect.peekWithoutPinning')}</span>
                   </div>
                   <div className="flex items-start gap-3">
                     <kbd className="shrink-0 mt-0.5 inline-flex items-center justify-center rounded px-2 py-0.5 text-[11px] font-mono font-medium leading-none bg-white/10 text-white/70 border border-white/15">Space</kbd>
-                    <span className="text-white/60">Play / pause</span>
+                    <span className="text-white/60">{t('inspect.playPause')}</span>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="flex gap-1 shrink-0 mt-0.5">
@@ -861,7 +863,7 @@ export default function LyricsPlayer({
                         <kbd key={k} className="inline-flex items-center justify-center rounded px-1.5 py-0.5 text-[11px] font-mono font-medium leading-none bg-white/10 text-white/70 border border-white/15">{k}</kbd>
                       ))}
                     </div>
-                    <span className="text-white/60">Seek to prev / next line</span>
+                    <span className="text-white/60">{t('inspect.seekPrevNextLine')}</span>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="flex gap-1 shrink-0 mt-0.5">
@@ -869,7 +871,7 @@ export default function LyricsPlayer({
                         <kbd key={k} className="inline-flex items-center justify-center rounded px-1.5 py-0.5 text-[11px] font-mono font-medium leading-none bg-white/10 text-white/70 border border-white/15">{k}</kbd>
                       ))}
                     </div>
-                    <span className="text-white/60">Prev / next song</span>
+                    <span className="text-white/60">{t('inspect.prevNextSong')}</span>
                   </div>
                 </div>
               </div>
@@ -965,6 +967,7 @@ interface InspectPanelProps {
 }
 
 function InspectPanel({ info, onClose, compact = false, accentTextColor = 'hsl(320, 88%, 38%)' }: InspectPanelProps) {
+  const t = useT()
   const isWord = info.kind === 'word'
   const cleanDisplayForm = isWord ? stripBoundaryPunctuation(info.word.display_form) : null
 
@@ -979,7 +982,7 @@ function InspectPanel({ info, onClose, compact = false, accentTextColor = 'hsl(3
     >
       <div className="flex items-start justify-between gap-3">
         <p className="text-xs leading-none font-bold text-zinc-900 uppercase tracking-wide">
-          {isWord ? 'Definition' : 'Translation'}
+          {isWord ? t('inspect.definition') : t('inspect.translation')}
         </p>
         <button
           type="button"
@@ -987,7 +990,7 @@ function InspectPanel({ info, onClose, compact = false, accentTextColor = 'hsl(3
           className="text-xs text-gray-500 hover:text-gray-700 transition-colors"
           aria-label="Close inspector"
         >
-          Close
+          {t('inspect.close')}
         </button>
       </div>
 
@@ -1011,7 +1014,7 @@ function InspectPanel({ info, onClose, compact = false, accentTextColor = 'hsl(3
                   ))}
                 </ol>
               )
-          })() : <p className="text-gray-500 italic text-base font-normal mt-1">No definition yet</p>}
+          })() : <p className="text-gray-500 italic text-base font-normal mt-1">{t('inspect.noDefinition')}</p>}
 
           <div className="my-4 border-t border-zinc-300" />
 
@@ -1046,7 +1049,7 @@ function InspectPanel({ info, onClose, compact = false, accentTextColor = 'hsl(3
           {/* ── Nominative / infinitive (lemma) ── */}
           <p className="text-base leading-tight font-semibold mt-3" style={{ color: accentTextColor }}>
             <span className="text-[11px] leading-tight font-medium text-zinc-500 uppercase tracking-wide mr-2">
-              {info.word.grammar?.startsWith('Verb') ? 'infinitive' : 'nominative'}
+              {info.word.grammar?.startsWith('Verb') ? t('inspect.infinitive') : t('inspect.nominative')}
             </span>
             {info.word.lemma}
           </p>
@@ -1054,7 +1057,7 @@ function InspectPanel({ info, onClose, compact = false, accentTextColor = 'hsl(3
       ) : (
         <>
           <p className="text-lg font-semibold leading-snug mt-1" style={{ color: accentTextColor }}>
-            {info.line.translation || 'No translation available for this line yet'}
+            {info.line.translation || t('inspect.noTranslation')}
           </p>
           <div className="my-3 border-t border-zinc-300" />
           <p className="stressed text-zinc-700 text-base leading-relaxed opacity-80">{info.line.original_line}</p>

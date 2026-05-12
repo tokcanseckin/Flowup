@@ -153,8 +153,8 @@ class Playlist(Base):
     description         = Column(Text,        nullable=True)
     cover_image         = deferred(Column(LargeBinary, nullable=True))
     cover_image_type    = Column(String(64),  nullable=True)
-    # CEFR-style level: A1, A2, B1, B2, C1, C2
-    difficulty_level    = Column(String(20),  nullable=True)
+    # CEFR-style level: A1, A2, B1, B2, C1, C2 — or a [[localization.key]]
+    difficulty_level    = Column(String(512), nullable=True)
     language_code       = Column(String(8),   nullable=True)
     # Target language for translations/definitions in this playlist (e.g. "RU")
     target_lang         = Column(String(16),  nullable=True)

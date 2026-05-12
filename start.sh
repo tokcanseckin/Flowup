@@ -20,7 +20,7 @@ wait_for() {
   local url="$1" label="$2" tries=0
   while ! curl -sf "$url" >/dev/null 2>&1; do
     tries=$((tries+1))
-    if [ $tries -ge 20 ]; then
+    if [ $tries -ge 60 ]; then
       echo "ERROR: $label did not start (timeout). Check logs above."
       return 1
     fi

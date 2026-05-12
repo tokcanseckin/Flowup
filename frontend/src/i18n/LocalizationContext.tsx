@@ -17,6 +17,8 @@ interface LocalizationContextValue {
   language: UILanguage
   setLanguage: (lang: UILanguage) => void
   t: (key: string) => string
+  /** Resolves [[loc.key]] references inside DB content strings. */
+  tc: (text: string) => string
   localizations: Record<string, LocalizationItem>
   isLoading: boolean
 }
@@ -25,6 +27,7 @@ const LocalizationContext = createContext<LocalizationContextValue>({
   language: 'en',
   setLanguage: () => {},
   t: (key) => key,
+  tc: (text) => text,
   localizations: {},
   isLoading: true,
 })
@@ -66,8 +69,17 @@ export function LocalizationProvider({ children }: Props) {
     [localizations, language],
   )
 
+  const tc = useCallback(
+    (text: string): string => text.replace(/\[\[([^\]]+)\]\]/g, (_, key: string) => {
+      const entry = localizations[key]
+      if (!entry) return key
+      return entry[language] || entry.en || key
+    }),
+    [localizations, language],
+  )
+
   return (
-    <LocalizationContext.Provider value={{ language, setLanguage, t, localizations, isLoading }}>
+    <LocalizationContext.Provider value={{ language, setLanguage, t, tc, localizations, isLoading }}>
       {children}
     </LocalizationContext.Provider>
   )
@@ -80,6 +92,14 @@ export function useLocalization() {
 /** Shorthand hook: just returns the `t()` translation function. */
 export function useT() {
   return useContext(LocalizationContext).t
+}
+
+/**
+ * Returns `tc()` — resolves [[loc.key]] placeholders inside DB content strings
+ * (e.g. playlist name, description) into the current UI language.
+ */
+export function useContentT() {
+  return useContext(LocalizationContext).tc
 }
 
 /** Storage key for external consumers (e.g. AppSettings sync). */

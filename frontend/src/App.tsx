@@ -10,7 +10,7 @@ import { api, BackendUser, PlaylistDetail, PlaylistSummary, SongDetail, SongSumm
 import { useFavorites } from './hooks/useFavorites'
 import { useListened } from './hooks/useListened'
 import { useWordHistory } from './hooks/useWordHistory'
-import { useLocalization, useT } from './i18n/LocalizationContext'
+import { useLocalization, useT, useContentT } from './i18n/LocalizationContext'
 
 // ── Module-level song cache (survives re-renders, cleared on logout) ──────────
 // Key: `{id}:{source}` where source is 'youtube' or 'apple_music'.
@@ -199,6 +199,7 @@ function settingsPath(tab: SettingsTab = 'preferences'): string {
 // ── Shared auth helpers ────────────────────────────────────────────────────────
 
 function AppLogo() {
+  const t = useT()
   return (
     <div className="text-center mb-10">
       <div className="inline-flex items-center gap-2 mb-4">
@@ -212,14 +213,15 @@ function AppLogo() {
         </h1>
       </div>
       <p className="text-gray-500 text-sm leading-relaxed max-w-xs mx-auto">
-        Learn languages through music.<br/>
-        Real lyrics. Real grammar. Real context.
+        {t('auth.tagline1')}<br/>
+        {t('auth.tagline2')}
       </p>
     </div>
   )
 }
 
 function AppleButton({ disabled }: { disabled?: boolean }) {
+  const t = useT()
   return (
     <button
       type="button"
@@ -234,7 +236,7 @@ function AppleButton({ disabled }: { disabled?: boolean }) {
       <svg viewBox="0 0 24 24" className="w-4.5 h-4.5 fill-current shrink-0" aria-hidden>
         <path d="M16.462 1.184a4.694 4.694 0 01-3.293 3.574 4.21 4.21 0 01-3.18-3.38 4.693 4.693 0 013.38-.49 4.23 4.23 0 013.093.296zM20.5 17.6c-.41.94-.886 1.808-1.43 2.602-.755 1.077-1.374 1.822-1.85 2.232-.74.68-1.53 1.027-2.374 1.047-.607 0-1.34-.173-2.19-.524-.855-.35-1.64-.524-2.357-.524-.752 0-1.559.174-2.424.524-.866.35-1.562.533-2.094.55-.81.035-1.617-.32-2.424-1.065-.517-.453-1.163-1.225-1.936-2.316C.713 18.925.06 17.374.06 15.774c0-1.457.314-2.713.946-3.762A5.538 5.538 0 013.12 9.956a5.27 5.27 0 012.651-.747c.657 0 1.52.203 2.595.602 1.073.4 1.762.603 2.064.603.226 0 .993-.237 2.293-.71 1.23-.438 2.268-.62 3.12-.548 2.307.186 4.04 1.097 5.19 2.736-2.063 1.25-3.082 3-3.054 5.244.025 1.748.65 3.202 1.872 4.357.556.529 1.176.937 1.862 1.226-.15.434-.308.85-.476 1.24l.013-.36z"/>
       </svg>
-      Continue with Apple
+      {t('auth.continueWithApple')}
     </button>
   )
 }
@@ -291,6 +293,7 @@ function LoginScreen({
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const googleBtnRef = useRef<HTMLDivElement>(null)
+  const t = useT()
 
   useGoogleButton(googleBtnRef, onGoogleLogin, 'continue_with')
 
@@ -308,7 +311,7 @@ function LoginScreen({
         <div className="rounded-2xl border border-gray-800/80 p-8 shadow-2xl space-y-5"
              style={{ background: '#12121f' }}>
           <div>
-            <h2 className="text-white font-semibold text-lg mb-1">Sign in</h2>
+            <h2 className="text-white font-semibold text-lg mb-1">{t('auth.signIn')}</h2>
           </div>
 
           {error && (
@@ -327,7 +330,7 @@ function LoginScreen({
 
           <div className="flex items-center gap-3 text-xs text-gray-600">
             <div className="h-px flex-1 bg-gray-800" />
-            <span>or</span>
+            <span>{t('auth.or')}</span>
             <div className="h-px flex-1 bg-gray-800" />
           </div>
 
@@ -337,7 +340,7 @@ function LoginScreen({
               required
               value={email}
               onChange={e => setEmail(e.target.value)}
-              placeholder="Email"
+              placeholder={t('auth.emailPlaceholder')}
               className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500"
             />
             <input
@@ -346,7 +349,7 @@ function LoginScreen({
               minLength={8}
               value={password}
               onChange={e => setPassword(e.target.value)}
-              placeholder="Password"
+              placeholder={t('auth.passwordPlaceholder')}
               className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500"
             />
             <button
@@ -358,18 +361,18 @@ function LoginScreen({
                 text-white transition-all duration-150
               "
             >
-              {busy ? 'Signing in…' : 'Sign in'}
+              {busy ? t('auth.signingIn') : t('auth.signIn')}
             </button>
           </form>
 
           <p className="text-center text-sm text-gray-500">
-            Don't have an account?{' '}
+            {t('auth.dontHaveAccount')}{' '}
             <button
               type="button"
               onClick={onShowSignUp}
               className="text-indigo-400 hover:text-indigo-300 font-medium transition-colors"
             >
-              Sign up
+              {t('auth.signUp')}
             </button>
           </p>
         </div>
@@ -399,6 +402,7 @@ function SignUpScreen({
   const [confirm, setConfirm] = useState('')
   const [localError, setLocalError] = useState<string | null>(null)
   const googleBtnRef = useRef<HTMLDivElement>(null)
+  const t = useT()
 
   useGoogleButton(googleBtnRef, onGoogleLogin, 'signup_with')
 
@@ -406,7 +410,7 @@ function SignUpScreen({
     e.preventDefault()
     setLocalError(null)
     if (password !== confirm) {
-      setLocalError('Passwords do not match')
+      setLocalError(t('auth.passwordsDoNotMatch'))
       return
     }
     void onRegister(displayName.trim(), email.trim(), password)
@@ -423,7 +427,7 @@ function SignUpScreen({
         <div className="rounded-2xl border border-gray-800/80 p-8 shadow-2xl space-y-5"
              style={{ background: '#12121f' }}>
           <div>
-            <h2 className="text-white font-semibold text-lg mb-1">Create an account</h2>
+            <h2 className="text-white font-semibold text-lg mb-1">{t('auth.createAccount')}</h2>
           </div>
 
           {shownError && (
@@ -442,7 +446,7 @@ function SignUpScreen({
 
           <div className="flex items-center gap-3 text-xs text-gray-600">
             <div className="h-px flex-1 bg-gray-800" />
-            <span>or</span>
+            <span>{t('auth.or')}</span>
             <div className="h-px flex-1 bg-gray-800" />
           </div>
 
@@ -452,7 +456,7 @@ function SignUpScreen({
               required
               value={displayName}
               onChange={e => setDisplayName(e.target.value)}
-              placeholder="Your name"
+              placeholder={t('auth.namePlaceholder')}
               className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500"
             />
             <input
@@ -460,7 +464,7 @@ function SignUpScreen({
               required
               value={email}
               onChange={e => setEmail(e.target.value)}
-              placeholder="Email"
+              placeholder={t('auth.emailPlaceholder')}
               className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500"
             />
             <input
@@ -469,7 +473,7 @@ function SignUpScreen({
               minLength={8}
               value={password}
               onChange={e => setPassword(e.target.value)}
-              placeholder="Password (min. 8 characters)"
+              placeholder={t('auth.passwordMinPlaceholder')}
               className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500"
             />
             <input
@@ -478,7 +482,7 @@ function SignUpScreen({
               minLength={8}
               value={confirm}
               onChange={e => setConfirm(e.target.value)}
-              placeholder="Confirm password"
+              placeholder={t('auth.confirmPasswordPlaceholder')}
               className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500"
             />
             <button
@@ -490,18 +494,18 @@ function SignUpScreen({
                 text-white transition-all duration-150
               "
             >
-              {busy ? 'Creating account…' : 'Create account'}
+              {busy ? t('auth.creatingAccount') : t('auth.createAccount')}
             </button>
           </form>
 
           <p className="text-center text-sm text-gray-500">
-            Already have an account?{' '}
+            {t('auth.alreadyHaveAccount')}{' '}
             <button
               type="button"
               onClick={onShowSignIn}
               className="text-indigo-400 hover:text-indigo-300 font-medium transition-colors"
             >
-              Sign in
+              {t('auth.signIn')}
             </button>
           </p>
         </div>
@@ -510,11 +514,6 @@ function SignUpScreen({
   )
 }
 
-const SOURCE_OPTIONS: { value: AppSettings['preferredSource']; label: string; description: string }[] = [
-  { value: 'youtube', label: 'YouTube', description: 'Embed YouTube videos when available' },
-  { value: 'apple_music', label: 'Apple Music', description: 'Use Apple Music (requires subscription)' },
-]
-
 function SourcePicker({
   value,
   onChange,
@@ -522,7 +521,11 @@ function SourcePicker({
   value: AppSettings['preferredSource']
   onChange: (v: AppSettings['preferredSource']) => void
 }) {
-  const options = SOURCE_OPTIONS
+  const t = useT()
+  const options: { value: AppSettings['preferredSource']; label: string; description: string }[] = [
+    { value: 'youtube', label: 'YouTube', description: t('settings.sourceYoutubeDesc') },
+    { value: 'apple_music', label: 'Apple Music', description: t('settings.sourceAppleMusicDesc') },
+  ]
   return (
     <div className="space-y-2">
       {options.map(opt => (
@@ -588,6 +591,7 @@ function SongBrowser({
   onTargetLangChange: (lang: string | null) => void
 }) {
   const t = useT()
+  const tc = useContentT()
   const listenedCount = activePlaylist
     ? activePlaylist.songs.filter(s => openedSongIds.has(s.song_id)).length
     : 0
@@ -619,7 +623,7 @@ function SongBrowser({
       {loading ? (
         <div className="flex items-center gap-3 py-8 text-gray-600">
           <div className="w-5 h-5 border-2 border-gray-700 border-t-indigo-500 rounded-full animate-spin" />
-          <span className="text-sm">Loading songs...</span>
+          <span className="text-sm">{t('browser.loadingSongs')}</span>
         </div>
       ) : songs.length === 0 && !error ? (
         <div className="rounded-2xl border border-zinc-700/70 p-8 text-center" style={{ background: '#25262b' }}>
@@ -675,7 +679,7 @@ function SongBrowser({
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="text-white font-semibold truncate">{song.title}</p>
-                    <p className="text-gray-500 text-sm truncate">{song.artist ?? 'Unknown artist'}</p>
+                    <p className="text-gray-500 text-sm truncate">{song.artist ?? t('browser.unknownArtist')}</p>
                   </div>
                   {favoriteSongIds.has(song.id) && (
                     <svg viewBox="0 0 24 24" className="shrink-0 w-4 h-4" fill="#f87171" aria-label="Favorited">
@@ -711,7 +715,7 @@ function SongBrowser({
                     <svg viewBox="0 0 24 24" className="w-4 h-4 shrink-0" fill={favoriteSongIds.has(song.id) ? '#f87171' : 'none'} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                     </svg>
-                    {favoriteSongIds.has(song.id) ? 'Remove from favorites' : 'Add to favorites'}
+                    {favoriteSongIds.has(song.id) ? t('browser.removeFromFavorites') : t('browser.addToFavorites')}
                   </button>
                   {openedSongIds.has(song.id) && (
                     <button
@@ -721,7 +725,7 @@ function SongBrowser({
                       <svg viewBox="0 0 24 24" className="w-4 h-4 shrink-0 fill-none stroke-current" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                         <polyline points="9 11 12 14 22 4" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
                       </svg>
-                      Mark as not listened
+                      {t('browser.markAsNotListened')}
                     </button>
                   )}
                   <div className="border-t border-zinc-700/60 mx-3" />
@@ -732,7 +736,7 @@ function SongBrowser({
                     <svg viewBox="0 0 24 24" className="w-4 h-4 shrink-0 fill-none stroke-current" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" /><line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" />
                     </svg>
-                    Report a problem
+                    {t('browser.reportProblem')}
                   </button>
                 </div>
               )}
@@ -765,7 +769,7 @@ function SongBrowser({
                 onClick={onOpenAdmin}
                 className="text-xs text-amber-500 hover:text-amber-300 transition-colors"
               >
-                Admin
+                {t('nav.admin')}
               </button>
             )}
             {activePlaylistId !== null && availableTargetLangs.length > 0 && (
@@ -785,7 +789,7 @@ function SongBrowser({
               onClick={onOpenSettings}
               className="text-xs text-gray-500 hover:text-gray-200 transition-colors"
             >
-              Preferences
+              {t('nav.preferences')}
             </button>
             {user?.display_name && (
               <button type="button" onClick={onOpenAccount} className="text-xs text-gray-500 hover:text-gray-300 transition-colors">{user.display_name}</button>
@@ -829,7 +833,7 @@ function SongBrowser({
               {activePlaylist.cover_image_url ? (
                 <img
                   src={activePlaylist.cover_image_url}
-                  alt={activePlaylist.name}
+                  alt={tc(activePlaylist.name)}
                   className="w-full aspect-square rounded-2xl mb-5 object-cover"
                 />
               ) : (
@@ -838,13 +842,13 @@ function SongBrowser({
                   style={{ background: 'linear-gradient(135deg, #003d1f 0%, #006D36 50%, #003d1f 100%)' }}
                 >
                   <span className="text-white/30 text-6xl font-bold uppercase">
-                    {activePlaylist.name.charAt(0)}
+                    {tc(activePlaylist.name).charAt(0)}
                   </span>
                 </div>
               )}
 
               {/* Title */}
-              <h1 className="text-white font-bold text-xl leading-tight mb-3">{activePlaylist.name}</h1>
+              <h1 className="text-white font-bold text-xl leading-tight mb-3">{tc(activePlaylist.name)}</h1>
 
               {/* Badges */}
               <div className="flex flex-wrap gap-1.5 mb-5">
@@ -873,29 +877,29 @@ function SongBrowser({
                   <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current shrink-0">
                     <path d="M8 5v14l11-7z"/>
                   </svg>
-                  Play
+                  {t('browser.play')}
                 </button>
               )}
 
               {/* Stats */}
               <div className="rounded-2xl border border-zinc-700/70 divide-y divide-zinc-700/70 mb-4" style={{ background: '#25262b' }}>
                 <div className="px-4 py-3 flex items-center justify-between">
-                  <span className="text-xs text-gray-500">Songs</span>
+                  <span className="text-xs text-gray-500">{t('browser.songs')}</span>
                   <span className="text-sm text-white font-medium">{activePlaylist.song_count}</span>
                 </div>
                 <div className="px-4 py-3 flex items-center justify-between">
-                  <span className="text-xs text-gray-500">Progress</span>
+                  <span className="text-xs text-gray-500">{t('browser.progress')}</span>
                   <span className="text-sm text-white font-medium">{progressPct}%</span>
                 </div>
                 <div className="px-4 py-3 flex items-center justify-between">
-                  <span className="text-xs text-gray-500">Words looked up</span>
+                  <span className="text-xs text-gray-500">{t('browser.wordsLookedUp')}</span>
                   <span className="text-sm text-white font-medium">{wordsLookedUpCount}</span>
                 </div>
               </div>
 
               {/* Description */}
               {activePlaylist.description && (
-                <p className="text-gray-400 text-sm leading-relaxed">{activePlaylist.description}</p>
+                <p className="text-gray-400 text-sm leading-relaxed">{tc(activePlaylist.description)}</p>
               )}
 
 
@@ -904,7 +908,7 @@ function SongBrowser({
             {/* Right column — song list */}
             <div className="flex-1 min-w-0">
               <div className="mb-4 flex items-center justify-between gap-3">
-                <h2 className="text-white font-semibold text-lg">Songs</h2>
+                <h2 className="text-white font-semibold text-lg">{t('browser.songs')}</h2>
               </div>
               {songList}
             </div>
@@ -913,7 +917,7 @@ function SongBrowser({
           <div className="max-w-2xl mx-auto">
             {playlists.length > 0 && (
               <div className="mb-6 grid grid-cols-1 gap-2">
-                <p className="text-xs text-gray-600 uppercase tracking-wider font-medium mb-1">Playlists</p>
+                <p className="text-xs text-gray-600 uppercase tracking-wider font-medium mb-1">{t('nav.playlists')}</p>
                 {playlists.map(pl => (
                   <button
                     key={pl.id}
@@ -926,15 +930,15 @@ function SongBrowser({
                   >
                     <div className="flex items-center gap-3">
                       {pl.cover_image_url ? (
-                        <img src={pl.cover_image_url} alt={pl.name} className="w-10 h-10 rounded-lg object-cover shrink-0" />
+                        <img src={pl.cover_image_url} alt={tc(pl.name)} className="w-10 h-10 rounded-lg object-cover shrink-0" />
                       ) : (
                         <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 select-none" style={{ background: 'linear-gradient(135deg, #003d1f 0%, #006D36 100%)' }}>
-                          <span className="text-white/40 text-sm font-bold uppercase">{pl.name.charAt(0)}</span>
+                          <span className="text-white/40 text-sm font-bold uppercase">{tc(pl.name).charAt(0)}</span>
                         </div>
                       )}
                       <div className="min-w-0 flex-1">
-                        <p className="text-white font-medium truncate">{pl.name}</p>
-                        <p className="text-gray-500 text-xs truncate">{pl.song_count} songs{pl.language_code ? ` · ${pl.language_code.toUpperCase()}` : ''}{pl.difficulty_level ? ` · ${pl.difficulty_level}` : ''}</p>
+                        <p className="text-white font-medium truncate">{tc(pl.name)}</p>
+                        <p className="text-gray-500 text-xs truncate">{pl.song_count} {t('browser.songs').toLowerCase()}{pl.language_code ? ` · ${pl.language_code.toUpperCase()}` : ''}{pl.difficulty_level ? ` · ${pl.difficulty_level}` : ''}</p>
                       </div>
                       <svg viewBox="0 0 24 24" className="w-4 h-4 fill-gray-600 shrink-0">
                         <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/>
@@ -1235,7 +1239,7 @@ function SettingsPage({
                         type="text"
                         value={supportForm.subject}
                         onChange={e => setSupportForm(f => ({ ...f, subject: e.target.value }))}
-                        placeholder="e.g. Bug report, Feature request…"
+                        placeholder={t('settings.subjectPlaceholder')}
                         className="w-full rounded-xl border border-gray-700 bg-gray-900/60 px-3 py-2.5 text-sm text-white placeholder-gray-600 outline-none focus:border-gray-500 transition-colors"
                       />
                     </div>
@@ -1246,7 +1250,7 @@ function SettingsPage({
                         rows={5}
                         value={supportForm.message}
                         onChange={e => setSupportForm(f => ({ ...f, message: e.target.value }))}
-                        placeholder="Describe your issue or question…"
+                        placeholder={t('settings.messagePlaceholder')}
                         className="w-full rounded-xl border border-gray-700 bg-gray-900/60 px-3 py-2.5 text-sm text-white placeholder-gray-600 outline-none focus:border-gray-500 transition-colors resize-none"
                       />
                     </div>
@@ -1740,7 +1744,7 @@ function PlayerView({
               onClick={onOpenAdmin}
               className="text-xs text-amber-500 hover:text-amber-300 transition-colors"
             >
-              Admin
+              {t('nav.admin')}
             </button>
           )}
           {/* Target language combobox */}
@@ -1797,7 +1801,7 @@ function PlayerView({
             onClick={onOpenSettings}
             className="text-xs text-gray-500 hover:text-gray-200 transition-colors"
           >
-            Preferences
+            {t('nav.preferences')}
           </button>
           {user?.display_name && <button type="button" onClick={onOpenAccount} className="text-xs text-gray-500 hover:text-gray-300 transition-colors">{user.display_name}</button>}
           <button onClick={onLogout} className="text-xs text-gray-600 hover:text-gray-400 transition-colors">{t('nav.signOut')}</button>
@@ -1846,7 +1850,7 @@ function PlayerView({
                     <svg viewBox="0 0 24 24" className="w-4 h-4 shrink-0" fill={favoriteSongIds.has(song.id) ? '#f87171' : 'none'} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                       <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                     </svg>
-                    {favoriteSongIds.has(song.id) ? 'Remove from favorites' : 'Add to favorites'}
+                    {favoriteSongIds.has(song.id) ? t('browser.removeFromFavorites') : t('browser.addToFavorites')}
                   </button>
                   <button
                     type="button"
@@ -1856,7 +1860,7 @@ function PlayerView({
                     <svg viewBox="0 0 20 20" className="w-4 h-4 shrink-0 fill-current text-zinc-400" aria-hidden>
                       <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd"/>
                     </svg>
-                    Mark as not listened
+                    {t('browser.markAsNotListened')}
                   </button>
                   <div className="border-t border-zinc-700/60 mx-3 my-1" />
                   <button
@@ -1867,7 +1871,7 @@ function PlayerView({
                     <svg viewBox="0 0 20 20" className="w-4 h-4 shrink-0 fill-current" aria-hidden>
                       <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-3a1 1 0 00-1 1v.5a1 1 0 002 0V11a1 1 0 00-1-1z" clipRule="evenodd"/>
                     </svg>
-                    Report a problem
+                    {t('browser.reportProblem')}
                   </button>
                 </div>
               )}
