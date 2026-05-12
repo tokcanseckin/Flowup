@@ -389,6 +389,18 @@ _INITIAL_LOCALIZATIONS: list[dict] = [
     {"key": "language.ko",  "en": "Korean",    "tr": "Korece",     "ru": "Корейский"},
     {"key": "language.zh",  "en": "Chinese",   "tr": "Çince",      "ru": "Китайский"},
     {"key": "language.tr",  "en": "Turkish",   "tr": "Türkçe",     "ru": "Турецкий"},
+    # Browse / Discover
+    {"key": "browse.learnTitle",    "en": "I want to improve",                            "tr": "Geliştirmek istiyorum",                     "ru": "Хочу улучшить"},
+    {"key": "browse.learnSubtitle", "en": "Choose the language you want to learn",         "tr": "Öğrenmek istediğiniz dili seçin",           "ru": "Выберите язык для изучения"},
+    {"key": "browse.playlist",      "en": "playlist",                                      "tr": "çalma listesi",                             "ru": "плейлист"},
+    {"key": "browse.playlists",     "en": "playlists",                                     "tr": "çalma listesi",                             "ru": "плейлистов"},
+    {"key": "browse.song",          "en": "song",                                          "tr": "şarkı",                                     "ru": "песня"},
+    {"key": "browse.songs",         "en": "songs",                                         "tr": "şarkı",                                     "ru": "песен"},
+    {"key": "browse.speakTitle",    "en": "I speak",                                       "tr": "Konuştuğum dil",                            "ru": "Я говорю на"},
+    {"key": "browse.speakSubtitle", "en": "Choose your native language for translations",  "tr": "Çeviriler için ana dilinizi seçin",         "ru": "Выберите родной язык для переводов"},
+    {"key": "browse.playlistsTitle","en": "Playlists",                                     "tr": "Çalma listeleri",                           "ru": "Плейлисты"},
+    {"key": "browse.available",     "en": "available",                                     "tr": "mevcut",                                    "ru": "доступно"},
+    {"key": "browse.noPlaylists",   "en": "No playlists for this language pair yet.",      "tr": "Bu dil çifti için henüz çalma listesi yok.","ru": "Пока нет плейлистов для этой пары языков."},
 ]
 
 

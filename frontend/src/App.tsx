@@ -944,8 +944,8 @@ function SongBrowser({
           <div className="pt-2">
             {/* Section 1 — I want to improve */}
             <section className="mb-10">
-              <h2 className="text-xl font-bold text-white mb-1">I want to improve</h2>
-              <p className="text-sm text-gray-500 mb-5">Choose the language you want to learn</p>
+              <h2 className="text-xl font-bold text-white mb-1">{t('browse.learnTitle')}</h2>
+              <p className="text-sm text-gray-500 mb-5">{t('browse.learnSubtitle')}</p>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-w-2xl">
                 {learnLangs.map(code => {
                   const plCount = playlists.filter(p => p.language_code === code && p.target_langs.length > 0).length
@@ -963,7 +963,7 @@ function SongBrowser({
                       <span className="text-4xl shrink-0" role="img" aria-label={code}>{langFlag(code)}</span>
                       <div className="min-w-0">
                         <p className="text-white font-semibold text-sm">{t(`language.${code}`)}</p>
-                        {plCount > 0 && <p className="text-gray-600 text-xs mt-0.5">{plCount} {plCount === 1 ? 'playlist' : 'playlists'}</p>}
+                        {plCount > 0 && <p className="text-gray-600 text-xs mt-0.5">{plCount} {plCount === 1 ? t('browse.playlist') : t('browse.playlists')}</p>}
                       </div>
                       {selected && (
                         <svg viewBox="0 0 24 24" className="w-4 h-4 shrink-0 ml-auto" fill="rgba(255,255,255,0.5)">
@@ -979,8 +979,8 @@ function SongBrowser({
             {/* Section 2 — I speak */}
             {learnLang && nativeLangs.length > 0 && (
               <section className="mb-10">
-                <h2 className="text-xl font-bold text-white mb-1">I speak</h2>
-                <p className="text-sm text-gray-500 mb-5">Choose your native language for translations</p>
+                <h2 className="text-xl font-bold text-white mb-1">{t('browse.speakTitle')}</h2>
+                <p className="text-sm text-gray-500 mb-5">{t('browse.speakSubtitle')}</p>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-w-2xl">
                   {nativeLangs.map(code => {
                     const selected = nativeLang === code
@@ -1014,12 +1014,12 @@ function SongBrowser({
             {learnLang && nativeLang && (
               <section>
                 <div className="flex items-baseline gap-3 mb-5">
-                  <h2 className="text-xl font-bold text-white">Playlists</h2>
-                  {matchingPlaylists.length > 0 && <span className="text-sm text-gray-500">{matchingPlaylists.length} available</span>}
+                  <h2 className="text-xl font-bold text-white">{t('browse.playlistsTitle')}</h2>
+                  {matchingPlaylists.length > 0 && <span className="text-sm text-gray-500">{matchingPlaylists.length} {t('browse.available')}</span>}
                 </div>
                 {matchingPlaylists.length === 0 ? (
                   <div className="rounded-2xl border border-zinc-700/70 p-10 text-center" style={{ background: '#18191f' }}>
-                    <p className="text-gray-500 text-sm">No playlists for this language pair yet.</p>
+                    <p className="text-gray-500 text-sm">{t('browse.noPlaylists')}</p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -1048,7 +1048,7 @@ function SongBrowser({
                               </span>
                             )}
                             <span className="text-[10px] font-mono font-medium px-1.5 py-0.5 rounded-md tracking-wider" style={{ color: '#a5b4fc', background: 'rgba(165,180,252,0.1)', border: '1px solid rgba(165,180,252,0.2)' }}>
-                              {pl.song_count} songs
+                              {pl.song_count} {pl.song_count === 1 ? t('browse.song') : t('browse.songs')}
                             </span>
                           </div>
                           <h3 className="text-white font-semibold text-base leading-snug mb-2">{tc(pl.name)}</h3>
