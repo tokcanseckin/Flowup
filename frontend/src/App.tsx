@@ -59,6 +59,7 @@ declare global {
             options: { theme?: string; size?: string; width?: number; text?: string }
           ) => void
           disableAutoSelect: () => void
+          prompt: () => void
         }
       }
     }
