@@ -1682,6 +1682,21 @@ function LocalizationsTab() {
         />
       </div>
 
+      {/* Add / overwrite key */}
+      <div className="border border-gray-800 rounded-2xl p-4 space-y-2">
+        <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Add / overwrite key</p>
+        {addError && <p className="text-xs text-red-400">{addError}</p>}
+        <div className="grid grid-cols-4 gap-2">
+          <input value={newKey} onChange={e => setNewKey(e.target.value)} placeholder="key" className={inputCls} />
+          <input value={newEn} onChange={e => setNewEn(e.target.value)} placeholder="EN" className={inputCls} />
+          <input value={newTr} onChange={e => setNewTr(e.target.value)} placeholder="TR" className={inputCls} />
+          <input value={newRu} onChange={e => setNewRu(e.target.value)} placeholder="RU" className={inputCls} />
+        </div>
+        <button onClick={() => void handleAdd()} disabled={saving} className="rounded-xl bg-indigo-600 px-4 py-1.5 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50">
+          {saving ? 'Saving…' : 'Add key'}
+        </button>
+      </div>
+
       {loading ? (
         <p className="text-gray-500 text-sm">Loading…</p>
       ) : (
@@ -1727,21 +1742,6 @@ function LocalizationsTab() {
           </table>
         </div>
       )}
-
-      {/* Add new key */}
-      <div className="border-t border-gray-800 pt-4">
-        <p className="text-xs font-medium text-gray-500 mb-2 uppercase tracking-wider">Add / overwrite key</p>
-        {addError && <p className="text-xs text-red-400 mb-2">{addError}</p>}
-        <div className="grid grid-cols-4 gap-2 mb-2">
-          <input value={newKey} onChange={e => setNewKey(e.target.value)} placeholder="key" className={inputCls} />
-          <input value={newEn} onChange={e => setNewEn(e.target.value)} placeholder="EN" className={inputCls} />
-          <input value={newTr} onChange={e => setNewTr(e.target.value)} placeholder="TR" className={inputCls} />
-          <input value={newRu} onChange={e => setNewRu(e.target.value)} placeholder="RU" className={inputCls} />
-        </div>
-        <button onClick={() => void handleAdd()} disabled={saving} className="rounded-xl bg-indigo-600 px-4 py-1.5 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50">
-          {saving ? 'Saving…' : 'Add key'}
-        </button>
-      </div>
     </div>
   )
 }

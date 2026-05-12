@@ -156,11 +156,11 @@ function parseAppRoute(pathname: string): AppRoute {
     const tab = (settingsMatch[1] as SettingsTab) ?? 'preferences'
     return { page: 'settings', tab }
   }
-  const adminMatch = path.match(/^\/admin(?:\/(song|playlist|user|task)(?:\/(\d+))?)?$/)
+  const adminMatch = path.match(/^\/admin(?:\/(song|playlist|user|task|localization)(?:\/(\d+))?)?$/)
   if (adminMatch) {
     const seg = adminMatch[1]
     const id = adminMatch[2] ? Number(adminMatch[2]) : null
-    const tab = seg === 'playlist' ? 'playlists' : seg === 'user' ? 'users' : seg === 'task' ? 'tasks' : 'songs'
+    const tab = seg === 'playlist' ? 'playlists' : seg === 'user' ? 'users' : seg === 'task' ? 'tasks' : seg === 'localization' ? 'localizations' : 'songs'
     return { page: 'admin', tab, id }
   }
   if (path === '/browse' || path === '/') return { page: 'browse' }
@@ -187,6 +187,7 @@ function songPath(songId: number): string {
 }
 
 function adminPath(tab: 'songs' | 'playlists' | 'users' | 'tasks' | 'localizations', id: number | null): string {
+  if (tab === 'localizations') return '/admin/localization'
   const seg = tab === 'playlists' ? 'playlist' : tab === 'users' ? 'user' : tab === 'tasks' ? 'task' : 'song'
   if (id === null) return `/admin/${seg}`
   return `/admin/${seg}/${id}`

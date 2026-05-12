@@ -4,6 +4,7 @@ import { api, LocalizationItem } from '../api/client'
 export type UILanguage = 'en' | 'tr' | 'ru'
 
 const LANG_STORAGE_KEY = 'flowup.uiLanguage'
+const LOC_CACHE_KEY = 'flowup.localizations'
 
 function readStoredLang(): UILanguage {
   try {
@@ -11,6 +12,14 @@ function readStoredLang(): UILanguage {
     if (v === 'en' || v === 'tr' || v === 'ru') return v
   } catch {}
   return 'en'
+}
+
+function readCachedLocalizations(): Record<string, LocalizationItem> {
+  try {
+    const raw = localStorage.getItem(LOC_CACHE_KEY)
+    if (raw) return JSON.parse(raw) as Record<string, LocalizationItem>
+  } catch {}
+  return {}
 }
 
 interface LocalizationContextValue {
@@ -38,8 +47,9 @@ interface Props {
 
 export function LocalizationProvider({ children }: Props) {
   const [language, setLanguageState] = useState<UILanguage>(readStoredLang)
-  const [localizations, setLocalizations] = useState<Record<string, LocalizationItem>>({})
-  const [isLoading, setIsLoading] = useState(true)
+  const cached = readCachedLocalizations()
+  const [localizations, setLocalizations] = useState<Record<string, LocalizationItem>>(cached)
+  const [isLoading, setIsLoading] = useState(Object.keys(cached).length === 0)
   const fetchedRef = useRef(false)
 
   useEffect(() => {
@@ -50,6 +60,7 @@ export function LocalizationProvider({ children }: Props) {
         const map: Record<string, LocalizationItem> = {}
         for (const item of items) map[item.key] = item
         setLocalizations(map)
+        try { localStorage.setItem(LOC_CACHE_KEY, JSON.stringify(map)) } catch {}
       })
       .catch(err => console.warn('[i18n] Failed to load localizations:', err))
       .finally(() => setIsLoading(false))
