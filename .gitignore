@@ -41,3 +41,6 @@ Thumbs.db
 backend/flowup.db
 content_to_add
 pipeline/*_output.json
+backend/flowup.db-shm
+backend/flowup.db-wal
+migrate_sqlite_to_postgres.py
