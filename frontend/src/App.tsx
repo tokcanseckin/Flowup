@@ -2512,16 +2512,6 @@ export default function App() {
     }
   }, [settings.preferredSource, navigateToPath, availableTargetLangs, overrideTargetLang])
 
-  const handleTargetLangChange = useCallback((lang: string | null) => {
-    setOverrideTargetLang(lang)
-    if (activeSong) {
-      const effectiveLang = lang !== null ? (lang || undefined) : (availableTargetLangs[0] ?? undefined)
-      void _fetchSong(activeSong.id, settings.preferredSource, effectiveLang)
-        .then(d => setActiveSong(d))
-        .catch(console.error)
-    }
-  }, [activeSong, availableTargetLangs, settings.preferredSource])
-
   const handlePrefetchSong = useCallback((id: number) => {
     const source = settings.preferredSource
     void _fetchSong(id, source).catch(() => {})
