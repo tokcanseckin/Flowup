@@ -11,16 +11,6 @@ export interface WordHistoryEntry extends WordLookupEntry {
   song_artist: string | null
 }
 
-function loadEntries(): WordHistoryEntry[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return []
-    return JSON.parse(raw) as WordHistoryEntry[]
-  } catch {
-    return []
-  }
-}
-
 function saveEntries(entries: WordHistoryEntry[]) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(entries))
