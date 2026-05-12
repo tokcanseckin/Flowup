@@ -673,6 +673,7 @@ function SongBrowser({
   const [openMenuSongId, setOpenMenuSongId] = useState<number | null>(null)
   const [learnLang, setLearnLang] = useState<string | null>(null)
   const [nativeLang, setNativeLang] = useState<string | null>(null)
+  const playlistsSectionRef = useRef<HTMLElement>(null)
 
   const learnLangs = useMemo(() =>
     Array.from(new Set(playlists.map(p => p.language_code).filter((c): c is string => !!c))),
@@ -696,6 +697,16 @@ function SongBrowser({
     window.addEventListener('click', close)
     return () => window.removeEventListener('click', close)
   }, [openMenuSongId])
+
+  useEffect(() => {
+    if (!nativeLang) return
+    const el = playlistsSectionRef.current
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'end' })
+    } else {
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
+    }
+  }, [nativeLang])
 
   const songList = (
     <>
@@ -1117,7 +1128,7 @@ function SongBrowser({
 
             {/* Section 3 — Playlists */}
             {learnLang && nativeLang && (
-              <section>
+              <section ref={playlistsSectionRef}>
                 <div className="flex items-baseline gap-3 mb-5">
                   <h2 className="text-xl font-bold text-white">{t('browse.playlistsTitle')}</h2>
                   {matchingPlaylists.length > 0 && <span className="text-sm text-gray-500">{matchingPlaylists.length} {t('browse.available')}</span>}
