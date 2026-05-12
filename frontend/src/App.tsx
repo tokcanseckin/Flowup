@@ -564,6 +564,13 @@ function SourcePicker({
 
 // ── Song browser ──────────────────────────────────────────────────────────────
 
+const LANG_FLAG: Record<string, string> = {
+  ru: '🇷🇺', en: '🇬🇧', es: '🇪🇸', fr: '🇫🇷', de: '🇩🇪',
+  it: '🇮🇹', pt: '🇵🇹', ja: '🇯🇵', zh: '🇨🇳', ko: '🇰🇷', tr: '🇹🇷',
+  uk: '🇺🇦', nl: '🇳🇱', pl: '🇵🇱', sv: '🇸🇪', ar: '🇸🇦', he: '🇮🇱',
+}
+function langFlag(code: string): string { return LANG_FLAG[code] ?? '🌐' }
+
 function SongBrowser({
   songs, playlists, activePlaylistId, activePlaylist, loading, error, onSelect, onPrefetch, onSelectPlaylist, onLogout, onOpenSettings, onOpenAdmin, onOpenAccount, isAdmin, user, openedSongIds, favoriteSongIds, toggleFavorite, markAsNotListened, wordsLookedUpCount, availableTargetLangs, targetLang, onTargetLangChange,
 }: {
@@ -601,6 +608,24 @@ function SongBrowser({
     : 0
 
   const [openMenuSongId, setOpenMenuSongId] = useState<number | null>(null)
+  const [learnLang, setLearnLang] = useState<string | null>(null)
+  const [nativeLang, setNativeLang] = useState<string | null>(null)
+
+  const learnLangs = useMemo(() =>
+    Array.from(new Set(playlists.map(p => p.language_code).filter((c): c is string => !!c))),
+  [playlists])
+
+  const nativeLangs = useMemo(() => {
+    if (!learnLang) return []
+    const langs = new Set<string>()
+    playlists.filter(p => p.language_code === learnLang).forEach(p => p.target_langs.forEach(l => langs.add(l)))
+    return Array.from(langs)
+  }, [playlists, learnLang])
+
+  const matchingPlaylists = useMemo(() => {
+    if (!learnLang || !nativeLang) return []
+    return playlists.filter(p => p.language_code === learnLang && p.target_langs.includes(nativeLang))
+  }, [playlists, learnLang, nativeLang])
 
   useEffect(() => {
     if (openMenuSongId === null) return
@@ -915,39 +940,127 @@ function SongBrowser({
             </div>
           </div>
         ) : (
-          <div className="max-w-2xl mx-auto">
-            {playlists.length > 0 && (
-              <div className="mb-6 grid grid-cols-1 gap-2">
-                <p className="text-xs text-gray-600 uppercase tracking-wider font-medium mb-1">{t('nav.playlists')}</p>
-                {playlists.map(pl => (
-                  <button
-                    key={pl.id}
-                    type="button"
-                    onClick={() => onSelectPlaylist(pl.id)}
-                    className="w-full text-left rounded-xl border border-zinc-700/70 px-4 py-3 active:scale-[0.99] transition-all"
-                    style={{ background: '#25262b' }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(0,109,54,0.08)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(0,109,54,0.5)' }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#25262b'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(63,63,70,0.7)' }}
-                  >
-                    <div className="flex items-center gap-3">
-                      {pl.cover_image_url ? (
-                        <img src={pl.cover_image_url} alt={tc(pl.name)} className="w-10 h-10 rounded-lg object-cover shrink-0" />
-                      ) : (
-                        <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 select-none" style={{ background: 'linear-gradient(135deg, #003d1f 0%, #006D36 100%)' }}>
-                          <span className="text-white/40 text-sm font-bold uppercase">{tc(pl.name).charAt(0)}</span>
-                        </div>
-                      )}
-                      <div className="min-w-0 flex-1">
-                        <p className="text-white font-medium truncate">{tc(pl.name)}</p>
-                        <p className="text-gray-500 text-xs truncate">{pl.song_count} {t('browser.songs').toLowerCase()}{pl.language_code ? ` · ${pl.language_code.toUpperCase()}` : ''}{pl.difficulty_level ? ` · ${tc(pl.difficulty_level)}` : ''}</p>
+          /* ── Discover view ── */
+          <div className="pt-2">
+            {/* Section 1 — I want to improve */}
+            <section className="mb-10">
+              <h2 className="text-xl font-bold text-white mb-1">I want to improve</h2>
+              <p className="text-sm text-gray-500 mb-5">Choose the language you want to learn</p>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-w-2xl">
+                {learnLangs.map(code => {
+                  const plCount = playlists.filter(p => p.language_code === code && p.target_langs.length > 0).length
+                  const selected = learnLang === code
+                  return (
+                    <button
+                      key={code}
+                      type="button"
+                      onClick={() => { setLearnLang(code); setNativeLang(null) }}
+                      className={`rounded-2xl border p-5 flex items-center gap-4 transition-all cursor-pointer text-left ${selected ? 'border-white/30' : 'border-zinc-700/70 hover:border-white/15'}`}
+                      style={{ background: selected ? 'rgba(255,255,255,0.07)' : '#18191f' }}
+                      onMouseEnter={e => { if (!selected) (e.currentTarget as HTMLElement).style.background = '#22232a' }}
+                      onMouseLeave={e => { if (!selected) (e.currentTarget as HTMLElement).style.background = '#18191f' }}
+                    >
+                      <span className="text-4xl shrink-0" role="img" aria-label={code}>{langFlag(code)}</span>
+                      <div className="min-w-0">
+                        <p className="text-white font-semibold text-sm">{t(`language.${code}`)}</p>
+                        {plCount > 0 && <p className="text-gray-600 text-xs mt-0.5">{plCount} {plCount === 1 ? 'playlist' : 'playlists'}</p>}
                       </div>
-                      <svg viewBox="0 0 24 24" className="w-4 h-4 fill-gray-600 shrink-0">
-                        <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/>
-                      </svg>
-                    </div>
-                  </button>
-                ))}
+                      {selected && (
+                        <svg viewBox="0 0 24 24" className="w-4 h-4 shrink-0 ml-auto" fill="rgba(255,255,255,0.5)">
+                          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                        </svg>
+                      )}
+                    </button>
+                  )
+                })}
               </div>
+            </section>
+
+            {/* Section 2 — I speak */}
+            {learnLang && nativeLangs.length > 0 && (
+              <section className="mb-10">
+                <h2 className="text-xl font-bold text-white mb-1">I speak</h2>
+                <p className="text-sm text-gray-500 mb-5">Choose your native language for translations</p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-w-2xl">
+                  {nativeLangs.map(code => {
+                    const selected = nativeLang === code
+                    return (
+                      <button
+                        key={code}
+                        type="button"
+                        onClick={() => setNativeLang(code)}
+                        className={`rounded-2xl border p-5 flex items-center gap-4 transition-all cursor-pointer text-left ${selected ? 'border-white/30' : 'border-zinc-700/70 hover:border-white/15'}`}
+                        style={{ background: selected ? 'rgba(255,255,255,0.07)' : '#18191f' }}
+                        onMouseEnter={e => { if (!selected) (e.currentTarget as HTMLElement).style.background = '#22232a' }}
+                        onMouseLeave={e => { if (!selected) (e.currentTarget as HTMLElement).style.background = '#18191f' }}
+                      >
+                        <span className="text-4xl shrink-0" role="img" aria-label={code}>{langFlag(code)}</span>
+                        <div className="min-w-0">
+                          <p className="text-white font-semibold text-sm">{t(`language.${code}`)}</p>
+                        </div>
+                        {selected && (
+                          <svg viewBox="0 0 24 24" className="w-4 h-4 shrink-0 ml-auto" fill="rgba(255,255,255,0.5)">
+                            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                          </svg>
+                        )}
+                      </button>
+                    )
+                  })}
+                </div>
+              </section>
+            )}
+
+            {/* Section 3 — Playlists */}
+            {learnLang && nativeLang && (
+              <section>
+                <div className="flex items-baseline gap-3 mb-5">
+                  <h2 className="text-xl font-bold text-white">Playlists</h2>
+                  {matchingPlaylists.length > 0 && <span className="text-sm text-gray-500">{matchingPlaylists.length} available</span>}
+                </div>
+                {matchingPlaylists.length === 0 ? (
+                  <div className="rounded-2xl border border-zinc-700/70 p-10 text-center" style={{ background: '#18191f' }}>
+                    <p className="text-gray-500 text-sm">No playlists for this language pair yet.</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                    {matchingPlaylists.map(pl => (
+                      <button
+                        key={pl.id}
+                        type="button"
+                        onClick={() => onSelectPlaylist(pl.id)}
+                        className="text-left rounded-2xl border border-zinc-700/70 overflow-hidden transition-all hover:border-zinc-500/60"
+                        style={{ background: '#18191f' }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#22232a' }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#18191f' }}
+                      >
+                        {pl.cover_image_url ? (
+                          <img src={pl.cover_image_url} alt={tc(pl.name)} className="w-full aspect-square object-cover" />
+                        ) : (
+                          <div className="w-full aspect-square flex items-center justify-center select-none" style={{ background: 'linear-gradient(135deg, #003d1f 0%, #006D36 50%, #003d1f 100%)' }}>
+                            <span className="text-white/20 text-7xl font-bold uppercase">{tc(pl.name).charAt(0)}</span>
+                          </div>
+                        )}
+                        <div className="p-4">
+                          <div className="flex gap-1.5 mb-2 flex-wrap">
+                            {pl.difficulty_level && (
+                              <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-md uppercase tracking-wider" style={{ color: '#fb923c', background: 'rgba(251,146,60,0.15)', border: '1px solid rgba(251,146,60,0.35)' }}>
+                                {tc(pl.difficulty_level)}
+                              </span>
+                            )}
+                            <span className="text-[10px] font-mono font-medium px-1.5 py-0.5 rounded-md tracking-wider" style={{ color: '#a5b4fc', background: 'rgba(165,180,252,0.1)', border: '1px solid rgba(165,180,252,0.2)' }}>
+                              {pl.song_count} songs
+                            </span>
+                          </div>
+                          <h3 className="text-white font-semibold text-base leading-snug mb-2">{tc(pl.name)}</h3>
+                          {pl.description && (
+                            <p className="text-gray-500 text-sm leading-relaxed line-clamp-2">{tc(pl.description)}</p>
+                          )}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </section>
             )}
           </div>
         )}
