@@ -233,15 +233,22 @@ function AppleButton({ onAppleLogin, disabled }: { onAppleLogin?: (idToken: stri
   const redirectURI = import.meta.env.VITE_APPLE_REDIRECT_URI as string | undefined
   const [appleError, setAppleError] = useState<string | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+  const [buttonWidth, setButtonWidth] = useState<number>(0)
 
-  // Load SDK, init auth config, then let the SDK render its own official button.
+  // Step 1: measure the container width after mount, before loading the SDK.
   useEffect(() => {
-    if (!clientId) return
+    if (containerRef.current) {
+      setButtonWidth(containerRef.current.clientWidth)
+    }
+  }, [])
+
+  // Step 2: load SDK only after width is known so data-width is in the DOM
+  // when the script auto-processes #appleid-signin.
+  useEffect(() => {
+    if (!clientId || !buttonWidth) return
 
     const init = () => {
-      if (!window.AppleID || !containerRef.current) return
-      // Set width to match container so the SDK iframe fills the full width
-      containerRef.current.setAttribute('data-width', String(containerRef.current.clientWidth || 384))
+      if (!window.AppleID) return
       window.AppleID.auth.init({
         clientId,
         scope: 'name email',
@@ -262,7 +269,7 @@ function AppleButton({ onAppleLogin, disabled }: { onAppleLogin?: (idToken: stri
       script.onload = init
       document.head.appendChild(script)
     }
-  }, [clientId, redirectURI])
+  }, [clientId, redirectURI, buttonWidth])
 
   // Apple fires these events when the SDK-rendered button completes sign-in.
   useEffect(() => {
@@ -286,13 +293,14 @@ function AppleButton({ onAppleLogin, disabled }: { onAppleLogin?: (idToken: stri
 
   return (
     <div className="space-y-1">
-      {/* Apple's SDK replaces this div with its own official button iframe */}
+      {/* data-width is set before the SDK loads so the iframe renders at the correct size */}
       <div
         ref={containerRef}
         id="appleid-signin"
         data-color="black"
         data-border="false"
         data-type="continue"
+        data-width={buttonWidth || undefined}
         data-height="44"
         data-border-radius="8"
         data-logo-size="medium"
