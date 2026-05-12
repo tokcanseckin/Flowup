@@ -229,72 +229,74 @@ function AppLogo() {
 }
 
 function AppleButton({ onAppleLogin, disabled }: { onAppleLogin?: (idToken: string) => Promise<void>; disabled?: boolean }) {
-  const t = useT()
   const clientId = import.meta.env.VITE_APPLE_CLIENT_ID as string | undefined
   const redirectURI = import.meta.env.VITE_APPLE_REDIRECT_URI as string | undefined
   const [appleError, setAppleError] = useState<string | null>(null)
-  const [busy, setBusy] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
 
-  // Load the Apple Sign In JS SDK once.
+  // Load SDK, init auth config, then let the SDK render its own official button.
   useEffect(() => {
     if (!clientId) return
-    if (document.querySelector('script[src*="appleid.cdn-apple.com"]')) return
-    const script = document.createElement('script')
-    script.src = 'https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js'
-    script.async = true
-    document.head.appendChild(script)
-  }, [clientId])
 
-  const handleClick = async () => {
-    if (!clientId || !onAppleLogin) return
-    if (!window.AppleID) {
-      setAppleError('Apple Sign In script is still loading — please try again')
-      return
-    }
-    setAppleError(null)
-    setBusy(true)
-    try {
+    const init = () => {
+      if (!window.AppleID) return
       window.AppleID.auth.init({
         clientId,
         scope: 'name email',
         redirectURI: redirectURI ?? window.location.origin,
         usePopup: true,
       })
-      const response = await window.AppleID.auth.signIn()
-      await onAppleLogin(response.authorization.id_token)
-    } catch (err: unknown) {
-      // User cancelled the popup — Apple throws a plain object { error: "popup_closed_by_user" }
-      const code = (err as { error?: string })?.error
-      if (code !== 'popup_closed_by_user') {
-        setAppleError('Apple sign-in failed — please try again')
-      }
-    } finally {
-      setBusy(false)
     }
-  }
 
-  const isDisabled = disabled || busy || !clientId || !onAppleLogin
+    const existing = document.querySelector('script[src*="appleid.cdn-apple.com"]')
+    if (window.AppleID) {
+      init()
+    } else if (existing) {
+      existing.addEventListener('load', init, { once: true })
+    } else {
+      const script = document.createElement('script')
+      script.src = 'https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js'
+      script.async = true
+      script.onload = init
+      document.head.appendChild(script)
+    }
+  }, [clientId, redirectURI])
+
+  // Apple fires these events when the SDK-rendered button completes sign-in.
+  useEffect(() => {
+    if (!onAppleLogin) return
+    const handleSuccess = (e: Event) => {
+      void onAppleLogin((e as CustomEvent).detail.authorization.id_token)
+    }
+    const handleFailure = (e: Event) => {
+      const code = (e as CustomEvent).detail?.error as string | undefined
+      if (code !== 'popup_closed_by_user') setAppleError('Apple sign-in failed — please try again')
+    }
+    document.addEventListener('AppleIDSignInOnSuccess', handleSuccess)
+    document.addEventListener('AppleIDSignInOnFailure', handleFailure)
+    return () => {
+      document.removeEventListener('AppleIDSignInOnSuccess', handleSuccess)
+      document.removeEventListener('AppleIDSignInOnFailure', handleFailure)
+    }
+  }, [onAppleLogin])
+
+  if (!clientId) return null
 
   return (
     <div className="space-y-1">
-      <button
-        type="button"
-        onClick={() => { void handleClick() }}
-        disabled={isDisabled}
-        title={!clientId ? 'Apple Sign-In not configured' : undefined}
-        className={`
-          w-full flex items-center justify-center gap-3
-          bg-black text-white rounded-lg
-          transition-colors duration-150
-          ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#1a1a1a] active:brightness-90 cursor-pointer'}
-        `}
-        style={{ minHeight: '44px', fontFamily: '-apple-system, "SF Pro Text", "Helvetica Neue", sans-serif', fontSize: '17px', fontWeight: 500, letterSpacing: '0.01em' }}
-      >
-        <svg viewBox="0 0 814 1000" className="w-[18px] h-[18px] fill-white shrink-0" aria-hidden>
-          <path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76 0-103.7 40.8-165.9 40.8s-105-43.4-150.3-109.2C158 388.7 100 221.5 100 174c0-95.6 66.5-146.1 130.3-146.1 64.8 0 111.4 42.8 147.7 42.8 35.3 0 90.3-45.2 164-45.2 26.2 0 108.2 2.6 168.2 79.7zm-110.1-129.2c31.1-36.9 53.1-88.1 53.1-139.3 0-7.1-.6-14.3-1.9-20.1-50.6 1.9-110.8 33.7-147.1 75.8-28.5 32.4-55.1 83.6-55.1 135.5 0 7.8 1.3 15.6 1.9 18.1 3.2.6 8.4 1.3 13.6 1.3 45.4 0 102.5-30.4 135.5-71.3z"/>
-        </svg>
-        {busy ? 'Signing in…' : t('auth.continueWithApple')}
-      </button>
+      {/* Apple's SDK replaces this div with its own official button iframe */}
+      <div
+        ref={containerRef}
+        id="appleid-signin"
+        data-color="black"
+        data-border="false"
+        data-type="continue"
+        data-width="380"
+        data-height="44"
+        data-border-radius="8"
+        data-logo-size="medium"
+        className={`w-full ${disabled ? 'pointer-events-none opacity-50' : ''}`}
+      />
       {appleError && (
         <p className="text-red-400 text-xs text-center">{appleError}</p>
       )}
