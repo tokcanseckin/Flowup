@@ -146,7 +146,7 @@ type AppRoute =
   | { page: 'playlist'; playlistId: number }
   | { page: 'song'; songId: number }
   | { page: 'settings'; tab: SettingsTab }
-  | { page: 'admin'; tab: 'songs' | 'playlists' | 'users' | 'tasks'; id: number | null }
+  | { page: 'admin'; tab: 'songs' | 'playlists' | 'users' | 'tasks' | 'localizations'; id: number | null }
 
 function parseAppRoute(pathname: string): AppRoute {
   const path = pathname || '/browse'
