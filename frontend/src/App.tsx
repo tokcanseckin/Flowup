@@ -283,14 +283,15 @@ function AppleButton({ onAppleLogin, disabled }: { onAppleLogin?: (idToken: stri
         disabled={isDisabled}
         title={!clientId ? 'Apple Sign-In not configured' : undefined}
         className={`
-          w-full flex items-center justify-center gap-2.5 py-2.5 rounded-xl
-          border border-gray-700 bg-gray-900/60 text-white text-sm font-medium
-          transition-all duration-150
-          ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-800/60 active:scale-[0.98] cursor-pointer'}
+          w-full flex items-center justify-center gap-3
+          bg-black text-white rounded-lg
+          transition-colors duration-150
+          ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#1a1a1a] active:brightness-90 cursor-pointer'}
         `}
+        style={{ minHeight: '44px', fontFamily: '-apple-system, "SF Pro Text", "Helvetica Neue", sans-serif', fontSize: '17px', fontWeight: 500, letterSpacing: '0.01em' }}
       >
-        <svg viewBox="0 0 24 24" className="w-4.5 h-4.5 fill-current shrink-0" aria-hidden>
-          <path d="M16.462 1.184a4.694 4.694 0 01-3.293 3.574 4.21 4.21 0 01-3.18-3.38 4.693 4.693 0 013.38-.49 4.23 4.23 0 013.093.296zM20.5 17.6c-.41.94-.886 1.808-1.43 2.602-.755 1.077-1.374 1.822-1.85 2.232-.74.68-1.53 1.027-2.374 1.047-.607 0-1.34-.173-2.19-.524-.855-.35-1.64-.524-2.357-.524-.752 0-1.559.174-2.424.524-.866.35-1.562.533-2.094.55-.81.035-1.617-.32-2.424-1.065-.517-.453-1.163-1.225-1.936-2.316C.713 18.925.06 17.374.06 15.774c0-1.457.314-2.713.946-3.762A5.538 5.538 0 013.12 9.956a5.27 5.27 0 012.651-.747c.657 0 1.52.203 2.595.602 1.073.4 1.762.603 2.064.603.226 0 .993-.237 2.293-.71 1.23-.438 2.268-.62 3.12-.548 2.307.186 4.04 1.097 5.19 2.736-2.063 1.25-3.082 3-3.054 5.244.025 1.748.65 3.202 1.872 4.357.556.529 1.176.937 1.862 1.226-.15.434-.308.85-.476 1.24l.013-.36z"/>
+        <svg viewBox="0 0 814 1000" className="w-[18px] h-[18px] fill-white shrink-0" aria-hidden>
+          <path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76 0-103.7 40.8-165.9 40.8s-105-43.4-150.3-109.2C158 388.7 100 221.5 100 174c0-95.6 66.5-146.1 130.3-146.1 64.8 0 111.4 42.8 147.7 42.8 35.3 0 90.3-45.2 164-45.2 26.2 0 108.2 2.6 168.2 79.7zm-110.1-129.2c31.1-36.9 53.1-88.1 53.1-139.3 0-7.1-.6-14.3-1.9-20.1-50.6 1.9-110.8 33.7-147.1 75.8-28.5 32.4-55.1 83.6-55.1 135.5 0 7.8 1.3 15.6 1.9 18.1 3.2.6 8.4 1.3 13.6 1.3 45.4 0 102.5-30.4 135.5-71.3z"/>
         </svg>
         {busy ? 'Signing in…' : t('auth.continueWithApple')}
       </button>
