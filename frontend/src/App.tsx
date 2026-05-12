@@ -777,7 +777,7 @@ function SongBrowser({
     <div className="min-h-screen" style={{ background: '#050608' }}>
       {/* Header */}
       <header className="sticky top-0 z-20 border-b border-gray-900" style={{ background: '#050608' }}>
-        <div className="max-w-[1200px] mx-auto w-full px-4 py-4 flex items-center justify-between">
+        <div className="max-w-[972px] mx-auto w-full px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             {(activePlaylist || (activePlaylistId !== null && loading)) && (
               <button onClick={() => onSelectPlaylist(null)} className="text-gray-500 hover:text-gray-300 transition-colors mr-1" aria-label="Back to all playlists">
@@ -828,7 +828,7 @@ function SongBrowser({
       </header>
 
       {/* Content */}
-      <div className="px-4 pt-6 pb-10 max-w-[1200px] mx-auto">
+      <div className="px-4 pt-6 pb-10 max-w-[972px] mx-auto">
         {activePlaylistId !== null && activePlaylist === null && loading ? (
           <div className="flex gap-8 items-start">
             {/* Left skeleton */}
@@ -976,6 +976,25 @@ function SongBrowser({
               </div>
             </section>
 
+            {/* Section 2 skeleton — before learnLang is chosen */}
+            {!learnLang && (
+              <section className="mb-10 opacity-40 pointer-events-none select-none">
+                <div className="h-7 rounded-lg mb-1 animate-pulse w-44" style={{ background: '#1c1d21' }} />
+                <div className="h-4 rounded-lg mb-5 animate-pulse w-64" style={{ background: '#1c1d21' }} />
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-w-2xl">
+                  {[0, 1, 2].map(i => (
+                    <div key={i} className="rounded-2xl border border-zinc-700/70 p-5 flex items-center gap-4" style={{ background: '#18191f' }}>
+                      <div className="w-10 h-10 rounded-full animate-pulse shrink-0" style={{ background: '#1c1d21' }} />
+                      <div className="flex-1 min-w-0">
+                        <div className="h-3.5 rounded-md animate-pulse mb-1.5 w-3/4" style={{ background: '#1c1d21' }} />
+                        <div className="h-3 rounded-md animate-pulse w-1/2" style={{ background: '#1c1d21' }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
             {/* Section 2 — I speak */}
             {learnLang && nativeLangs.length > 0 && (
               <section className="mb-10">
@@ -1010,6 +1029,29 @@ function SongBrowser({
               </section>
             )}
 
+            {/* Section 3 skeleton — before nativeLang is chosen */}
+            {learnLang && !nativeLang && (
+              <section className="opacity-40 pointer-events-none select-none">
+                <div className="h-7 rounded-lg mb-5 animate-pulse w-44" style={{ background: '#1c1d21' }} />
+                <div className="flex flex-wrap gap-5">
+                  {[0, 1, 2].map(i => (
+                    <div key={i} className="rounded-2xl border border-zinc-700/70 overflow-hidden shrink-0" style={{ width: 300, background: '#18191f' }}>
+                      <div className="w-full aspect-square animate-pulse" style={{ background: '#1c1d21' }} />
+                      <div className="p-4">
+                        <div className="flex gap-1.5 mb-2">
+                          <div className="h-4 rounded-md animate-pulse w-16" style={{ background: '#1c1d21' }} />
+                          <div className="h-4 rounded-md animate-pulse w-12" style={{ background: '#1c1d21' }} />
+                        </div>
+                        <div className="h-4 rounded-md animate-pulse mb-2 w-3/4" style={{ background: '#1c1d21' }} />
+                        <div className="h-3 rounded-md animate-pulse mb-1 w-full" style={{ background: '#1c1d21' }} />
+                        <div className="h-3 rounded-md animate-pulse w-2/3" style={{ background: '#1c1d21' }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
             {/* Section 3 — Playlists */}
             {learnLang && nativeLang && (
               <section>
@@ -1017,49 +1059,51 @@ function SongBrowser({
                   <h2 className="text-xl font-bold text-white">{t('browse.playlistsTitle')}</h2>
                   {matchingPlaylists.length > 0 && <span className="text-sm text-gray-500">{matchingPlaylists.length} {t('browse.available')}</span>}
                 </div>
-                {matchingPlaylists.length === 0 ? (
-                  <div className="rounded-2xl border border-zinc-700/70 p-10 text-center" style={{ background: '#18191f' }}>
-                    <p className="text-gray-500 text-sm">{t('browse.noPlaylists')}</p>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                    {matchingPlaylists.map(pl => (
-                      <button
-                        key={pl.id}
-                        type="button"
-                        onClick={() => onSelectPlaylist(pl.id)}
-                        className="text-left rounded-2xl border border-zinc-700/70 overflow-hidden transition-all hover:border-zinc-500/60"
-                        style={{ background: '#18191f' }}
-                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#22232a' }}
-                        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#18191f' }}
-                      >
-                        {pl.cover_image_url ? (
-                          <img src={pl.cover_image_url} alt={tc(pl.name)} className="w-full aspect-square object-cover" />
-                        ) : (
-                          <div className="w-full aspect-square flex items-center justify-center select-none" style={{ background: 'linear-gradient(135deg, #003d1f 0%, #006D36 50%, #003d1f 100%)' }}>
-                            <span className="text-white/20 text-7xl font-bold uppercase">{tc(pl.name).charAt(0)}</span>
-                          </div>
-                        )}
-                        <div className="p-4">
-                          <div className="flex gap-1.5 mb-2 flex-wrap">
-                            {pl.difficulty_level && (
-                              <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-md uppercase tracking-wider" style={{ color: '#fb923c', background: 'rgba(251,146,60,0.15)', border: '1px solid rgba(251,146,60,0.35)' }}>
-                                {tc(pl.difficulty_level)}
-                              </span>
-                            )}
-                            <span className="text-[10px] font-mono font-medium px-1.5 py-0.5 rounded-md tracking-wider" style={{ color: '#a5b4fc', background: 'rgba(165,180,252,0.1)', border: '1px solid rgba(165,180,252,0.2)' }}>
-                              {pl.song_count} {pl.song_count === 1 ? t('browse.song') : t('browse.songs')}
-                            </span>
-                          </div>
-                          <h3 className="text-white font-semibold text-base leading-snug mb-2">{tc(pl.name)}</h3>
-                          {pl.description && (
-                            <p className="text-gray-500 text-sm leading-relaxed line-clamp-2">{tc(pl.description)}</p>
-                          )}
+                <div className="flex flex-wrap gap-5">
+                  {matchingPlaylists.map(pl => (
+                    <button
+                      key={pl.id}
+                      type="button"
+                      onClick={() => onSelectPlaylist(pl.id)}
+                      className="text-left rounded-2xl border border-zinc-700/70 overflow-hidden transition-all hover:border-zinc-500/60 shrink-0"
+                      style={{ width: 300, background: '#18191f' }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#22232a' }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#18191f' }}
+                    >
+                      {pl.cover_image_url ? (
+                        <img src={pl.cover_image_url} alt={tc(pl.name)} className="w-full aspect-square object-cover" />
+                      ) : (
+                        <div className="w-full aspect-square flex items-center justify-center select-none" style={{ background: 'linear-gradient(135deg, #003d1f 0%, #006D36 50%, #003d1f 100%)' }}>
+                          <span className="text-white/20 text-7xl font-bold uppercase">{tc(pl.name).charAt(0)}</span>
                         </div>
-                      </button>
-                    ))}
-                  </div>
-                )}
+                      )}
+                      <div className="p-4">
+                        <div className="flex gap-1.5 mb-2 flex-wrap">
+                          {pl.difficulty_level && (
+                            <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-md uppercase tracking-wider" style={{ color: '#fb923c', background: 'rgba(251,146,60,0.15)', border: '1px solid rgba(251,146,60,0.35)' }}>
+                              {tc(pl.difficulty_level)}
+                            </span>
+                          )}
+                          <span className="text-[10px] font-mono font-medium px-1.5 py-0.5 rounded-md tracking-wider" style={{ color: '#a5b4fc', background: 'rgba(165,180,252,0.1)', border: '1px solid rgba(165,180,252,0.2)' }}>
+                            {pl.song_count} {pl.song_count === 1 ? t('browse.song') : t('browse.songs')}
+                          </span>
+                        </div>
+                        <h3 className="text-white font-semibold text-base leading-snug mb-2">{tc(pl.name)}</h3>
+                        {pl.description && (
+                          <p className="text-gray-500 text-sm leading-relaxed line-clamp-2">{tc(pl.description)}</p>
+                        )}
+                      </div>
+                    </button>
+                  ))}
+                  {/* Placeholder slots to always fill up to 3 */}
+                  {Array.from({ length: Math.max(0, 3 - matchingPlaylists.length) }).map((_, i) => (
+                    <div
+                      key={`placeholder-${i}`}
+                      className="rounded-2xl border border-dashed border-zinc-700/60 shrink-0"
+                      style={{ width: 300, aspectRatio: '1 / 1.45', background: '#18191f' }}
+                    />
+                  ))}
+                </div>
               </section>
             )}
           </div>
