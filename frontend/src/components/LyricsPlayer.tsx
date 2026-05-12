@@ -289,6 +289,7 @@ interface Props {
   durationMs?: number
   isPlaying: boolean
   songData: SongDetail
+  targetLang?: string
   themeBackground?: string
   themeAsideBackground?: string
   accentTextColor?: string
@@ -303,6 +304,7 @@ export default function LyricsPlayer({
   durationMs = 0,
   isPlaying,
   songData,
+  targetLang = 'en',
   themeBackground,
   themeAsideBackground,
   accentTextColor,
@@ -384,8 +386,8 @@ export default function LyricsPlayer({
   const { entries: wordHistoryEntries, recordLookup } = useWordHistory()
   // Only underline words looked up in the same language as this song
   const lookedUpLemmas = useMemo(
-    () => new Set(wordHistoryEntries.filter(e => e.language === langCode).map(e => e.lemma)),
-    [wordHistoryEntries, langCode],
+    () => new Set(wordHistoryEntries.filter(e => e.language === langCode && e.target_lang === targetLang).map(e => e.lemma)),
+    [wordHistoryEntries, langCode, targetLang],
   )
   const prevInspectStateRef = useRef<InspectState | null>(null)
   const panelBackground = themeBackground ?? 'linear-gradient(180deg, #1a57bf 0%, #0f46a8 100%)'
@@ -485,7 +487,7 @@ export default function LyricsPlayer({
     const line = lines[inspectState.target.lineIndex]
     const wordTarget = inspectState.target
     const word = wordTarget.type === 'word' ? line?.words.find(w => w.key === wordTarget.wordKey) : undefined
-    if (word) recordLookup(word, songData)
+    if (word) recordLookup(word, songData, targetLang)
   }, [inspectState, lines, songData, recordLookup])
 
   useEffect(() => {

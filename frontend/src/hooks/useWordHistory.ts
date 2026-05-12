@@ -28,40 +28,30 @@ function saveEntries(entries: WordHistoryEntry[]) {
 }
 
 export function useWordHistory() {
-  const [entries, setEntries] = useState<WordHistoryEntry[]>(loadEntries)
+  // Start empty — only server (DB) data marks words as looked up.
+  // Optimistic in-session lookups are still added to state immediately via recordLookup.
+  const [entries, setEntries] = useState<WordHistoryEntry[]>([])
   // Prevent duplicate backend fetches on StrictMode double-mount
   const fetchedRef = useRef(false)
 
-  // On mount: fetch from backend and merge (backend is authoritative).
-  // Silently falls back to localStorage if user is not authenticated or offline.
+  // On mount: fetch from backend (authoritative source).
   useEffect(() => {
     if (fetchedRef.current) return
     fetchedRef.current = true
 
     api.getWordLookups().then(serverEntries => {
-      // Build a map from server data (lemma|language → entry)
-      const map = new Map<string, WordHistoryEntry>()
-      for (const e of serverEntries) {
-        const key = `${e.lemma}|${e.language}`
-        map.set(key, { ...e, song_title: '', song_artist: null })
-      }
-      // Layer in any local-only entries that aren't on the server yet
-      // (e.g. recorded while offline)
-      const local = loadEntries()
-      for (const e of local) {
-        const key = `${e.lemma}|${e.language}`
-        if (!map.has(key)) map.set(key, e)
-      }
-      const merged = Array.from(map.values()).sort((a, b) => b.looked_up_at - a.looked_up_at)
-      setEntries(merged)
-      saveEntries(merged)
-    }).catch(() => { /* unauthenticated or offline — keep localStorage */ })
+      const serverList = serverEntries.map(e => ({ ...e, song_title: '', song_artist: null }))
+      serverList.sort((a, b) => b.looked_up_at - a.looked_up_at)
+      setEntries(serverList)
+      saveEntries(serverList)
+    }).catch(() => { /* unauthenticated or offline — entries stay empty */ })
   }, [])
 
-  const recordLookup = useCallback((word: SongWord, song: SongDetail) => {
+  const recordLookup = useCallback((word: SongWord, song: SongDetail, targetLang: string) => {
     const newEntry: WordHistoryEntry = {
       lemma: word.lemma,
       language: song.language.code,
+      target_lang: targetLang,
       display_form: word.display_form,
       definition: word.dictionary_definition,
       grammar: word.grammar,
@@ -74,7 +64,7 @@ export function useWordHistory() {
     // Update state + localStorage immediately (optimistic)
     setEntries(prev => {
       const filtered = prev.filter(
-        e => !(e.lemma === newEntry.lemma && e.language === newEntry.language),
+        e => !(e.lemma === newEntry.lemma && e.language === newEntry.language && e.target_lang === newEntry.target_lang),
       )
       const updated = [newEntry, ...filtered]
       saveEntries(updated)
@@ -85,6 +75,7 @@ export function useWordHistory() {
     api.recordWordLookup({
       lemma: newEntry.lemma,
       language: newEntry.language,
+      target_lang: newEntry.target_lang,
       display_form: newEntry.display_form,
       definition: newEntry.definition,
       grammar: newEntry.grammar,

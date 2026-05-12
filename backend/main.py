@@ -1584,15 +1584,16 @@ async def upload_playlist_cover(
 
 @app.get("/api/playlists/{playlist_id}/cover")
 async def get_playlist_cover(playlist_id: int, db: Session = Depends(get_db)):
+    _COVER_HEADERS = {"Cache-Control": "public, max-age=86400"}
     if playlist_id in _cover_cache:
         data, content_type = _cover_cache[playlist_id]
-        return Response(content=data, media_type=content_type)
+        return Response(content=data, media_type=content_type, headers=_COVER_HEADERS)
     pl = db.get(Playlist, playlist_id)
     if not pl or pl.cover_image_type is None:
         raise HTTPException(status_code=404, detail="No cover image")
     data = pl.cover_image  # triggers deferred load
     _cover_cache[playlist_id] = (data, pl.cover_image_type)
-    return Response(content=data, media_type=pl.cover_image_type)
+    return Response(content=data, media_type=pl.cover_image_type, headers=_COVER_HEADERS)
 
 
 @app.delete("/api/playlists/{playlist_id}/cover", status_code=204)
@@ -1746,6 +1747,7 @@ def get_word_lookups(
         WordLookupResponse(
             lemma=r.lemma,
             language=r.language,
+            target_lang=r.target_lang,
             display_form=r.display_form,
             definition=r.definition,
             grammar=r.grammar,
@@ -1767,6 +1769,7 @@ def record_word_lookup(
         UserWordLookup.user_id == current_user.id,
         UserWordLookup.lemma == body.lemma,
         UserWordLookup.language == body.language,
+        UserWordLookup.target_lang == body.target_lang,
     ).first()
     now = int(time.time())
     if existing:
@@ -1780,6 +1783,7 @@ def record_word_lookup(
             user_id=current_user.id,
             lemma=body.lemma,
             language=body.language,
+            target_lang=body.target_lang,
             display_form=body.display_form,
             definition=body.definition,
             grammar=body.grammar,

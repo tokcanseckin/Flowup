@@ -120,7 +120,8 @@ export interface UserSettings {
 
 export interface WordLookupEntry {
   lemma: string
-  language: string       // song language code, e.g. "ru", "tr"
+  language: string       // source language (song language code, e.g. "ru", "tr")
+  target_lang: string    // definition language (e.g. "en", "tr")
   display_form: string
   definition: string | null
   grammar: string | null

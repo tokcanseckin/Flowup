@@ -222,12 +222,13 @@ class UserListenedSong(Base):
 class UserWordLookup(Base):
     """A word the user has looked up while studying a song."""
     __tablename__ = "user_word_lookups"
-    __table_args__ = (UniqueConstraint("user_id", "lemma", "language", name="uq_user_word_lookup"),)
+    __table_args__ = (UniqueConstraint("user_id", "lemma", "language", "target_lang", name="uq_user_word_lookup"),)
 
     id           = Column(Integer,     primary_key=True)
     user_id      = Column(Integer,     ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     lemma        = Column(String(256), nullable=False)
-    language     = Column(String(8),   nullable=False)
+    language     = Column(String(8),   nullable=False)   # source language (song language)
+    target_lang  = Column(String(8),   nullable=False, server_default='en')   # definition language
     display_form = Column(String(256), nullable=False)
     definition   = Column(Text,        nullable=True)
     grammar      = Column(String(256), nullable=True)

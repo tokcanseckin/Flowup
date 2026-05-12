@@ -1431,7 +1431,7 @@ function useAlbumLyricsTheme(albumArtUrl: string | null): [{ panelGradient: stri
 // ── Player view ────────────────────────────────────────────────────────────────
 
 function PlayerView({
-  song, user, onBack, onLogout, onOpenSettings, onOpenAdmin, onOpenAccount, isAdmin, onPrev, onNext, canPrev, canNext, settings, onUpdate, storedMusicUserToken, onMusicUserToken, favoriteSongIds, toggleFavorite,
+  song, user, onBack, onLogout, onOpenSettings, onOpenAdmin, onOpenAccount, isAdmin, onPrev, onNext, canPrev, canNext, settings, onUpdate, storedMusicUserToken, onMusicUserToken, favoriteSongIds, toggleFavorite, targetLang,
 }: {
   song: SongDetail
   user: { display_name: string | null; email: string | null } | null
@@ -1451,6 +1451,7 @@ function PlayerView({
   onMusicUserToken?: (token: string | null) => void
   favoriteSongIds: Set<number>
   toggleFavorite: (id: number) => void
+  targetLang?: string
 }) {
   const [infoVisible, setInfoVisible] = useState(false)
   const [playerMenuOpen, setPlayerMenuOpen] = useState(false)
@@ -1928,6 +1929,7 @@ function PlayerView({
             durationMs={durationMs}
             isPlaying={isPlaying}
             songData={song}
+            targetLang={targetLang}
             themeBackground={lyricsTheme.panelGradient}
             themeAsideBackground={lyricsTheme.asideGradient}
             accentTextColor={lyricsTheme.accentTextColor}
@@ -1971,7 +1973,12 @@ export default function App() {
   const { listenedSongIds, markListened, unmarkListened } = useListened(!!credentialUser)
 
   const [songs,        setSongs]        = useState<SongSummary[]>([])
-  const [playlists,    setPlaylists]    = useState<PlaylistSummary[]>([])
+  const [playlists,    setPlaylists]    = useState<PlaylistSummary[]>(() => {
+    try {
+      const raw = localStorage.getItem('flowup_playlists_cache')
+      return raw ? (JSON.parse(raw) as PlaylistSummary[]) : []
+    } catch { return [] }
+  })
   const [activePlaylistId, setActivePlaylistId] = useState<number | null>(null)
   const [activePlaylist, setActivePlaylist] = useState<PlaylistDetail | null>(null)
   const [playlistsLoading, setPlaylistsLoading] = useState(false)
@@ -2025,6 +2032,7 @@ export default function App() {
     try {
       const pls = await api.listPlaylists()
       setPlaylists(pls)
+      try { localStorage.setItem('flowup_playlists_cache', JSON.stringify(pls)) } catch { /* ignore */ }
     } catch (e) {
       setSongsError(e instanceof Error ? e.message : 'Failed to load playlists')
     } finally {
@@ -2458,6 +2466,7 @@ export default function App() {
         onMusicUserToken={handleMusicUserToken}
         favoriteSongIds={favoriteSongIds}
         toggleFavorite={toggleFavorite}
+        targetLang={activePlaylist?.target_lang ?? undefined}
       />
     )
   }

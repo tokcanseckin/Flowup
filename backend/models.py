@@ -255,7 +255,8 @@ class SongIngest(BaseModel):
 class WordLookupCreate(BaseModel):
     """Body for POST /api/me/word-lookups."""
     lemma: str
-    language: str         # song language code, e.g. "ru", "tr"
+    language: str         # source language (song language code, e.g. "ru", "tr")
+    target_lang: str      # definition language (e.g. "en", "tr")
     display_form: str
     definition: Optional[str] = None
     grammar: Optional[str] = None
@@ -266,6 +267,7 @@ class WordLookupResponse(BaseModel):
     """One entry returned by GET /api/me/word-lookups."""
     lemma: str
     language: str
+    target_lang: str
     display_form: str
     definition: Optional[str] = None
     grammar: Optional[str] = None
