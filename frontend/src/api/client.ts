@@ -75,6 +75,7 @@ export interface PlaylistSummary {
   difficulty_level: string | null
   language_code: string | null
   target_lang: string | null
+  is_hidden: boolean
   song_count: number
 }
 
@@ -221,6 +222,9 @@ export const api = {
     return apiFetch(`/playlists${qs}`)
   },
 
+  adminListPlaylists: (): Promise<PlaylistSummary[]> =>
+    apiFetch('/admin/playlists', { headers: getAdminHeaders() }),
+
   getPlaylist: (id: number): Promise<PlaylistDetail> =>
     apiFetch(`/playlists/${id}`),
 
@@ -231,6 +235,7 @@ export const api = {
     difficulty_level?: string | null
     language_code?: string | null
     target_lang?: string | null
+    is_hidden?: boolean
     song_ids?: number[]
   }): Promise<PlaylistDetail> =>
     apiFetch('/playlists', {
@@ -245,6 +250,7 @@ export const api = {
     difficulty_level?: string | null
     language_code?: string | null
     target_lang?: string | null
+    is_hidden?: boolean
   }): Promise<PlaylistDetail> =>
     apiFetch(`/playlists/${playlistId}`, {
       method: 'PATCH',

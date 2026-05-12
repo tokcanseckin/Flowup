@@ -487,7 +487,7 @@ export default function LyricsPlayer({
     const line = lines[inspectState.target.lineIndex]
     const wordTarget = inspectState.target
     const word = wordTarget.type === 'word' ? line?.words.find(w => w.key === wordTarget.wordKey) : undefined
-    if (word && targetLang !== langCode) recordLookup(word, songData, targetLang)
+    if (word && targetLang !== langCode && isRealDefinition(word.dictionary_definition)) recordLookup(word, songData, targetLang)
   }, [inspectState, lines, songData, recordLookup, targetLang, langCode])
 
   useEffect(() => {

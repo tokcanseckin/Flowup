@@ -1474,6 +1474,7 @@ def _playlist_response(pl: Playlist, db: Session) -> PlaylistResponse:
         difficulty_level=pl.difficulty_level,
         language_code=pl.language_code,
         target_lang=pl.target_lang,
+        is_hidden=pl.is_hidden,
         song_count=pl.song_count,
         songs=songs,
     )
@@ -1489,16 +1490,24 @@ def _playlist_summary(pl: Playlist) -> PlaylistSummaryResponse:
         difficulty_level=pl.difficulty_level,
         language_code=pl.language_code,
         target_lang=pl.target_lang,
+        is_hidden=pl.is_hidden,
         song_count=pl.song_count,
     )
 
 
 @app.get("/api/playlists", response_model=list[PlaylistSummaryResponse])
 def list_playlists(target_lang: Optional[str] = Query(None), db: Session = Depends(get_db)):
-    q = db.query(Playlist)
+    q = db.query(Playlist).filter(Playlist.is_hidden == False)  # noqa: E712
     if target_lang:
         q = q.filter(Playlist.target_lang == target_lang)
     playlists = q.order_by(Playlist.created_at.desc()).all()
+    return [_playlist_summary(pl) for pl in playlists]
+
+
+@app.get("/api/admin/playlists", response_model=list[PlaylistSummaryResponse])
+def admin_list_playlists(db: Session = Depends(get_db), _: User = Depends(_require_admin)):
+    """Admin-only: returns all playlists including hidden ones."""
+    playlists = db.query(Playlist).order_by(Playlist.created_at.desc()).all()
     return [_playlist_summary(pl) for pl in playlists]
 
 
@@ -1511,6 +1520,7 @@ def create_playlist(body: PlaylistCreate, db: Session = Depends(get_db), _: User
         difficulty_level=body.difficulty_level,
         language_code=body.language_code,
         target_lang=body.target_lang,
+        is_hidden=body.is_hidden,
     )
     db.add(pl)
     db.flush()
@@ -1549,6 +1559,8 @@ def update_playlist(playlist_id: int, body: PlaylistUpdate, db: Session = Depend
         pl.language_code = body.language_code
     if body.target_lang is not None:
         pl.target_lang = body.target_lang
+    if body.is_hidden is not None:
+        pl.is_hidden = body.is_hidden
     db.commit()
     db.refresh(pl)
     return _playlist_response(pl, db)

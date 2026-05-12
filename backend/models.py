@@ -86,6 +86,7 @@ class PlaylistResponse(BaseModel):
     difficulty_level: Optional[str]
     language_code: Optional[str]
     target_lang: Optional[str] = None
+    is_hidden: bool = False
     song_count: int
     songs: list[PlaylistSongEntry]
 
@@ -101,6 +102,7 @@ class PlaylistSummaryResponse(BaseModel):
     difficulty_level: Optional[str]
     language_code: Optional[str]
     target_lang: Optional[str] = None
+    is_hidden: bool = False
     song_count: int
 
     model_config = {"from_attributes": True}
@@ -113,6 +115,7 @@ class PlaylistCreate(BaseModel):
     difficulty_level: Optional[str] = None  # A1 | A2 | B1 | B2 | C1 | C2
     language_code: Optional[str] = None
     target_lang: Optional[str] = None
+    is_hidden: bool = False
     song_ids: list[int] = []
 
 
@@ -122,6 +125,7 @@ class PlaylistUpdate(BaseModel):
     difficulty_level: Optional[str] = None
     language_code: Optional[str] = None
     target_lang: Optional[str] = None
+    is_hidden: Optional[bool] = None
 
 
 class PlaylistAddSong(BaseModel):

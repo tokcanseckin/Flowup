@@ -9,6 +9,7 @@ import AppleMusicPlayer, { AppleMusicPlayerHandle, isAppleMusicAuthorized } from
 import { api, BackendUser, PlaylistDetail, PlaylistSummary, SongDetail, SongSummary, UserSettings as ApiUserSettings, clearAdminSession, setAdminSession, getAdminHeaders } from './api/client'
 import { useFavorites } from './hooks/useFavorites'
 import { useListened } from './hooks/useListened'
+import { useWordHistory } from './hooks/useWordHistory'
 
 // ── Module-level song cache (survives re-renders, cleared on logout) ──────────
 // Key: `{id}:{source}` where source is 'youtube' or 'apple_music'.
@@ -555,7 +556,7 @@ function SourcePicker({
 // ── Song browser ──────────────────────────────────────────────────────────────
 
 function SongBrowser({
-  songs, playlists, activePlaylistId, activePlaylist, loading, error, onSelect, onPrefetch, onSelectPlaylist, onLogout, onOpenSettings, onOpenAdmin, onOpenAccount, isAdmin, user, openedSongIds, favoriteSongIds, toggleFavorite, markAsNotListened,
+  songs, playlists, activePlaylistId, activePlaylist, loading, error, onSelect, onPrefetch, onSelectPlaylist, onLogout, onOpenSettings, onOpenAdmin, onOpenAccount, isAdmin, user, openedSongIds, favoriteSongIds, toggleFavorite, markAsNotListened, wordsLookedUpCount,
 }: {
   songs: SongSummary[]
   playlists: PlaylistSummary[]
@@ -576,9 +577,13 @@ function SongBrowser({
   favoriteSongIds: Set<number>
   toggleFavorite: (id: number) => void
   markAsNotListened: (id: number) => void
+  wordsLookedUpCount: number
 }) {
   const listenedCount = activePlaylist
     ? activePlaylist.songs.filter(s => openedSongIds.has(s.song_id)).length
+    : 0
+  const progressPct = activePlaylist && activePlaylist.song_count > 0
+    ? Math.round((listenedCount / activePlaylist.song_count) * 100)
     : 0
 
   const [openMenuSongId, setOpenMenuSongId] = useState<number | null>(null)
@@ -863,34 +868,16 @@ function SongBrowser({
                   <span className="text-sm text-white font-medium">{activePlaylist.song_count}</span>
                 </div>
                 <div className="px-4 py-3 flex items-center justify-between">
-                  <span className="text-xs text-gray-500">Listened</span>
-                  <span className="text-sm text-white font-medium">{listenedCount}</span>
+                  <span className="text-xs text-gray-500">Progress</span>
+                  <span className="text-sm text-white font-medium">{progressPct}%</span>
                 </div>
                 <div className="px-4 py-3 flex items-center justify-between">
                   <span className="text-xs text-gray-500">Words looked up</span>
-                  <span className="text-sm text-gray-500 font-medium">–</span>
+                  <span className="text-sm text-white font-medium">{wordsLookedUpCount}</span>
                 </div>
               </div>
 
-              {/* Playlist switcher */}
-              {playlists.length > 1 && (
-                <div className="mt-4">
-                  <label className="text-xs text-gray-600 block mb-1.5" htmlFor="playlist-select-col">Switch playlist</label>
-                  <select
-                    id="playlist-select-col"
-                    value={activePlaylistId ?? ''}
-                    onChange={e => onSelectPlaylist(e.target.value ? Number(e.target.value) : null)}
-                    className="w-full rounded-lg border border-gray-700 bg-gray-900/80 px-2 py-1.5 text-xs text-gray-200 focus:outline-none" style={{ outlineColor: '#006D36' }}
-                  >
-                    <option value="">All songs</option>
-                    {playlists.map(pl => (
-                      <option key={pl.id} value={pl.id}>
-                        {pl.name} ({pl.song_count})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
+
             </div>
 
             {/* Right column — song list */}
@@ -1971,6 +1958,7 @@ export default function App() {
 
   const { favoriteSongIds, toggleFavorite } = useFavorites(!!credentialUser)
   const { listenedSongIds, markListened, unmarkListened } = useListened(!!credentialUser)
+  const { entries: wordLookupEntries } = useWordHistory()
 
   const [songs,        setSongs]        = useState<SongSummary[]>([])
   const [playlists,    setPlaylists]    = useState<PlaylistSummary[]>(() => {
@@ -1981,6 +1969,16 @@ export default function App() {
   })
   const [activePlaylistId, setActivePlaylistId] = useState<number | null>(null)
   const [activePlaylist, setActivePlaylist] = useState<PlaylistDetail | null>(null)
+
+  const playlistWordCount = useMemo(() => {
+    if (!activePlaylist) return 0
+    const songIdSet = new Set(activePlaylist.songs.map(s => s.song_id))
+    return new Set(
+      wordLookupEntries
+        .filter(e => e.song_id !== null && songIdSet.has(e.song_id))
+        .map(e => `${e.lemma}|${e.language}|${e.target_lang}`)
+    ).size
+  }, [activePlaylist, wordLookupEntries])
   const [playlistsLoading, setPlaylistsLoading] = useState(false)
   const [playlistDetailLoading, setPlaylistDetailLoading] = useState(false)
   const [songsError,   setSongsError]   = useState<string | null>(null)
@@ -2178,11 +2176,12 @@ export default function App() {
     setSettingsHydrated(false)
   }, [settingsOwnerSpotifyId])
 
-  // Fetch playlist list once authenticated; songs are loaded on-demand per playlist
+  // Fetch playlist list once authenticated; songs are loaded for admin panel
   useEffect(() => {
     if (!isAuthenticated) return
     void loadPlaylists()
-  }, [isAuthenticated, loadPlaylists])
+    if (isAdmin) void loadSongs()
+  }, [isAuthenticated, isAdmin, loadPlaylists, loadSongs])
 
   useEffect(() => {
     if (!activePlaylistId) {
@@ -2492,6 +2491,7 @@ export default function App() {
       favoriteSongIds={favoriteSongIds}
       toggleFavorite={toggleFavorite}
       markAsNotListened={unmarkListened}
+      wordsLookedUpCount={playlistWordCount}
     />
   )
 }

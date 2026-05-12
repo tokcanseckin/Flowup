@@ -6,28 +6,17 @@ import os
 import time
 from collections.abc import Generator
 
-from sqlalchemy import Column, ForeignKey, Integer, LargeBinary, String, Text, UniqueConstraint, create_engine, event, text
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, LargeBinary, String, Text, UniqueConstraint, create_engine, text
 from sqlalchemy.orm import DeclarativeBase, Session, deferred, relationship, sessionmaker
 
-DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///./flowup.db")
+DATABASE_URL = os.environ.get("DATABASE_URL", "")
+if not DATABASE_URL:
+    raise RuntimeError("DATABASE_URL environment variable is required")
 # UpCloud (and Heroku) issue "postgres://" but SQLAlchemy 2.x requires "postgresql://"
 if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
-engine = create_engine(
-    DATABASE_URL,
-    connect_args={"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {},
-    echo=False,
-)
-
-if DATABASE_URL.startswith("sqlite"):
-    @event.listens_for(engine, "connect")
-    def _set_sqlite_pragma(dbapi_conn, _):
-        dbapi_conn.execute("PRAGMA foreign_keys = ON")
-        dbapi_conn.execute("PRAGMA journal_mode = WAL")
-        dbapi_conn.execute("PRAGMA synchronous = FULL")
-        dbapi_conn.execute("PRAGMA mmap_size = 134217728")  # 128 MB OS page cache
-        dbapi_conn.execute("PRAGMA wal_autocheckpoint = 100")
+engine = create_engine(DATABASE_URL, echo=False)
 
 SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
 
@@ -168,6 +157,7 @@ class Playlist(Base):
     language_code       = Column(String(8),   nullable=True)
     # Target language for translations/definitions in this playlist (e.g. "RU")
     target_lang         = Column(String(16),  nullable=True)
+    is_hidden           = Column(Boolean,     nullable=False, default=False, server_default='0')
     created_at          = Column(Integer,     default=lambda: int(time.time()))
 
     playlist_songs = relationship(
@@ -266,77 +256,18 @@ class AlignmentTask(Base):
 
 def create_tables() -> None:
     Base.metadata.create_all(bind=engine)
-    _migrate_users_table()
+    _migrate_playlists_pg()
 
 
-def _migrate_users_table() -> None:
-    """Best-effort migration for SQLite users and songs table columns."""
-    if not DATABASE_URL.startswith("sqlite"):
-        return
-
-    with engine.begin() as conn:
-        # users table
-        user_cols = {str(row[1]) for row in conn.execute(text("PRAGMA table_info(users)")).fetchall()}
-        if "password_hash" not in user_cols:
-            conn.execute(text("ALTER TABLE users ADD COLUMN password_hash TEXT"))
-        if "settings_json" not in user_cols:
-            conn.execute(text("ALTER TABLE users ADD COLUMN settings_json TEXT"))
-        if "is_admin" not in user_cols:
-            conn.execute(text("ALTER TABLE users ADD COLUMN is_admin INTEGER NOT NULL DEFAULT 0"))
-        if "spotify_enabled" not in user_cols:
-            conn.execute(text("ALTER TABLE users ADD COLUMN spotify_enabled INTEGER NOT NULL DEFAULT 0"))
-        if "apple_music_user_token" not in user_cols:
-            conn.execute(text("ALTER TABLE users ADD COLUMN apple_music_user_token TEXT"))
-
-        # songs table
-        song_cols = {str(row[1]) for row in conn.execute(text("PRAGMA table_info(songs)")).fetchall()}
-        if "youtube_url" not in song_cols:
-            conn.execute(text("ALTER TABLE songs ADD COLUMN youtube_url TEXT"))
-        if "apple_music_url" not in song_cols:
-            conn.execute(text("ALTER TABLE songs ADD COLUMN apple_music_url TEXT"))
-
-        # lines table
-        line_cols = {str(row[1]) for row in conn.execute(text("PRAGMA table_info(lines)")).fetchall()}
-        if "source" not in line_cols:
-            conn.execute(text("ALTER TABLE lines ADD COLUMN source VARCHAR(32)"))
-
-        # user_favorites table — create if not present (SQLite has no CREATE TABLE IF NOT EXISTS for columns)
-        conn.execute(text("""
-            CREATE TABLE IF NOT EXISTS user_favorites (
-                id         INTEGER PRIMARY KEY,
-                user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-                song_id    INTEGER NOT NULL REFERENCES songs(id) ON DELETE CASCADE,
-                created_at INTEGER,
-                UNIQUE(user_id, song_id)
-            )
-        """))
-
-        # playlists table — add target_lang if missing
-        pl_cols = {str(row[1]) for row in conn.execute(text("PRAGMA table_info(playlists)")).fetchall()}
-        if "target_lang" not in pl_cols:
-            conn.execute(text("ALTER TABLE playlists ADD COLUMN target_lang VARCHAR(16)"))
-
-        # line_translations table
-        conn.execute(text("""
-            CREATE TABLE IF NOT EXISTS line_translations (
-                id          INTEGER PRIMARY KEY,
-                line_id     INTEGER NOT NULL REFERENCES lines(id) ON DELETE CASCADE,
-                target_lang VARCHAR(16) NOT NULL,
-                text        TEXT NOT NULL,
-                UNIQUE(line_id, target_lang)
-            )
-        """))
-
-        # word_definitions table
-        conn.execute(text("""
-            CREATE TABLE IF NOT EXISTS word_definitions (
-                id          INTEGER PRIMARY KEY,
-                word_id     INTEGER NOT NULL REFERENCES words(id) ON DELETE CASCADE,
-                target_lang VARCHAR(16) NOT NULL,
-                definition  TEXT,
-                UNIQUE(word_id, target_lang)
-            )
-        """))
+def _migrate_playlists_pg() -> None:
+    """Add is_hidden to playlists on PostgreSQL (idempotent)."""
+    try:
+        with engine.begin() as conn:
+            conn.execute(text(
+                "ALTER TABLE playlists ADD COLUMN IF NOT EXISTS is_hidden BOOLEAN NOT NULL DEFAULT FALSE"
+            ))
+    except Exception:
+        pass  # column already exists or other non-fatal error
 
 
 def get_db() -> Generator[Session, None, None]:

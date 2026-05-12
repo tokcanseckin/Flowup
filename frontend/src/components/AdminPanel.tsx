@@ -24,6 +24,7 @@ type PlaylistDraft = {
   difficulty_level: string
   language_code: string
   target_lang: string
+  is_hidden: boolean
 }
 
 type SongDraft = {
@@ -70,6 +71,7 @@ function emptyPlaylistDraft(): PlaylistDraft {
     difficulty_level: '',
     language_code: '',
     target_lang: '',
+    is_hidden: false,
   }
 }
 
@@ -179,6 +181,8 @@ export default function AdminPanel({
   const [playlistSongQuery, setPlaylistSongQuery] = useState('')
   const [coverUploading, setCoverUploading] = useState(false)
   const [coverKey, setCoverKey] = useState(0)
+  // All playlists including hidden — loaded via admin endpoint
+  const [adminPlaylists, setAdminPlaylists] = useState<PlaylistSummary[]>(playlists)
 
   const [users, setUsers] = useState<AdminUser[]>([])
   const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null)
@@ -213,15 +217,15 @@ export default function AdminPanel({
       return
     }
 
-    if (nextTab === 'playlists' && !selectedPlaylistId && playlists[0]) {
-      setSelectedPlaylistId(playlists[0].id)
-      onNavigateRoute?.('playlists', playlists[0].id)
+    if (nextTab === 'playlists' && !selectedPlaylistId && adminPlaylists[0]) {
+      setSelectedPlaylistId(adminPlaylists[0].id)
+      onNavigateRoute?.('playlists', adminPlaylists[0]?.id ?? null)
       return
     }
 
     const id = getIdForTab(nextTab)
     onNavigateRoute?.(nextTab, id ?? null)
-  }, [getIdForTab, onNavigateRoute, playlists, selectedPlaylistId, selectedSongId, songs])
+  }, [adminPlaylists, getIdForTab, onNavigateRoute, selectedPlaylistId, selectedSongId, songs])
 
   const filteredSongs = useMemo(() => {
     const needle = searchQuery.trim().toLowerCase()
@@ -231,9 +235,9 @@ export default function AdminPanel({
 
   const filteredPlaylists = useMemo(() => {
     const needle = searchQuery.trim().toLowerCase()
-    if (tab !== 'playlists' || !needle) return playlists
-    return playlists.filter(playlist => `${playlist.name} ${playlist.description ?? ''} ${playlist.language_code ?? ''}`.toLowerCase().includes(needle))
-  }, [playlists, searchQuery, tab])
+    if (tab !== 'playlists' || !needle) return adminPlaylists
+    return adminPlaylists.filter(playlist => `${playlist.name} ${playlist.description ?? ''} ${playlist.language_code ?? ''}`.toLowerCase().includes(needle))
+  }, [adminPlaylists, searchQuery, tab])
 
   const filteredUsers = useMemo(() => {
     const needle = searchQuery.trim().toLowerCase()
@@ -267,11 +271,17 @@ export default function AdminPanel({
   }, [onNavigateRoute, selectedSongId, songs, tab])
 
   useEffect(() => {
-    if (!selectedPlaylistId && playlists[0]) {
-      setSelectedPlaylistId(playlists[0].id)
-      if (tab === 'playlists') onNavigateRoute?.('playlists', playlists[0].id)
+    if (!selectedPlaylistId && adminPlaylists[0]) {
+      setSelectedPlaylistId(adminPlaylists[0].id)
+      if (tab === 'playlists') onNavigateRoute?.('playlists', adminPlaylists[0].id)
     }
-  }, [onNavigateRoute, playlists, selectedPlaylistId, tab])
+  }, [onNavigateRoute, adminPlaylists, selectedPlaylistId, tab])
+
+  // Load all playlists (including hidden) for the admin panel
+  useEffect(() => {
+    void api.adminListPlaylists().then(setAdminPlaylists).catch(() => setAdminPlaylists(playlists))
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [playlists])
 
   useEffect(() => {
     if (!routeTab) return
@@ -408,6 +418,7 @@ export default function AdminPanel({
           difficulty_level: detail.difficulty_level ?? '',
           language_code: detail.language_code ?? '',
           target_lang: detail.target_lang ?? '',
+          is_hidden: detail.is_hidden ?? false,
         })
         setPlaylistSongIds(detail.songs.map(song => song.song_id))
       })
@@ -745,6 +756,7 @@ export default function AdminPanel({
         difficulty_level: playlistDraft.difficulty_level.trim() || null,
         language_code: playlistDraft.language_code.trim() || null,
         target_lang: playlistDraft.target_lang.trim() || null,
+        is_hidden: playlistDraft.is_hidden,
       })
 
       const existingSongIds = new Set(playlistDetail.songs.map(song => song.song_id))
@@ -786,6 +798,7 @@ export default function AdminPanel({
         difficulty_level: newPlaylistDraft.difficulty_level.trim() || null,
         language_code: newPlaylistDraft.language_code.trim() || null,
         target_lang: newPlaylistDraft.target_lang.trim() || null,
+        is_hidden: newPlaylistDraft.is_hidden,
       })
       await onRefreshPlaylists()
       setSelectedPlaylistId(created.id)
@@ -1023,7 +1036,7 @@ export default function AdminPanel({
                     className={`w-full rounded-2xl border px-3 py-3 text-left transition-colors ${selectedPlaylistId === playlist.id ? 'border-indigo-500 bg-indigo-950/40' : 'border-gray-800 bg-gray-950/30 hover:border-gray-700'}`}
                   >
                     <p className="text-sm font-medium text-white truncate">{playlist.name}</p>
-                    <p className="text-xs text-gray-500 truncate">{playlist.song_count} songs</p>
+                    <p className="text-xs text-gray-500 truncate">{playlist.song_count} songs{playlist.is_hidden ? ' · hidden' : ''}</p>
                   </button>
                 ))}
               </div>
@@ -1143,7 +1156,7 @@ export default function AdminPanel({
                       <div>
                         <p className="text-xs text-gray-500 mb-2">Playlist membership</p>
                         <div className="grid gap-2 md:grid-cols-2">
-                          {playlists.map(playlist => (
+                          {adminPlaylists.map(playlist => (
                             <label key={playlist.id} className="flex items-center gap-3 rounded-xl border border-gray-800 bg-gray-950/30 px-3 py-2 text-sm text-gray-200">
                               <input type="checkbox" checked={songDraft.playlist_ids.includes(playlist.id)} onChange={() => toggleSongPlaylistMembership(playlist.id)} className="rounded border-gray-600 bg-gray-900 text-indigo-500 focus:ring-indigo-500" />
                               <span>{playlist.name}</span>
@@ -1290,7 +1303,7 @@ export default function AdminPanel({
                   <div>
                     <p className="text-xs text-gray-500 mb-2">Add to playlists</p>
                     <div className="grid gap-2 md:grid-cols-2">
-                      {playlists.map(playlist => (
+                      {adminPlaylists.map(playlist => (
                         <label key={playlist.id} className="flex items-center gap-3 rounded-xl border border-gray-800 bg-gray-950/30 px-3 py-2 text-sm text-gray-200">
                           <input type="checkbox" checked={newSongDraft.playlist_ids.includes(playlist.id)} onChange={() => setNewSongDraft(prev => ({ ...prev, playlist_ids: prev.playlist_ids.includes(playlist.id) ? prev.playlist_ids.filter(id => id !== playlist.id) : [...prev.playlist_ids, playlist.id] }))} className="rounded border-gray-600 bg-gray-900 text-indigo-500 focus:ring-indigo-500" />
                           <span>{playlist.name}</span>
@@ -1343,6 +1356,10 @@ export default function AdminPanel({
                           <input value={playlistDraft.target_lang} onChange={e => setPlaylistDraft(prev => ({ ...prev, target_lang: e.target.value.toUpperCase() }))} placeholder="e.g. RU" maxLength={8} className="mt-1 w-full rounded-xl border border-indigo-700/60 bg-indigo-950/20 px-3 py-2 text-sm text-indigo-200 placeholder-indigo-800 focus:outline-none focus:border-indigo-400" />
                         </label>
                       </div>
+                      <label className="flex items-center gap-3 cursor-pointer select-none">
+                        <input type="checkbox" checked={playlistDraft.is_hidden} onChange={e => setPlaylistDraft(prev => ({ ...prev, is_hidden: e.target.checked }))} className="rounded border-gray-600 bg-gray-900 text-amber-500 focus:ring-amber-500" />
+                        <span className="text-sm text-amber-300">Hidden <span className="text-xs text-gray-500 font-normal">(not shown to users)</span></span>
+                      </label>
                       <div>
                         <div className="flex items-center justify-between gap-3 mb-2">
                           <p className="text-xs text-gray-500">Songs in playlist</p>
@@ -1374,6 +1391,10 @@ export default function AdminPanel({
                         <input value={newPlaylistDraft.target_lang} onChange={e => setNewPlaylistDraft(prev => ({ ...prev, target_lang: e.target.value.toUpperCase() }))} placeholder="e.g. RU" maxLength={8} className="mt-1 w-full rounded-xl border border-indigo-700/60 bg-indigo-950/20 px-3 py-2 text-sm text-indigo-200 placeholder-indigo-800 focus:outline-none focus:border-indigo-400" />
                       </label>
                     </div>
+                    <label className="flex items-center gap-3 cursor-pointer select-none">
+                      <input type="checkbox" checked={newPlaylistDraft.is_hidden} onChange={e => setNewPlaylistDraft(prev => ({ ...prev, is_hidden: e.target.checked }))} className="rounded border-gray-600 bg-gray-900 text-amber-500 focus:ring-amber-500" />
+                      <span className="text-sm text-amber-300">Hidden <span className="text-xs text-gray-500 font-normal">(not shown to users)</span></span>
+                    </label>
                     <button type="button" onClick={() => void handleCreatePlaylist()} disabled={playlistSaving} className="w-full rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-500 disabled:bg-gray-800 disabled:text-gray-500">Create Playlist</button>
                   </div>
                 </div>
