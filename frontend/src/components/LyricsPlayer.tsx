@@ -848,6 +848,10 @@ export default function LyricsPlayer({
                     <span className="text-white/60">Sentence translation</span>
                   </div>
                   <div className="flex items-start gap-3">
+                    <span className="shrink-0 mt-0.5 text-white/30 text-[11px] font-medium leading-none">hold</span>
+                    <span className="text-white/60">Peek without pinning</span>
+                  </div>
+                  <div className="flex items-start gap-3">
                     <kbd className="shrink-0 mt-0.5 inline-flex items-center justify-center rounded px-2 py-0.5 text-[11px] font-mono font-medium leading-none bg-white/10 text-white/70 border border-white/15">Space</kbd>
                     <span className="text-white/60">Play / pause</span>
                   </div>
@@ -860,8 +864,12 @@ export default function LyricsPlayer({
                     <span className="text-white/60">Seek to prev / next line</span>
                   </div>
                   <div className="flex items-start gap-3">
-                    <span className="shrink-0 mt-0.5 text-white/30 text-[11px] font-medium leading-none">hold</span>
-                    <span className="text-white/60">Peek without pinning</span>
+                    <div className="flex gap-1 shrink-0 mt-0.5">
+                      {['←','→'].map(k => (
+                        <kbd key={k} className="inline-flex items-center justify-center rounded px-1.5 py-0.5 text-[11px] font-mono font-medium leading-none bg-white/10 text-white/70 border border-white/15">{k}</kbd>
+                      ))}
+                    </div>
+                    <span className="text-white/60">Prev / next song</span>
                   </div>
                 </div>
               </div>

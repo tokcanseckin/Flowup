@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
-import { AdminSongDetail, AlignmentTask, AdminUser, PlaylistDetail, PlaylistSummary, SongSummary, api } from '../api/client'
+import { AdminSongDetail, AlignmentTask, AdminUser, LocalizationItem, PlaylistDetail, PlaylistSummary, SongSummary, api } from '../api/client'
 import SyncCalibrator from './SyncCalibrator'
 
 interface Props {
@@ -16,7 +16,7 @@ interface Props {
   onNavigateRoute?: (tab: TabKey, id: number | null) => void
 }
 
-type TabKey = 'songs' | 'playlists' | 'users' | 'tasks'
+type TabKey = 'songs' | 'playlists' | 'users' | 'tasks' | 'localizations'
 
 type PlaylistDraft = {
   name: string
@@ -993,6 +993,7 @@ export default function AdminPanel({
           <button type="button" onClick={() => openTab('playlists')} className={`rounded-xl border px-4 py-2 text-sm font-semibold transition-colors ${tabButtonClass(tab === 'playlists')}`}>Playlists</button>
           <button type="button" onClick={() => openTab('users')} className={`rounded-xl border px-4 py-2 text-sm font-semibold transition-colors ${tabButtonClass(tab === 'users')}`}>Users</button>
           <button type="button" onClick={() => openTab('tasks')} className={`rounded-xl border px-4 py-2 text-sm font-semibold transition-colors ${tabButtonClass(tab === 'tasks')}`}>Tasks</button>
+          <button type="button" onClick={() => openTab('localizations')} className={`rounded-xl border px-4 py-2 text-sm font-semibold transition-colors ${tabButtonClass(tab === 'localizations')}`}>Localizations</button>
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[320px_minmax(0,1fr)]">
@@ -1582,8 +1583,164 @@ export default function AdminPanel({
                 </div>
               </>
             )}
+
+            {tab === 'localizations' && (
+              <LocalizationsTab />
+            )}
           </section>
         </div>
+      </div>
+    </div>
+  )
+}
+
+function LocalizationsTab() {
+  const [items, setItems] = useState<LocalizationItem[]>([])
+  const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState('')
+  const [editKey, setEditKey] = useState<string | null>(null)
+  const [editDraft, setEditDraft] = useState<{ en: string; tr: string; ru: string }>({ en: '', tr: '', ru: '' })
+  const [saving, setSaving] = useState(false)
+  const [newKey, setNewKey] = useState('')
+  const [newEn, setNewEn] = useState('')
+  const [newTr, setNewTr] = useState('')
+  const [newRu, setNewRu] = useState('')
+  const [addError, setAddError] = useState<string | null>(null)
+
+  const load = useCallback(() => {
+    setLoading(true)
+    api.getLocalizations()
+      .then(rows => setItems(rows))
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, [])
+
+  useEffect(() => { load() }, [load])
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase()
+    if (!q) return items
+    return items.filter(i => i.key.includes(q) || i.en.toLowerCase().includes(q) || i.tr.toLowerCase().includes(q) || i.ru.toLowerCase().includes(q))
+  }, [items, search])
+
+  function startEdit(item: LocalizationItem) {
+    setEditKey(item.key)
+    setEditDraft({ en: item.en, tr: item.tr, ru: item.ru })
+  }
+
+  async function saveEdit() {
+    if (!editKey) return
+    setSaving(true)
+    try {
+      await api.updateLocalization(editKey, editDraft)
+      setItems(prev => prev.map(i => i.key === editKey ? { ...i, ...editDraft } : i))
+      setEditKey(null)
+    } catch {}
+    setSaving(false)
+  }
+
+  async function handleAdd() {
+    setAddError(null)
+    if (!newKey.trim()) { setAddError('Key is required'); return }
+    setSaving(true)
+    try {
+      const created = await api.upsertLocalization(newKey.trim(), { en: newEn, tr: newTr, ru: newRu })
+      setItems(prev => {
+        const exists = prev.some(i => i.key === created.key)
+        return exists ? prev.map(i => i.key === created.key ? created : i) : [...prev, created]
+      })
+      setNewKey(''); setNewEn(''); setNewTr(''); setNewRu('')
+    } catch (e: unknown) {
+      setAddError(e instanceof Error ? e.message : 'Failed to save')
+    }
+    setSaving(false)
+  }
+
+  async function handleDelete(key: string) {
+    if (!confirm(`Delete localization key "${key}"?`)) return
+    try {
+      await api.deleteLocalization(key)
+      setItems(prev => prev.filter(i => i.key !== key))
+    } catch {}
+  }
+
+  const cellCls = 'px-3 py-2 text-sm text-gray-300 align-top'
+  const inputCls = 'w-full rounded-lg border border-gray-700 bg-gray-900 px-2 py-1 text-xs text-white focus:outline-none focus:border-indigo-500'
+
+  return (
+    <div className="rounded-3xl border border-gray-800/80 p-5 space-y-4" style={{ background: '#12121f' }}>
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <p className="text-white font-semibold">Localizations</p>
+          <p className="text-xs text-gray-500">{items.length} keys · EN / TR / RU</p>
+        </div>
+        <input
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="Search keys or text…"
+          className="rounded-xl border border-gray-700 bg-gray-900 px-3 py-1.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500 w-64"
+        />
+      </div>
+
+      {loading ? (
+        <p className="text-gray-500 text-sm">Loading…</p>
+      ) : (
+        <div className="overflow-auto max-h-[60vh]">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="border-b border-gray-800">
+                <th className="px-3 py-2 text-xs font-medium text-gray-500 uppercase w-48">Key</th>
+                <th className="px-3 py-2 text-xs font-medium text-gray-500 uppercase">EN</th>
+                <th className="px-3 py-2 text-xs font-medium text-gray-500 uppercase">TR</th>
+                <th className="px-3 py-2 text-xs font-medium text-gray-500 uppercase">RU</th>
+                <th className="px-3 py-2 text-xs font-medium text-gray-500 uppercase w-24"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map(item => (
+                <tr key={item.key} className="border-b border-gray-800/50 hover:bg-gray-800/20">
+                  <td className={`${cellCls} font-mono text-xs text-indigo-400`}>{item.key}</td>
+                  {editKey === item.key ? (
+                    <>
+                      <td className={cellCls}><input value={editDraft.en} onChange={e => setEditDraft(d => ({ ...d, en: e.target.value }))} className={inputCls} /></td>
+                      <td className={cellCls}><input value={editDraft.tr} onChange={e => setEditDraft(d => ({ ...d, tr: e.target.value }))} className={inputCls} /></td>
+                      <td className={cellCls}><input value={editDraft.ru} onChange={e => setEditDraft(d => ({ ...d, ru: e.target.value }))} className={inputCls} /></td>
+                      <td className={cellCls}>
+                        <button onClick={() => void saveEdit()} disabled={saving} className="text-xs text-indigo-400 hover:text-indigo-300 mr-2 disabled:opacity-50">Save</button>
+                        <button onClick={() => setEditKey(null)} className="text-xs text-gray-500 hover:text-gray-300">Cancel</button>
+                      </td>
+                    </>
+                  ) : (
+                    <>
+                      <td className={cellCls}>{item.en}</td>
+                      <td className={cellCls}>{item.tr}</td>
+                      <td className={cellCls}>{item.ru}</td>
+                      <td className={cellCls}>
+                        <button onClick={() => startEdit(item)} className="text-xs text-gray-400 hover:text-white mr-2">Edit</button>
+                        <button onClick={() => void handleDelete(item.key)} className="text-xs text-red-500 hover:text-red-400">Del</button>
+                      </td>
+                    </>
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Add new key */}
+      <div className="border-t border-gray-800 pt-4">
+        <p className="text-xs font-medium text-gray-500 mb-2 uppercase tracking-wider">Add / overwrite key</p>
+        {addError && <p className="text-xs text-red-400 mb-2">{addError}</p>}
+        <div className="grid grid-cols-4 gap-2 mb-2">
+          <input value={newKey} onChange={e => setNewKey(e.target.value)} placeholder="key" className={inputCls} />
+          <input value={newEn} onChange={e => setNewEn(e.target.value)} placeholder="EN" className={inputCls} />
+          <input value={newTr} onChange={e => setNewTr(e.target.value)} placeholder="TR" className={inputCls} />
+          <input value={newRu} onChange={e => setNewRu(e.target.value)} placeholder="RU" className={inputCls} />
+        </div>
+        <button onClick={() => void handleAdd()} disabled={saving} className="rounded-xl bg-indigo-600 px-4 py-1.5 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50">
+          {saving ? 'Saving…' : 'Add key'}
+        </button>
       </div>
     </div>
   )

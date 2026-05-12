@@ -423,3 +423,21 @@ class WorkerResultSubmit(BaseModel):
     lrc: Optional[str] = None
     error: Optional[str] = None
 
+
+# ── Localization models ────────────────────────────────────────────────────────
+
+class LocalizationItem(BaseModel):
+    key: str
+    en: str = ''
+    tr: str = ''
+    ru: str = ''
+
+    model_config = {"from_attributes": True}
+
+
+class LocalizationUpsert(BaseModel):
+    """Create or update a single localization entry."""
+    en: str = ''
+    tr: str = ''
+    ru: str = ''
+

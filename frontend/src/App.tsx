@@ -10,6 +10,7 @@ import { api, BackendUser, PlaylistDetail, PlaylistSummary, SongDetail, SongSumm
 import { useFavorites } from './hooks/useFavorites'
 import { useListened } from './hooks/useListened'
 import { useWordHistory } from './hooks/useWordHistory'
+import { useLocalization, useT } from './i18n/LocalizationContext'
 
 // ── Module-level song cache (survives re-renders, cleared on logout) ──────────
 // Key: `{id}:{source}` where source is 'youtube' or 'apple_music'.
@@ -85,6 +86,7 @@ interface AppSettings {
   lastPlaylistId: number | null
   lastSongId: number | null
   preferredSource: 'youtube' | 'apple_music'
+  uiLanguage: 'en' | 'tr' | 'ru'
 }
 
 const DEFAULT_SETTINGS: AppSettings = {
@@ -93,6 +95,7 @@ const DEFAULT_SETTINGS: AppSettings = {
   lastPlaylistId: null,
   lastSongId: null,
   preferredSource: 'youtube',
+  uiLanguage: 'en',
 }
 
 function fromApiSettings(settings: ApiUserSettings): AppSettings {
@@ -102,6 +105,7 @@ function fromApiSettings(settings: ApiUserSettings): AppSettings {
     lastPlaylistId: settings.last_playlist_id ?? null,
     lastSongId: settings.last_song_id ?? null,
     preferredSource: (settings.preferred_source as AppSettings['preferredSource']) ?? 'youtube',
+    uiLanguage: ((settings as unknown) as Record<string, unknown>).ui_language as AppSettings['uiLanguage'] ?? 'en',
   }
 }
 
@@ -124,6 +128,7 @@ function toApiSettingsPatch(patch: Partial<AppSettings>): Partial<ApiUserSetting
   }
   return out
 }
+
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -181,7 +186,7 @@ function songPath(songId: number): string {
   return `/song/${songId}`
 }
 
-function adminPath(tab: 'songs' | 'playlists' | 'users' | 'tasks', id: number | null): string {
+function adminPath(tab: 'songs' | 'playlists' | 'users' | 'tasks' | 'localizations', id: number | null): string {
   const seg = tab === 'playlists' ? 'playlist' : tab === 'users' ? 'user' : tab === 'tasks' ? 'task' : 'song'
   if (id === null) return `/admin/${seg}`
   return `/admin/${seg}/${id}`
@@ -582,6 +587,7 @@ function SongBrowser({
   targetLang: string | undefined
   onTargetLangChange: (lang: string | null) => void
 }) {
+  const t = useT()
   const listenedCount = activePlaylist
     ? activePlaylist.songs.filter(s => openedSongIds.has(s.song_id)).length
     : 0
@@ -785,7 +791,7 @@ function SongBrowser({
               <button type="button" onClick={onOpenAccount} className="text-xs text-gray-500 hover:text-gray-300 transition-colors">{user.display_name}</button>
             )}
             <button onClick={onLogout} className="text-xs text-gray-600 hover:text-gray-400 transition-colors">
-              Sign out
+              {t('nav.signOut')}
             </button>
           </div>
         </div>
@@ -985,6 +991,33 @@ function SettingRow({
   )
 }
 
+function LanguagePicker() {
+  const { language, setLanguage } = useLocalization()
+  const t = useT()
+  const langs: { code: 'en' | 'tr' | 'ru'; label: string }[] = [
+    { code: 'en', label: 'English' },
+    { code: 'tr', label: 'Türkçe' },
+    { code: 'ru', label: 'Русский' },
+  ]
+  return (
+    <div className="rounded-2xl border border-gray-800/80 p-4" style={{ background: '#12121f' }}>
+      <p className="text-white font-medium mb-1">{t('settings.uiLanguage')}</p>
+      <p className="text-xs text-gray-500 mb-3 leading-relaxed">{t('settings.uiLanguageDesc')}</p>
+      <div className="flex gap-2">
+        {langs.map(l => (
+          <button
+            key={l.code}
+            onClick={() => setLanguage(l.code)}
+            className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${language === l.code ? 'bg-indigo-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}
+          >
+            {l.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 function SettingsPage({
   settings,
   onUpdate,
@@ -1004,11 +1037,12 @@ function SettingsPage({
 }) {
   const [supportForm, setSupportForm] = useState({ subject: '', message: '' })
   const [supportSent, setSupportSent] = useState(false)
+  const t = useT()
 
   const tabs: { key: SettingsTab; label: string; icon: React.ReactNode }[] = [
     {
       key: 'preferences',
-      label: 'Preferences',
+      label: t('settings.preferences'),
       icon: (
         <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current shrink-0">
           <path d="M19.14 12.94a7.43 7.43 0 000-1.88l2.03-1.58a.5.5 0 00.12-.64l-1.92-3.32a.5.5 0 00-.6-.22l-2.39.96a7.36 7.36 0 00-1.63-.94l-.36-2.54A.5.5 0 0013.9 2h-3.8a.5.5 0 00-.49.42l-.36 2.54a7.36 7.36 0 00-1.63.94l-2.39-.96a.5.5 0 00-.6.22L2.71 8.48a.5.5 0 00.12.64l2.03 1.58a7.43 7.43 0 000 1.88l-2.03 1.58a.5.5 0 00-.12.64l1.92 3.32a.5.5 0 00.6.22l2.39-.96c.5.39 1.05.71 1.63.94l.36 2.54a.5.5 0 00.49.42h3.8a.5.5 0 00.49-.42l.36-2.54c.58-.23 1.13-.55 1.63-.94l2.39.96a.5.5 0 00.6-.22l1.92-3.32a.5.5 0 00-.12-.64l-2.03-1.58zM12 15.5A3.5 3.5 0 1112 8a3.5 3.5 0 010 7.5z"/>
@@ -1017,7 +1051,7 @@ function SettingsPage({
     },
     {
       key: 'account',
-      label: 'Account',
+      label: t('settings.account'),
       icon: (
         <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current shrink-0">
           <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
@@ -1026,7 +1060,7 @@ function SettingsPage({
     },
     {
       key: 'subscription',
-      label: 'Subscription',
+      label: t('settings.subscription'),
       icon: (
         <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current shrink-0">
           <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/>
@@ -1035,7 +1069,7 @@ function SettingsPage({
     },
     {
       key: 'support',
-      label: 'Support',
+      label: t('settings.support'),
       icon: (
         <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current shrink-0">
           <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/>
@@ -1058,7 +1092,7 @@ function SettingsPage({
         </div>
         <div className="flex items-center gap-3">
           {user?.display_name && <button type="button" onClick={() => onTabChange('account')} className="text-xs text-gray-500 hover:text-gray-300 transition-colors">{user.display_name}</button>}
-          <button onClick={onLogout} className="text-xs text-gray-600 hover:text-gray-400 transition-colors">Sign out</button>
+          <button onClick={onLogout} className="text-xs text-gray-600 hover:text-gray-400 transition-colors">{t('nav.signOut')}</button>
         </div>
         </div>
       </header>
@@ -1088,31 +1122,32 @@ function SettingsPage({
         <main className="flex-1 overflow-y-auto px-6 py-6 flex flex-col">
           {activeTab === 'preferences' && (
             <div className="max-w-xl w-full space-y-3">
-              <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-4">Preferences</h2>
+              <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-4">{t('settings.preferences')}</h2>
               <div className="rounded-2xl border border-gray-800/80 p-4" style={{ background: '#12121f' }}>
-                <p className="text-white font-medium mb-1">Music source</p>
-                <p className="text-xs text-gray-500 mb-3 leading-relaxed">Choose whether to use YouTube or Apple Music.</p>
+                <p className="text-white font-medium mb-1">{t('settings.musicSource')}</p>
+                <p className="text-xs text-gray-500 mb-3 leading-relaxed">{t('settings.musicSourceDesc')}</p>
                 <SourcePicker value={settings.preferredSource} onChange={v => onUpdate({ preferredSource: v })} />
               </div>
               <SettingRow
-                title="Prioritize content words for 1-9 shortcuts"
-                description="When on, shortcut numbers skip common stop words (pronouns, prepositions, conjunctions) and target more meaningful words first."
+                title={t('settings.prioritizeContentWords')}
+                description={t('settings.prioritizeContentWordsDesc')}
                 value={settings.excludeStopWordsFromShortcuts}
                 onChange={(next) => onUpdate({ excludeStopWordsFromShortcuts: next })}
               />
               <SettingRow
-                title="Pause playback while inspecting lyrics"
-                description="When on, playback pauses while definition/translation panels are open and resumes when you close them."
+                title={t('settings.pauseOnInspect')}
+                description={t('settings.pauseOnInspectDesc')}
                 value={settings.pauseOnInspect}
                 onChange={(next) => onUpdate({ pauseOnInspect: next })}
               />
+              <LanguagePicker />
             </div>
           )}
 
           {activeTab === 'account' && (
             <div className="max-w-xl w-full flex flex-col min-h-full">
               <div className="space-y-3 flex-1">
-              <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-4">Account</h2>
+              <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-4">{t('settings.account')}</h2>
               <div className="rounded-2xl border border-gray-800/80 p-5" style={{ background: '#12121f' }}>
                 <div className="flex items-center gap-4 mb-5">
                   <div className="w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center shrink-0">
@@ -1121,7 +1156,7 @@ function SettingsPage({
                     </svg>
                   </div>
                   <div>
-                    <p className="text-white font-medium">{user?.display_name ?? 'Unknown user'}</p>
+                    <p className="text-white font-medium">{user?.display_name ?? t('settings.unknownUser')}</p>
                     <p className="text-xs text-gray-500 mt-0.5">{user?.email ?? ''}</p>
                   </div>
                 </div>
@@ -1132,12 +1167,12 @@ function SettingsPage({
                       <svg viewBox="0 0 24 24" className="w-4 h-4 shrink-0 fill-gray-400">
                         <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.7 9.05 7.4c1.4.07 2.38.79 3.19.8 1.21-.23 2.37-.97 3.67-.84 1.57.19 2.75.87 3.52 2.16-3.21 1.93-2.45 5.97.62 7.12-.58 1.53-1.34 3.05-3 3.64zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
                       </svg>
-                      <span className="text-sm text-gray-300">Apple Music</span>
+                      <span className="text-sm text-gray-300">{t('settings.appleMusic')}</span>
                     </div>
                     {isAppleMusicAuthorized() ? (
-                      <span className="text-xs text-green-400 font-medium">Connected</span>
+                      <span className="text-xs text-green-400 font-medium">{t('settings.connected')}</span>
                     ) : (
-                      <span className="text-xs text-gray-500">Not connected</span>
+                      <span className="text-xs text-gray-500">{t('settings.notConnected')}</span>
                     )}
                   </div>
                 </div>
@@ -1149,7 +1184,7 @@ function SettingsPage({
                   onClick={onLogout}
                   className="w-full rounded-xl border border-gray-700 px-4 py-2.5 text-sm text-gray-400 hover:text-white hover:border-gray-500 transition-colors text-left"
                 >
-                  Sign out
+                  {t('nav.signOut')}
                 </button>
               </div>
             </div>
@@ -1157,44 +1192,44 @@ function SettingsPage({
 
           {activeTab === 'subscription' && (
             <div className="max-w-xl w-full space-y-3">
-              <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-4">Subscription</h2>
+              <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-4">{t('settings.subscription')}</h2>
               <div className="rounded-2xl border border-gray-800/80 p-8 flex flex-col items-center text-center" style={{ background: '#12121f' }}>
                 <div className="w-14 h-14 rounded-2xl bg-gray-800 flex items-center justify-center mb-4">
                   <svg viewBox="0 0 24 24" className="w-7 h-7 fill-gray-500">
                     <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/>
                   </svg>
                 </div>
-                <p className="text-white font-semibold mb-1">Subscription management</p>
-                <p className="text-gray-500 text-sm leading-relaxed">Subscription details and billing will be available here soon.</p>
+                <p className="text-white font-semibold mb-1">{t('settings.subscriptionManagement')}</p>
+                <p className="text-gray-500 text-sm leading-relaxed">{t('settings.subscriptionDesc')}</p>
               </div>
             </div>
           )}
 
           {activeTab === 'support' && (
             <div className="max-w-xl w-full space-y-3">
-              <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-4">Support</h2>
+              <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-4">{t('settings.support')}</h2>
               {supportSent ? (
                 <div className="rounded-2xl border border-gray-800/80 p-8 flex flex-col items-center text-center" style={{ background: '#12121f' }}>
                   <svg viewBox="0 0 24 24" className="w-10 h-10 fill-green-500 mb-3">
                     <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
                   </svg>
-                  <p className="text-white font-semibold mb-1">Message sent</p>
-                  <p className="text-gray-500 text-sm">We'll get back to you as soon as possible.</p>
+                  <p className="text-white font-semibold mb-1">{t('settings.messageSent')}</p>
+                  <p className="text-gray-500 text-sm">{t('settings.messageReply')}</p>
                   <button
                     type="button"
                     onClick={() => { setSupportSent(false); setSupportForm({ subject: '', message: '' }) }}
                     className="mt-4 text-xs text-gray-500 hover:text-gray-300 transition-colors"
                   >
-                    Send another message
+                    {t('settings.sendAnotherMessage')}
                   </button>
                 </div>
               ) : (
                 <div className="rounded-2xl border border-gray-800/80 p-5" style={{ background: '#12121f' }}>
-                  <p className="text-white font-medium mb-1">Contact us</p>
-                  <p className="text-xs text-gray-500 mb-4 leading-relaxed">Have a question or found an issue? We're happy to help.</p>
+                  <p className="text-white font-medium mb-1">{t('settings.contactUs')}</p>
+                  <p className="text-xs text-gray-500 mb-4 leading-relaxed">{t('settings.contactUsDesc')}</p>
                   <div className="space-y-3">
                     <div>
-                      <label className="block text-xs text-gray-500 mb-1.5" htmlFor="support-subject">Subject</label>
+                      <label className="block text-xs text-gray-500 mb-1.5" htmlFor="support-subject">{t('settings.subject')}</label>
                       <input
                         id="support-subject"
                         type="text"
@@ -1205,7 +1240,7 @@ function SettingsPage({
                       />
                     </div>
                     <div>
-                      <label className="block text-xs text-gray-500 mb-1.5" htmlFor="support-message">Message</label>
+                      <label className="block text-xs text-gray-500 mb-1.5" htmlFor="support-message">{t('settings.message')}</label>
                       <textarea
                         id="support-message"
                         rows={5}
@@ -1221,7 +1256,7 @@ function SettingsPage({
                       onClick={() => setSupportSent(true)}
                       className="w-full rounded-xl bg-white text-black text-sm font-medium py-2.5 hover:bg-gray-100 disabled:bg-gray-800 disabled:text-gray-500 transition-colors"
                     >
-                      Send message
+                      {t('settings.sendMessage')}
                     </button>
                   </div>
                 </div>
@@ -1460,6 +1495,7 @@ function PlayerView({
   const [infoVisible, setInfoVisible] = useState(false)
   const [playerMenuOpen, setPlayerMenuOpen] = useState(false)
   const autoPausedRef = useRef(false)
+  const t = useT()
 
   useEffect(() => {
     if (!playerMenuOpen) return
@@ -1764,7 +1800,7 @@ function PlayerView({
             Preferences
           </button>
           {user?.display_name && <button type="button" onClick={onOpenAccount} className="text-xs text-gray-500 hover:text-gray-300 transition-colors">{user.display_name}</button>}
-          <button onClick={onLogout} className="text-xs text-gray-600 hover:text-gray-400 transition-colors">Sign out</button>
+          <button onClick={onLogout} className="text-xs text-gray-600 hover:text-gray-400 transition-colors">{t('nav.signOut')}</button>
         </div>
         </div>
       </header>

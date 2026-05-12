@@ -50,7 +50,7 @@ from fastapi.responses import JSONResponse, Response, StreamingResponse
 from sqlalchemy import select as sa_select
 from sqlalchemy.orm import Session, noload
 
-from database import AlignmentTask, Line, LineTranslation, Playlist, PlaylistSong, Song, User, UserFavorite, UserListenedSong, UserWordLookup, Word, WordDefinition, create_tables, get_db
+from database import AlignmentTask, Line, LineTranslation, Localization, Playlist, PlaylistSong, Song, User, UserFavorite, UserListenedSong, UserWordLookup, Word, WordDefinition, create_tables, get_db
 from models import (
     AdminLyricsUpdate,
     AdminSongDetailResponse,
@@ -92,6 +92,8 @@ from models import (
     WordResponse,
     WorkerResultSubmit,
     WorkerTaskResponse,
+    LocalizationItem,
+    LocalizationUpsert,
 )
 from openrussian import ensure_loaded as _load_or, lookup as _or_lookup, lookup_local as _or_lookup_local
 import italian_dict as _italian_dict
@@ -203,12 +205,39 @@ def _warm_new_songs_only() -> None:
         db.close()
 
 
+# ── Localization cache ─────────────────────────────────────────────────────────
+# All rows from the `localizations` table, keyed by `key`.
+# None means "not yet loaded"; invalidated on any admin write.
+_loc_cache: dict[str, dict] | None = None
+_loc_lock = threading.Lock()
+
+
+def _load_loc_cache(db: Session) -> dict[str, dict]:
+    rows = db.query(Localization).all()
+    return {row.key: {"key": row.key, "en": row.en, "tr": row.tr, "ru": row.ru} for row in rows}
+
+
+def _invalidate_loc_cache() -> None:
+    global _loc_cache
+    with _loc_lock:
+        _loc_cache = None
+
+
+def _get_loc_cache(db: Session) -> dict[str, dict]:
+    global _loc_cache
+    with _loc_lock:
+        if _loc_cache is None:
+            _loc_cache = _load_loc_cache(db)
+        return _loc_cache
+
+
 # ── Startup ────────────────────────────────────────────────────────────────────
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     create_tables()
     _seed_sample_data()
+    _seed_localizations()
     _ensure_admin_user()
     _ensure_spotify_enabled_users()
     loop = asyncio.get_event_loop()
@@ -226,6 +255,14 @@ async def lifespan(app: FastAPI):
     _load_disk_cache()
     # Phase 2: Background sync — only fetch songs missing from the disk cache.
     warm_future = asyncio.ensure_future(loop.run_in_executor(None, _warm_new_songs_only))
+    # Pre-warm localizations cache.
+    try:
+        _loc_db = next(get_db())
+        _get_loc_cache(_loc_db)
+        _loc_db.close()
+        print("[Cache] Localizations cache loaded.")
+    except Exception as exc:
+        print(f"[Cache] Localization preload failed (non-fatal): {exc}")
     yield
     # Shutdown: cancel background warm if still running.
     warm_future.cancel()
@@ -251,6 +288,96 @@ def _seed_sample_data() -> None:
         print("[DB] Sample song seeded.")
     except Exception as exc:
         print(f"[DB] Seed failed (non-fatal): {exc}")
+    finally:
+        db.close()
+
+
+_INITIAL_LOCALIZATIONS: list[dict] = [
+    # Auth
+    {"key": "auth.tagline1",                "en": "Learn languages",            "tr": "Dil öğren",                 "ru": "Учи языки"},
+    {"key": "auth.tagline2",                "en": "through music",              "tr": "müzikle",                   "ru": "через музыку"},
+    {"key": "auth.signIn",                  "en": "Sign in",                    "tr": "Giriş yap",                 "ru": "Войти"},
+    {"key": "auth.signingIn",               "en": "Signing in…",                "tr": "Giriş yapılıyor…",          "ru": "Вход…"},
+    {"key": "auth.signUp",                  "en": "Sign up",                    "tr": "Kayıt ol",                  "ru": "Зарегистрироваться"},
+    {"key": "auth.createAccount",           "en": "Create account",             "tr": "Hesap oluştur",             "ru": "Создать аккаунт"},
+    {"key": "auth.creatingAccount",         "en": "Creating account…",          "tr": "Hesap oluşturuluyor…",      "ru": "Создание аккаунта…"},
+    {"key": "auth.dontHaveAccount",         "en": "Don't have an account?",     "tr": "Hesabınız yok mu?",         "ru": "Нет аккаунта?"},
+    {"key": "auth.alreadyHaveAccount",      "en": "Already have an account?",   "tr": "Zaten hesabınız var mı?",   "ru": "Уже есть аккаунт?"},
+    {"key": "auth.or",                      "en": "or",                         "tr": "veya",                      "ru": "или"},
+    {"key": "auth.continueWithApple",       "en": "Continue with Apple",        "tr": "Apple ile devam et",        "ru": "Войти через Apple"},
+    {"key": "auth.passwordsDoNotMatch",     "en": "Passwords do not match",     "tr": "Şifreler eşleşmiyor",       "ru": "Пароли не совпадают"},
+    {"key": "auth.emailPlaceholder",        "en": "Email",                      "tr": "E-posta",                   "ru": "Email"},
+    {"key": "auth.passwordPlaceholder",     "en": "Password",                   "tr": "Şifre",                     "ru": "Пароль"},
+    {"key": "auth.namePlaceholder",         "en": "Name",                       "tr": "İsim",                      "ru": "Имя"},
+    {"key": "auth.passwordMinPlaceholder",  "en": "Password (min 8 chars)",     "tr": "Şifre (min 8 karakter)",    "ru": "Пароль (мин. 8 символов)"},
+    {"key": "auth.confirmPasswordPlaceholder", "en": "Confirm password",        "tr": "Şifreyi onayla",            "ru": "Подтвердите пароль"},
+    # Navigation / Browser
+    {"key": "nav.admin",                    "en": "Admin",                      "tr": "Yönetici",                  "ru": "Администратор"},
+    {"key": "nav.preferences",             "en": "Preferences",                "tr": "Tercihler",                 "ru": "Настройки"},
+    {"key": "nav.signOut",                  "en": "Sign out",                   "tr": "Çıkış yap",                 "ru": "Выйти"},
+    {"key": "nav.playlists",               "en": "Playlists",                  "tr": "Çalma listeleri",           "ru": "Плейлисты"},
+    {"key": "browser.songs",               "en": "Songs",                      "tr": "Şarkılar",                  "ru": "Песни"},
+    {"key": "browser.play",                "en": "Play",                       "tr": "Oynat",                     "ru": "Играть"},
+    {"key": "browser.progress",            "en": "Progress",                   "tr": "İlerleme",                  "ru": "Прогресс"},
+    {"key": "browser.wordsLookedUp",       "en": "Words looked up",            "tr": "Aranan kelimeler",          "ru": "Слов изучено"},
+    {"key": "browser.loadingSongs",        "en": "Loading songs…",             "tr": "Şarkılar yükleniyor…",      "ru": "Загрузка песен…"},
+    {"key": "browser.noSongs",             "en": "No songs available",         "tr": "Şarkı bulunamadı",          "ru": "Нет доступных песен"},
+    {"key": "browser.unknownArtist",       "en": "Unknown artist",             "tr": "Bilinmeyen sanatçı",        "ru": "Неизвестный исполнитель"},
+    {"key": "browser.addToFavorites",      "en": "Add to favorites",           "tr": "Favorilere ekle",           "ru": "В избранное"},
+    {"key": "browser.removeFromFavorites", "en": "Remove from favorites",      "tr": "Favorilerden kaldır",       "ru": "Из избранного"},
+    {"key": "browser.markAsNotListened",   "en": "Mark as not listened",       "tr": "Dinlenmedi olarak işaretle","ru": "Отметить как непрослушанное"},
+    {"key": "browser.reportProblem",       "en": "Report a problem",           "tr": "Sorun bildir",              "ru": "Сообщить о проблеме"},
+    # Settings / Preferences
+    {"key": "settings.preferences",       "en": "Preferences",                "tr": "Tercihler",                 "ru": "Настройки"},
+    {"key": "settings.account",           "en": "Account",                    "tr": "Hesap",                     "ru": "Аккаунт"},
+    {"key": "settings.subscription",      "en": "Subscription",               "tr": "Abonelik",                  "ru": "Подписка"},
+    {"key": "settings.support",           "en": "Support",                    "tr": "Destek",                    "ru": "Поддержка"},
+    {"key": "settings.musicSource",       "en": "Music source",               "tr": "Müzik kaynağı",             "ru": "Источник музыки"},
+    {"key": "settings.musicSourceDesc",   "en": "Choose whether to use YouTube or Apple Music.", "tr": "Müziğin nereden çalınacağını seçin", "ru": "Выберите источник воспроизведения"},
+    {"key": "settings.prioritizeContentWords",     "en": "Prioritize content words for 1-9 shortcuts",      "tr": "İçerik kelimelerine öncelik ver",   "ru": "Приоритет смысловых слов"},
+    {"key": "settings.prioritizeContentWordsDesc", "en": "When on, shortcut numbers skip common stop words (pronouns, prepositions, conjunctions) and target more meaningful words first.", "tr": "Önemli kelimelerin tanımlarını önce göster", "ru": "Сначала показывать определения важных слов"},
+    {"key": "settings.pauseOnInspect",    "en": "Pause playback while inspecting lyrics",           "tr": "İnceleme sırasında duraklat", "ru": "Пауза при изучении"},
+    {"key": "settings.pauseOnInspectDesc","en": "When on, playback pauses while definition/translation panels are open and resumes when you close them.", "tr": "Kelime incelerken oynatmayı duraklat", "ru": "Ставить на паузу при изучении слова"},
+    {"key": "settings.connected",         "en": "Connected",                  "tr": "Bağlı",                     "ru": "Подключено"},
+    {"key": "settings.notConnected",      "en": "Not connected",              "tr": "Bağlı değil",               "ru": "Не подключено"},
+    {"key": "settings.appleMusic",        "en": "Apple Music",                "tr": "Apple Music",               "ru": "Apple Music"},
+    {"key": "settings.contactUs",         "en": "Contact us",                 "tr": "Bize ulaşın",               "ru": "Связаться с нами"},
+    {"key": "settings.contactUsDesc",     "en": "Have a question or found an issue? We're happy to help.", "tr": "Bize mesaj gönderin",       "ru": "Напишите нам"},
+    {"key": "settings.subject",           "en": "Subject",                    "tr": "Konu",                      "ru": "Тема"},
+    {"key": "settings.message",           "en": "Message",                    "tr": "Mesaj",                     "ru": "Сообщение"},
+    {"key": "settings.sendMessage",       "en": "Send message",               "tr": "Mesaj gönder",              "ru": "Отправить сообщение"},
+    {"key": "settings.sendAnotherMessage","en": "Send another message",       "tr": "Başka mesaj gönder",        "ru": "Отправить ещё"},
+    {"key": "settings.messageSent",       "en": "Message sent",               "tr": "Mesaj gönderildi",          "ru": "Сообщение отправлено"},
+    {"key": "settings.messageReply",      "en": "We'll get back to you as soon as possible.", "tr": "E-postanıza yanıt vereceğiz.", "ru": "Мы ответим на ваш email."},
+    {"key": "settings.subscriptionManagement", "en": "Subscription management",   "tr": "Aboneliği yönet",           "ru": "Управление подпиской"},
+    {"key": "settings.subscriptionDesc",  "en": "Subscription details and billing will be available here soon.", "tr": "Aboneliğinizi App Store veya cihaz ayarlarınızdan yönetin.", "ru": "Управляйте подпиской в App Store или настройках устройства."},
+    {"key": "settings.unknownUser",       "en": "Unknown user",               "tr": "Bilinmeyen kullanıcı",      "ru": "Неизвестный пользователь"},
+    {"key": "settings.uiLanguage",        "en": "Interface language",         "tr": "Arayüz dili",               "ru": "Язык интерфейса"},
+    {"key": "settings.uiLanguageDesc",    "en": "Choose the language used throughout the app UI.", "tr": "Uygulama genelinde kullanılan dili seçin.", "ru": "Выберите язык интерфейса."},
+    # Inspect / Lyrics shortcuts
+    {"key": "inspect.title",              "en": "INSPECT LYRICS",             "tr": "SÖZLERE BAK",               "ru": "ТЕКСТ ПЕСНИ"},
+    {"key": "inspect.numberedWord",       "en": "Inspect a numbered word",    "tr": "Numaralı kelimeye bak",     "ru": "Изучить пронумерованное слово"},
+    {"key": "inspect.sentenceTranslation","en": "Sentence translation",       "tr": "Cümle çevirisi",            "ru": "Перевод предложения"},
+    {"key": "inspect.peekWithoutPinning", "en": "Peek without pinning",       "tr": "Sabitleme ile gözetleme",   "ru": "Подглядеть без закрепления"},
+    {"key": "inspect.hold",               "en": "hold",                       "tr": "basılı tut",                "ru": "удерживать"},
+    {"key": "inspect.playPause",          "en": "Play / pause",               "tr": "Oynat / duraklat",          "ru": "Воспроизведение / пауза"},
+    {"key": "inspect.seekPrevNextLine",   "en": "Seek to prev / next line",   "tr": "Önceki / sonraki satıra git","ru": "К пред. / следующей строке"},
+    {"key": "inspect.prevNextSong",       "en": "Prev / next song",           "tr": "Önceki / sonraki şarkı",    "ru": "Пред. / следующая песня"},
+]
+
+
+def _seed_localizations() -> None:
+    """Upsert the initial localization strings into the DB (idempotent)."""
+    db = next(get_db())
+    try:
+        for entry in _INITIAL_LOCALIZATIONS:
+            existing = db.query(Localization).filter(Localization.key == entry["key"]).first()
+            if not existing:
+                db.add(Localization(key=entry["key"], en=entry["en"], tr=entry["tr"], ru=entry["ru"]))
+        db.commit()
+        print("[DB] Localizations seeded.")
+    except Exception as exc:
+        print(f"[DB] Localization seed failed (non-fatal): {exc}")
     finally:
         db.close()
 
@@ -2446,3 +2573,66 @@ def get_apple_music_token():
         except ValueError as exc:
             raise HTTPException(status_code=503, detail=str(exc))
     return {"token": _apple_token_cache[0]}
+
+
+# ── Localizations ──────────────────────────────────────────────────────────────
+
+@app.get("/api/localizations", response_model=list[LocalizationItem])
+def get_localizations(db: Session = Depends(get_db)):
+    """Return all localization strings. Results are served from in-memory cache."""
+    cache = _get_loc_cache(db)
+    return list(cache.values())
+
+
+@app.post("/api/admin/localizations", response_model=LocalizationItem, status_code=201)
+def create_or_update_localization(
+    key: str,
+    body: LocalizationUpsert,
+    db: Session = Depends(get_db),
+    _: User = Depends(_require_admin),
+):
+    row = db.query(Localization).filter(Localization.key == key).first()
+    if row:
+        row.en = body.en
+        row.tr = body.tr
+        row.ru = body.ru
+    else:
+        row = Localization(key=key, en=body.en, tr=body.tr, ru=body.ru)
+        db.add(row)
+    db.commit()
+    db.refresh(row)
+    _invalidate_loc_cache()
+    return LocalizationItem.model_validate(row)
+
+
+@app.put("/api/admin/localizations/{key}", response_model=LocalizationItem)
+def update_localization(
+    key: str,
+    body: LocalizationUpsert,
+    db: Session = Depends(get_db),
+    _: User = Depends(_require_admin),
+):
+    row = db.query(Localization).filter(Localization.key == key).first()
+    if not row:
+        raise HTTPException(status_code=404, detail="Localization key not found")
+    row.en = body.en
+    row.tr = body.tr
+    row.ru = body.ru
+    db.commit()
+    db.refresh(row)
+    _invalidate_loc_cache()
+    return LocalizationItem.model_validate(row)
+
+
+@app.delete("/api/admin/localizations/{key}", status_code=204)
+def delete_localization(
+    key: str,
+    db: Session = Depends(get_db),
+    _: User = Depends(_require_admin),
+):
+    row = db.query(Localization).filter(Localization.key == key).first()
+    if not row:
+        raise HTTPException(status_code=404, detail="Localization key not found")
+    db.delete(row)
+    db.commit()
+    _invalidate_loc_cache()

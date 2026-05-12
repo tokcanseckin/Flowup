@@ -257,6 +257,16 @@ class AlignmentTask(Base):
     created_at    = Column(Integer,     default=lambda: int(time.time()))
 
 
+class Localization(Base):
+    """UI localization strings stored per key, with text for each supported UI language."""
+    __tablename__ = "localizations"
+
+    key = Column(String(128), primary_key=True)
+    en  = Column(Text, nullable=False, default='')
+    tr  = Column(Text, nullable=False, default='')
+    ru  = Column(Text, nullable=False, default='')
+
+
 def create_tables() -> None:
     Base.metadata.create_all(bind=engine)
     _migrate_playlists_pg()
@@ -268,6 +278,7 @@ def _migrate_playlists_pg() -> None:
         "ALTER TABLE playlists ADD COLUMN IF NOT EXISTS is_hidden BOOLEAN NOT NULL DEFAULT FALSE",
         "ALTER TABLE playlists ADD COLUMN IF NOT EXISTS target_langs TEXT NOT NULL DEFAULT '[]'",
         "ALTER TABLE songs ADD COLUMN IF NOT EXISTS target_langs TEXT NOT NULL DEFAULT '[]'",
+        "CREATE TABLE IF NOT EXISTS localizations (key TEXT PRIMARY KEY, en TEXT NOT NULL DEFAULT '', tr TEXT NOT NULL DEFAULT '', ru TEXT NOT NULL DEFAULT '')",
     ]
     for stmt in statements:
         try:

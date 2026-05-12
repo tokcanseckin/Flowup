@@ -132,6 +132,13 @@ export interface WordLookupEntry {
   looked_up_at: number   // Unix seconds
 }
 
+export interface LocalizationItem {
+  key: string
+  en: string
+  tr: string
+  ru: string
+}
+
 export interface AlignmentTask {
   id: number
   status: 'pending' | 'processing' | 'done' | 'failed'
@@ -584,6 +591,34 @@ export const api = {
 
   removeListened: (songId: number, headers: HeadersInit): Promise<void> =>
     fetch(`/api/me/listened/${songId}`, { method: 'DELETE', headers }).then(async r => {
+      if (!r.ok && r.status !== 204) {
+        const body = await r.json().catch(() => ({ detail: r.statusText })) as { detail?: string }
+        throw new Error(body.detail ?? `API error ${r.status}`)
+      }
+    }),
+
+  getLocalizations: (): Promise<LocalizationItem[]> =>
+    apiFetch('/localizations'),
+
+  upsertLocalization: (key: string, body: { en: string; tr: string; ru: string }): Promise<LocalizationItem> =>
+    apiFetch(`/admin/localizations?key=${encodeURIComponent(key)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...getAdminHeaders() },
+      body: JSON.stringify(body),
+    }),
+
+  updateLocalization: (key: string, body: { en: string; tr: string; ru: string }): Promise<LocalizationItem> =>
+    apiFetch(`/admin/localizations/${encodeURIComponent(key)}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', ...getAdminHeaders() },
+      body: JSON.stringify(body),
+    }),
+
+  deleteLocalization: (key: string): Promise<void> =>
+    fetch(`/api/admin/localizations/${encodeURIComponent(key)}`, {
+      method: 'DELETE',
+      headers: getAdminHeaders(),
+    }).then(async r => {
       if (!r.ok && r.status !== 204) {
         const body = await r.json().catch(() => ({ detail: r.statusText })) as { detail?: string }
         throw new Error(body.detail ?? `API error ${r.status}`)
