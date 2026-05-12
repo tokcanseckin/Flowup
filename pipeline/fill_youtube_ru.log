@@ -1,0 +1,101 @@
+Fetching songs from https://singoling.com …
+Total songs: 150
+Songs to process: 24
+
+[1/24] ATL — Марабу
+    → Match: 'Марабу'  channel='ATL ACIDHOUZE'  title_sim=1.00  score=1.00
+      https://www.youtube.com/watch?v=GUOTtXDDxSI
+    ✓ Updated
+[2/24] Машина Времени — Поворот
+    → Match: 'Поворот'  channel='Машина Времени'  title_sim=1.00  score=1.00
+      https://www.youtube.com/watch?v=6cw-vz7vS-8
+    ✓ Updated
+[3/24] Ленинград — Экспонат
+    → Match: 'Ленинград - Экспонат'  channel='Paper Swan Music'  title_sim=0.95  score=1.00
+      https://www.youtube.com/watch?v=V9KJAxt269Y
+    ✓ Updated
+[4/24] Мумий Тролль — Утекай
+    → Match: 'Утекай'  channel='Mumiy Troll - Topic'  title_sim=1.00  score=1.00
+      https://www.youtube.com/watch?v=SraTD8cpg0o
+    ✓ Updated
+[5/24] Би-2 — Молитва
+    → Match: 'Молитва'  channel='Би-2'  title_sim=1.00  score=1.00
+      https://www.youtube.com/watch?v=g8ANZClR4UI
+    ✓ Updated
+[6/24] Сплин — Орбит без сахара
+    → Match: 'Сплин - Орбит без сахара'  channel='Russian music with English subtitles'  title_sim=0.96  score=1.00
+      https://www.youtube.com/watch?v=Y1rPa9KK1w4
+    ✓ Updated
+[7/24] Земфира — Прощай
+    ✗ No confident match found
+[8/24] Скриптонит — Положение
+    → Match: 'Положение'  channel='Skryptonite'  title_sim=1.00  score=1.00
+      https://www.youtube.com/watch?v=nkncpcanly0
+    ✓ Updated
+[9/24] Фараон — Унесённые ветром
+    → Match: 'Унесённые Ветром'  channel='Release - Topic'  title_sim=1.00  score=1.00
+      https://www.youtube.com/watch?v=0bZ6Qn3zMm4
+    ✓ Updated
+[10/24] Молчат Дома — Тоска
+    ✗ No confident match found
+[11/24] Кино — Бошетунмай
+    → Match: 'Бошетунмай'  channel='Группа КИНО'  title_sim=1.00  score=1.00
+      https://www.youtube.com/watch?v=86lHZMGWWiQ
+    ✓ Updated
+[12/24] Алиса — Небо славян
+    → Match: 'Небо славян'  channel='alisachannel'  title_sim=1.00  score=1.00
+      https://www.youtube.com/watch?v=Nb7BZbsm_Lw
+    ✓ Updated
+[13/24] Наутилус Помпилиус — Гудбай Америка
+    → Match: 'Наутилус Помпилиус - Гуд-бай Америка'  channel='7re1'  title_sim=0.96  score=0.96
+      https://www.youtube.com/watch?v=lNTTm9Bc6Eo
+    ✓ Updated
+[14/24] Аквариум — Поезд в огне
+    → Match: 'Поезд в Огне'  channel='Aquarium - Topic'  title_sim=1.00  score=1.00
+      https://www.youtube.com/watch?v=DKQmDZdGVjg
+    ✓ Updated
+[15/24] Янка Дягилева — От большого ума
+    → Match: 'От большого ума'  channel='Yanka - Topic'  title_sim=1.00  score=1.00
+      https://www.youtube.com/watch?v=sQODGos_sug
+    ✓ Updated
+[16/24] Гражданская оборона — Всё идёт по плану
+    → Match: 'Все идет по плану'  channel='Egor Letov - Topic'  title_sim=1.00  score=1.00
+      https://www.youtube.com/watch?v=HgIVasI24Qo
+    ✓ Updated
+[17/24] ДДТ — Это всё
+    → Match: 'Это всё'  channel='officialddt'  title_sim=1.00  score=1.00
+      https://www.youtube.com/watch?v=Wc1sWBXl4x8
+    ✓ Updated
+[18/24] Александр Галич — Облака
+    → Match: 'Александр Галич - Облака'  channel='TheVideoBard'  title_sim=0.96  score=0.96
+      https://www.youtube.com/watch?v=9qPnVsV9L08
+    ✓ Updated
+[19/24] Булат Окуджава — Грузинская песня
+    → Match: 'Грузинская песня'  channel='Bulat Okudzhava - Topic'  title_sim=1.00  score=1.00
+      https://www.youtube.com/watch?v=VYqAXlJvM9Y
+    ✓ Updated
+[20/24] Noize MC — Выдыхай
+    → Match: 'Выдыхай'  channel='Noize MC'  title_sim=1.00  score=1.00
+      https://www.youtube.com/watch?v=1I4_0qSOP0A
+    ✓ Updated
+[21/24] Хаски — Поэма о Родине
+    → Match: 'Хаски. Поэма о Родине'  channel='Сергей ***'  title_sim=0.98  score=0.98
+      https://www.youtube.com/watch?v=Va2g_Z9ivT8
+    ✓ Updated
+[22/24] Окcимирон — Признаки жизни
+    → Match: 'Oxxxymiron - Признаки жизни'  channel='oxxxymironofficial'  title_sim=0.68  score=0.83
+      https://www.youtube.com/watch?v=tV7xNtLD1wM
+    ✓ Updated
+[23/24] Владимир Высоцкий / Vladimir Vysotsky — Охота на волков
+    → Match: 'Охота на волков'  channel='Владимир Высоцкий'  title_sim=1.00  score=1.00
+      https://www.youtube.com/watch?v=5E5IlVsfFEM
+    ✓ Updated
+[24/24] Баста / Basta — Моя игра
+    → Match: 'Песня моя игра'  channel='Vse Music 2'  title_sim=0.73  score=0.88
+      https://www.youtube.com/watch?v=FypeLfpgciU
+    ✓ Updated
+
+── Summary ────────────────────────────────────────────
+  Found / updated : 22
+  No match        : 2
+  Errors          : 0

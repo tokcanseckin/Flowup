@@ -1,0 +1,1782 @@
+  [Info] Auto-generated URI: local:-
+────────────────────────────────────────────────────────────
+  FlowUp — Data Pipeline  [Russian]
+────────────────────────────────────────────────────────────
+
+[1/5] Fetching lyrics from LRCLIB …
+  [LRCLIB] Searching 'Калинка' by '' …
+  [LRCLIB] Found (id=2265213, title=Катюша)
+       Parsed 20 lyric lines.
+
+[2/5] Translating via DeepL …
+  [DeepL] No API key – trying Argos offline fallback.
+  [Argos] Translating 20 lines (ru -> en) using local model.
+
+[3/5] Loading Russian NLP backend …
+       pymorphy3 (ru) ready.
+       ruaccent ready.
+[Dictionary] Loaded 87,706 words from local cache.
+  [OpenRussian] Dictionary loaded.
+
+[4/5] Processing lines …
+    1/20: Расцветали яблони и груши
+    2/20: Поплыли туманы над рекой
+    3/20: Выходила на берег Катюша
+    4/20: На высокий берег на крутой
+    5/20: Выходила, песню заводила
+    6/20: Про степного сизого орла
+    7/20: Про того, которого любила
+    8/20: Про того, чьи письма берегла
+    9/20: Ой, ты, песня, песенка девичья
+   10/20: Ты лети за ясным солнцем вслед
+   11/20: И бойцу на дальнем пограничье
+   12/20: От Катюши передай привет
+   13/20: Пусть он вспомнит девушку простую
+   14/20: Пусть услышит, как она поет
+   15/20: Пусть он землю бережет родную
+   16/20: А любовь Катюша сбережет
+   17/20: Расцветали яблони и груши
+   18/20: Поплыли туманы над рекой
+   19/20: Выходила на берег Катюша
+   20/20: На высокий берег на крутой
+
+[5/5] Writing song_data.json …
+       Written to /Users/seckintokcan/Documents/The Foundry/Active/Flowup/pipeline/song_data.json
+
+[6/5] Pushing to backend: https://singoling.com/api/songs …
+  [Backend] Song stored (id=136).
+  [Backend] Assigning song 136 to playlist 4 …
+  [Backend] Song added to playlist 4.
+
+✓  Done — 20 lines.
+────────────────────────────────────────────────────────────
+  [Info] Auto-generated URI: local:-
+────────────────────────────────────────────────────────────
+  FlowUp — Data Pipeline  [Russian]
+────────────────────────────────────────────────────────────
+
+[1/5] Fetching lyrics from LRCLIB …
+  [LRCLIB] Searching 'Катюша' by '' …
+  [LRCLIB] Found (id=689817, title=Катюша)
+       Parsed 20 lyric lines.
+
+[2/5] Translating via DeepL …
+  [DeepL] No API key – trying Argos offline fallback.
+  [Argos] Translating 20 lines (ru -> en) using local model.
+
+[3/5] Loading Russian NLP backend …
+       pymorphy3 (ru) ready.
+       ruaccent ready.
+[Dictionary] Loaded 87,706 words from local cache.
+  [OpenRussian] Dictionary loaded.
+
+[4/5] Processing lines …
+    1/20: Расцветали яблони и груши,
+    2/20: Поплыли туманы над рекой.
+    3/20: Выходила на берег Катюша,
+    4/20: На высокий берег на крутой.
+    5/20: Выходила, песню заводила
+    6/20: Про степного сизого орла,
+    7/20: Про того, которого любила,
+    8/20: Про того, чьи письма берегла.
+    9/20: Ой, ты, песня, песенка девичья,
+   10/20: Ты лети за ясным солнцем вслед
+   11/20: И бойцу на дальнем пограничье
+   12/20: От Катюши передай привет.
+   13/20: Пусть он вспомнит девушку простую,
+   14/20: Пусть услышит, как она поет,
+   15/20: Пусть он землю бережет родную,
+   16/20: А любовь Катюша сбережет.
+   17/20: Расцветали яблони и груши,
+   18/20: Поплыли туманы над рекой.
+   19/20: Выходила на берег Катюша,
+   20/20: На высокий берег на крутой
+
+[5/5] Writing song_data.json …
+       Written to /Users/seckintokcan/Documents/The Foundry/Active/Flowup/pipeline/song_data.json
+
+[6/5] Pushing to backend: https://singoling.com/api/songs …
+  [Backend] Song stored (id=137).
+  [Backend] Assigning song 137 to playlist 4 …
+  [Backend] Song added to playlist 4.
+
+✓  Done — 20 lines.
+────────────────────────────────────────────────────────────
+  [Info] Auto-generated URI: local:vladimir-troshin-
+────────────────────────────────────────────────────────────
+  FlowUp — Data Pipeline  [Russian]
+────────────────────────────────────────────────────────────
+
+[1/5] Fetching lyrics from LRCLIB …
+  [LRCLIB] Searching 'Подмосковные вечера' by 'Vladimir Troshin' …
+  [LRCLIB] Found (id=13755420, title=Подмосковные вечера)
+       Parsed 24 lyric lines.
+
+[2/5] Translating via DeepL …
+  [DeepL] No API key – trying Argos offline fallback.
+  [Argos] Translating 24 lines (ru -> en) using local model.
+
+[3/5] Loading Russian NLP backend …
+       pymorphy3 (ru) ready.
+       ruaccent ready.
+[Dictionary] Loaded 87,706 words from local cache.
+  [OpenRussian] Dictionary loaded.
+
+[4/5] Processing lines …
+    1/24: Не слышны в саду даже шорохи
+    2/24: Все здесь замерло до утра
+    3/24: Если б знали вы, как мне дороги
+    4/24: Подмосковные вечера
+    5/24: Если б знали вы, как мне дороги
+    6/24: Подмосковные вечера
+    7/24: Речка движется и не движется
+    8/24: Вся из лунного серебра
+    9/24: Песня слышится и не слышится
+   10/24: В эти тихие вечера
+   11/24: Песня слышится и не слышится
+   12/24: В эти тихие вечера
+   13/24: Что ж ты, милая, смотришь искоса
+   14/24: Низко голову наклоня?
+   15/24: Трудно высказать и не высказать
+   16/24: Все, что на сердце у меня
+   17/24: Трудно высказать и не высказать
+   18/24: Все, что на сердце у меня
+   19/24: А рассвет уже все заметнее...
+   20/24: Так, пожалуйста, будь добра
+   21/24: Не забудь и ты эти летние
+   22/24: Подмосковные вечера
+   23/24: Не забудь и ты эти летние
+   24/24: Подмосковные вечера
+
+[5/5] Writing song_data.json …
+       Written to /Users/seckintokcan/Documents/The Foundry/Active/Flowup/pipeline/song_data.json
+
+[6/5] Pushing to backend: https://singoling.com/api/songs …
+  [Backend] Song stored (id=138).
+  [Backend] Assigning song 138 to playlist 4 …
+  [Backend] Song added to playlist 4.
+
+✓  Done — 24 lines.
+────────────────────────────────────────────────────────────
+  [Info] Auto-generated URI: local:-
+────────────────────────────────────────────────────────────
+  FlowUp — Data Pipeline  [Russian]
+────────────────────────────────────────────────────────────
+
+[1/5] Fetching lyrics from LRCLIB …
+  [LRCLIB] Searching 'Очи чёрные' by '' …
+  [LRCLIB] Found (id=4725209, title=Очи чёрные. Старый дом)
+       Parsed 64 lyric lines.
+
+[2/5] Translating via DeepL …
+  [DeepL] No API key – trying Argos offline fallback.
+  [Argos] Translating 64 lines (ru -> en) using local model.
+
+[3/5] Loading Russian NLP backend …
+       pymorphy3 (ru) ready.
+       ruaccent ready.
+[Dictionary] Loaded 87,706 words from local cache.
+  [OpenRussian] Dictionary loaded.
+
+[4/5] Processing lines …
+    1/64: Что за дом притих
+    2/64: Погружён во мрак
+    3/64: На семи лихих
+    4/64: Продувных ветрах
+    5/64: Всеми окнами
+    6/64: Обратясь в овраг
+    7/64: А воротами
+    8/64: На проезжий тракт?
+    9/64: Ох, устал я, устал, — а лошадок распряг
+   10/64: Эй, живой кто-нибудь, выходи, помоги!
+   11/64: Никого, — только тень промелькнула в сенях
+   12/64: Да стервятник спустился и сузил круги
+   13/64: В дом заходишь как
+   14/64: Всё равно в кабак
+   15/64: А народишко
+   16/64: Каждый третий — враг
+   17/64: Своротят скулу
+   18/64: Гость непрошенный!
+   19/64: Образа в углу
+   20/64: И те перекошены
+   21/64: И затеялся смутный, чудной разговор
+   22/64: Кто-то песню стонал и гармошку терзал
+   23/64: И припадочный малый — придурок и вор
+   24/64: Мне тайком из-под скатерти нож показал
+   25/64: "Кто ответит мне
+   26/64: Что за дом такой?
+   27/64: Почему — во тьме
+   28/64: Как барак чумной?
+   29/64: Свет лампад погас
+   30/64: Воздух вылился
+   31/64: Али жить у вас
+   32/64: Разучилися?
+   33/64: Двери настежь у вас, а душа взаперти
+   34/64: Кто хозяином здесь? — напоил бы вином"
+   35/64: А в ответ мне: "Видать, был ты долго в пути
+   36/64: И людей позабыл, — мы всегда так живём!
+   37/64: Траву кушаем
+   38/64: Век — на щавеле
+   39/64: Скисли душами
+   40/64: Опрыщавели
+   41/64: Да ещё вином
+   42/64: Много тешились
+   43/64: Разоряли дом
+   44/64: Дрались, вешались"
+   45/64: "Я коней заморил, от волков ускакал
+   46/64: Укажите мне край, где светло от лампад
+   47/64: Укажите мне место, какое искал
+   48/64: Где поют, а не стонут, где пол не покат"
+   49/64: "О таких домах
+   50/64: Не слыхали мы
+   51/64: Вечно жить впотьмах
+   52/64: Привыкали мы
+   53/64: Испокону мы
+   54/64: В зле да шёпоте
+   55/64: Под иконами
+   56/64: В чёрной копоти"
+   57/64: И из смрада, где косо висят образа
+   58/64: Я, башку очертя, гнал, забросивши кнут
+   59/64: Куда кони несли да глядели глаза
+   60/64: И где люди живут, и — как люди живут
+   61/64: Сколько кануло, сколько схлынуло!
+   62/64: Жизнь кидала меня — не докинула
+   63/64: Может, спел про вас неумело я
+   64/64: Очи чёрные, скатерть белая?!
+
+[5/5] Writing song_data.json …
+       Written to /Users/seckintokcan/Documents/The Foundry/Active/Flowup/pipeline/song_data.json
+
+[6/5] Pushing to backend: https://singoling.com/api/songs …
+  [Backend] Song stored (id=139).
+  [Backend] Assigning song 139 to playlist 4 …
+  [Backend] Song added to playlist 4.
+
+✓  Done — 64 lines.
+────────────────────────────────────────────────────────────
+  [Info] Auto-generated URI: local:aleksandr-vertinsky-
+────────────────────────────────────────────────────────────
+  FlowUp — Data Pipeline  [Russian]
+────────────────────────────────────────────────────────────
+
+[1/5] Fetching lyrics from LRCLIB …
+  [LRCLIB] Searching 'Дорогой длинною' by 'Aleksandr Vertinsky' …
+  [LRCLIB] Network error: HTTPSConnectionPool(host='lrclib.net', port=443): Read timed out. (read timeout=12)
+  [LRCLIB] Looking for plain lyrics for 'Дорогой длинною' by 'Aleksandr Vertinsky' …
+  [LRCLIB] No plain lyrics found.
+ERROR: Could not retrieve synced lyrics. Aborting.
+TIP:   Provide --youtube-url for stable-ts forced alignment.
+TIP:   Pass --lrc-file <path> to use a local .lrc file as a fallback.
+  [Info] Auto-generated URI: local:-
+────────────────────────────────────────────────────────────
+  FlowUp — Data Pipeline  [Russian]
+────────────────────────────────────────────────────────────
+
+[1/5] Fetching lyrics from LRCLIB …
+  [LRCLIB] Searching 'Коробейники' by '' …
+  [LRCLIB] No synced lyrics found.
+  [LRCLIB] Looking for plain lyrics for 'Коробейники' by '' …
+  [LRCLIB] Found plain lyrics.
+ERROR: Could not retrieve synced lyrics. Aborting.
+TIP:   Provide --youtube-url for stable-ts forced alignment.
+TIP:   Pass --lrc-file <path> to use a local .lrc file as a fallback.
+  [Info] Auto-generated URI: local:-
+────────────────────────────────────────────────────────────
+  FlowUp — Data Pipeline  [Russian]
+────────────────────────────────────────────────────────────
+
+[1/5] Fetching lyrics from LRCLIB …
+  [LRCLIB] Searching 'Миленький ты мой' by '' …
+  [LRCLIB] Found (id=8915406, title=Миленький ты мой)
+       Parsed 24 lyric lines.
+
+[2/5] Translating via DeepL …
+  [DeepL] No API key – trying Argos offline fallback.
+  [Argos] Translating 24 lines (ru -> en) using local model.
+
+[3/5] Loading Russian NLP backend …
+       pymorphy3 (ru) ready.
+       ruaccent ready.
+[Dictionary] Loaded 87,706 words from local cache.
+  [OpenRussian] Dictionary loaded.
+
+[4/5] Processing lines …
+    1/24: Миленький ты мой
+    2/24: Возьми меня с собой
+    3/24: Там, в стране далёкой
+    4/24: Буду тебе женой
+    5/24: Милая моя
+    6/24: Взял бы я тебя
+    7/24: Но там, в стране далёкой
+    8/24: Есть у меня жена
+    9/24: Миленький ты мой
+   10/24: Возьми меня с собой
+   11/24: Там, в стране далёкой
+   12/24: Буду тебе сестрой
+   13/24: Милая моя
+   14/24: Взял бы я тебя
+   15/24: Но там, в стране далёкой
+   16/24: Есть у меня сестра
+   17/24: Миленький ты мой
+   18/24: Возьми меня с собой
+   19/24: Там, в стране далёкой
+   20/24: Буду тебе чужой
+   21/24: Милая моя
+   22/24: Взял бы я тебя
+   23/24: Но там, в стране далёкой
+   24/24: Чужая мне не нужна
+
+[5/5] Writing song_data.json …
+       Written to /Users/seckintokcan/Documents/The Foundry/Active/Flowup/pipeline/song_data.json
+
+[6/5] Pushing to backend: https://singoling.com/api/songs …
+  [Backend] Song stored (id=140).
+  [Backend] Assigning song 140 to playlist 4 …
+  [Backend] Song added to playlist 4.
+
+✓  Done — 24 lines.
+────────────────────────────────────────────────────────────
+  [Info] Auto-generated URI: local:-
+────────────────────────────────────────────────────────────
+  FlowUp — Data Pipeline  [Russian]
+────────────────────────────────────────────────────────────
+
+[1/5] Fetching lyrics from LRCLIB …
+  [LRCLIB] Searching 'Ой мороз мороз' by '' …
+  [LRCLIB] No synced lyrics found.
+  [LRCLIB] Looking for plain lyrics for 'Ой мороз мороз' by '' …
+  [LRCLIB] Found plain lyrics.
+ERROR: Could not retrieve synced lyrics. Aborting.
+TIP:   Provide --youtube-url for stable-ts forced alignment.
+TIP:   Pass --lrc-file <path> to use a local .lrc file as a fallback.
+  [Info] Auto-generated URI: local:-
+────────────────────────────────────────────────────────────
+  FlowUp — Data Pipeline  [Russian]
+────────────────────────────────────────────────────────────
+
+[1/5] Fetching lyrics from LRCLIB …
+  [LRCLIB] Searching 'Вечерний звон' by '' …
+  [LRCLIB] Found (id=21181491, title=Вечерний звон)
+       Parsed 20 lyric lines.
+
+[2/5] Translating via DeepL …
+  [DeepL] No API key – trying Argos offline fallback.
+  [Argos] Translating 20 lines (ru -> en) using local model.
+
+[3/5] Loading Russian NLP backend …
+       pymorphy3 (ru) ready.
+       ruaccent ready.
+[Dictionary] Loaded 87,706 words from local cache.
+  [OpenRussian] Dictionary loaded.
+
+[4/5] Processing lines …
+    1/20: Вечерний звон
+    2/20: Вечерний звон
+    3/20: Как много дум
+    4/20: Наводит он
+    5/20: О юных днях
+    6/20: В краю родном
+    7/20: Где я любил
+    8/20: Где отчий дом
+    9/20: И где я с ним
+   10/20: Навек простясь
+   11/20: Услышал звон
+   12/20: В последний раз
+   13/20: Вечерний звон
+   14/20: Вечерний звон
+   15/20: Как много дум
+   16/20: Наводит он
+   17/20: Вечерний звон
+   18/20: Вечерний звoн
+   19/20: Как много дум
+   20/20: Наводит он
+
+[5/5] Writing song_data.json …
+       Written to /Users/seckintokcan/Documents/The Foundry/Active/Flowup/pipeline/song_data.json
+
+[6/5] Pushing to backend: https://singoling.com/api/songs …
+  [Backend] Song stored (id=141).
+  [Backend] Assigning song 141 to playlist 4 …
+  [Backend] Song added to playlist 4.
+
+✓  Done — 20 lines.
+────────────────────────────────────────────────────────────
+  [Info] Auto-generated URI: local:-
+────────────────────────────────────────────────────────────
+  FlowUp — Data Pipeline  [Russian]
+────────────────────────────────────────────────────────────
+
+[1/5] Fetching lyrics from LRCLIB …
+  [LRCLIB] Searching 'Эй ухнем' by '' …
+  [LRCLIB] No synced lyrics found.
+  [LRCLIB] Looking for plain lyrics for 'Эй ухнем' by '' …
+  [LRCLIB] Found plain lyrics.
+ERROR: Could not retrieve synced lyrics. Aborting.
+TIP:   Provide --youtube-url for stable-ts forced alignment.
+TIP:   Pass --lrc-file <path> to use a local .lrc file as a fallback.
+  [Info] Auto-generated URI: local:mark-bernes-
+────────────────────────────────────────────────────────────
+  FlowUp — Data Pipeline  [Russian]
+────────────────────────────────────────────────────────────
+
+[1/5] Fetching lyrics from LRCLIB …
+  [LRCLIB] Searching 'Тёмная ночь' by 'Mark Bernes' …
+  [LRCLIB] No synced lyrics found.
+  [LRCLIB] Looking for plain lyrics for 'Тёмная ночь' by 'Mark Bernes' …
+  [LRCLIB] Found plain lyrics.
+ERROR: Could not retrieve synced lyrics. Aborting.
+TIP:   Provide --youtube-url for stable-ts forced alignment.
+TIP:   Pass --lrc-file <path> to use a local .lrc file as a fallback.
+  [Info] Auto-generated URI: local:mark-bernes-
+────────────────────────────────────────────────────────────
+  FlowUp — Data Pipeline  [Russian]
+────────────────────────────────────────────────────────────
+
+[1/5] Fetching lyrics from LRCLIB …
+  [LRCLIB] Searching 'Журавли' by 'Mark Bernes' …
+  [LRCLIB] Network error: HTTPSConnectionPool(host='lrclib.net', port=443): Read timed out. (read timeout=12)
+  [LRCLIB] Looking for plain lyrics for 'Журавли' by 'Mark Bernes' …
+  [LRCLIB] Found plain lyrics.
+ERROR: Could not retrieve synced lyrics. Aborting.
+TIP:   Provide --youtube-url for stable-ts forced alignment.
+TIP:   Pass --lrc-file <path> to use a local .lrc file as a fallback.
+  [Info] Auto-generated URI: local:lev-leshchenko-
+────────────────────────────────────────────────────────────
+  FlowUp — Data Pipeline  [Russian]
+────────────────────────────────────────────────────────────
+
+[1/5] Fetching lyrics from LRCLIB …
+  [LRCLIB] Searching 'День Победы' by 'Lev Leshchenko' …
+  [LRCLIB] Found (id=17606994, title=День победы)
+       Parsed 28 lyric lines.
+
+[2/5] Translating via DeepL …
+  [DeepL] No API key – trying Argos offline fallback.
+  [Argos] Translating 28 lines (ru -> en) using local model.
+
+[3/5] Loading Russian NLP backend …
+       pymorphy3 (ru) ready.
+       ruaccent ready.
+[Dictionary] Loaded 87,706 words from local cache.
+  [OpenRussian] Dictionary loaded.
+
+[4/5] Processing lines …
+    1/28: День Победы, как он был от нас далёк
+    2/28: Как в костре потухшем таял уголёк
+    3/28: Были вёрсты, обгорелые, в пыли
+    4/28: Этот день мы приближали как могли
+    5/28: Этот День Победы порохом пропах
+    6/28: Это праздник с сединою на висках
+    7/28: Это радость со слезами на глазах
+    8/28: День Победы, День Победы, День Победы
+    9/28: Дни и ночи у мартеновских печей
+   10/28: Не смыкала наша Родина очей
+   11/28: Дни и ночи битву трудную вели
+   12/28: Этот день мы приближали как могли
+   13/28: Этот День Победы порохом пропах
+   14/28: Это праздник с сединою на висках
+   15/28: Это радость со слезами на глазах
+   16/28: День Победы, День Победы, День Победы
+   17/28: Здравствуй, мама, возвратились мы не все
+   18/28: Босиком бы пробежаться по росе
+   19/28: Пол-Европы, прошагали пол-Земли
+   20/28: Этот день мы приближали как могли
+   21/28: Этот День Победы порохом пропах
+   22/28: Это праздник с сединою на висках
+   23/28: Это радость со слезами на глазах
+   24/28: День Победы, День Победы, День Победы
+   25/28: Этот День Победы порохом пропах
+   26/28: Это праздник с сединою на висках
+   27/28: Это радость со слезами на глазах
+   28/28: День Победы, День Победы, День Победы
+
+[5/5] Writing song_data.json …
+       Written to /Users/seckintokcan/Documents/The Foundry/Active/Flowup/pipeline/song_data.json
+
+[6/5] Pushing to backend: https://singoling.com/api/songs …
+  [Backend] Song stored (id=142).
+  [Backend] Assigning song 142 to playlist 4 …
+  [Backend] Song added to playlist 4.
+
+✓  Done — 28 lines.
+────────────────────────────────────────────────────────────
+  [Info] Auto-generated URI: local:-
+────────────────────────────────────────────────────────────
+  FlowUp — Data Pipeline  [Russian]
+────────────────────────────────────────────────────────────
+
+[1/5] Fetching lyrics from LRCLIB …
+  [LRCLIB] Searching 'Смуглянка' by '' …
+  [LRCLIB] No synced lyrics found.
+  [LRCLIB] Looking for plain lyrics for 'Смуглянка' by '' …
+  [LRCLIB] Found plain lyrics.
+ERROR: Could not retrieve synced lyrics. Aborting.
+TIP:   Provide --youtube-url for stable-ts forced alignment.
+TIP:   Pass --lrc-file <path> to use a local .lrc file as a fallback.
+  [Info] Auto-generated URI: local:-
+────────────────────────────────────────────────────────────
+  FlowUp — Data Pipeline  [Russian]
+────────────────────────────────────────────────────────────
+
+[1/5] Fetching lyrics from LRCLIB …
+  [LRCLIB] Searching 'Пусть бегут неуклюже' by '' …
+  [LRCLIB] Looking for plain lyrics for 'Пусть бегут неуклюже' by '' …
+  [LRCLIB] No plain lyrics found.
+ERROR: Could not retrieve synced lyrics. Aborting.
+TIP:   Provide --youtube-url for stable-ts forced alignment.
+TIP:   Pass --lrc-file <path> to use a local .lrc file as a fallback.
+  [Info] Auto-generated URI: local:-
+────────────────────────────────────────────────────────────
+  FlowUp — Data Pipeline  [Russian]
+────────────────────────────────────────────────────────────
+
+[1/5] Fetching lyrics from LRCLIB …
+  [LRCLIB] Searching 'Голубой вагон' by '' …
+  [LRCLIB] No synced lyrics found.
+  [LRCLIB] Looking for plain lyrics for 'Голубой вагон' by '' …
+  [LRCLIB] Found plain lyrics.
+ERROR: Could not retrieve synced lyrics. Aborting.
+TIP:   Provide --youtube-url for stable-ts forced alignment.
+TIP:   Pass --lrc-file <path> to use a local .lrc file as a fallback.
+  [Info] Auto-generated URI: local:-
+────────────────────────────────────────────────────────────
+  FlowUp — Data Pipeline  [Russian]
+────────────────────────────────────────────────────────────
+
+[1/5] Fetching lyrics from LRCLIB …
+  [LRCLIB] Searching 'Я был когда-то странной игрушкой' by '' …
+  [LRCLIB] Looking for plain lyrics for 'Я был когда-то странной игрушкой' by '' …
+  [LRCLIB] No plain lyrics found.
+ERROR: Could not retrieve synced lyrics. Aborting.
+TIP:   Provide --youtube-url for stable-ts forced alignment.
+TIP:   Pass --lrc-file <path> to use a local .lrc file as a fallback.
+  [Info] Auto-generated URI: local:-
+────────────────────────────────────────────────────────────
+  FlowUp — Data Pipeline  [Russian]
+────────────────────────────────────────────────────────────
+
+[1/5] Fetching lyrics from LRCLIB …
+  [LRCLIB] Searching 'Антошка' by '' …
+  [LRCLIB] Found (id=12531306, title=Антошка)
+       Parsed 22 lyric lines.
+
+[2/5] Translating via DeepL …
+  [DeepL] No API key – trying Argos offline fallback.
+  [Argos] Translating 22 lines (ru -> en) using local model.
+
+[3/5] Loading Russian NLP backend …
+       pymorphy3 (ru) ready.
+       ruaccent ready.
+[Dictionary] Loaded 87,706 words from local cache.
+  [OpenRussian] Dictionary loaded.
+
+[4/5] Processing lines …
+    1/22: Антошка, Антошка, пойдём копать картошку
+    2/22: Антошка, Антошка, пойдём копать картошку
+    3/22: Дили-дили (дили-дили), трали-вали (трали-вали)
+    4/22: Это мы не проходили, это нам не задавали
+    5/22: Дили-дили (дили-дили), трали-вали (трали-вали)
+    6/22: Это мы не проходили, это нам не задавали
+    7/22: Па-рам-пам-пам, па-рам-пам-пам
+    8/22: Антошка, Антошка, сыграй нам на гармошке
+    9/22: Антошка, Антошка, сыграй нам на гармошке
+   10/22: Дили-дили (дили-дили), трали-вали (трали-вали)
+   11/22: Это мы не проходили, это нам не задавали
+   12/22: Дили-дили (дили-дили), трали-вали (трали-вали)
+   13/22: Это мы не проходили, это нам не задавали
+   14/22: Па-рам-пам-пам, па-рам-пам-пам
+   15/22: Антошка, Антошка, готовь к обеду ложку
+   16/22: Антошка, Антошка, готовь к обеду ложку
+   17/22: Дили-дили (дили-дили), трали-вали (трали-вали)
+   18/22: Это, братцы, мне по силе, откажусь теперь едва ли
+   19/22: Дили-дили (дили-дили), трали-вали (трали-вали)
+   20/22: Это, братцы, мне по силе, откажусь теперь едва ли
+   21/22: Па-рам-пам-пам, па-рам-пам-пам
+   22/22: Па-рам-пам-пам
+
+[5/5] Writing song_data.json …
+       Written to /Users/seckintokcan/Documents/The Foundry/Active/Flowup/pipeline/song_data.json
+
+[6/5] Pushing to backend: https://singoling.com/api/songs …
+  [Backend] Song stored (id=143).
+  [Backend] Assigning song 143 to playlist 4 …
+  [Backend] Song added to playlist 4.
+
+✓  Done — 22 lines.
+────────────────────────────────────────────────────────────
+  [Info] Auto-generated URI: local:-
+────────────────────────────────────────────────────────────
+  FlowUp — Data Pipeline  [Russian]
+────────────────────────────────────────────────────────────
+
+[1/5] Fetching lyrics from LRCLIB …
+  [LRCLIB] Searching 'В траве сидел кузнечик' by '' …
+  [LRCLIB] Found (id=22155944, title=В траве сидел кузнечик)
+       Parsed 32 lyric lines.
+
+[2/5] Translating via DeepL …
+  [DeepL] No API key – trying Argos offline fallback.
+  [Argos] Translating 32 lines (ru -> en) using local model.
+
+[3/5] Loading Russian NLP backend …
+       pymorphy3 (ru) ready.
+       ruaccent ready.
+[Dictionary] Loaded 87,706 words from local cache.
+  [OpenRussian] Dictionary loaded.
+
+[4/5] Processing lines …
+    1/32: В траве сидел кузнечик,
+    2/32: В траве сидел кузнечик,
+    3/32: Совсем как огуречик,
+    4/32: Зелененький он был.
+    5/32: Представьте себе, представьте себе,
+    6/32: Совсем как огуречик.
+    7/32: Представьте себе, представьте себе,
+    8/32: Зелененький он был.
+    9/32: Он ел одну лишь травку,
+   10/32: Он ел одну лишь травку,
+   11/32: Не трогал и козявку
+   12/32: И с мухами дружил.
+   13/32: Представьте себе, представьте себе,
+   14/32: Не трогал и козявку,
+   15/32: Представьте себе, представьте себе,
+   16/32: И с мухами дружил.
+   17/32: Но вот пришла лягушка,
+   18/32: Но вот пришла лягушка -
+   19/32: Прожорливое брюшко -
+   20/32: И съела кузнеца.
+   21/32: Представьте себе, представьте себе,
+   22/32: Прожорливое брюшко.
+   23/32: Представьте себе, представьте себе,
+   24/32: И съела кузнеца.
+   25/32: Не думал, не гадал он,
+   26/32: Не думал, не гадал он,
+   27/32: Никак не ожидал он
+   28/32: Такого вот конца.
+   29/32: Представьте себе, представьте себе,
+   30/32: Никак не ожидал он,
+   31/32: Представьте себе, представьте себе,
+   32/32: Такого вот конца.
+
+[5/5] Writing song_data.json …
+       Written to /Users/seckintokcan/Documents/The Foundry/Active/Flowup/pipeline/song_data.json
+
+[6/5] Pushing to backend: https://singoling.com/api/songs …
+  [Backend] Song stored (id=144).
+  [Backend] Assigning song 144 to playlist 4 …
+  [Backend] Song added to playlist 4.
+
+✓  Done — 32 lines.
+────────────────────────────────────────────────────────────
+  [Info] Auto-generated URI: local:-
+────────────────────────────────────────────────────────────
+  FlowUp — Data Pipeline  [Russian]
+────────────────────────────────────────────────────────────
+
+[1/5] Fetching lyrics from LRCLIB …
+  [LRCLIB] Searching 'В лесу родилась ёлочка' by '' …
+  [LRCLIB] Network error: HTTPSConnectionPool(host='lrclib.net', port=443): Read timed out. (read timeout=12)
+  [LRCLIB] Looking for plain lyrics for 'В лесу родилась ёлочка' by '' …
+  [LRCLIB] Found plain lyrics.
+ERROR: Could not retrieve synced lyrics. Aborting.
+TIP:   Provide --youtube-url for stable-ts forced alignment.
+TIP:   Pass --lrc-file <path> to use a local .lrc file as a fallback.
+  [Info] Auto-generated URI: local:-
+────────────────────────────────────────────────────────────
+  FlowUp — Data Pipeline  [Russian]
+────────────────────────────────────────────────────────────
+
+[1/5] Fetching lyrics from LRCLIB …
+  [LRCLIB] Searching 'Я на солнышке лежу' by '' …
+  [LRCLIB] Looking for plain lyrics for 'Я на солнышке лежу' by '' …
+  [LRCLIB] No plain lyrics found.
+ERROR: Could not retrieve synced lyrics. Aborting.
+TIP:   Provide --youtube-url for stable-ts forced alignment.
+TIP:   Pass --lrc-file <path> to use a local .lrc file as a fallback.
+  [Info] Auto-generated URI: local:-
+────────────────────────────────────────────────────────────
+  FlowUp — Data Pipeline  [Russian]
+────────────────────────────────────────────────────────────
+
+[1/5] Fetching lyrics from LRCLIB …
+  [LRCLIB] Searching 'Облака' by '' …
+  [LRCLIB] Found (id=1023558, title=Любите, девушки)
+       Parsed 27 lyric lines.
+
+[2/5] Translating via DeepL …
+  [DeepL] No API key – trying Argos offline fallback.
+  [Argos] Translating 27 lines (ru -> en) using local model.
+
+[3/5] Loading Russian NLP backend …
+       pymorphy3 (ru) ready.
+       ruaccent ready.
+[Dictionary] Loaded 87,706 words from local cache.
+  [OpenRussian] Dictionary loaded.
+
+[4/5] Processing lines …
+    1/27: В самый полный штиль, и в самый сильный ураган
+    2/27: Ходят в синем море корабли
+    3/27: Может, потому-то и понятно морякам
+    4/27: Что такое океан любви
+    5/27: Этим смелым парням и беда – не беда
+    6/27: Путеводная им помогает звезда
+    7/27: Любите девушки простых романтиков
+    8/27: Отважных лётчиков и моряков
+    9/27: Бросайте девушки домашних мальчиков
+   10/27: Не стоит им дарить свою любовь
+   11/27: Начертил на синем небе "я тебя люблю"
+   12/27: Белым следом быстрый самолёт
+   13/27: Кто поздравит с днём рожденья девушку свою
+   14/27: Так, как это делает пилот
+   15/27: Этим смелым парням и беда – не беда
+   16/27: Путеводная им помогает звезда
+   17/27: Любите девушки простых романтиков
+   18/27: Отважных лётчиков и моряков
+   19/27: Бросайте девушки домашних мальчиков
+   20/27: Не стоит им дарить свою любовь
+   21/27: Этим смелым парням и беда – не беда
+   22/27: Путеводная им помогает звезда-а-а
+   23/27: Любите девушки простых романтиков
+   24/27: Отважных лётчиков и моряков
+   25/27: Бросайте девушки домашних мальчиков
+   26/27: Не стоит им дарить свою любовь
+   27/27: Не стоит им дарить свою любовь
+
+[5/5] Writing song_data.json …
+       Written to /Users/seckintokcan/Documents/The Foundry/Active/Flowup/pipeline/song_data.json
+
+[6/5] Pushing to backend: https://singoling.com/api/songs …
+  [Backend] Song stored (id=145).
+  [Backend] Assigning song 145 to playlist 4 …
+  [Backend] Song added to playlist 4.
+
+✓  Done — 27 lines.
+────────────────────────────────────────────────────────────
+  [Info] Auto-generated URI: local:-
+────────────────────────────────────────────────────────────
+  FlowUp — Data Pipeline  [Russian]
+────────────────────────────────────────────────────────────
+
+[1/5] Fetching lyrics from LRCLIB …
+  [LRCLIB] Searching 'Кабы не было зимы' by '' …
+  [LRCLIB] Found (id=31825149, title=Кабы не было зимы)
+       Parsed 32 lyric lines.
+
+[2/5] Translating via DeepL …
+  [DeepL] No API key – trying Argos offline fallback.
+  [Argos] Translating 32 lines (ru -> en) using local model.
+
+[3/5] Loading Russian NLP backend …
+       pymorphy3 (ru) ready.
+       ruaccent ready.
+[Dictionary] Loaded 87,706 words from local cache.
+  [OpenRussian] Dictionary loaded.
+
+[4/5] Processing lines …
+    1/32: Кабы не было зимы
+    2/32: В гоpодах и сёлах
+    3/32: Hикогда б не знали мы
+    4/32: Этих дней весёлых
+    5/32: Hе кружила б малышня
+    6/32: Возле снежной бабы
+    7/32: Hе петляла бы лыжня
+    8/32: Кабы, кабы, кабы
+    9/32: Кабы не было зимы
+   10/32: В этом нет секрета
+   11/32: От жары б увяли мы
+   12/32: Hадоело б лето
+   13/32: Hе пришла бы к нам метель
+   14/32: Hа денёк хотя бы
+   15/32: И снегирь не сел на ель
+   16/32: Кабы, кабы, кабы
+   17/32: Кабы не было зимы
+   18/32: А всё время лето
+   19/32: Мы б не знали кутерьмы
+   20/32: Hовогодней этой
+   21/32: Hе спешил бы Дед Мороз
+   22/32: К нам через ухабы
+   23/32: Лёд на речке б не замёрз
+   24/32: Кабы, кабы, кабы
+   25/32: Лёд на речке б не замёрз
+   26/32: Кабы, кабы, кабы
+   27/32: Лёд на речке б не замёрз
+   28/32: Кабы, кабы, кабы
+   29/32: Лёд на речке б не замёрз
+   30/32: Кабы, кабы, кабы
+   31/32: Кабы, кабы, кабы
+   32/32: Кабы, кабы, кабы
+
+[5/5] Writing song_data.json …
+       Written to /Users/seckintokcan/Documents/The Foundry/Active/Flowup/pipeline/song_data.json
+
+[6/5] Pushing to backend: https://singoling.com/api/songs …
+  [Backend] Song stored (id=146).
+  [Backend] Assigning song 146 to playlist 4 …
+  [Backend] Song added to playlist 4.
+
+✓  Done — 32 lines.
+────────────────────────────────────────────────────────────
+  [Info] Auto-generated URI: local:-
+────────────────────────────────────────────────────────────
+  FlowUp — Data Pipeline  [Russian]
+────────────────────────────────────────────────────────────
+
+[1/5] Fetching lyrics from LRCLIB …
+  [LRCLIB] Searching 'Крылатые качели' by '' …
+  [LRCLIB] Found (id=10939857, title=Крылатые качели)
+       Parsed 48 lyric lines.
+
+[2/5] Translating via DeepL …
+  [DeepL] No API key – trying Argos offline fallback.
+  [Argos] Translating 48 lines (ru -> en) using local model.
+
+[3/5] Loading Russian NLP backend …
+       pymorphy3 (ru) ready.
+       ruaccent ready.
+[Dictionary] Loaded 87,706 words from local cache.
+  [OpenRussian] Dictionary loaded.
+
+[4/5] Processing lines …
+    1/48: В юном месяце апреле
+    2/48: В старом парке тает снег
+    3/48: И веселые качели
+    4/48: Начинают свой разбег
+    5/48: Позабыто все на свете!
+    6/48: Сердце замерло в груди!
+    7/48: Только небо, только ветер,
+    8/48: Только радость впереди.
+    9/48: Только небо, только ветер,
+   10/48: Только радость впереди.
+   11/48: Взмывая выше ели,
+   12/48: Не ведая преград
+   13/48: Крылатые качели
+   14/48: Летят, летят, летят.
+   15/48: Крылатые качели
+   16/48: Летят, летят, летят.
+   17/48: Детство кончится когда-то,
+   18/48: Ведь оно не навсегда,
+   19/48: Станут взрослыми ребята,
+   20/48: Разлетятся кто-куда
+   21/48: А пока мы только дети,
+   22/48: Нам расти еще расти
+   23/48: Только небо, только ветер,
+   24/48: Только радость впереди.
+   25/48: Только небо, только ветер,
+   26/48: Только радость впереди.
+   27/48: Взмывая выше ели,
+   28/48: Не ведая преград
+   29/48: Крылатые качели
+   30/48: Летят, летят, летят.
+   31/48: Крылатые качели
+   32/48: Летят, летят, летят.
+   33/48: Шар земной быстрей кружится
+   34/48: От весенней кутерьмы
+   35/48: И поют над нами птицы.
+   36/48: И поем как птицы мы.
+   37/48: Позабыто все на свете,
+   38/48: Сердце замерло в груди
+   39/48: Только небо, только ветер,
+   40/48: Только радость впереди.
+   41/48: Только небо, только ветер,
+   42/48: Только радость впереди.
+   43/48: Взмывая выше ели,
+   44/48: Не ведая преград
+   45/48: Крылатые качели
+   46/48: Летят, летят, летят.
+   47/48: Крылатые качели
+   48/48: Летят, летят, летят.
+
+[5/5] Writing song_data.json …
+       Written to /Users/seckintokcan/Documents/The Foundry/Active/Flowup/pipeline/song_data.json
+
+[6/5] Pushing to backend: https://singoling.com/api/songs …
+  [Backend] Song stored (id=147).
+  [Backend] Assigning song 147 to playlist 4 …
+  [Backend] Song added to playlist 4.
+
+✓  Done — 48 lines.
+────────────────────────────────────────────────────────────
+  [Info] Auto-generated URI: local:-
+────────────────────────────────────────────────────────────
+  FlowUp — Data Pipeline  [Russian]
+────────────────────────────────────────────────────────────
+
+[1/5] Fetching lyrics from LRCLIB …
+  [LRCLIB] Searching 'Прекрасное далёко' by '' …
+  [LRCLIB] Found (id=5481963, title=Прекрасное Далёко (feat. Брутто))
+       Parsed 56 lyric lines.
+
+[2/5] Translating via DeepL …
+  [DeepL] No API key – trying Argos offline fallback.
+  [Argos] Translating 56 lines (ru -> en) using local model.
+
+[3/5] Loading Russian NLP backend …
+       pymorphy3 (ru) ready.
+       ruaccent ready.
+[Dictionary] Loaded 87,706 words from local cache.
+  [OpenRussian] Dictionary loaded.
+
+[4/5] Processing lines …
+    1/56: С запада до юго-востока
+    2/56: В лабиринтах, блоках высоток
+    3/56: За гранью болевого порога
+    4/56: Бродим в поисках прекрасного далёка
+    5/56: С запада до юго-востока
+    6/56: В лабиринтах, блоках высоток
+    7/56: За гранью болевого порога
+    8/56: Бродим в поисках прекрасного далёка
+    9/56: Может, я моложусь, может, в яму ложусь
+   10/56: Мир — то ли ягодный морс, то ли жалобный блюз
+   11/56: Воздушный свадебный вальс, учащается пульс
+   12/56: Абсурдный траурный джаз, опускается груз
+   13/56: При старческой болезни пиздюком курю в подъезде
+   14/56: Гляжу в режиме Бога на свою судьбу в разрезе
+   15/56: Васильевская стрелка на недремлющем Breguet'е
+   16/56: Вожу себя в музеи, тащу свой труп в пакете (ха-ха-ха-ха
+   17/56: Мы лаем всласть на караван
+   18/56: На мне вязь — это харам
+   19/56: Время вспять, и нам усатый секундант объявит
+   20/56: "Господа, вращайте барабан!"
+   21/56: С запада до юго-востока
+   22/56: В лабиринтах, блоках высоток
+   23/56: За гранью болевого порога
+   24/56: Бродим в поисках прекрасного далёка
+   25/56: С запада до юго-востока
+   26/56: В лабиринтах, блоках высоток
+   27/56: За гранью болевого порога
+   28/56: Бродим в поисках прекрасного далёка (е, эй, goddamn, Бр
+   29/56: В лагерях, на строгом, в острогах (bоу, what?)
+   30/56: Нихуя прекрасного, хоть и далёко (а-а)
+   31/56: Опер думал о высоком — он думал про пост
+   32/56: Барыга думал о высоком — он думал про спрос
+   33/56: А я думал про свой возраст дожития (я)
+   34/56: Пока ехал на самокате по Moscow City я
+   35/56: Житие-бытие твое — АУЕ (АУЕ)
+   36/56: Но ты бы там пожил-побыл — охуел (пау)
+   37/56: За нас решают и нарушают наши права
+   38/56: Или мы нарушаем, и они просят наши права (what?)
+   39/56: Уезжает рэп-интеллигенция
+   40/56: Влади теперь знает, что им делать в Греции (пу-пу-пу)
+   41/56: Нет зависти, что у соседа трава зеленее (а)
+   42/56: Ведь тогда соседа примут быстрее
+   43/56: А я тащу свой труп в пакете мимо мавзолея (what?)
+   44/56: Севернее нас только Корея
+   45/56: Одним детям нужны "Мстители" и "Hello Kitty" (what?)
+   46/56: Другим детям нужна услуга "трезвый родитель"
+   47/56: А я бухаю и пишу, будто Хайям (будто Хайям)
+   48/56: Если на мне твоя мразь — это харам (это харам)
+   49/56: С запада до юго-востока
+   50/56: В лабиринтах, блоках высоток
+   51/56: За гранью болевого порога
+   52/56: Бродим в поисках прекрасного далёка
+   53/56: С запада до юго-востока
+   54/56: В лабиринтах, блоках высоток
+   55/56: За гранью болевого порога
+   56/56: Бродим в поисках прекрасного далёка (Брутто)
+
+[5/5] Writing song_data.json …
+       Written to /Users/seckintokcan/Documents/The Foundry/Active/Flowup/pipeline/song_data.json
+
+[6/5] Pushing to backend: https://singoling.com/api/songs …
+  [Backend] Song stored (id=148).
+  [Backend] Assigning song 148 to playlist 4 …
+  [Backend] Song added to playlist 4.
+
+✓  Done — 56 lines.
+────────────────────────────────────────────────────────────
+  [Info] Auto-generated URI: local:-
+────────────────────────────────────────────────────────────
+  FlowUp — Data Pipeline  [Russian]
+────────────────────────────────────────────────────────────
+
+[1/5] Fetching lyrics from LRCLIB …
+  [LRCLIB] Searching 'Песенка мамонтёнка' by '' …
+  [LRCLIB] Found (id=11913314, title=Песенка мамонтёнка)
+       Parsed 30 lyric lines.
+
+[2/5] Translating via DeepL …
+  [DeepL] No API key – trying Argos offline fallback.
+  [Argos] Translating 30 lines (ru -> en) using local model.
+
+[3/5] Loading Russian NLP backend …
+       pymorphy3 (ru) ready.
+       ruaccent ready.
+[Dictionary] Loaded 87,706 words from local cache.
+  [OpenRussian] Dictionary loaded.
+
+[4/5] Processing lines …
+    1/30: По синему морю к зелёной земле
+    2/30: Плыву я на белом своём корабле
+    3/30: На белом своём корабле
+    4/30: На белом своём корабле
+    5/30: Меня не пугают ни волны, ни ветер
+    6/30: Плыву я к единственной маме на свете
+    7/30: Плыву я сквозь волны и ветер
+    8/30: К единственной маме на свете
+    9/30: Плыву я сквозь волны и ветер
+   10/30: К единственной маме на свете
+   11/30: Скорей до земли я добраться хочу
+   12/30: "Я здесь, я приехал!" - я ей закричу
+   13/30: Я маме своей закричу
+   14/30: Я маме своей закричу
+   15/30: Пусть мама услышит
+   16/30: Пусть мама придёт
+   17/30: Пусть мама меня непременно найдёт
+   18/30: Ведь так не бывает на свете
+   19/30: Чтоб были потеряны дети
+   20/30: Ведь так не бывает на свете
+   21/30: Чтоб были потеряны дети
+   22/30: На-на-на-на-на-на-на-на
+   23/30: На-на-на-на-на-на-на-на
+   24/30: Пусть мама услышит
+   25/30: Пусть мама придёт
+   26/30: Пусть мама меня непременно найдёт
+   27/30: Ведь так не бывает на свете
+   28/30: Чтоб были потеряны дети
+   29/30: Ведь так не бывает на свете
+   30/30: Чтоб были потеряны дети
+
+[5/5] Writing song_data.json …
+       Written to /Users/seckintokcan/Documents/The Foundry/Active/Flowup/pipeline/song_data.json
+
+[6/5] Pushing to backend: https://singoling.com/api/songs …
+  [Backend] Song stored (id=149).
+  [Backend] Assigning song 149 to playlist 4 …
+  [Backend] Song added to playlist 4.
+
+✓  Done — 30 lines.
+────────────────────────────────────────────────────────────
+  [Info] Auto-generated URI: local:alla-pugacheva-
+────────────────────────────────────────────────────────────
+  FlowUp — Data Pipeline  [Russian]
+────────────────────────────────────────────────────────────
+
+[1/5] Fetching lyrics from LRCLIB …
+  [LRCLIB] Searching 'Миллион алых роз' by 'Alla Pugacheva' …
+  [LRCLIB] Found (id=26296060, title=Миллион алых роз)
+       Parsed 56 lyric lines.
+
+[2/5] Translating via DeepL …
+  [DeepL] No API key – trying Argos offline fallback.
+  [Argos] Translating 56 lines (ru -> en) using local model.
+
+[3/5] Loading Russian NLP backend …
+       pymorphy3 (ru) ready.
+       ruaccent ready.
+[Dictionary] Loaded 87,706 words from local cache.
+  [OpenRussian] Dictionary loaded.
+
+[4/5] Processing lines …
+    1/56: Жил был художник один
+    2/56: Домик имел и холсты
+    3/56: Но он актрису любил
+    4/56: Ту, что любила цветы
+    5/56: Он тогда продал свой дом
+    6/56: Продал картины и кров
+    7/56: И на все деньги купил
+    8/56: Целое море цветов
+    9/56: Миллион, миллион, миллион алых роз
+   10/56: Из окна, из окна, из окна видишь ты
+   11/56: Кто влюблён, кто влюблён, кто влюблён и всерьёз
+   12/56: Свою жизнь для тебя превратит в цветы
+   13/56: Миллион, миллион, миллион алых роз
+   14/56: Из окна, из окна, из окна видишь ты
+   15/56: Кто влюблён, кто влюблён, кто влюблён и всерьёз
+   16/56: Свою жизнь для тебя превратит в цветы
+   17/56: Утром ты встанешь у окна
+   18/56: Может сошла ты с ума
+   19/56: Как продолжение сна
+   20/56: Площадь цветами полна
+   21/56: Похолодеет душа
+   22/56: Что за богач здесь чудит?
+   23/56: А под окном, чуть дыша
+   24/56: Бедный художник стоит
+   25/56: Миллион, миллион, миллион алых роз
+   26/56: Из окна, из окна, из окна видишь ты
+   27/56: Кто влюблён, кто влюблён, кто влюблён и всерьёз
+   28/56: Свою жизнь для тебя превратит в цветы
+   29/56: Миллион, миллион, миллион алых роз
+   30/56: Из окна, из окна, из окна видишь ты
+   31/56: Кто влюблён, кто влюблён, кто влюблён и всерьёз
+   32/56: Свою жизнь для тебя превратит в цветы
+   33/56: Встреча была коротка
+   34/56: В ночь её поезд увёз
+   35/56: Но в её жизни была
+   36/56: Песня, безумная роз
+   37/56: Прожил художник один
+   38/56: Много он бед перенёс
+   39/56: Но в его жизни была
+   40/56: Целая площадь цветов
+   41/56: Миллион, миллион, миллион алых роз
+   42/56: Из окна, из окна, из окна видишь ты
+   43/56: Кто влюблён, кто влюблён, кто влюблён и всерьёз
+   44/56: Свою жизнь для тебя превратит в цветы
+   45/56: Миллион, миллион, миллион алых роз
+   46/56: Из окна, из окна, из окна видишь ты
+   47/56: Кто влюблён, кто влюблён, кто влюблён и всерьёз
+   48/56: Свою жизнь для тебя превратит в цветы
+   49/56: Миллион, миллион, миллион алых роз
+   50/56: Из окна, из окна, из окна видишь ты
+   51/56: Кто влюблён, кто влюблён, кто влюблён и всерьёз
+   52/56: Свою жизнь для тебя превратит в цветы
+   53/56: Миллион, миллион, миллион алых роз
+   54/56: Из окна, из окна, из окна видишь ты
+   55/56: Кто влюблён, кто влюблён, кто влюблён и всерьёз
+   56/56: Свою жизнь для тебя превратит в цветы
+
+[5/5] Writing song_data.json …
+       Written to /Users/seckintokcan/Documents/The Foundry/Active/Flowup/pipeline/song_data.json
+
+[6/5] Pushing to backend: https://singoling.com/api/songs …
+  [Backend] Song stored (id=150).
+  [Backend] Assigning song 150 to playlist 4 …
+  [Backend] Song added to playlist 4.
+
+✓  Done — 56 lines.
+────────────────────────────────────────────────────────────
+  [Info] Auto-generated URI: local:anna-german-
+────────────────────────────────────────────────────────────
+  FlowUp — Data Pipeline  [Russian]
+────────────────────────────────────────────────────────────
+
+[1/5] Fetching lyrics from LRCLIB …
+  [LRCLIB] Searching 'Надежда' by 'Anna German' …
+  [LRCLIB] Found (id=14370135, title=Эхо любви)
+       Parsed 25 lyric lines.
+
+[2/5] Translating via DeepL …
+  [DeepL] No API key – trying Argos offline fallback.
+  [Argos] Translating 25 lines (ru -> en) using local model.
+
+[3/5] Loading Russian NLP backend …
+       pymorphy3 (ru) ready.
+       ruaccent ready.
+[Dictionary] Loaded 87,706 words from local cache.
+  [OpenRussian] Dictionary loaded.
+
+[4/5] Processing lines …
+    1/25: Покроется небо пылинками звезд
+    2/25: И выгнутся ветки упруго
+    3/25: Тебя я услышу за тысячу верст
+    4/25: Мы эхо, мы эхо
+    5/25: Мы долгое эхо друг друга
+    6/25: Мы эхо, мы эхо
+    7/25: Мы долгое эхо друг друга
+    8/25: И мне до тебя, где бы я ни была
+    9/25: Дотронуться сердцем не трудно
+   10/25: Опять нас любовь за собой позвала
+   11/25: Мы нежность, мы нежность
+   12/25: Мы вечная нежность друг друга
+   13/25: Мы нежность, мы нежность
+   14/25: Мы вечная нежность друг друга
+   15/25: И даже в краю наползающей тьмы
+   16/25: За гранью смертельного круга
+   17/25: Я знаю с тобой не расстанемся мы
+   18/25: Мы память, мы память
+   19/25: Мы звездная память друг друга
+   20/25: Мы память, мы память
+   21/25: Мы звездная память друг друга
+   22/25: Мы эхо, эхо, мы эхо, эхо
+   23/25: Мы долгое эхо друг друга
+   24/25: Мы эхо, эхо, мы эхо эхо
+   25/25: Мы долгое эхо друг друга
+
+[5/5] Writing song_data.json …
+       Written to /Users/seckintokcan/Documents/The Foundry/Active/Flowup/pipeline/song_data.json
+
+[6/5] Pushing to backend: https://singoling.com/api/songs …
+  [Backend] Song stored (id=151).
+  [Backend] Assigning song 151 to playlist 4 …
+  [Backend] Song added to playlist 4.
+
+✓  Done — 25 lines.
+────────────────────────────────────────────────────────────
+  [Info] Auto-generated URI: local:leonid-utyosov-
+────────────────────────────────────────────────────────────
+  FlowUp — Data Pipeline  [Russian]
+────────────────────────────────────────────────────────────
+
+[1/5] Fetching lyrics from LRCLIB …
+  [LRCLIB] Searching 'У чёрного моря' by 'Leonid Utyosov' …
+  [LRCLIB] No synced lyrics found.
+  [LRCLIB] Looking for plain lyrics for 'У чёрного моря' by 'Leonid Utyosov' …
+  [LRCLIB] Found plain lyrics.
+ERROR: Could not retrieve synced lyrics. Aborting.
+TIP:   Provide --youtube-url for stable-ts forced alignment.
+TIP:   Pass --lrc-file <path> to use a local .lrc file as a fallback.
+  [Info] Auto-generated URI: local:bravo-zhanna-aguzarova-
+────────────────────────────────────────────────────────────
+  FlowUp — Data Pipeline  [Russian]
+────────────────────────────────────────────────────────────
+
+[1/5] Fetching lyrics from LRCLIB …
+  [LRCLIB] Searching 'Старый отель' by 'Bravo (Zhanna Aguzarova)' …
+  [LRCLIB] Network error: HTTPSConnectionPool(host='lrclib.net', port=443): Read timed out. (read timeout=12)
+  [LRCLIB] Looking for plain lyrics for 'Старый отель' by 'Bravo (Zhanna Aguzarova)' …
+  [LRCLIB] No plain lyrics found.
+ERROR: Could not retrieve synced lyrics. Aborting.
+TIP:   Provide --youtube-url for stable-ts forced alignment.
+TIP:   Pass --lrc-file <path> to use a local .lrc file as a fallback.
+  [Info] Auto-generated URI: local:alliance-
+────────────────────────────────────────────────────────────
+  FlowUp — Data Pipeline  [Russian]
+────────────────────────────────────────────────────────────
+
+[1/5] Fetching lyrics from LRCLIB …
+  [LRCLIB] Searching 'На заре' by 'Alliance' …
+  [LRCLIB] Network error: HTTPSConnectionPool(host='lrclib.net', port=443): Read timed out. (read timeout=12)
+  [LRCLIB] Looking for plain lyrics for 'На заре' by 'Alliance' …
+  [LRCLIB] Found plain lyrics.
+ERROR: Could not retrieve synced lyrics. Aborting.
+TIP:   Provide --youtube-url for stable-ts forced alignment.
+TIP:   Pass --lrc-file <path> to use a local .lrc file as a fallback.
+  [Info] Auto-generated URI: local:mikhail-boyarsky-
+────────────────────────────────────────────────────────────
+  FlowUp — Data Pipeline  [Russian]
+────────────────────────────────────────────────────────────
+
+[1/5] Fetching lyrics from LRCLIB …
+  [LRCLIB] Searching 'Зеленоглазое такси' by 'Mikhail Boyarsky' …
+  [LRCLIB] Looking for plain lyrics for 'Зеленоглазое такси' by 'Mikhail Boyarsky' …
+  [LRCLIB] Network error: HTTPSConnectionPool(host='lrclib.net', port=443): Read timed out. (read timeout=12)
+  [LRCLIB] No plain lyrics found.
+ERROR: Could not retrieve synced lyrics. Aborting.
+TIP:   Provide --youtube-url for stable-ts forced alignment.
+TIP:   Pass --lrc-file <path> to use a local .lrc file as a fallback.
+  [Info] Auto-generated URI: local:nikita-mikhalkov-
+────────────────────────────────────────────────────────────
+  FlowUp — Data Pipeline  [Russian]
+────────────────────────────────────────────────────────────
+
+[1/5] Fetching lyrics from LRCLIB …
+  [LRCLIB] Searching 'А я иду шагаю по Москве' by 'Nikita Mikhalkov' …
+  [LRCLIB] Looking for plain lyrics for 'А я иду шагаю по Москве' by 'Nikita Mikhalkov' …
+  [LRCLIB] Network error: HTTPSConnectionPool(host='lrclib.net', port=443): Read timed out. (read timeout=12)
+  [LRCLIB] No plain lyrics found.
+ERROR: Could not retrieve synced lyrics. Aborting.
+TIP:   Provide --youtube-url for stable-ts forced alignment.
+TIP:   Pass --lrc-file <path> to use a local .lrc file as a fallback.
+  [Info] Auto-generated URI: local:-
+────────────────────────────────────────────────────────────
+  FlowUp — Data Pipeline  [Russian]
+────────────────────────────────────────────────────────────
+
+[1/5] Fetching lyrics from LRCLIB …
+  [LRCLIB] Searching 'Песенка о медведях' by '' …
+  [LRCLIB] Found (id=11280903, title=Песенка о медведях)
+       Parsed 30 lyric lines.
+
+[2/5] Translating via DeepL …
+  [DeepL] No API key – trying Argos offline fallback.
+  [Argos] Translating 30 lines (ru -> en) using local model.
+
+[3/5] Loading Russian NLP backend …
+       pymorphy3 (ru) ready.
+       ruaccent ready.
+[Dictionary] Loaded 87,706 words from local cache.
+  [OpenRussian] Dictionary loaded.
+
+[4/5] Processing lines …
+    1/30: Где-то на белом свете, там, где всегда мороз
+    2/30: Трутся спиной медведи о земную ось
+    3/30: Мимо плывут столетья, спят подо льдом моря
+    4/30: Трутся об ось медведи, вертится Земля
+    5/30: Ла-ла-ла-ла-ла-ла-ла
+    6/30: Вертится быстрей Зeмля
+    7/30: Крутят они, стараясь, вертят земную ось
+    8/30: Чтобы влюблённым раньше встретиться пришлось
+    9/30: Чтобы однажды утром, раньше на год иль два
+   10/30: Кто-то сказал кому-то главные слова
+   11/30: А-а-а-а-а-а-а
+   12/30: Вертится быстрей Земля
+   13/30: Ла-ла-ла-ла-ла-ла-ла
+   14/30: Вертится быстрей Земля
+   15/30: Вслед за весенним ливнем, раньше придёт рассвет
+   16/30: И для двоих счастливых много-много лет
+   17/30: Будут сверкать зарницы, будут ручьи звенеть
+   18/30: Будет туман клубиться, белый, как медведь
+   19/30: Где-то на белом свете, там, где всегда мороз
+   20/30: Трутся спиной медведи о земную ось
+   21/30: Мимо плывут столетья, спят подо льдом моря
+   22/30: Трутся об ось медведи, вертится Земля
+   23/30: Ла-ла-ла-ла-ла-ла-ла
+   24/30: Вертится быстрей Земля
+   25/30: А-а-а-а-а-а-а
+   26/30: Вертится быстрей Земля
+   27/30: А-а-а-а-а-а-а
+   28/30: Вертится быстрей Земля
+   29/30: Ла-ла-ла-ла-ла-ла-ла
+   30/30: Вертится быстрей Земля
+
+[5/5] Writing song_data.json …
+       Written to /Users/seckintokcan/Documents/The Foundry/Active/Flowup/pipeline/song_data.json
+
+[6/5] Pushing to backend: https://singoling.com/api/songs …
+  [Backend] Song stored (id=152).
+  [Backend] Assigning song 152 to playlist 4 …
+  [Backend] Song added to playlist 4.
+
+✓  Done — 30 lines.
+────────────────────────────────────────────────────────────
+  [Info] Auto-generated URI: local:vladimir-vysotsky-
+────────────────────────────────────────────────────────────
+  FlowUp — Data Pipeline  [Russian]
+────────────────────────────────────────────────────────────
+
+[1/5] Fetching lyrics from LRCLIB …
+  [LRCLIB] Searching 'Песня о друге' by 'Vladimir Vysotsky' …
+  [LRCLIB] Found (id=4362213, title=Песня о друге)
+       Parsed 28 lyric lines.
+
+[2/5] Translating via DeepL …
+  [DeepL] No API key – trying Argos offline fallback.
+  [Argos] Translating 28 lines (ru -> en) using local model.
+
+[3/5] Loading Russian NLP backend …
+       pymorphy3 (ru) ready.
+       ruaccent ready.
+[Dictionary] Loaded 87,706 words from local cache.
+  [OpenRussian] Dictionary loaded.
+
+[4/5] Processing lines …
+    1/28: Если друг оказался вдруг
+    2/28: И не друг, и не враг, а - так
+    3/28: Если сразу не разберешь
+    4/28: Плох он или хорош
+    5/28: Парня в горы тяни - рискни!
+    6/28: Не бросай одного его
+    7/28: Пусть он в связке в одной с тобой
+    8/28: Там поймешь, кто такой
+    9/28: Если парень в горах - не ах
+   10/28: Если сразу раскис и - вниз
+   11/28: Шаг ступил на ледник и - сник
+   12/28: Оступился - и в крик
+   13/28: Значит, рядом с тобой - чужой
+   14/28: Ты его не брани - гони
+   15/28: Вверх таких не берут, и тут
+   16/28: Про таких не поют
+   17/28: Если ж он не скулил, не ныл
+   18/28: Пусть он хмур был и зол, но - шел
+   19/28: А когда ты упал со скал
+   20/28: Он стонал, но - держал
+   21/28: Если шел за тобой, как в бой
+   22/28: На вершине стоял хмельной
+   23/28: Значит, как на себя самого
+   24/28: Положись на него
+   25/28: Если шел за тобой, как в бой
+   26/28: На вершине стоял хмельной
+   27/28: Значит, как на себя самого
+   28/28: Положись на него
+
+[5/5] Writing song_data.json …
+       Written to /Users/seckintokcan/Documents/The Foundry/Active/Flowup/pipeline/song_data.json
+
+[6/5] Pushing to backend: https://singoling.com/api/songs …
+  [Backend] Song stored (id=153).
+  [Backend] Assigning song 153 to playlist 4 …
+  [Backend] Song added to playlist 4.
+
+✓  Done — 28 lines.
+────────────────────────────────────────────────────────────
+  [Info] Auto-generated URI: local:glukoza-
+────────────────────────────────────────────────────────────
+  FlowUp — Data Pipeline  [Russian]
+────────────────────────────────────────────────────────────
+
+[1/5] Fetching lyrics from LRCLIB …
+  [LRCLIB] Searching 'Снег идёт' by 'Glukoza' …
+  [LRCLIB] Found (id=14098771, title=Снег идёт)
+       Parsed 37 lyric lines.
+
+[2/5] Translating via DeepL …
+  [DeepL] No API key – trying Argos offline fallback.
+  [Argos] Translating 37 lines (ru -> en) using local model.
+
+[3/5] Loading Russian NLP backend …
+       pymorphy3 (ru) ready.
+       ruaccent ready.
+[Dictionary] Loaded 87,706 words from local cache.
+  [OpenRussian] Dictionary loaded.
+
+[4/5] Processing lines …
+    1/37: Такси, ну как котята, мурлыкали у ног
+    2/37: А я в мобильном слышу длинный гудок
+    3/37: А что сказать — не знаю точно
+    4/37: Может, тебя я люблю
+    5/37: А снег идёт, а снег идёт
+    6/37: По щекам мне бьёт, бьёт
+    7/37: Болею очень, температура
+    8/37: Стою и жду тебя, как дура
+    9/37: Снежинки ртом ловила, очень мило
+   10/37: Клёвый вечер, делать нечё
+   11/37: Там, где нет тебя
+   12/37: А снег идёт
+   13/37: И вся к тебе дорога изучена до нет
+   14/37: И я, наверно, знаю грустный ответ
+   15/37: И всё равно смотрела в окна
+   16/37: Может, увижу тебя
+   17/37: А снег идёт, а снег идёт
+   18/37: По щекам мне бьёт, бьёт
+   19/37: Болею очень, температура
+   20/37: Стою и жду тебя, как дура
+   21/37: Снежинки ртом ловила, очень мило
+   22/37: Клёвый вечер, делать нечё
+   23/37: Там, где нет тебя
+   24/37: А снег идёт
+   25/37: (А снег идёт, снег идёт)
+   26/37: (По щекам мне бьёт, бьёт)
+   27/37: (Болею очень, температура)
+   28/37: (Стою и жду тебя, как дура)
+   29/37: (Снежинки ртом ловила, очень мило)
+   30/37: (Клёвый вечер, делать нечё)
+   31/37: (Там, где нет тебя)
+   32/37: А снег идёт
+   33/37: А снег идёт
+   34/37: Снежинки ртом ловила, очень мило
+   35/37: Клёвый вечер, делать нечё
+   36/37: Там, где нет тебя
+   37/37: А снег идёт
+
+[5/5] Writing song_data.json …
+       Written to /Users/seckintokcan/Documents/The Foundry/Active/Flowup/pipeline/song_data.json
+
+[6/5] Pushing to backend: https://singoling.com/api/songs …
+  [Backend] Song stored (id=154).
+  [Backend] Assigning song 154 to playlist 4 …
+  [Backend] Song added to playlist 4.
+
+✓  Done — 37 lines.
+────────────────────────────────────────────────────────────
+  [Info] Auto-generated URI: local:zemfira-
+────────────────────────────────────────────────────────────
+  FlowUp — Data Pipeline  [Russian]
+────────────────────────────────────────────────────────────
+
+[1/5] Fetching lyrics from LRCLIB …
+  [LRCLIB] Searching 'Хочешь?' by 'Zemfira' …
+  [LRCLIB] Found (id=1024006, title=Хочешь?)
+       Parsed 24 lyric lines.
+
+[2/5] Translating via DeepL …
+  [DeepL] No API key – trying Argos offline fallback.
+  [Argos] Translating 24 lines (ru -> en) using local model.
+
+[3/5] Loading Russian NLP backend …
+       pymorphy3 (ru) ready.
+       ruaccent ready.
+[Dictionary] Loaded 87,706 words from local cache.
+  [OpenRussian] Dictionary loaded.
+
+[4/5] Processing lines …
+    1/24: Пожалуйста, не умиpай
+    2/24: Или мне придётся тоже
+    3/24: Ты, конечно, сразу в рай
+    4/24: А я не думаю, что тоже
+    5/24: Хочешь сладких апельсинов?
+    6/24: Хочешь вслух рассказов длинных?
+    7/24: Хочешь, я взорву все звёзды
+    8/24: Что мешают спать?
+    9/24: Пожалуйста, только живи
+   10/24: Ты же видишь: я живу тобою
+   11/24: Моей огромной любви
+   12/24: Хватит нам двоим с головою
+   13/24: Хочешь в море с парусами?
+   14/24: Хочешь музык новых самых?
+   15/24: Хочешь, я убью соседей
+   16/24: Что мешают спать?
+   17/24: Хочешь солнце вместо лампы?
+   18/24: Хочешь за окошком Альпы?
+   19/24: Хочешь, я отдам все пeсни?
+   20/24: Про тебя отдам все пeсни
+   21/24: Хочешь солнце вместо лампы?
+   22/24: Хочешь за окошком Альпы?
+   23/24: Хочешь, я отдам все пeсни?
+   24/24: Про тебя отдам все пeсни я
+
+[5/5] Writing song_data.json …
+       Written to /Users/seckintokcan/Documents/The Foundry/Active/Flowup/pipeline/song_data.json
+
+[6/5] Pushing to backend: https://singoling.com/api/songs …
+  [Backend] Song stored (id=155).
+  [Backend] Assigning song 155 to playlist 4 …
+  [Backend] Song added to playlist 4.
+
+✓  Done — 24 lines.
+────────────────────────────────────────────────────────────
+  [Info] Auto-generated URI: local:aquarium-
+────────────────────────────────────────────────────────────
+  FlowUp — Data Pipeline  [Russian]
+────────────────────────────────────────────────────────────
+
+[1/5] Fetching lyrics from LRCLIB …
+  [LRCLIB] Searching 'Под небом голубым' by 'Aquarium' …
+  [LRCLIB] Looking for plain lyrics for 'Под небом голубым' by 'Aquarium' …
+  [LRCLIB] No plain lyrics found.
+ERROR: Could not retrieve synced lyrics. Aborting.
+TIP:   Provide --youtube-url for stable-ts forced alignment.
+TIP:   Pass --lrc-file <path> to use a local .lrc file as a fallback.
+  [Info] Auto-generated URI: local:bi-2-
+────────────────────────────────────────────────────────────
+  FlowUp — Data Pipeline  [Russian]
+────────────────────────────────────────────────────────────
+
+[1/5] Fetching lyrics from LRCLIB …
+  [LRCLIB] Searching 'Полковнику никто не пишет' by 'Bi-2' …
+  [LRCLIB] Found (id=9977215, title=Полковнику никто не пишет)
+       Parsed 31 lyric lines.
+
+[2/5] Translating via DeepL …
+  [DeepL] No API key – trying Argos offline fallback.
+  [Argos] Translating 31 lines (ru -> en) using local model.
+
+[3/5] Loading Russian NLP backend …
+       pymorphy3 (ru) ready.
+       ruaccent ready.
+[Dictionary] Loaded 87,706 words from local cache.
+  [OpenRussian] Dictionary loaded.
+
+[4/5] Processing lines …
+    1/31: Большие города
+    2/31: Пустые поезда
+    3/31: Ни берега, ни дна
+    4/31: Всё начинать сначала
+    5/31: Холодная война
+    6/31: И время как вода
+    7/31: Он не сошёл с ума
+    8/31: Ты ничего не знала-а-а
+    9/31: Полковнику никто
+   10/31: Не пишет
+   11/31: Полковника никто
+   12/31: Не ждё-ё-ё-т
+   13/31: На линии огня
+   14/31: Пустые города
+   15/31: В которых никогда
+   16/31: Ты раньше не бывала
+   17/31: И рвутся поезда
+   18/31: На тонкие слова
+   19/31: Он не сошёл с ума
+   20/31: Ты ничего не знала-а-а
+   21/31: Полковнику никто
+   22/31: Не пишет
+   23/31: Полковника никто
+   24/31: Не ждё-ё-ё-т
+   25/31: Полковнику никто
+   26/31: Не пишет
+   27/31: Полковника никто
+   28/31: Не ждё-ё-ё-т
+   29/31: Полковнику никто
+   30/31: Не пишет
+   31/31: Полковника никто
+
+[5/5] Writing song_data.json …
+       Written to /Users/seckintokcan/Documents/The Foundry/Active/Flowup/pipeline/song_data.json
+
+[6/5] Pushing to backend: https://singoling.com/api/songs …
+  [Backend] Song stored (id=156).
+  [Backend] Assigning song 156 to playlist 4 …
+  [Backend] Song added to playlist 4.
+
+✓  Done — 31 lines.
+────────────────────────────────────────────────────────────
+  [Info] Auto-generated URI: local:yan-frenkel-
+────────────────────────────────────────────────────────────
+  FlowUp — Data Pipeline  [Russian]
+────────────────────────────────────────────────────────────
+
+[1/5] Fetching lyrics from LRCLIB …
+  [LRCLIB] Searching 'Поле русское поле' by 'Yan Frenkel' …
+  [LRCLIB] Looking for plain lyrics for 'Поле русское поле' by 'Yan Frenkel' …
+  [LRCLIB] No plain lyrics found.
+ERROR: Could not retrieve synced lyrics. Aborting.
+TIP:   Provide --youtube-url for stable-ts forced alignment.
+TIP:   Pass --lrc-file <path> to use a local .lrc file as a fallback.
+[22:17:38] Starting import — 40 songs total
+============================================================
+
+[22:17:38] [1/40] Калинка — (title-only, was: Traditional folk)
+------------------------------------------------------------
+[22:18:07] ✓ [1/40]  OK  (28s)  progress: 1 done, 0 failed
+
+[22:18:10] [2/40] Катюша — (title-only, was: Traditional / Matvey Blanter)
+------------------------------------------------------------
+[22:18:37] ✓ [2/40]  OK  (28s)  progress: 2 done, 0 failed
+
+[22:18:40] [3/40] Подмосковные вечера — Vladimir Troshin
+------------------------------------------------------------
+[22:19:08] ✓ [3/40]  OK  (28s)  progress: 3 done, 0 failed
+
+[22:19:11] [4/40] Очи чёрные — (title-only, was: Traditional romance)
+------------------------------------------------------------
+[22:19:52] ✓ [4/40]  OK  (40s)  progress: 4 done, 0 failed
+
+[22:19:55] [5/40] Дорогой длинною — Aleksandr Vertinsky
+------------------------------------------------------------
+[22:20:24] ✗ [5/40]  FAIL (30s)  progress: 4 done, 1 failed
+
+[22:20:27] [6/40] Коробейники — (title-only, was: Traditional folk)
+------------------------------------------------------------
+[22:20:48] ✗ [6/40]  FAIL (21s)  progress: 4 done, 2 failed
+
+[22:20:51] [7/40] Миленький ты мой — (title-only, was: Traditional folk)
+------------------------------------------------------------
+[22:21:17] ✓ [7/40]  OK  (26s)  progress: 5 done, 2 failed
+
+[22:21:20] [8/40] Ой мороз мороз — (title-only, was: Traditional folk)
+------------------------------------------------------------
+[22:21:35] ✗ [8/40]  FAIL (14s)  progress: 5 done, 3 failed
+
+[22:21:38] [9/40] Вечерний звон — (title-only, was: Traditional / Ivan Kozlov)
+------------------------------------------------------------
+[22:22:06] ✓ [9/40]  OK  (28s)  progress: 6 done, 3 failed
+
+[22:22:09] [10/40] Эй ухнем — (title-only, was: Traditional folk)
+------------------------------------------------------------
+[22:22:29] ✗ [10/40]  FAIL (20s)  progress: 6 done, 4 failed
+
+[22:22:32] [11/40] Тёмная ночь — Mark Bernes
+------------------------------------------------------------
+[22:22:51] ✗ [11/40]  FAIL (19s)  progress: 6 done, 5 failed
+
+[22:22:54] [12/40] Журавли — Mark Bernes
+------------------------------------------------------------
+[22:23:15] ✗ [12/40]  FAIL (20s)  progress: 6 done, 6 failed
+
+[22:23:18] [13/40] День Победы — Lev Leshchenko
+------------------------------------------------------------
+[22:23:47] ✓ [13/40]  OK  (30s)  progress: 7 done, 6 failed
+
+[22:23:50] [14/40] Смуглянка — (title-only, was: Traditional Soviet)
+------------------------------------------------------------
+[22:24:11] ✗ [14/40]  FAIL (20s)  progress: 7 done, 7 failed
+
+[22:24:14] [15/40] Пусть бегут неуклюже — (title-only, was: Crocodile Gena (Cheburashka))
+------------------------------------------------------------
+[22:24:32] ✗ [15/40]  FAIL (18s)  progress: 7 done, 8 failed
+
+[22:24:35] [16/40] Голубой вагон — (title-only, was: Cheburashka cartoon)
+------------------------------------------------------------
+[22:24:54] ✗ [16/40]  FAIL (19s)  progress: 7 done, 9 failed
+
+[22:24:57] [17/40] Я был когда-то странной игрушкой — (title-only, was: Cheburashka cartoon)
+------------------------------------------------------------
+[22:25:13] ✗ [17/40]  FAIL (16s)  progress: 7 done, 10 failed
+
+[22:25:16] [18/40] Антошка — (title-only, was: Soviet children's cartoon)
+------------------------------------------------------------
+[22:25:47] ✓ [18/40]  OK  (31s)  progress: 8 done, 10 failed
+
+[22:25:50] [19/40] В траве сидел кузнечик — (title-only, was: Soviet children's song)
+------------------------------------------------------------
+[22:26:21] ✓ [19/40]  OK  (31s)  progress: 9 done, 10 failed
+
+[22:26:24] [20/40] В лесу родилась ёлочка — (title-only, was: Traditional New Year song)
+------------------------------------------------------------
+[22:26:44] ✗ [20/40]  FAIL (20s)  progress: 9 done, 11 failed
+
+[22:26:47] [21/40] Я на солнышке лежу — (title-only, was: Lion and Tortoise cartoon)
+------------------------------------------------------------
+[22:27:02] ✗ [21/40]  FAIL (15s)  progress: 9 done, 12 failed
+
+[22:27:05] [22/40] Облака — (title-only, was: Soviet children's cartoon)
+------------------------------------------------------------
+[22:27:35] ✓ [22/40]  OK  (30s)  progress: 10 done, 12 failed
+
+[22:27:38] [23/40] Кабы не было зимы — (title-only, was: Prostokvashino cartoon)
+------------------------------------------------------------
+[22:28:12] ✓ [23/40]  OK  (34s)  progress: 11 done, 12 failed
+
+[22:28:15] [24/40] Крылатые качели — (title-only, was: Adventures of Elektronik)
+------------------------------------------------------------
+[22:28:47] ✓ [24/40]  OK  (32s)  progress: 12 done, 12 failed
+
+[22:28:50] [25/40] Прекрасное далёко — (title-only, was: Guest from the Future)
+------------------------------------------------------------
+[22:29:46] ✓ [25/40]  OK  (56s)  progress: 13 done, 12 failed
+
+[22:29:49] [26/40] Песенка мамонтёнка — (title-only, was: Soviet children's cartoon)
+------------------------------------------------------------
+[22:30:15] ✓ [26/40]  OK  (25s)  progress: 14 done, 12 failed
+
+[22:30:18] [27/40] Миллион алых роз — Alla Pugacheva
+------------------------------------------------------------
+[22:30:48] ✓ [27/40]  OK  (30s)  progress: 15 done, 12 failed
+
+[22:30:51] [28/40] Надежда — Anna German
+------------------------------------------------------------
+[22:31:15] ✓ [28/40]  OK  (25s)  progress: 16 done, 12 failed
+
+[22:31:18] [29/40] У чёрного моря — Leonid Utyosov
+------------------------------------------------------------
+[22:31:36] ✗ [29/40]  FAIL (17s)  progress: 16 done, 13 failed
+
+[22:31:39] [30/40] Старый отель — Bravo (Zhanna Aguzarova)
+------------------------------------------------------------
+[22:32:13] ✗ [30/40]  FAIL (34s)  progress: 16 done, 14 failed
+
+[22:32:16] [31/40] На заре — Alliance
+------------------------------------------------------------
+[22:32:38] ✗ [31/40]  FAIL (22s)  progress: 16 done, 15 failed
+
+[22:32:41] [32/40] Зеленоглазое такси — Mikhail Boyarsky
+------------------------------------------------------------
+[22:33:10] ✗ [32/40]  FAIL (29s)  progress: 16 done, 16 failed
+
+[22:33:13] [33/40] А я иду шагаю по Москве — Nikita Mikhalkov
+------------------------------------------------------------
+[22:33:43] ✗ [33/40]  FAIL (31s)  progress: 16 done, 17 failed
+
+[22:33:46] [34/40] Песенка о медведях — (title-only, was: Kidnapping Caucasian Style film)
+------------------------------------------------------------
+[22:34:18] ✓ [34/40]  OK  (32s)  progress: 17 done, 17 failed
+
+[22:34:21] [35/40] Песня о друге — Vladimir Vysotsky
+------------------------------------------------------------
+[22:34:47] ✓ [35/40]  OK  (26s)  progress: 18 done, 17 failed
+
+[22:34:50] [36/40] Снег идёт — Glukoza
+------------------------------------------------------------
+[22:35:17] ✓ [36/40]  OK  (27s)  progress: 19 done, 17 failed
+
+[22:35:20] [37/40] Хочешь? — Zemfira
+------------------------------------------------------------
+[22:35:50] ✓ [37/40]  OK  (30s)  progress: 20 done, 17 failed
+
+[22:35:53] [38/40] Под небом голубым — Aquarium
+------------------------------------------------------------
+[22:36:30] ✗ [38/40]  FAIL (36s)  progress: 20 done, 18 failed
+
+[22:36:33] [39/40] Полковнику никто не пишет — Bi-2
+------------------------------------------------------------
+[22:37:02] ✓ [39/40]  OK  (29s)  progress: 21 done, 18 failed
+
+[22:37:05] [40/40] Поле русское поле — Yan Frenkel
+------------------------------------------------------------
+[22:37:48] ✗ [40/40]  FAIL (43s)  progress: 21 done, 19 failed
+
+============================================================
+[22:37:48] Import complete in 0:20:09
+  21/40 succeeded  |  19 failed
+
+  Failed songs:
+    Row 5: 'Aleksandr Vertinsky' – Дорогой длинною
+    Row 6: 'Traditional folk' – Коробейники
+    Row 8: 'Traditional folk' – Ой мороз мороз
+    Row 10: 'Traditional folk' – Эй ухнем
+    Row 11: 'Mark Bernes' – Тёмная ночь
+    Row 12: 'Mark Bernes' – Журавли
+    Row 14: 'Traditional Soviet' – Смуглянка
+    Row 15: 'Crocodile Gena (Cheburashka)' – Пусть бегут неуклюже
+    Row 16: 'Cheburashka cartoon' – Голубой вагон
+    Row 17: 'Cheburashka cartoon' – Я был когда-то странной игрушкой
+    Row 20: 'Traditional New Year song' – В лесу родилась ёлочка
+    Row 21: 'Lion and Tortoise cartoon' – Я на солнышке лежу
+    Row 29: 'Leonid Utyosov' – У чёрного моря
+    Row 30: 'Bravo (Zhanna Aguzarova)' – Старый отель
+    Row 31: 'Alliance' – На заре
+    Row 32: 'Mikhail Boyarsky' – Зеленоглазое такси
+    Row 33: 'Nikita Mikhalkov' – А я иду шагаю по Москве
+    Row 38: 'Aquarium' – Под небом голубым
+    Row 40: 'Yan Frenkel' – Поле русское поле
+
+  To retry failures, rerun with --start-at <row_num>
+============================================================

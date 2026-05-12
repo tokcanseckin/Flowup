@@ -1,0 +1,80 @@
+Fetching songs from https://singoling.com …
+Total songs (lang=ru): 70
+Scanning for plain-lyrics songs …
+  [API] Could not fetch song 193: HTTPSConnectionPool(host='singoling.com', port=443): Max retries exceeded with url: /api/songs/193 (Caused by ConnectTimeoutError(<HTTPSConnection(host='singoling.com', port=443) at 0x10a866e90>, 'Connection to singoling.com timed out. (connect timeout=15)'))
+  [API] Could not fetch song 51: HTTPSConnectionPool(host='singoling.com', port=443): Max retries exceeded with url: /api/songs/51 (Caused by ConnectTimeoutError(<HTTPSConnection(host='singoling.com', port=443) at 0x10a867110>, 'Connection to singoling.com timed out. (connect timeout=15)'))
+
+Found 1 plain-lyrics song(s):
+  id= 177  Кино — Бошетунмай
+
+[1/1] Кино — Бошетунмай  (id=177)
+  [LRCLIB] Searching 'Бошетунмай' by 'Кино' …
+  [LRCLIB] Found (id=3821295, title=Бошетунмай)
+  ✓ Synced lyrics found on LRCLIB!
+  → Re-running generate_song_data.py for song id=177 …
+  [Info] Auto-generated URI: local:ae1d9ff894f5
+────────────────────────────────────────────────────────────
+  FlowUp — Data Pipeline  [Russian]
+────────────────────────────────────────────────────────────
+
+[1/5] Fetching lyrics from LRCLIB …
+  [LRCLIB] Searching 'Бошетунмай' by 'Кино' …
+  [LRCLIB] Found (id=3821295, title=Бошетунмай)
+       Parsed 26 lyric lines.
+
+[2/5] Translating via DeepL …
+  [DeepL] No API key – trying Argos offline fallback.
+  [Argos] Translating 26 lines (ru -> en) using local model.
+
+[3/5] Loading Russian NLP backend …
+       pymorphy3 (ru) ready.
+       ruaccent ready.
+[Dictionary] Loaded 87,706 words from local cache.
+  [OpenRussian] Dictionary loaded.
+
+[4/5] Processing lines …
+    1/26: Тот, кто в пятнадцать лет убежал из дома
+    2/26: Вряд ли поймёт того, кто учился в спецшколе
+    3/26: Тот, у кого есть хороший жизненный план
+    4/26: Вряд ли будет думать о чём-то другом
+    5/26: Мы пьём чай в старых квартирах
+    6/26: Ждём лета в старых квартирах
+    7/26: В старых квартирах, где есть свет
+    8/26: Газ, телефон, горячая вода
+    9/26: Радиоточка, пол паркет
+   10/26: Санузел раздельный, дом кирпичный
+   11/26: Одна семья, две семьи, три семьи
+   12/26: Много подсобных помещений
+   13/26: Первый и последний не предлагать
+   14/26: Рядом с метро, центр
+   15/26: Все говорят, что мы (в)месте
+   16/26: Все говорят, но немногие знают, в каком
+   17/26: А из наших труб идёт необычный дым
+   18/26: Стой! Опасная зона! Работа мозга
+   19/26: Мм, Бошетунмай
+   20/26: Мм, Бошетунмай
+   21/26: Мм, Бошетунмай
+   22/26: Мм, Бошетунмай
+   23/26: Мм,Бошетунмай
+   24/26: Мм, Бошетунмай
+   25/26: Мм, Бошетунмай
+   26/26: Мм, Бошетунмай
+
+[5/5] Writing song_data.json …
+       Written to /Users/seckintokcan/Documents/The Foundry/Active/Flowup/pipeline/song_data.json
+
+[6/5] Deleting old song id=177 …
+  [Backend] Deleted song 177.
+
+[6/5] Pushing to backend: https://singoling.com/api/songs …
+  [Backend] Song stored (id=201).
+  [Backend] Assigning song 201 to playlist 5 …
+  [Backend] Song added to playlist 5.
+
+✓  Done — 26 lines.
+────────────────────────────────────────────────────────────
+  ✓ Replaced song id=177.
+
+── Summary ────────────────────────────────────────
+  Replaced / updated : 1
+  No synced found    : 0

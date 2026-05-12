@@ -1,0 +1,51 @@
+Fetching songs from https://singoling.com …
+Total songs: 149
+Songs to process: 15
+
+[1/15] Наутилус Помпилиус — Гудбай Америка
+    ✗ No confident match found
+[2/4] Алиса — Небо славян
+    [iTunes] Candidate  title='Небо славян'  artist='Alisa'  title_sim=1.00  artist_sim=1.00  score=1.00
+    → Match: https://music.apple.com/us/album/%D0%BD%D0%B5%D0%B1%D0%BE-%D1%81%D0%BB%D0%B0%D0%B2%D1%8F%D0%BD/1604622493?i=1604622500&uo=4
+    ✓ Updated
+[3/5] Кино — Бошетунмай
+    [iTunes] Candidate  title='Бошетунмай'  artist='Kino'  title_sim=1.00  artist_sim=1.00  score=1.00
+    → Match: https://music.apple.com/us/album/%D0%B1%D0%BE%D1%88%D0%B5%D1%82%D1%83%D0%BD%D0%BC%D0%B0%D0%B9/1333010977?i=1333011502&uo=4
+    ✓ Updated
+[4/5] Окcимирон — Признаки жизни
+    ✗ No confident match found
+[5/0] Noize MC — Выдыхай
+    [iTunes] Candidate  title='Выдыхай'  artist='Noize MC'  title_sim=1.00  artist_sim=1.00  score=1.00
+    → Match: https://music.apple.com/us/album/%D0%B2%D1%8B%D0%B4%D1%8B%D1%85%D0%B0%D0%B9/1685090699?i=1685090871&uo=4
+    ✓ Updated
+[6/8] Янка Дягилева — От большого ума
+    [iTunes] Candidate  title='От большого ума'  artist='Yanka Dyagileva & Children Slyness'  title_sim=1.00  artist_sim=0.53  score=0.81
+    → Match: https://music.apple.com/us/album/%D0%BE%D1%82-%D0%B1%D0%BE%D0%BB%D1%8C%D1%88%D0%BE%D0%B3%D0%BE-%D1%83%D0%BC%D0%B0/1681914990?i=1681914997&uo=4
+    ✓ Updated
+[7/1] Би-2 — Молитва
+    [iTunes] Candidate  title='Молитва'  artist='Bi-2'  title_sim=1.00  artist_sim=1.00  score=1.00
+    → Match: https://music.apple.com/us/album/%D0%BC%D0%BE%D0%BB%D0%B8%D1%82%D0%B2%D0%B0/511452474?i=511452655&uo=4
+    ✓ Updated
+[8/10] ATL — Марабу
+    ✗ No confident match found
+[9/5] Ленинград — Экспонат
+    ✗ No confident match found
+[10/0] Земфира — Прощай
+    ✗ No confident match found
+[11/0] Скриптонит — Положение
+    ✗ No confident match found
+[12/10] Фараон — Унесённые ветром
+    ✗ No confident match found
+[13/0] Александр Галич — Облака
+    [iTunes] Candidate  title='Облака'  artist='Alexander Galich'  title_sim=1.00  artist_sim=0.88  score=0.95
+    → Match: https://music.apple.com/us/album/%D0%BE%D0%B1%D0%BB%D0%B0%D0%BA%D0%B0/1439932941?i=1439932943&uo=4
+    ✓ Updated
+[14/1] Хаски — Поэма о Родине
+    ✗ No confident match found
+[15/0] Юрий Антонов — Крыша дома твоего
+    ✗ No confident match found
+
+── Summary ────────────────────────────────────────
+  Found / updated : 6
+  No match        : 9
+  Errors          : 0

@@ -661,6 +661,7 @@ function SongBrowser({
 }) {
   const t = useT()
   const tc = useContentT()
+  const { language, setLanguage } = useLocalization()
   const listenedCount = activePlaylist
     ? activePlaylist.songs.filter(s => openedSongIds.has(s.song_id)).length
     : 0
@@ -669,9 +670,19 @@ function SongBrowser({
     : 0
 
   const [openMenuSongId, setOpenMenuSongId] = useState<number | null>(null)
-  const [learnLang, setLearnLang] = useState<string | null>(null)
-  const [nativeLang, setNativeLang] = useState<string | null>(null)
+  const [learnLang, setLearnLang] = useState<string | null>(() => localStorage.getItem('browse.learnLang'))
+  const [nativeLang, setNativeLang] = useState<string | null>(() => localStorage.getItem('browse.nativeLang'))
   const playlistsSectionRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    if (learnLang) localStorage.setItem('browse.learnLang', learnLang)
+    else localStorage.removeItem('browse.learnLang')
+  }, [learnLang])
+
+  useEffect(() => {
+    if (nativeLang) localStorage.setItem('browse.nativeLang', nativeLang)
+    else localStorage.removeItem('browse.nativeLang')
+  }, [nativeLang])
 
   const learnLangs = useMemo(() =>
     Array.from(new Set(playlists.map(p => p.language_code).filter((c): c is string => !!c))),
@@ -865,18 +876,16 @@ function SongBrowser({
                 {t('nav.admin')}
               </button>
             )}
-            {activePlaylistId !== null && availableTargetLangs.length > 0 && (
-              <select
-                value={targetLang ?? ''}
-                onChange={e => onTargetLangChange(e.target.value || null)}
-                className="text-xs rounded-lg border border-gray-700/70 bg-gray-800/70 px-2 py-1 text-gray-300 focus:outline-none focus:border-gray-500 cursor-pointer"
-                aria-label="Translation language"
-              >
-                {availableTargetLangs.map(lang => (
-                  <option key={lang} value={lang}>{lang.toUpperCase()}</option>
-                ))}
-              </select>
-            )}
+            <select
+              value={language}
+              onChange={e => setLanguage(e.target.value as 'en' | 'tr' | 'ru')}
+              className="text-xs rounded-lg border border-gray-700/70 bg-gray-800/70 px-2 py-1 text-gray-300 focus:outline-none focus:border-gray-500 cursor-pointer"
+              aria-label="UI language"
+            >
+              <option value="en">EN</option>
+              <option value="tr">TR</option>
+              <option value="ru">RU</option>
+            </select>
             <button
               type="button"
               onClick={onOpenSettings}
@@ -1725,6 +1734,7 @@ function PlayerView({
   const [playerMenuOpen, setPlayerMenuOpen] = useState(false)
   const autoPausedRef = useRef(false)
   const t = useT()
+  const { language, setLanguage } = useLocalization()
 
   useEffect(() => {
     if (!playerMenuOpen) return
@@ -1972,19 +1982,17 @@ function PlayerView({
               {t('nav.admin')}
             </button>
           )}
-          {/* Target language combobox */}
-          {availableTargetLangs.length > 0 && (
-            <select
-              value={targetLang ?? ''}
-              onChange={e => onTargetLangChange(e.target.value || null)}
-              className="text-xs rounded-lg border border-gray-700/70 bg-gray-800/70 px-2 py-1 text-gray-300 focus:outline-none focus:border-gray-500 cursor-pointer"
-              aria-label="Translation language"
-            >
-              {availableTargetLangs.map(lang => (
-                <option key={lang} value={lang}>{lang.toUpperCase()}</option>
-              ))}
-            </select>
-          )}
+          {/* UI language selector */}
+          <select
+            value={language}
+            onChange={e => setLanguage(e.target.value as 'en' | 'tr' | 'ru')}
+            className="text-xs rounded-lg border border-gray-700/70 bg-gray-800/70 px-2 py-1 text-gray-300 focus:outline-none focus:border-gray-500 cursor-pointer"
+            aria-label="UI language"
+          >
+            <option value="en">EN</option>
+            <option value="tr">TR</option>
+            <option value="ru">RU</option>
+          </select>
           {/* Inline source switcher — always visible; unavailable sources are dimmed */}
           {(() => {
             const opts: { value: AppSettings['preferredSource']; activeClass: string; available: boolean; label: string }[] = [

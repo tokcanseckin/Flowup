@@ -1,0 +1,52 @@
+  [Info] Auto-generated URI: local:217e7f73b962
+────────────────────────────────────────────────────────────
+  FlowUp — Data Pipeline  [Russian]
+────────────────────────────────────────────────────────────
+
+[1/5] Fetching lyrics from LRCLIB …
+  [LRCLIB] Searching 'Гудбай Америка' by 'Наутилус Помпилиус' …
+  [LRCLIB] Found (id=11729200, title=Последнее письмо (Гудбай Америка))
+       Parsed 20 lyric lines.
+
+[2/5] Translating via DeepL …
+  [DeepL] No API key – trying Argos offline fallback.
+  [Argos] Translating 20 lines (ru -> en) using local model.
+
+[3/5] Loading Russian NLP backend …
+       pymorphy3 (ru) ready.
+       ruaccent ready.
+[Dictionary] Loaded 87,706 words from local cache.
+  [OpenRussian] Dictionary loaded.
+
+[4/5] Processing lines …
+    1/20: Когда умолкнут все песни
+    2/20: Которых я не знаю
+    3/20: В терпком воздухе крикнет
+    4/20: Последний мой бумажный пароход
+    5/20: Гудбай Америка, о
+    6/20: Где я не был никогда
+    7/20: Прощай навсегда
+    8/20: Возьми банджо, сыграй мне на прощанье
+    9/20: Ла-ла-ла-лай-ла-ла-ла-лай-ла, Ла-ла-ла-лай-ла-ла-ла-лай
+   10/20: Ла-ла-ла-лай-ла-ла-ла-лай-ла, Ла-ла-ла-лай-ла-ла-ла-лай
+   11/20: Мне стали слишком малы
+   12/20: Твои тертые джинсы
+   13/20: Нас так долго учили
+   14/20: Любить твои запретные плоды
+   15/20: Гудбай Америка, о
+   16/20: Где я не буду никогда
+   17/20: Услышу ли песню
+   18/20: Которую запомню навсегда
+   19/20: Ла-ла-ла-лай-ла-ла-ла-лай-ла, Ла-ла-ла-лай-ла-ла-ла-лай
+   20/20: Ла-ла-ла-лай-ла-ла-ла-лай-ла, Ла-ла-ла-лай-ла-ла-ла-лай
+
+[5/5] Writing song_data.json …
+       Written to /Users/seckintokcan/Documents/The Foundry/Active/Flowup/pipeline/song_data.json
+
+[6/5] Pushing to backend: https://singoling.com/api/songs …
+  [Backend] Song stored (id=203).
+  [Backend] Assigning song 203 to playlist 5 …
+  [Backend] Song added to playlist 5.
+
+✓  Done — 20 lines.
+────────────────────────────────────────────────────────────

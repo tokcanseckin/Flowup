@@ -53,6 +53,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import re
@@ -539,8 +540,11 @@ def _is_cyrillic(text: str) -> bool:
 def _fetch_lrclib_candidate(artist: str, title: str, lang: str = "") -> dict | None:
     require_cyrillic = lang in _CYRILLIC_LANGS
 
-    def _hit_ok(hit: dict) -> bool:
-        if not (hit.get("syncedLyrics") or hit.get("plainLyrics")):
+    def _hit_ok(hit: dict, require_synced: bool = False) -> bool:
+        if require_synced:
+            if not hit.get("syncedLyrics"):
+                return False
+        elif not (hit.get("syncedLyrics") or hit.get("plainLyrics")):
             return False
         if require_cyrillic:
             text = hit.get("syncedLyrics") or hit.get("plainLyrics") or ""
@@ -549,26 +553,66 @@ def _fetch_lrclib_candidate(artist: str, title: str, lang: str = "") -> dict | N
                 return False
         return True
 
+    def _best_hit(hits: list[dict]) -> dict | None:
+        """Return the first synced hit; fall back to the first plain hit."""
+        plain_fallback = None
+        for hit in hits:
+            if _hit_ok(hit, require_synced=True):
+                return hit
+            if plain_fallback is None and _hit_ok(hit):
+                plain_fallback = hit
+        return plain_fallback
+
+    def _artist_variants(s: str) -> list[str]:
+        """Return all artist name variants to try, deduped, non-empty."""
+        if " / " not in s:
+            return [s] if s else []
+        parts = [p.strip() for p in s.split(" / ") if p.strip()]
+        seen, result = set(), []
+        for p in parts:
+            if p not in seen:
+                seen.add(p)
+                result.append(p)
+        return result
+
     try:
-        r = requests.get(
-            "https://lrclib.net/api/search",
-            params={"q": f"{artist} {title}"},
-            timeout=12,
-        )
-        r.raise_for_status()
-        for hit in r.json():
-            if _hit_ok(hit):
+        variants = _artist_variants(artist)
+        # Try /api/search with each artist variant
+        for variant in variants:
+            query = f"{variant} {title}".strip()
+            r = requests.get(
+                "https://lrclib.net/api/search",
+                params={"q": query},
+                timeout=12,
+            )
+            r.raise_for_status()
+            hit = _best_hit(r.json())
+            if hit:
                 return hit
 
-        r2 = requests.get(
-            "https://lrclib.net/api/get",
-            params={"artist_name": artist, "track_name": title},
-            timeout=12,
-        )
-        if r2.status_code == 200:
-            body = r2.json()
-            if isinstance(body, dict) and _hit_ok(body):
-                return body
+        # Fallback: try /api/get with each artist variant
+        for variant in variants:
+            r2 = requests.get(
+                "https://lrclib.net/api/get",
+                params={"artist_name": variant, "track_name": title},
+                timeout=12,
+            )
+            if r2.status_code == 200:
+                body = r2.json()
+                if isinstance(body, dict) and _hit_ok(body):
+                    return body
+
+        # Last resort: title-only search
+        if variants:
+            r3 = requests.get(
+                "https://lrclib.net/api/search",
+                params={"q": title},
+                timeout=12,
+            )
+            r3.raise_for_status()
+            hit = _best_hit(r3.json())
+            if hit:
+                return hit
     except requests.RequestException as exc:
         print(f"  [LRCLIB] Network error: {exc}")
     return None
@@ -1062,14 +1106,13 @@ def main() -> None:
     lang   = LANGUAGES[args.lang]
     sep    = "─" * 60
 
-    # Auto-generate local URI if --spotify-uri was omitted
+    # Auto-generate local URI if --spotify-uri was omitted.
+    # Use a short hash of "artist|title" so every song gets a stable, unique
+    # URI regardless of character set (Cyrillic, CJK, etc.).
     if not args.spotify_uri:
-        import unicodedata as _ud
-        def _slugify(s: str) -> str:
-            s = _ud.normalize("NFKD", s).encode("ascii", "ignore").decode()
-            s = re.sub(r"[^\w\s-]", "", s.lower())
-            return re.sub(r"[\s_-]+", "-", s).strip("-")
-        args.spotify_uri = f"local:{_slugify(args.artist)}-{_slugify(args.title)}"
+        _uri_key = f"{args.artist.lower().strip()}|{args.title.lower().strip()}"
+        _uri_hash = hashlib.md5(_uri_key.encode("utf-8")).hexdigest()[:12]
+        args.spotify_uri = f"local:{_uri_hash}"
         print(f"  [Info] Auto-generated URI: {args.spotify_uri}")
 
     print(sep)
@@ -1091,8 +1134,15 @@ def main() -> None:
                     plain_lyrics, args.youtube_url, args.lang,
                     model_name=args.stable_ts_model,
                 )
+            elif plain_lyrics:
+                print("  [plain] No synced lyrics or YouTube URL found; saving with plain lyrics (no timestamps).")
+                print("  [plain] Add a YouTube URL and re-run with --regenerate to force-align later.")
+                lrc = "\n".join(
+                    f"[00:00.00]{line}"
+                    for line in _normalize_plain_lyrics(plain_lyrics)
+                )
     if lrc is None:
-        print("ERROR: Could not retrieve synced lyrics. Aborting.")
+        print("ERROR: Could not retrieve synced or plain lyrics. Aborting.")
         print("TIP:   Provide --youtube-url for stable-ts forced alignment.")
         print("TIP:   Pass --lrc-file <path> to use a local .lrc file as a fallback.")
         sys.exit(1)
@@ -1134,10 +1184,19 @@ def main() -> None:
 
     # ── 5. Write output JSON
     print(f"\n[5/5] Writing {args.output} …")
+
+    def _cyrillic_part(s: str) -> str:
+        """If artist is bilingual (e.g. 'Latin / Кирилл'), return Cyrillic part only."""
+        if " / " in s:
+            for part in s.split(" / "):
+                if any('\u0400' <= c <= '\u04FF' for c in part):
+                    return part.strip()
+        return s
+
     output = {
         "spotify_uri": args.spotify_uri,
         "title":       args.display_title or args.title,
-        "artist":      args.artist,
+        "artist":      _cyrillic_part(args.artist),
         "language": {
             "code":      args.lang,
             "name":      lang.name,
