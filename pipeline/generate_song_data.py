@@ -115,7 +115,7 @@ LANGUAGES: dict[str, LanguageConfig] = {
     "he": LanguageConfig("Hebrew",     "Hebrew",   "rtl", "HE",  GenericBackend),
 
     # ── English ───────────────────────────────────────────────────────────────
-    "en": LanguageConfig("English",    "Latin",    "ltr", "EN",  lambda: _make_spacy_or_generic("en")),
+    "en": LanguageConfig("English",    "Latin",    "ltr", "EN",  lambda: SpaCyBackend("en")),
 }
 
 # ── CLI ───────────────────────────────────────────────────────────────────────
@@ -830,6 +830,99 @@ def _resolve_definition(lemma: str, lang_code: str, translation: str = "",
     return "; ".join(ranked[:4])
 
 
+def _grammar_to_kaikki_pos(grammar: str) -> str:
+    """Map a SpaCy grammar label to a kaikki.org POS string."""
+    g = grammar.lower()
+    if g.startswith("verb") or g.startswith("auxiliary"):
+        return "verb"
+    if g.startswith("noun") or g.startswith("proper"):
+        return "noun"
+    if g.startswith("adj"):
+        return "adj"
+    if g.startswith("adv"):
+        return "adv"
+    return ""
+
+
+def _is_clean_ru_word(word: str) -> bool:
+    """Return True only for simple Cyrillic words (no phrases, no punctuation)."""
+    if not word or len(word) > 25 or " " in word:
+        return False
+    if any(c in word for c in "()«»/\\[]"):
+        return False
+    return bool(re.match(r"^[\u0400-\u04ff]", word))
+
+
+def _kaikki_en_lookup(lemma: str, pos_hint: str = "") -> tuple[str, str]:
+    """Fetch English gloss and Russian translation for an English lemma.
+
+    Uses the kaikki.org per-word JSONL endpoint (no full-file download needed).
+    pos_hint: kaikki POS string ("verb", "noun", "adj", "adv") to prefer matching entry.
+    Returns (en_gloss, ru_str); either may be an empty string on miss.
+    """
+    import urllib.error
+    import urllib.request
+
+    w = lemma.lower().strip()
+    if not w or len(w) < 2:
+        return "", ""
+
+    url = f"https://kaikki.org/dictionary/English/meaning/{w[0]}/{w[:2]}/{w}.jsonl"
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": "FlowUp/1.0"})
+        with urllib.request.urlopen(req, timeout=12) as resp:
+            entries = [json.loads(line) for line in resp if line.strip()]
+    except urllib.error.HTTPError as e:
+        if e.code == 404:
+            return "", ""
+        return "", ""
+    except Exception:
+        return "", ""
+
+    if not entries:
+        return "", ""
+
+    preferred_pos = {"verb", "noun", "adj", "adv"}
+    # Prefer entry matching the caller's POS hint, then any preferred POS, then first entry
+    if pos_hint and pos_hint in preferred_pos:
+        best = (
+            next((e for e in entries if e.get("pos") == pos_hint), None)
+            or next((e for e in entries if e.get("pos") in preferred_pos), entries[0])
+        )
+    else:
+        best = next((e for e in entries if e.get("pos") in preferred_pos), entries[0])
+
+    skip_prefixes = (
+        "simple past", "past participle", "plural of", "present participle",
+        "third-person", "archaic form", "alternative form", "obsolete form",
+    )
+    en_gloss = ""
+    for sense in best.get("senses", []):
+        for g in sense.get("glosses", []):
+            if g and not any(g.lower().startswith(p) for p in skip_prefixes):
+                en_gloss = g
+                break
+        if en_gloss:
+            break
+    if not en_gloss:
+        for sense in best.get("senses", []):
+            for g in sense.get("glosses", []):
+                if g:
+                    en_gloss = g
+                    break
+            if en_gloss:
+                break
+
+    ru_words = [
+        t["word"]
+        for t in best.get("translations", [])
+        if t.get("lang_code") == "ru" and _is_clean_ru_word(t.get("word", ""))
+    ]
+    ru_str = " / ".join(ru_words[:4])
+
+    return en_gloss, ru_str
+
+
 # ── Backend push ──────────────────────────────────────────────────────────────
 
 def push_to_backend(
@@ -925,7 +1018,15 @@ def process_line(
 
         analysis = backend.analyze_token(raw_tok, annot_tok)
 
-        definition = _resolve_definition(analysis.lemma, lang_code, translation, raw_tok)
+        if lang_code == "en":
+            pos_hint = _grammar_to_kaikki_pos(analysis.grammar)
+            en_gloss, ru_str = _kaikki_en_lookup(analysis.lemma, pos_hint)
+            definition = en_gloss or f"[{re.sub(r'[^\w]', '', analysis.lemma, flags=re.UNICODE)}]"
+            target_def = ru_str or definition
+        else:
+            definition = _resolve_definition(analysis.lemma, lang_code, translation, raw_tok)
+            target_def = definition
+
         words.append({
             "key":                  key,
             "display_form":         analysis.display_form,
@@ -933,7 +1034,7 @@ def process_line(
             "grammar":              analysis.grammar,
             "dictionary_definition": definition,
             # Normalized per-target-lang definitions (new format)
-            "definitions": {target_lang: definition} if target_lang else {},
+            "definitions": {target_lang: target_def} if target_lang else {},
         })
         key += 1
 

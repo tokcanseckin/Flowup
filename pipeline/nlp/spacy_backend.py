@@ -28,6 +28,7 @@ from typing import Optional
 from .base import NLPBackend, WordAnalysis
 
 _MODEL_MAP: dict[str, str] = {
+    "en": "en_core_web_sm",
     "de": "de_core_news_sm",
     "es": "es_core_news_sm",
     "fr": "fr_core_news_sm",

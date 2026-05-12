@@ -307,19 +307,31 @@ def _enrich_definition(raw_def: Optional[str], lemma: str, lang_code: str = "ru"
     return raw_def or _or_lookup_local(bare_lemma)
 
 
+def _is_placeholder_def(s: Optional[str]) -> bool:
+    """Return True for '[lemma]'-style placeholder definitions inserted by the pipeline."""
+    if not s:
+        return True
+    s = s.strip()
+    return len(s) < 60 and s.startswith("[") and s.endswith("]")
+
+
 def _word_response(word: Word, lang_code: str = "ru", target_lang: Optional[str] = None) -> WordResponse:
-    # Check normalized WordDefinition table first (multi-lang support)
+    # Check normalized WordDefinition table first (multi-lang support).
+    # Skip placeholder entries so we can fall through to a real definition.
     definition: Optional[str] = None
     if target_lang and word.definitions:
         for wd in word.definitions:
-            if wd.target_lang == target_lang:
+            if wd.target_lang == target_lang and not _is_placeholder_def(wd.definition):
                 definition = wd.definition
                 break
-    if definition is None:
+    if definition is None or _is_placeholder_def(definition):
         definition = word.dictionary_definition
-    # Last resort: if still no definition, pick any entry from word_definitions
-    if definition is None and word.definitions:
-        definition = word.definitions[0].definition
+    # Last resort: any non-placeholder entry from word_definitions
+    if _is_placeholder_def(definition) and word.definitions:
+        for wd in word.definitions:
+            if not _is_placeholder_def(wd.definition):
+                definition = wd.definition
+                break
     return WordResponse(
         key=word.key_index,
         display_form=word.display_form,
