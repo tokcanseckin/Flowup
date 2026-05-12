@@ -381,7 +381,12 @@ export default function LyricsPlayer({
   }>({ timer: null, key: null, holdShown: false, target: null })
 
   const inspectInfo = resolveInspectInfo(lines, inspectState)
-  const { lookedUpLemmas, recordLookup } = useWordHistory()
+  const { entries: wordHistoryEntries, recordLookup } = useWordHistory()
+  // Only underline words looked up in the same language as this song
+  const lookedUpLemmas = useMemo(
+    () => new Set(wordHistoryEntries.filter(e => e.language === langCode).map(e => e.lemma)),
+    [wordHistoryEntries, langCode],
+  )
   const prevInspectStateRef = useRef<InspectState | null>(null)
   const panelBackground = themeBackground ?? 'linear-gradient(180deg, #1a57bf 0%, #0f46a8 100%)'
   const asideBackground = themeAsideBackground ?? '#184f9b'

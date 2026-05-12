@@ -250,6 +250,29 @@ class SongIngest(BaseModel):
     apple_music_url: Optional[str] = None
 
 
+# ── Word lookup models ─────────────────────────────────────────────────────────
+
+class WordLookupCreate(BaseModel):
+    """Body for POST /api/me/word-lookups."""
+    lemma: str
+    language: str         # song language code, e.g. "ru", "tr"
+    display_form: str
+    definition: Optional[str] = None
+    grammar: Optional[str] = None
+    song_id: Optional[int] = None
+
+
+class WordLookupResponse(BaseModel):
+    """One entry returned by GET /api/me/word-lookups."""
+    lemma: str
+    language: str
+    display_form: str
+    definition: Optional[str] = None
+    grammar: Optional[str] = None
+    song_id: Optional[int] = None
+    looked_up_at: int
+
+
 class SongSourcesUpdate(BaseModel):
     """PATCH body to update alternative source URLs for a song."""
     youtube_url: Optional[str] = None

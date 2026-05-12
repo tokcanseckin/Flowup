@@ -50,7 +50,7 @@ from fastapi.responses import JSONResponse, Response, StreamingResponse
 from sqlalchemy import select as sa_select
 from sqlalchemy.orm import Session, noload
 
-from database import AlignmentTask, Line, LineTranslation, Playlist, PlaylistSong, Song, User, UserFavorite, UserListenedSong, Word, WordDefinition, create_tables, get_db
+from database import AlignmentTask, Line, LineTranslation, Playlist, PlaylistSong, Song, User, UserFavorite, UserListenedSong, UserWordLookup, Word, WordDefinition, create_tables, get_db
 from models import (
     AdminLyricsUpdate,
     AdminSongDetailResponse,
@@ -87,6 +87,8 @@ from models import (
     UserSettingsUpdate,
     AppleMusicTokenRequest,
     UserSyncRequest,
+    WordLookupCreate,
+    WordLookupResponse,
     WordResponse,
     WorkerResultSubmit,
     WorkerTaskResponse,
@@ -1726,6 +1728,64 @@ def remove_listened(
         UserListenedSong.user_id == current_user.id,
         UserListenedSong.song_id == song_id,
     ).delete()
+    db.commit()
+
+
+# ── Word Lookups ───────────────────────────────────────────────────────────────
+
+@app.get("/api/me/word-lookups", response_model=list[WordLookupResponse])
+def get_word_lookups(
+    current_user: User = Depends(_get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Return all words the current user has ever looked up."""
+    rows = db.query(UserWordLookup).filter(
+        UserWordLookup.user_id == current_user.id,
+    ).all()
+    return [
+        WordLookupResponse(
+            lemma=r.lemma,
+            language=r.language,
+            display_form=r.display_form,
+            definition=r.definition,
+            grammar=r.grammar,
+            song_id=r.song_id,
+            looked_up_at=r.looked_up_at,
+        )
+        for r in rows
+    ]
+
+
+@app.post("/api/me/word-lookups", status_code=204)
+def record_word_lookup(
+    body: WordLookupCreate,
+    current_user: User = Depends(_get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Upsert a word lookup — updates timestamp and details if the (lemma, language) pair already exists."""
+    existing = db.query(UserWordLookup).filter(
+        UserWordLookup.user_id == current_user.id,
+        UserWordLookup.lemma == body.lemma,
+        UserWordLookup.language == body.language,
+    ).first()
+    now = int(time.time())
+    if existing:
+        existing.display_form = body.display_form
+        existing.definition   = body.definition
+        existing.grammar      = body.grammar
+        existing.song_id      = body.song_id
+        existing.looked_up_at = now
+    else:
+        db.add(UserWordLookup(
+            user_id=current_user.id,
+            lemma=body.lemma,
+            language=body.language,
+            display_form=body.display_form,
+            definition=body.definition,
+            grammar=body.grammar,
+            song_id=body.song_id,
+            looked_up_at=now,
+        ))
     db.commit()
 
 

@@ -219,6 +219,22 @@ class UserListenedSong(Base):
     created_at = Column(Integer, default=lambda: int(time.time()))
 
 
+class UserWordLookup(Base):
+    """A word the user has looked up while studying a song."""
+    __tablename__ = "user_word_lookups"
+    __table_args__ = (UniqueConstraint("user_id", "lemma", "language", name="uq_user_word_lookup"),)
+
+    id           = Column(Integer,     primary_key=True)
+    user_id      = Column(Integer,     ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    lemma        = Column(String(256), nullable=False)
+    language     = Column(String(8),   nullable=False)
+    display_form = Column(String(256), nullable=False)
+    definition   = Column(Text,        nullable=True)
+    grammar      = Column(String(256), nullable=True)
+    song_id      = Column(Integer,     ForeignKey("songs.id", ondelete="SET NULL"), nullable=True)
+    looked_up_at = Column(Integer,     nullable=False, default=lambda: int(time.time()))
+
+
 class AlignmentTask(Base):
     """
     A queued request for the Mac Mini alignment worker to process one song.

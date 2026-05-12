@@ -118,6 +118,16 @@ export interface UserSettings {
   preferred_source: 'spotify' | 'youtube' | 'apple_music'
 }
 
+export interface WordLookupEntry {
+  lemma: string
+  language: string       // song language code, e.g. "ru", "tr"
+  display_form: string
+  definition: string | null
+  grammar: string | null
+  song_id: number | null
+  looked_up_at: number   // Unix seconds
+}
+
 export interface AlignmentTask {
   id: number
   status: 'pending' | 'processing' | 'done' | 'failed'
@@ -336,6 +346,16 @@ export const api = {
     apiFetch('/me/apple-music-token', {
       method: 'PUT',
       body: JSON.stringify({ token }),
+      headers: getUserAuthHeaders(),
+    }),
+
+  getWordLookups: (): Promise<WordLookupEntry[]> =>
+    apiFetch('/me/word-lookups', { headers: getUserAuthHeaders() }),
+
+  recordWordLookup: (entry: Omit<WordLookupEntry, 'looked_up_at'>): Promise<void> =>
+    apiFetch('/me/word-lookups', {
+      method: 'POST',
+      body: JSON.stringify(entry),
       headers: getUserAuthHeaders(),
     }),
 
