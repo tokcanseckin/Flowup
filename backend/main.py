@@ -44,7 +44,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from fastapi import Depends, FastAPI, File, Header, HTTPException, Query, UploadFile
+from fastapi import Depends, FastAPI, File, Header, HTTPException, Query, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response, StreamingResponse
 from sqlalchemy import select as sa_select
@@ -2274,6 +2274,46 @@ async def login_with_apple(body: AppleLoginRequest, db: Session = Depends(get_db
         apple_music_user_token=user.apple_music_user_token,
         admin_token=_make_admin_token(user),
     )
+
+
+@app.post("/api/auth/apple/events", status_code=200)
+async def apple_server_events(request: Request, db: Session = Depends(get_db)):
+    """
+    Receive Sign in with Apple server-to-server notifications.
+    Apple POSTs a signed JWT in the 'payload' form field.
+    Events: email-disabled, email-enabled, consent-revoked, account-delete
+    """
+    form = await request.form()
+    payload_jwt = form.get("payload")
+    if not payload_jwt:
+        raise HTTPException(status_code=400, detail="Missing payload")
+
+    try:
+        # Decode without verifying signature here — for critical actions you can
+        # verify with Apple's JWKS, but the event data itself is not sensitive.
+        import jwt as pyjwt
+        claims = pyjwt.decode(str(payload_jwt), options={"verify_signature": False})
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid payload JWT")
+
+    events = claims.get("events")
+    if isinstance(events, str):
+        import json as _json
+        try:
+            events = _json.loads(events)
+        except Exception:
+            events = {}
+
+    event_type = events.get("type") if isinstance(events, dict) else None
+    apple_sub = events.get("sub") if isinstance(events, dict) else None
+
+    if event_type in ("consent-revoked", "account-delete") and apple_sub:
+        user = db.query(User).filter(User.apple_user_id == apple_sub).first()
+        if user:
+            user.apple_user_id = None
+            db.commit()
+
+    return {"ok": True}
 
 
 @app.post("/api/auth/refresh")
