@@ -117,13 +117,25 @@ def main() -> None:
     parser.add_argument("--dry-run", action="store_true", help="Print changes without writing")
     parser.add_argument("--delay", type=float, default=0.3, help="Seconds between HTTP requests")
     parser.add_argument("--limit", type=int, default=0, help="Max unique lemmas to process (0 = all)")
+    parser.add_argument("--recheck", action="store_true",
+                        help="Re-fetch ALL words (not just placeholders) to fix bad prior translations")
     args = parser.parse_args()
 
     conn = sqlite3.connect(args.db_path)
     conn.row_factory = sqlite3.Row
 
-    # Collect word_ids whose RU definition is a placeholder
-    rows = conn.execute("""
+    if args.recheck:
+        # Re-process everything — needed to fix bad translations from a prior run
+        rows = conn.execute("""
+            SELECT w.lemma, w.id AS word_id, w.dictionary_definition, wd.id AS wd_id, wd.definition AS wd_def
+            FROM word_definitions wd
+            JOIN words w ON w.id = wd.word_id
+            WHERE wd.target_lang = 'RU'
+            ORDER BY w.lemma
+        """).fetchall()
+    else:
+        # Only process placeholder '[lemma]' entries
+        rows = conn.execute("""
         SELECT w.lemma, w.id AS word_id, w.dictionary_definition, wd.id AS wd_id, wd.definition AS wd_def
         FROM word_definitions wd
         JOIN words w ON w.id = wd.word_id
