@@ -71,6 +71,8 @@ class PlaylistSongEntry(BaseModel):
     spotify_uri: str
     title: str
     artist: Optional[str]
+    youtube_url: Optional[str] = None
+    apple_music_url: Optional[str] = None
 
     model_config = {"from_attributes": True}
 

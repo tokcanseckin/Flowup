@@ -62,6 +62,8 @@ export interface PlaylistSongEntry {
   spotify_uri: string
   title: string
   artist: string | null
+  youtube_url: string | null
+  apple_music_url: string | null
 }
 
 export interface PlaylistSummary {
@@ -318,22 +320,23 @@ export const api = {
       body: JSON.stringify(body),
     }),
 
-  getUserSettings: (spotifyId: string): Promise<UserSettings> =>
-    apiFetch(`/users/${encodeURIComponent(spotifyId)}/settings`),
+  getUserSettings: (): Promise<UserSettings> =>
+    apiFetch('/me/settings', { headers: getUserAuthHeaders() }),
 
   updateUserSettings: (
-    spotifyId: string,
     patch: Partial<UserSettings>,
   ): Promise<UserSettings> =>
-    apiFetch(`/users/${encodeURIComponent(spotifyId)}/settings`, {
+    apiFetch('/me/settings', {
       method: 'PUT',
       body: JSON.stringify(patch),
+      headers: getUserAuthHeaders(),
     }),
 
-  saveAppleMusicToken: (spotifyId: string, token: string | null): Promise<void> =>
-    apiFetch(`/users/${encodeURIComponent(spotifyId)}/apple-music-token`, {
+  saveAppleMusicToken: (token: string | null): Promise<void> =>
+    apiFetch('/me/apple-music-token', {
       method: 'PUT',
       body: JSON.stringify({ token }),
+      headers: getUserAuthHeaders(),
     }),
 
   updateSongSources: (

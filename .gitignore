@@ -22,6 +22,8 @@ frontend/.vite/
 
 # Local databases
 flowup.db
+backend/.song_cache.json
+backend/.song_cache.tmp
 flowup.db-wal
 flowup.db-shm
 backend/flowup.db

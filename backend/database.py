@@ -10,6 +10,9 @@ from sqlalchemy import Column, ForeignKey, Integer, LargeBinary, String, Text, U
 from sqlalchemy.orm import DeclarativeBase, Session, deferred, relationship, sessionmaker
 
 DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///./flowup.db")
+# UpCloud (and Heroku) issue "postgres://" but SQLAlchemy 2.x requires "postgresql://"
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
 engine = create_engine(
     DATABASE_URL,
@@ -161,7 +164,7 @@ class Playlist(Base):
     cover_image         = deferred(Column(LargeBinary, nullable=True))
     cover_image_type    = Column(String(64),  nullable=True)
     # CEFR-style level: A1, A2, B1, B2, C1, C2
-    difficulty_level    = Column(String(8),   nullable=True)
+    difficulty_level    = Column(String(20),  nullable=True)
     language_code       = Column(String(8),   nullable=True)
     # Target language for translations/definitions in this playlist (e.g. "RU")
     target_lang         = Column(String(16),  nullable=True)

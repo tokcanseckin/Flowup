@@ -735,7 +735,7 @@ function SongBrowser({
       <header className="sticky top-0 z-20 border-b border-gray-900" style={{ background: '#050608' }}>
         <div className="max-w-[1200px] mx-auto w-full px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            {activePlaylist && (
+            {(activePlaylist || (activePlaylistId !== null && loading)) && (
               <button onClick={() => onSelectPlaylist(null)} className="text-gray-500 hover:text-gray-300 transition-colors mr-1" aria-label="Back to all playlists">
                 <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">
                   <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
@@ -773,7 +773,27 @@ function SongBrowser({
 
       {/* Content */}
       <div className="px-4 pt-6 pb-10 max-w-[1200px] mx-auto">
-        {activePlaylist ? (
+        {activePlaylistId !== null && activePlaylist === null && loading ? (
+          <div className="flex gap-8 items-start">
+            {/* Left skeleton */}
+            <div className="w-72 shrink-0">
+              <div className="h-11" />
+              <div className="w-full aspect-square rounded-2xl mb-5 animate-pulse" style={{ background: '#1c1d21' }} />
+              <div className="h-5 rounded-lg mb-2 animate-pulse w-3/4" style={{ background: '#1c1d21' }} />
+              <div className="h-3 rounded-lg mb-5 animate-pulse w-1/2" style={{ background: '#1c1d21' }} />
+              <div className="h-9 rounded-xl mb-5 animate-pulse" style={{ background: '#1c1d21' }} />
+            </div>
+            {/* Right skeleton */}
+            <div className="flex-1 min-w-0">
+              <div className="h-7 rounded-lg mb-4 animate-pulse w-24" style={{ background: '#1c1d21' }} />
+              <div className="space-y-2">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="h-[72px] rounded-2xl animate-pulse" style={{ background: '#1c1d21' }} />
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : activePlaylist ? (
           <div className="flex gap-8 items-start">
             {/* Left column — playlist detail */}
             <div className="w-72 shrink-0 sticky top-20 overflow-y-auto no-scrollbar pb-10" style={{ maxHeight: 'calc(100vh - 5rem)' }}>
@@ -916,7 +936,6 @@ function SongBrowser({
                 ))}
               </div>
             )}
-            {songList}
           </div>
         )}
       </div>
@@ -1964,6 +1983,7 @@ export default function App() {
   const [lastSelectedSongId, setLastSelectedSongId] = useState<number | null>(null)
   const [settingsHydrated, setSettingsHydrated] = useState(false)
   const restoreDoneRef = useRef(false)
+  const playlistCacheRef = useRef<Map<number, PlaylistDetail>>(new Map())
   const route = useMemo(() => parseAppRoute(currentPath), [currentPath])
 
   const navigateToPath = useCallback((path: string, replace = false) => {
@@ -2019,7 +2039,7 @@ export default function App() {
   const updateSettings = useCallback((patch: Partial<AppSettings>) => {
     setSettings(prev => ({ ...prev, ...patch }))
     if (!settingsOwnerSpotifyId) return
-    api.updateUserSettings(settingsOwnerSpotifyId, toApiSettingsPatch(patch)).catch(() => {
+    api.updateUserSettings(toApiSettingsPatch(patch)).catch(() => {
       // Non-fatal: keep optimistic UI state if backend update fails.
     })
   }, [settingsOwnerSpotifyId])
@@ -2098,7 +2118,7 @@ export default function App() {
     const updated: BackendUser = { ...credentialUser, apple_music_user_token: token }
     setCredentialUser(updated)
     localStorage.setItem(PASSWORD_SESSION_KEY, JSON.stringify(updated))
-    api.saveAppleMusicToken(credentialUser.spotify_id, token).catch(console.error)
+    api.saveAppleMusicToken(token).catch(console.error)
   }, [credentialUser])
 
   const handleSelectSong = useCallback(async (id: number, options?: { updateRoute?: boolean }) => {
@@ -2154,12 +2174,11 @@ export default function App() {
     setSettingsHydrated(false)
   }, [settingsOwnerSpotifyId])
 
-  // Fetch song and playlist lists once authenticated
+  // Fetch playlist list once authenticated; songs are loaded on-demand per playlist
   useEffect(() => {
     if (!isAuthenticated) return
-    void loadSongs()
     void loadPlaylists()
-  }, [isAuthenticated, loadPlaylists, loadSongs])
+  }, [isAuthenticated, loadPlaylists])
 
   useEffect(() => {
     if (!activePlaylistId) {
@@ -2167,17 +2186,27 @@ export default function App() {
       setPlaylistDetailLoading(false)
       return
     }
+    const cached = playlistCacheRef.current.get(activePlaylistId)
+    if (cached) {
+      setActivePlaylist(cached)
+      setPlaylistDetailLoading(false)
+      return
+    }
     setActivePlaylist(null)
     setPlaylistDetailLoading(true)
     api.getPlaylist(activePlaylistId)
-      .then(pl => { setActivePlaylist(pl); setPlaylistDetailLoading(false) })
+      .then(pl => {
+        playlistCacheRef.current.set(activePlaylistId, pl)
+        setActivePlaylist(pl)
+        setPlaylistDetailLoading(false)
+      })
       .catch(() => { setActivePlaylist(null); setPlaylistDetailLoading(false) })
   }, [activePlaylistId])
 
   // Sync user to backend (non-fatal if backend is down)
   useEffect(() => {
     if (!credentialUser?.spotify_id) return
-    api.getUserSettings(credentialUser.spotify_id)
+    api.getUserSettings()
       .then((loaded) => {
         setSettings(fromApiSettings(loaded))
         setSettingsHydrated(true)
@@ -2292,8 +2321,8 @@ export default function App() {
         artist: entry.artist,
         language_code: activePlaylist.language_code ?? 'ru',
         language_name: (activePlaylist.language_code ?? 'ru').toUpperCase(),
-        youtube_url: null,
-        apple_music_url: null,
+        youtube_url: entry.youtube_url,
+        apple_music_url: entry.apple_music_url,
       }
     })
   }, [activePlaylist, songs])
@@ -2443,7 +2472,7 @@ export default function App() {
       playlists={playlists}
       activePlaylistId={activePlaylistId}
       activePlaylist={activePlaylist}
-      loading={songsLoading || playlistsLoading || playlistDetailLoading}
+      loading={playlistsLoading || playlistDetailLoading}
       error={songsError}
       onSelect={handleSelectSong}
       onPrefetch={handlePrefetchSong}

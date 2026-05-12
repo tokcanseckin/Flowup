@@ -29,6 +29,7 @@ import re
 import secrets
 import subprocess
 import tempfile
+import threading
 import time
 import urllib.parse
 import urllib.request
@@ -46,7 +47,8 @@ load_dotenv()
 from fastapi import Depends, FastAPI, File, Header, HTTPException, Query, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response, StreamingResponse
-from sqlalchemy.orm import Session
+from sqlalchemy import select as sa_select
+from sqlalchemy.orm import Session, noload
 
 from database import AlignmentTask, Line, LineTranslation, Playlist, PlaylistSong, Song, User, UserFavorite, UserListenedSong, Word, WordDefinition, create_tables, get_db
 from models import (
@@ -100,28 +102,101 @@ from google_auth import verify_google_id_token
 # Values: SongDetailResponse serialised as dict (JSON-ready, ~30 KB/song).
 _song_response_cache: dict[tuple[int, Optional[str]], dict] = {}
 
+# Persistent disk cache — survives process restarts so the DB is only queried
+# for songs that are new or have changed since the last save.
+_CACHE_FILE = Path(__file__).parent / ".song_cache.json"
+_disk_save_timer: Optional[threading.Timer] = None
+_disk_save_lock = threading.Lock()
+
+
+def _save_disk_cache() -> None:
+    """Atomically write the in-memory cache to disk."""
+    global _disk_save_timer
+    try:
+        songs: dict[str, dict] = {}
+        for (song_id, source), val in _song_response_cache.items():
+            songs[f"{song_id}:{source or ''}"] = val
+        payload = {"version": 1, "saved_at": int(time.time()), "songs": songs}
+        tmp = _CACHE_FILE.with_suffix(".tmp")
+        tmp.write_text(json.dumps(payload), encoding="utf-8")
+        tmp.replace(_CACHE_FILE)
+        print(f"[Cache] Saved {len(songs)} entries to disk.")
+    except Exception as exc:
+        print(f"[Cache] Disk save failed (non-fatal): {exc}")
+    finally:
+        with _disk_save_lock:
+            _disk_save_timer = None
+
+
+def _load_disk_cache() -> int:
+    """Populate the in-memory cache from disk. Returns number of entries loaded."""
+    if not _CACHE_FILE.exists():
+        return 0
+    try:
+        data = json.loads(_CACHE_FILE.read_text(encoding="utf-8"))
+        if data.get("version") != 1:
+            return 0
+        count = 0
+        for key_str, val in data.get("songs", {}).items():
+            parts = key_str.split(":", 1)
+            song_id = int(parts[0])
+            source: Optional[str] = parts[1] if len(parts) > 1 and parts[1] else None
+            _song_response_cache[(song_id, source)] = val
+            count += 1
+        age_h = (time.time() - data.get("saved_at", 0)) / 3600
+        print(f"[Cache] Loaded {count} entries from disk (age: {age_h:.1f}h).")
+        return count
+    except Exception as exc:
+        print(f"[Cache] Disk load failed (non-fatal): {exc}")
+        return 0
+
+
+def _schedule_disk_save(delay: float = 2.0) -> None:
+    """Debounced disk save — burst writes coalesce into a single flush."""
+    global _disk_save_timer
+    with _disk_save_lock:
+        if _disk_save_timer is not None:
+            _disk_save_timer.cancel()
+        t = threading.Timer(delay, _save_disk_cache)
+        t.daemon = True
+        t.start()
+        _disk_save_timer = t
+
 
 def _cache_invalidate(song_id: int) -> None:
-    """Remove all cached variants for a song. Call after any write."""
+    """Remove all cached variants for a song and schedule a disk flush."""
     keys = [k for k in _song_response_cache if k[0] == song_id]
     for k in keys:
         del _song_response_cache[k]
+    _schedule_disk_save()
 
 
-def _warm_song_cache() -> None:
-    """Pre-populate the cache for every song in the DB at startup."""
+def _warm_new_songs_only() -> None:
+    """Fetch only songs not already in the in-memory cache, then persist to disk."""
     db = next(get_db())
     try:
-        songs = db.query(Song).all()
-        count = 0
+        all_ids = {row[0] for row in db.query(Song.id).all()}
+        missing = [sid for sid in all_ids if (sid, None) not in _song_response_cache]
+        # Evict stale entries for songs deleted from the DB.
+        stale = [sid for (sid, src) in list(_song_response_cache) if src is None and sid not in all_ids]
+        for sid in stale:
+            keys = [k for k in _song_response_cache if k[0] == sid]
+            for k in keys:
+                del _song_response_cache[k]
+        if not missing:
+            if stale:
+                _save_disk_cache()
+            print(f"[Cache] All {len(all_ids)} songs already cached from disk.")
+            return
+        print(f"[Cache] Fetching {len(missing)} new/missing songs from DB…")
+        songs = db.query(Song).filter(Song.id.in_(missing)).all()
         for song in songs:
-            # Always cache the default view.
             detail = _song_detail(song, source=None)
             _song_response_cache[(song.id, None)] = detail.model_dump()
-            count += 1
-        print(f"[Cache] Warmed {count} songs.")
+        print(f"[Cache] Added {len(songs)} songs. Total in cache: {len(_song_response_cache)}.")
+        _save_disk_cache()
     except Exception as exc:
-        print(f"[Cache] Warm-up failed (non-fatal): {exc}")
+        print(f"[Cache] Background warm failed (non-fatal): {exc}")
     finally:
         db.close()
 
@@ -145,12 +220,17 @@ async def lifespan(app: FastAPI):
         await loop.run_in_executor(None, _italian_dict.ensure_loaded)
     except Exception as exc:
         print(f"[ItalianDict] Startup preload failed (non-fatal): {exc}")
-    # Warm the song cache so first requests are served from memory.
-    try:
-        await loop.run_in_executor(None, _warm_song_cache)
-    except Exception as exc:
-        print(f"[Cache] Startup warm failed (non-fatal): {exc}")
+    # Phase 1: Restore the disk cache instantly — no DB round-trip needed.
+    _load_disk_cache()
+    # Phase 2: Background sync — only fetch songs missing from the disk cache.
+    warm_future = asyncio.ensure_future(loop.run_in_executor(None, _warm_new_songs_only))
     yield
+    # Shutdown: cancel background warm if still running.
+    warm_future.cancel()
+    try:
+        await warm_future
+    except (asyncio.CancelledError, Exception):
+        pass
 
 
 def _seed_sample_data() -> None:
@@ -813,7 +893,8 @@ def image_proxy(url: str = Query(..., min_length=8, max_length=2048)):
 
 @app.get("/api/songs", response_model=list[SongSummaryResponse])
 def list_songs(db: Session = Depends(get_db)):
-    songs = db.query(Song).order_by(Song.created_at.desc()).all()
+    # noload(Song.lines) prevents the selectin cascade: lines → words → definitions
+    songs = db.query(Song).options(noload(Song.lines)).order_by(Song.created_at.desc()).all()
     return [
         SongSummaryResponse(
             id=s.id,
@@ -1346,24 +1427,42 @@ def update_admin_user(user_id: int, body: AdminUserUpdate, db: Session = Depends
 
 # ── Playlists ──────────────────────────────────────────────────────────────────
 
-def _playlist_song_entry(ps: PlaylistSong) -> PlaylistSongEntry | None:
-    if ps.song is None:
-        return None  # dangling FK — song was deleted without cascade
-    return PlaylistSongEntry(
-        position=ps.position,
-        song_id=ps.song.id,
-        spotify_uri=ps.song.spotify_uri,
-        title=ps.song.title,
-        artist=ps.song.artist,
-    )
-
-
 # In-process cover image cache {playlist_id: (bytes, content_type)}
 _cover_cache: dict[int, tuple[bytes, str]] = {}
 
 
-def _playlist_response(pl: Playlist) -> PlaylistResponse:
-    songs = [e for ps in pl.playlist_songs if (e := _playlist_song_entry(ps)) is not None]
+def _playlist_response(pl: Playlist, db: Session) -> PlaylistResponse:
+    # Load only the junction rows (already selectin on Playlist.playlist_songs)
+    ps_list = pl.playlist_songs
+    if ps_list:
+        pos_map = {ps.song_id: ps.position for ps in ps_list}
+        song_ids = list(pos_map.keys())
+        # Single targeted query — selects only scalar columns, never triggers
+        # the Song.lines selectin cascade (lines → words → definitions).
+        rows = db.execute(
+            sa_select(
+                Song.id, Song.spotify_uri, Song.title, Song.artist,
+                Song.youtube_url, Song.apple_music_url,
+            ).where(Song.id.in_(song_ids))
+        ).all()
+        songs = sorted(
+            [
+                PlaylistSongEntry(
+                    position=pos_map[r.id],
+                    song_id=r.id,
+                    spotify_uri=r.spotify_uri,
+                    title=r.title,
+                    artist=r.artist,
+                    youtube_url=r.youtube_url,
+                    apple_music_url=r.apple_music_url,
+                )
+                for r in rows
+                if r.id in pos_map
+            ],
+            key=lambda e: e.position,
+        )
+    else:
+        songs = []
     return PlaylistResponse(
         id=pl.id,
         spotify_playlist_id=pl.spotify_playlist_id,
@@ -1422,7 +1521,7 @@ def create_playlist(body: PlaylistCreate, db: Session = Depends(get_db), _: User
 
     db.commit()
     db.refresh(pl)
-    return _playlist_response(pl)
+    return _playlist_response(pl, db)
 
 
 @app.get("/api/playlists/{playlist_id}", response_model=PlaylistResponse)
@@ -1430,7 +1529,7 @@ def get_playlist(playlist_id: int, db: Session = Depends(get_db)):
     pl = db.get(Playlist, playlist_id)
     if not pl:
         raise HTTPException(status_code=404, detail="Playlist not found")
-    return _playlist_response(pl)
+    return _playlist_response(pl, db)
 
 
 @app.patch("/api/playlists/{playlist_id}", response_model=PlaylistResponse)
@@ -1450,7 +1549,7 @@ def update_playlist(playlist_id: int, body: PlaylistUpdate, db: Session = Depend
         pl.target_lang = body.target_lang
     db.commit()
     db.refresh(pl)
-    return _playlist_response(pl)
+    return _playlist_response(pl, db)
 
 
 @app.delete("/api/playlists/{playlist_id}", status_code=204)
@@ -1525,7 +1624,7 @@ def add_song_to_playlist(playlist_id: int, body: PlaylistAddSong, db: Session = 
     db.add(PlaylistSong(playlist_id=pl.id, song_id=body.song_id, position=pos))
     db.commit()
     db.refresh(pl)
-    return _playlist_response(pl)
+    return _playlist_response(pl, db)
 
 
 @app.delete("/api/playlists/{playlist_id}/songs/{song_id}", response_model=PlaylistResponse)
@@ -1539,7 +1638,7 @@ def remove_song_from_playlist(playlist_id: int, song_id: int, db: Session = Depe
     db.delete(ps)
     db.commit()
     db.refresh(pl)
-    return _playlist_response(pl)
+    return _playlist_response(pl, db)
 
 
 # ── Favorites ──────────────────────────────────────────────────────────────────
@@ -1758,19 +1857,18 @@ async def complete_onboarding(body: CompleteOnboardingRequest, db: Session = Dep
     )
 
 
-@app.get("/api/users/{spotify_id}/settings", response_model=UserSettings)
-async def get_user_settings(spotify_id: str, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.spotify_id == spotify_id).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    return _parse_user_settings(user.settings_json)
+@app.get("/api/me/settings", response_model=UserSettings)
+async def get_user_settings(current_user: User = Depends(_get_current_user)):
+    return _parse_user_settings(current_user.settings_json)
 
 
-@app.put("/api/users/{spotify_id}/settings", response_model=UserSettings)
-async def update_user_settings(spotify_id: str, body: UserSettingsUpdate, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.spotify_id == spotify_id).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+@app.put("/api/me/settings", response_model=UserSettings)
+async def update_user_settings(
+    body: UserSettingsUpdate,
+    current_user: User = Depends(_get_current_user),
+    db: Session = Depends(get_db),
+):
+    user = current_user
 
     current = _parse_user_settings(user.settings_json)
     patch = body.model_dump(exclude_unset=True)
@@ -1804,17 +1902,14 @@ async def update_user_settings(spotify_id: str, body: UserSettingsUpdate, db: Se
 # ── Apple Music user token persistence ────────────────────────────────────────
 
 
-@app.put("/api/users/{spotify_id}/apple-music-token")
+@app.put("/api/me/apple-music-token")
 async def save_apple_music_token(
-    spotify_id: str,
     body: AppleMusicTokenRequest,
+    current_user: User = Depends(_get_current_user),
     db: Session = Depends(get_db),
 ):
     """Persist (or clear) the user's MusicKit musicUserToken."""
-    user = db.query(User).filter(User.spotify_id == spotify_id).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    user.apple_music_user_token = body.token or None
+    current_user.apple_music_user_token = body.token or None
     db.commit()
     return {"ok": True}
 
