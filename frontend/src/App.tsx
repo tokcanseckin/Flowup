@@ -556,7 +556,7 @@ function SourcePicker({
 // ── Song browser ──────────────────────────────────────────────────────────────
 
 function SongBrowser({
-  songs, playlists, activePlaylistId, activePlaylist, loading, error, onSelect, onPrefetch, onSelectPlaylist, onLogout, onOpenSettings, onOpenAdmin, onOpenAccount, isAdmin, user, openedSongIds, favoriteSongIds, toggleFavorite, markAsNotListened, wordsLookedUpCount,
+  songs, playlists, activePlaylistId, activePlaylist, loading, error, onSelect, onPrefetch, onSelectPlaylist, onLogout, onOpenSettings, onOpenAdmin, onOpenAccount, isAdmin, user, openedSongIds, favoriteSongIds, toggleFavorite, markAsNotListened, wordsLookedUpCount, availableTargetLangs, targetLang, onTargetLangChange,
 }: {
   songs: SongSummary[]
   playlists: PlaylistSummary[]
@@ -578,6 +578,9 @@ function SongBrowser({
   toggleFavorite: (id: number) => void
   markAsNotListened: (id: number) => void
   wordsLookedUpCount: number
+  availableTargetLangs: string[]
+  targetLang: string | undefined
+  onTargetLangChange: (lang: string | null) => void
 }) {
   const listenedCount = activePlaylist
     ? activePlaylist.songs.filter(s => openedSongIds.has(s.song_id)).length
@@ -759,6 +762,18 @@ function SongBrowser({
                 Admin
               </button>
             )}
+            {activePlaylistId !== null && availableTargetLangs.length > 0 && (
+              <select
+                value={targetLang ?? ''}
+                onChange={e => onTargetLangChange(e.target.value || null)}
+                className="text-xs rounded-lg border border-gray-700/70 bg-gray-800/70 px-2 py-1 text-gray-300 focus:outline-none focus:border-gray-500 cursor-pointer"
+                aria-label="Translation language"
+              >
+                {availableTargetLangs.map(lang => (
+                  <option key={lang} value={lang}>{lang.toUpperCase()}</option>
+                ))}
+              </select>
+            )}
             <button
               type="button"
               onClick={onOpenSettings}
@@ -823,10 +838,10 @@ function SongBrowser({
               )}
 
               {/* Title */}
-              <h1 className="text-white font-bold text-xl leading-tight mb-1">{activePlaylist.name}</h1>
+              <h1 className="text-white font-bold text-xl leading-tight mb-3">{activePlaylist.name}</h1>
 
               {/* Badges */}
-              <div className="flex flex-wrap gap-1.5 mb-3">
+              <div className="flex flex-wrap gap-1.5 mb-5">
                 {activePlaylist.language_code && (
                   <span className="text-[10px] font-mono font-medium px-1.5 py-0.5 rounded-md uppercase tracking-wider" style={{ color: '#4ade80', background: 'rgba(0,109,54,0.25)', border: '1px solid rgba(0,109,54,0.45)' }}>
                     {activePlaylist.language_code}
@@ -839,17 +854,12 @@ function SongBrowser({
                 )}
               </div>
 
-              {/* Description */}
-              {activePlaylist.description && (
-                <p className="text-gray-400 text-sm leading-relaxed mb-4">{activePlaylist.description}</p>
-              )}
-
               {/* Play button */}
               {songs.length > 0 && (
                 <button
                   type="button"
                   onClick={() => onSelect(songs[0].id)}
-                  className="w-full flex items-center justify-center gap-2 rounded-xl active:scale-[0.98] transition-all text-white font-medium text-sm py-2.5 mb-5"
+                  className="w-full flex items-center justify-center gap-2 rounded-xl active:scale-[0.98] transition-all text-white font-medium text-sm py-3 mb-6"
                   style={{ background: '#006D36' }}
                   onMouseEnter={e => (e.currentTarget.style.background = '#008a44')}
                   onMouseLeave={e => (e.currentTarget.style.background = '#006D36')}
@@ -862,7 +872,7 @@ function SongBrowser({
               )}
 
               {/* Stats */}
-              <div className="rounded-2xl border border-zinc-700/70 divide-y divide-zinc-700/70" style={{ background: '#25262b' }}>
+              <div className="rounded-2xl border border-zinc-700/70 divide-y divide-zinc-700/70 mb-4" style={{ background: '#25262b' }}>
                 <div className="px-4 py-3 flex items-center justify-between">
                   <span className="text-xs text-gray-500">Songs</span>
                   <span className="text-sm text-white font-medium">{activePlaylist.song_count}</span>
@@ -876,6 +886,11 @@ function SongBrowser({
                   <span className="text-sm text-white font-medium">{wordsLookedUpCount}</span>
                 </div>
               </div>
+
+              {/* Description */}
+              {activePlaylist.description && (
+                <p className="text-gray-400 text-sm leading-relaxed">{activePlaylist.description}</p>
+              )}
 
 
             </div>
@@ -1418,7 +1433,7 @@ function useAlbumLyricsTheme(albumArtUrl: string | null): [{ panelGradient: stri
 // ── Player view ────────────────────────────────────────────────────────────────
 
 function PlayerView({
-  song, user, onBack, onLogout, onOpenSettings, onOpenAdmin, onOpenAccount, isAdmin, onPrev, onNext, canPrev, canNext, settings, onUpdate, storedMusicUserToken, onMusicUserToken, favoriteSongIds, toggleFavorite, targetLang,
+  song, user, onBack, onLogout, onOpenSettings, onOpenAdmin, onOpenAccount, isAdmin, onPrev, onNext, canPrev, canNext, settings, onUpdate, storedMusicUserToken, onMusicUserToken, favoriteSongIds, toggleFavorite, targetLang, availableTargetLangs, onTargetLangChange,
 }: {
   song: SongDetail
   user: { display_name: string | null; email: string | null } | null
@@ -1439,6 +1454,8 @@ function PlayerView({
   favoriteSongIds: Set<number>
   toggleFavorite: (id: number) => void
   targetLang?: string
+  availableTargetLangs: string[]
+  onTargetLangChange: (lang: string | null) => void
 }) {
   const [infoVisible, setInfoVisible] = useState(false)
   const [playerMenuOpen, setPlayerMenuOpen] = useState(false)
@@ -1689,6 +1706,19 @@ function PlayerView({
             >
               Admin
             </button>
+          )}
+          {/* Target language combobox */}
+          {availableTargetLangs.length > 0 && (
+            <select
+              value={targetLang ?? ''}
+              onChange={e => onTargetLangChange(e.target.value || null)}
+              className="text-xs rounded-lg border border-gray-700/70 bg-gray-800/70 px-2 py-1 text-gray-300 focus:outline-none focus:border-gray-500 cursor-pointer"
+              aria-label="Translation language"
+            >
+              {availableTargetLangs.map(lang => (
+                <option key={lang} value={lang}>{lang.toUpperCase()}</option>
+              ))}
+            </select>
           )}
           {/* Inline source switcher — always visible; unavailable sources are dimmed */}
           {(() => {
@@ -1969,6 +1999,8 @@ export default function App() {
   })
   const [activePlaylistId, setActivePlaylistId] = useState<number | null>(null)
   const [activePlaylist, setActivePlaylist] = useState<PlaylistDetail | null>(null)
+  // null = use playlist default; '' = no translation; 'en' etc = user-chosen override
+  const [overrideTargetLang, setOverrideTargetLang] = useState<string | null>(null)
 
   const playlistWordCount = useMemo(() => {
     if (!activePlaylist) return 0
@@ -1983,6 +2015,15 @@ export default function App() {
   const [playlistDetailLoading, setPlaylistDetailLoading] = useState(false)
   const [songsError,   setSongsError]   = useState<string | null>(null)
   const [activeSong,   setActiveSong]   = useState<SongDetail | null>(null)
+
+  const availableTargetLangs = useMemo(
+    () => activePlaylist?.target_langs ?? activeSong?.target_langs ?? [],
+    [activePlaylist, activeSong]
+  )
+  const effectiveTargetLang = overrideTargetLang !== null
+    ? (overrideTargetLang || undefined)
+    : (availableTargetLangs[0] ?? undefined)
+
   const [songLoading,  setSongLoading]  = useState(false)
   const [lastSelectedSongId, setLastSelectedSongId] = useState<number | null>(null)
   const [settingsHydrated, setSettingsHydrated] = useState(false)
@@ -2130,7 +2171,9 @@ export default function App() {
       navigateToPath(songPath(id))
     }
     const source = settings.preferredSource
-    const targetLang = activePlaylist?.target_lang ?? undefined
+    const targetLang = overrideTargetLang !== null
+      ? (overrideTargetLang || undefined)
+      : (availableTargetLangs[0] ?? undefined)
     const key = _songCacheKey(id, source)
     const cached = !targetLang ? _songCache.get(key) : undefined
     if (cached) {
@@ -2152,7 +2195,17 @@ export default function App() {
     } finally {
       setSongLoading(false)
     }
-  }, [settings.preferredSource, navigateToPath, activePlaylist?.target_lang])
+  }, [settings.preferredSource, navigateToPath, availableTargetLangs, overrideTargetLang])
+
+  const handleTargetLangChange = useCallback((lang: string | null) => {
+    setOverrideTargetLang(lang)
+    if (activeSong) {
+      const effectiveLang = lang !== null ? (lang || undefined) : (availableTargetLangs[0] ?? undefined)
+      void _fetchSong(activeSong.id, settings.preferredSource, effectiveLang)
+        .then(d => setActiveSong(d))
+        .catch(console.error)
+    }
+  }, [activeSong, availableTargetLangs, settings.preferredSource])
 
   const handlePrefetchSong = useCallback((id: number) => {
     const source = settings.preferredSource
@@ -2164,7 +2217,7 @@ export default function App() {
   useEffect(() => {
     if (!activeSong) return
     const source = settings.preferredSource
-    const targetLang = activePlaylist?.target_lang ?? undefined
+    const targetLang = effectiveTargetLang
     const key = _songCacheKey(activeSong.id, source)
     _songCache.delete(key)  // force fresh fetch for new source
     void _fetchSong(activeSong.id, source, targetLang).then(d => { setActiveSong(d) }).catch(() => {})
@@ -2184,6 +2237,8 @@ export default function App() {
   }, [isAuthenticated, isAdmin, loadPlaylists, loadSongs])
 
   useEffect(() => {
+    // Reset target lang override when switching playlists so playlist default applies
+    setOverrideTargetLang(null)
     if (!activePlaylistId) {
       setActivePlaylist(null)
       setPlaylistDetailLoading(false)
@@ -2465,7 +2520,9 @@ export default function App() {
         onMusicUserToken={handleMusicUserToken}
         favoriteSongIds={favoriteSongIds}
         toggleFavorite={toggleFavorite}
-        targetLang={activePlaylist?.target_lang ?? undefined}
+        targetLang={effectiveTargetLang}
+        availableTargetLangs={availableTargetLangs}
+        onTargetLangChange={handleTargetLangChange}
       />
     )
   }
@@ -2492,6 +2549,9 @@ export default function App() {
       toggleFavorite={toggleFavorite}
       markAsNotListened={unmarkListened}
       wordsLookedUpCount={playlistWordCount}
+      availableTargetLangs={availableTargetLangs}
+      targetLang={effectiveTargetLang}
+      onTargetLangChange={handleTargetLangChange}
     />
   )
 }

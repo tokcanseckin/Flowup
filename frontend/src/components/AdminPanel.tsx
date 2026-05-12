@@ -23,7 +23,7 @@ type PlaylistDraft = {
   description: string
   difficulty_level: string
   language_code: string
-  target_lang: string
+  target_langs: string[]
   is_hidden: boolean
 }
 
@@ -33,6 +33,7 @@ type SongDraft = {
   artist: string
   youtube_url: string
   apple_music_url: string
+  target_langs: string[]
   playlist_ids: number[]
 }
 
@@ -70,7 +71,7 @@ function emptyPlaylistDraft(): PlaylistDraft {
     description: '',
     difficulty_level: '',
     language_code: '',
-    target_lang: '',
+    target_langs: [],
     is_hidden: false,
   }
 }
@@ -341,6 +342,7 @@ export default function AdminPanel({
           artist: detail.artist ?? '',
           youtube_url: detail.youtube_url ?? '',
           apple_music_url: detail.apple_music_url ?? '',
+          target_langs: detail.target_langs ?? [],
           playlist_ids: [...detail.playlist_ids],
         })
         // Load lyrics for the current source
@@ -417,7 +419,7 @@ export default function AdminPanel({
           description: detail.description ?? '',
           difficulty_level: detail.difficulty_level ?? '',
           language_code: detail.language_code ?? '',
-          target_lang: detail.target_lang ?? '',
+          target_langs: detail.target_langs ?? [],
           is_hidden: detail.is_hidden ?? false,
         })
         setPlaylistSongIds(detail.songs.map(song => song.song_id))
@@ -622,6 +624,7 @@ export default function AdminPanel({
         artist: songDraft.artist.trim() || null,
         youtube_url: songDraft.youtube_url.trim() || null,
         apple_music_url: songDraft.apple_music_url.trim() || null,
+        target_langs: songDraft.target_langs,
         playlist_ids: songDraft.playlist_ids,
       })
       setAdminSong(updated)
@@ -755,7 +758,7 @@ export default function AdminPanel({
         description: playlistDraft.description.trim() || null,
         difficulty_level: playlistDraft.difficulty_level.trim() || null,
         language_code: playlistDraft.language_code.trim() || null,
-        target_lang: playlistDraft.target_lang.trim() || null,
+        target_langs: playlistDraft.target_langs,
         is_hidden: playlistDraft.is_hidden,
       })
 
@@ -797,7 +800,7 @@ export default function AdminPanel({
         description: newPlaylistDraft.description.trim() || null,
         difficulty_level: newPlaylistDraft.difficulty_level.trim() || null,
         language_code: newPlaylistDraft.language_code.trim() || null,
-        target_lang: newPlaylistDraft.target_lang.trim() || null,
+        target_langs: newPlaylistDraft.target_langs,
         is_hidden: newPlaylistDraft.is_hidden,
       })
       await onRefreshPlaylists()
@@ -1153,6 +1156,7 @@ export default function AdminPanel({
                         <label className="block text-xs text-gray-500">YouTube URL<input value={songDraft.youtube_url} onChange={e => setSongDraft(prev => prev ? { ...prev, youtube_url: e.target.value } : prev)} className="mt-1 w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" /></label>
                         <label className="block text-xs text-gray-500">Apple Music URL<input value={songDraft.apple_music_url} onChange={e => setSongDraft(prev => prev ? { ...prev, apple_music_url: e.target.value } : prev)} className="mt-1 w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" /></label>
                       </div>
+                      <label className="block text-xs text-gray-500">Target langs <span className="text-gray-600">(comma-separated)</span><input value={songDraft.target_langs.join(', ')} onChange={e => setSongDraft(prev => prev ? { ...prev, target_langs: e.target.value.split(',').map(s => s.trim().toUpperCase()).filter(Boolean) } : prev)} placeholder="e.g. EN, DE" className="mt-1 w-full rounded-xl border border-indigo-700/60 bg-indigo-950/20 px-3 py-2 text-sm text-indigo-200 placeholder-indigo-800 focus:outline-none focus:border-indigo-400" /></label>
                       <div>
                         <p className="text-xs text-gray-500 mb-2">Playlist membership</p>
                         <div className="grid gap-2 md:grid-cols-2">
@@ -1352,8 +1356,8 @@ export default function AdminPanel({
                       <div className="grid gap-3 md:grid-cols-3">
                         <input value={playlistDraft.difficulty_level} onChange={e => setPlaylistDraft(prev => ({ ...prev, difficulty_level: e.target.value }))} placeholder="Difficulty level" className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
                         <input value={playlistDraft.language_code} onChange={e => setPlaylistDraft(prev => ({ ...prev, language_code: e.target.value }))} placeholder="Language code (e.g. ru)" className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
-                        <label className="block text-xs text-gray-500">Target lang
-                          <input value={playlistDraft.target_lang} onChange={e => setPlaylistDraft(prev => ({ ...prev, target_lang: e.target.value.toUpperCase() }))} placeholder="e.g. RU" maxLength={8} className="mt-1 w-full rounded-xl border border-indigo-700/60 bg-indigo-950/20 px-3 py-2 text-sm text-indigo-200 placeholder-indigo-800 focus:outline-none focus:border-indigo-400" />
+                        <label className="block text-xs text-gray-500">Target langs <span className="text-gray-600">(comma-separated)</span>
+                          <input value={playlistDraft.target_langs.join(', ')} onChange={e => setPlaylistDraft(prev => ({ ...prev, target_langs: e.target.value.split(',').map(s => s.trim().toUpperCase()).filter(Boolean) }))} placeholder="e.g. EN, DE" className="mt-1 w-full rounded-xl border border-indigo-700/60 bg-indigo-950/20 px-3 py-2 text-sm text-indigo-200 placeholder-indigo-800 focus:outline-none focus:border-indigo-400" />
                         </label>
                       </div>
                       <label className="flex items-center gap-3 cursor-pointer select-none">
@@ -1387,8 +1391,8 @@ export default function AdminPanel({
                     <div className="grid gap-3 md:grid-cols-3">
                       <input value={newPlaylistDraft.difficulty_level} onChange={e => setNewPlaylistDraft(prev => ({ ...prev, difficulty_level: e.target.value }))} placeholder="Difficulty level" className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
                       <input value={newPlaylistDraft.language_code} onChange={e => setNewPlaylistDraft(prev => ({ ...prev, language_code: e.target.value }))} placeholder="Language code (e.g. ru)" className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
-                      <label className="block text-xs text-gray-500">Target lang
-                        <input value={newPlaylistDraft.target_lang} onChange={e => setNewPlaylistDraft(prev => ({ ...prev, target_lang: e.target.value.toUpperCase() }))} placeholder="e.g. RU" maxLength={8} className="mt-1 w-full rounded-xl border border-indigo-700/60 bg-indigo-950/20 px-3 py-2 text-sm text-indigo-200 placeholder-indigo-800 focus:outline-none focus:border-indigo-400" />
+                      <label className="block text-xs text-gray-500">Target langs <span className="text-gray-600">(comma-separated)</span>
+                        <input value={newPlaylistDraft.target_langs.join(', ')} onChange={e => setNewPlaylistDraft(prev => ({ ...prev, target_langs: e.target.value.split(',').map(s => s.trim().toUpperCase()).filter(Boolean) }))} placeholder="e.g. EN, DE" className="mt-1 w-full rounded-xl border border-indigo-700/60 bg-indigo-950/20 px-3 py-2 text-sm text-indigo-200 placeholder-indigo-800 focus:outline-none focus:border-indigo-400" />
                       </label>
                     </div>
                     <label className="flex items-center gap-3 cursor-pointer select-none">

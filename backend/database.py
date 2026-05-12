@@ -56,6 +56,7 @@ class Song(Base):
     language_direction = Column(String(3),   nullable=False, default="ltr")
     youtube_url        = Column(Text,        nullable=True)
     apple_music_url    = Column(Text,        nullable=True)
+    target_langs       = Column(Text,        nullable=False, server_default='[]', default='[]')
     created_at         = Column(Integer,     default=lambda: int(time.time()))
 
     lines = relationship(
@@ -157,6 +158,8 @@ class Playlist(Base):
     language_code       = Column(String(8),   nullable=True)
     # Target language for translations/definitions in this playlist (e.g. "RU")
     target_lang         = Column(String(16),  nullable=True)
+    # JSON array of supported target languages, e.g. '["ru", "en"]'
+    target_langs        = Column(Text,        nullable=False, server_default='[]', default='[]')
     is_hidden           = Column(Boolean,     nullable=False, default=False, server_default='0')
     created_at          = Column(Integer,     default=lambda: int(time.time()))
 
@@ -260,14 +263,18 @@ def create_tables() -> None:
 
 
 def _migrate_playlists_pg() -> None:
-    """Add is_hidden to playlists on PostgreSQL (idempotent)."""
-    try:
-        with engine.begin() as conn:
-            conn.execute(text(
-                "ALTER TABLE playlists ADD COLUMN IF NOT EXISTS is_hidden BOOLEAN NOT NULL DEFAULT FALSE"
-            ))
-    except Exception:
-        pass  # column already exists or other non-fatal error
+    """Add columns to playlists and songs on PostgreSQL (idempotent)."""
+    statements = [
+        "ALTER TABLE playlists ADD COLUMN IF NOT EXISTS is_hidden BOOLEAN NOT NULL DEFAULT FALSE",
+        "ALTER TABLE playlists ADD COLUMN IF NOT EXISTS target_langs TEXT NOT NULL DEFAULT '[]'",
+        "ALTER TABLE songs ADD COLUMN IF NOT EXISTS target_langs TEXT NOT NULL DEFAULT '[]'",
+    ]
+    for stmt in statements:
+        try:
+            with engine.begin() as conn:
+                conn.execute(text(stmt))
+        except Exception:
+            pass  # column already exists or other non-fatal error
 
 
 def get_db() -> Generator[Session, None, None]:

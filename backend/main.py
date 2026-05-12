@@ -476,6 +476,7 @@ def _song_detail(song: Song, source: Optional[str] = None, target_lang: Optional
         lines=lines,
         youtube_url=song.youtube_url,
         apple_music_url=song.apple_music_url,
+        target_langs=json.loads(song.target_langs or '[]'),
     )
 
 
@@ -1081,6 +1082,8 @@ def update_admin_song(song_id: int, body: AdminSongUpdate, db: Session = Depends
         song.youtube_url = body.youtube_url or None
     if "apple_music_url" in body.model_fields_set:
         song.apple_music_url = body.apple_music_url or None
+    if "target_langs" in body.model_fields_set and body.target_langs is not None:
+        song.target_langs = json.dumps(body.target_langs)
 
     if body.playlist_ids is not None:
         requested_ids = set(body.playlist_ids)
@@ -1474,6 +1477,7 @@ def _playlist_response(pl: Playlist, db: Session) -> PlaylistResponse:
         difficulty_level=pl.difficulty_level,
         language_code=pl.language_code,
         target_lang=pl.target_lang,
+        target_langs=json.loads(pl.target_langs or '[]'),
         is_hidden=pl.is_hidden,
         song_count=pl.song_count,
         songs=songs,
@@ -1490,6 +1494,7 @@ def _playlist_summary(pl: Playlist) -> PlaylistSummaryResponse:
         difficulty_level=pl.difficulty_level,
         language_code=pl.language_code,
         target_lang=pl.target_lang,
+        target_langs=json.loads(pl.target_langs or '[]'),
         is_hidden=pl.is_hidden,
         song_count=pl.song_count,
     )
@@ -1520,6 +1525,7 @@ def create_playlist(body: PlaylistCreate, db: Session = Depends(get_db), _: User
         difficulty_level=body.difficulty_level,
         language_code=body.language_code,
         target_lang=body.target_lang,
+        target_langs=json.dumps(body.target_langs),
         is_hidden=body.is_hidden,
     )
     db.add(pl)
@@ -1559,6 +1565,8 @@ def update_playlist(playlist_id: int, body: PlaylistUpdate, db: Session = Depend
         pl.language_code = body.language_code
     if body.target_lang is not None:
         pl.target_lang = body.target_lang
+    if body.target_langs is not None:
+        pl.target_langs = json.dumps(body.target_langs)
     if body.is_hidden is not None:
         pl.is_hidden = body.is_hidden
     db.commit()

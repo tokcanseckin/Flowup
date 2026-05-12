@@ -54,6 +54,7 @@ export interface SongDetail {
   lines: SongLine[]
   youtube_url: string | null
   apple_music_url: string | null
+  target_langs: string[]
 }
 
 export interface PlaylistSongEntry {
@@ -75,6 +76,7 @@ export interface PlaylistSummary {
   difficulty_level: string | null
   language_code: string | null
   target_lang: string | null
+  target_langs: string[]
   is_hidden: boolean
   song_count: number
 }
@@ -234,7 +236,7 @@ export const api = {
     description?: string | null
     difficulty_level?: string | null
     language_code?: string | null
-    target_lang?: string | null
+    target_langs?: string[]
     is_hidden?: boolean
     song_ids?: number[]
   }): Promise<PlaylistDetail> =>
@@ -249,7 +251,7 @@ export const api = {
     description?: string | null
     difficulty_level?: string | null
     language_code?: string | null
-    target_lang?: string | null
+    target_langs?: string[]
     is_hidden?: boolean
   }): Promise<PlaylistDetail> =>
     apiFetch(`/playlists/${playlistId}`, {
@@ -420,6 +422,7 @@ export const api = {
     spotify_uri?: string
     youtube_url?: string | null
     apple_music_url?: string | null
+    target_langs?: string[]
     playlist_ids?: number[]
   }): Promise<AdminSongDetail> =>
     apiFetch(`/admin/songs/${songId}`, {
