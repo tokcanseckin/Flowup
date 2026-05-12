@@ -377,6 +377,18 @@ _INITIAL_LOCALIZATIONS: list[dict] = [
     # Player empty state
     {"key": "player.waitingForPlayback",  "en": "Waiting for playback...",    "tr": "Oynatma bekleniyor...",     "ru": "Ожидание воспроизведения..."},
     {"key": "player.loadAndPlay",         "en": "Load a track and press Play","tr": "Bir parça yükle ve Oynat'a bas", "ru": "Загрузите трек и нажмите Воспроизвести"},
+    # Language names
+    {"key": "language.ru",  "en": "Russian",   "tr": "Rusça",      "ru": "Русский"},
+    {"key": "language.en",  "en": "English",   "tr": "İngilizce",  "ru": "Английский"},
+    {"key": "language.es",  "en": "Spanish",   "tr": "İspanyolca", "ru": "Испанский"},
+    {"key": "language.fr",  "en": "French",    "tr": "Fransızca",  "ru": "Французский"},
+    {"key": "language.de",  "en": "German",    "tr": "Almanca",    "ru": "Немецкий"},
+    {"key": "language.it",  "en": "Italian",   "tr": "İtalyanca",  "ru": "Итальянский"},
+    {"key": "language.pt",  "en": "Portuguese","tr": "Portekizce", "ru": "Португальский"},
+    {"key": "language.ja",  "en": "Japanese",  "tr": "Japonca",    "ru": "Японский"},
+    {"key": "language.ko",  "en": "Korean",    "tr": "Korece",     "ru": "Корейский"},
+    {"key": "language.zh",  "en": "Chinese",   "tr": "Çince",      "ru": "Китайский"},
+    {"key": "language.tr",  "en": "Turkish",   "tr": "Türkçe",     "ru": "Турецкий"},
 ]
 
 

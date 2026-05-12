@@ -687,7 +687,7 @@ function SongBrowser({
                     </svg>
                   )}
                   <span className="text-[10px] font-mono font-medium px-1.5 py-0.5 rounded-md uppercase tracking-wider shrink-0" style={{ color: '#4ade80', background: 'rgba(0,109,54,0.25)', border: '1px solid rgba(0,109,54,0.45)' }}>
-                    {song.language_name}
+                    {t(`language.${song.language_code}`)}
                   </span>
                   {/* 3-dot menu button */}
                   <button
