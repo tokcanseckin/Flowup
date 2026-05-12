@@ -1705,12 +1705,27 @@ def _playlist_summary(pl: Playlist) -> PlaylistSummaryResponse:
     )
 
 
+_DIFFICULTY_ORDER = {
+    "[[general.Tag.Difficulty.Beginner]]":     0,
+    "[[general.Tag.Difficulty.Intermediate]]": 1,
+    "[[general.Tag.Difficulty.Advanced]]":     2,
+}
+
+
+def _difficulty_sort_key(pl: Playlist) -> tuple:
+    """Sort by (language_code, difficulty position, name) so playlists of the
+    same language are grouped and ordered Beginner → Intermediate → Advanced."""
+    lang = (pl.language_code or "").lower()
+    diff = _DIFFICULTY_ORDER.get(pl.difficulty_level or "", 99)
+    return (lang, diff, pl.name)
+
+
 @app.get("/api/playlists", response_model=list[PlaylistSummaryResponse])
 def list_playlists(target_lang: Optional[str] = Query(None), db: Session = Depends(get_db)):
     q = db.query(Playlist).filter(Playlist.is_hidden == False)  # noqa: E712
     if target_lang:
         q = q.filter(Playlist.target_lang == target_lang)
-    playlists = q.order_by(Playlist.created_at.desc()).all()
+    playlists = sorted(q.all(), key=_difficulty_sort_key)
     return [_playlist_summary(pl) for pl in playlists]
 
 
