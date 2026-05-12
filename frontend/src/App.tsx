@@ -633,7 +633,7 @@ const LANG_FLAG: Record<string, string> = {
 function langFlag(code: string): string { return LANG_FLAG[code] ?? '🌐' }
 
 function SongBrowser({
-  songs, playlists, activePlaylistId, activePlaylist, loading, error, onSelect, onPrefetch, onSelectPlaylist, onLogout, onOpenSettings, onOpenAdmin, onOpenAccount, isAdmin, user, openedSongIds, favoriteSongIds, toggleFavorite, markAsNotListened, wordsLookedUpCount, availableTargetLangs, targetLang, onTargetLangChange,
+  songs, playlists, activePlaylistId, activePlaylist, loading, error, onSelect, onPrefetch, onSelectPlaylist, onLogout, onOpenSettings, onOpenAdmin, onOpenAccount, isAdmin, user, openedSongIds, favoriteSongIds, toggleFavorite, markAsNotListened, wordsLookedUpCount,
 }: {
   songs: SongSummary[]
   playlists: PlaylistSummary[]
@@ -655,9 +655,6 @@ function SongBrowser({
   toggleFavorite: (id: number) => void
   markAsNotListened: (id: number) => void
   wordsLookedUpCount: number
-  availableTargetLangs: string[]
-  targetLang: string | undefined
-  onTargetLangChange: (lang: string | null) => void
 }) {
   const t = useT()
   const tc = useContentT()
@@ -1706,7 +1703,7 @@ function useAlbumLyricsTheme(albumArtUrl: string | null): [{ panelGradient: stri
 // ── Player view ────────────────────────────────────────────────────────────────
 
 function PlayerView({
-  song, user, onBack, onLogout, onOpenSettings, onOpenAdmin, onOpenAccount, isAdmin, onPrev, onNext, canPrev, canNext, settings, onUpdate, storedMusicUserToken, onMusicUserToken, favoriteSongIds, toggleFavorite, targetLang, availableTargetLangs, onTargetLangChange,
+  song, user, onBack, onLogout, onOpenSettings, onOpenAdmin, onOpenAccount, isAdmin, onPrev, onNext, canPrev, canNext, settings, onUpdate, storedMusicUserToken, onMusicUserToken, favoriteSongIds, toggleFavorite, targetLang,
 }: {
   song: SongDetail
   user: { display_name: string | null; email: string | null } | null
@@ -1727,8 +1724,6 @@ function PlayerView({
   favoriteSongIds: Set<number>
   toggleFavorite: (id: number) => void
   targetLang?: string
-  availableTargetLangs: string[]
-  onTargetLangChange: (lang: string | null) => void
 }) {
   const [infoVisible, setInfoVisible] = useState(false)
   const [playerMenuOpen, setPlayerMenuOpen] = useState(false)
@@ -2843,8 +2838,6 @@ export default function App() {
         favoriteSongIds={favoriteSongIds}
         toggleFavorite={toggleFavorite}
         targetLang={effectiveTargetLang}
-        availableTargetLangs={availableTargetLangs}
-        onTargetLangChange={handleTargetLangChange}
       />
     )
   }
@@ -2871,9 +2864,6 @@ export default function App() {
       toggleFavorite={toggleFavorite}
       markAsNotListened={unmarkListened}
       wordsLookedUpCount={playlistWordCount}
-      availableTargetLangs={availableTargetLangs}
-      targetLang={effectiveTargetLang}
-      onTargetLangChange={handleTargetLangChange}
     />
   )
 }
