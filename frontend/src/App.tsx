@@ -859,7 +859,7 @@ function SongBrowser({
                 )}
                 {activePlaylist.difficulty_level && (
                   <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-md uppercase tracking-wider" style={{ color: '#fb923c', background: 'rgba(251,146,60,0.15)', border: '1px solid rgba(251,146,60,0.35)' }}>
-                    {activePlaylist.difficulty_level}
+                    {tc(activePlaylist.difficulty_level)}
                   </span>
                 )}
               </div>
@@ -938,7 +938,7 @@ function SongBrowser({
                       )}
                       <div className="min-w-0 flex-1">
                         <p className="text-white font-medium truncate">{tc(pl.name)}</p>
-                        <p className="text-gray-500 text-xs truncate">{pl.song_count} {t('browser.songs').toLowerCase()}{pl.language_code ? ` · ${pl.language_code.toUpperCase()}` : ''}{pl.difficulty_level ? ` · ${pl.difficulty_level}` : ''}</p>
+                        <p className="text-gray-500 text-xs truncate">{pl.song_count} {t('browser.songs').toLowerCase()}{pl.language_code ? ` · ${pl.language_code.toUpperCase()}` : ''}{pl.difficulty_level ? ` · ${tc(pl.difficulty_level)}` : ''}</p>
                       </div>
                       <svg viewBox="0 0 24 24" className="w-4 h-4 fill-gray-600 shrink-0">
                         <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/>
