@@ -336,6 +336,12 @@ export const api = {
       body: JSON.stringify({ id_token: idToken }),
     }),
 
+  loginWithApple: (idToken: string): Promise<BackendUser> =>
+    apiFetch('/auth/apple', {
+      method: 'POST',
+      body: JSON.stringify({ id_token: idToken }),
+    }),
+
   completeOnboarding: (body: {
     spotify_id: string
     email: string

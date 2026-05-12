@@ -40,6 +40,8 @@ class User(Base):
     is_admin                = Column(Integer,     nullable=False, default=0)
     spotify_enabled         = Column(Integer,     nullable=False, default=0)
     apple_music_user_token  = Column(Text,        nullable=True)
+    google_user_id          = Column(String(128), nullable=True, unique=True)
+    apple_user_id           = Column(String(128), nullable=True, unique=True)
     created_at              = Column(Integer,     default=lambda: int(time.time()))
 
 

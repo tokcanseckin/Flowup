@@ -69,6 +69,7 @@ from models import (
     CredentialLoginRequest,
     RegisterRequest,
     GoogleLoginRequest,
+    AppleLoginRequest,
     LanguageIngest,
     LanguageResponse,
     LineResponse,
@@ -99,6 +100,7 @@ from openrussian import ensure_loaded as _load_or, lookup as _or_lookup, lookup_
 import italian_dict as _italian_dict
 from spotify_auth import fetch_spotify_user, refresh_access_token
 from google_auth import verify_google_id_token
+from apple_auth import verify_apple_id_token
 
 
 # ── Server-side song cache ───────────────────────────────────────────────────
@@ -2190,6 +2192,7 @@ async def login_with_google(body: GoogleLoginRequest, db: Session = Depends(get_
             spotify_id=synthetic_id,
             display_name=display_name,
             email=email,
+            google_user_id=google_sub,
         )
         db.add(user)
     else:
@@ -2198,6 +2201,63 @@ async def login_with_google(body: GoogleLoginRequest, db: Session = Depends(get_
             user.spotify_id = synthetic_id
         user.display_name = user.display_name or display_name
         if not user.email:
+            user.email = email
+        if not user.google_user_id:
+            user.google_user_id = google_sub
+
+    db.commit()
+    db.refresh(user)
+    return UserResponse(
+        id=user.id,
+        spotify_id=user.spotify_id,
+        display_name=user.display_name,
+        email=user.email,
+        has_password=bool(user.password_hash),
+        needs_onboarding=False,
+        is_admin=bool(user.is_admin),
+        spotify_enabled=bool(user.spotify_enabled),
+        apple_music_user_token=user.apple_music_user_token,
+        admin_token=_make_admin_token(user),
+    )
+
+
+@app.post("/api/auth/apple", response_model=UserResponse)
+async def login_with_apple(body: AppleLoginRequest, db: Session = Depends(get_db)):
+    """Verify a Sign In with Apple identity token and create/return the matching user."""
+    try:
+        claims = await verify_apple_id_token(body.id_token)
+    except ValueError as exc:
+        raise HTTPException(status_code=401, detail=str(exc))
+
+    apple_sub = claims["sub"]
+    # Apple only sends email on the first sign-in; subsequent logins omit it.
+    email_raw = claims.get("email")
+    email = email_raw.strip().lower() if email_raw else None
+    # Apple also only provides name on first sign-in.
+    display_name: str | None = None
+
+    synthetic_id = f"apple:{apple_sub}"
+
+    user = db.query(User).filter(User.apple_user_id == apple_sub).first()
+    if not user:
+        user = db.query(User).filter(User.spotify_id == synthetic_id).first()
+    if not user and email:
+        user = db.query(User).filter(User.email == email).first()
+
+    if not user:
+        user = User(
+            spotify_id=synthetic_id,
+            display_name=display_name or email or "Apple User",
+            email=email,
+            apple_user_id=apple_sub,
+        )
+        db.add(user)
+    else:
+        if user.spotify_id != synthetic_id and not user.spotify_id.startswith("spotify:"):
+            user.spotify_id = synthetic_id
+        if not user.apple_user_id:
+            user.apple_user_id = apple_sub
+        if email and not user.email:
             user.email = email
 
     db.commit()

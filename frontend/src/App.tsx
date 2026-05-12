@@ -62,6 +62,20 @@ declare global {
         }
       }
     }
+    AppleID?: {
+      auth: {
+        init: (config: {
+          clientId: string
+          scope: string
+          redirectURI: string
+          usePopup: boolean
+        }) => void
+        signIn: () => Promise<{
+          authorization: { id_token: string; code: string }
+          user?: { name?: { firstName?: string; lastName?: string }; email?: string }
+        }>
+      }
+    }
   }
 }
 
@@ -203,15 +217,8 @@ function AppLogo() {
   const t = useT()
   return (
     <div className="text-center mb-10">
-      <div className="inline-flex items-center gap-2 mb-4">
-        <div className="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-900/50">
-          <svg viewBox="0 0 24 24" className="w-5 h-5 fill-white">
-            <path d="M12 3a9 9 0 100 18A9 9 0 0012 3zm-1 13V8l6 4-6 4z"/>
-          </svg>
-        </div>
-        <h1 className="text-2xl font-bold tracking-tight text-white">
-          Singo<span className="text-indigo-400">Ling</span>
-        </h1>
+      <div className="inline-flex items-center justify-center mb-4">
+        <img src={singolingLogo} className="h-10 object-contain" alt="SingoLing" />
       </div>
       <p className="text-gray-500 text-sm leading-relaxed max-w-xs mx-auto">
         {t('auth.tagline1')}<br/>
@@ -221,24 +228,76 @@ function AppLogo() {
   )
 }
 
-function AppleButton({ disabled }: { disabled?: boolean }) {
+function AppleButton({ onAppleLogin, disabled }: { onAppleLogin?: (idToken: string) => Promise<void>; disabled?: boolean }) {
   const t = useT()
+  const clientId = import.meta.env.VITE_APPLE_CLIENT_ID as string | undefined
+  const redirectURI = import.meta.env.VITE_APPLE_REDIRECT_URI as string | undefined
+  const [appleError, setAppleError] = useState<string | null>(null)
+  const [busy, setBusy] = useState(false)
+
+  // Load the Apple Sign In JS SDK once.
+  useEffect(() => {
+    if (!clientId) return
+    if (document.querySelector('script[src*="appleid.cdn-apple.com"]')) return
+    const script = document.createElement('script')
+    script.src = 'https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js'
+    script.async = true
+    document.head.appendChild(script)
+  }, [clientId])
+
+  const handleClick = async () => {
+    if (!clientId || !onAppleLogin) return
+    if (!window.AppleID) {
+      setAppleError('Apple Sign In script is still loading — please try again')
+      return
+    }
+    setAppleError(null)
+    setBusy(true)
+    try {
+      window.AppleID.auth.init({
+        clientId,
+        scope: 'name email',
+        redirectURI: redirectURI ?? window.location.origin,
+        usePopup: true,
+      })
+      const response = await window.AppleID.auth.signIn()
+      await onAppleLogin(response.authorization.id_token)
+    } catch (err: unknown) {
+      // User cancelled the popup — Apple throws a plain object { error: "popup_closed_by_user" }
+      const code = (err as { error?: string })?.error
+      if (code !== 'popup_closed_by_user') {
+        setAppleError('Apple sign-in failed — please try again')
+      }
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const isDisabled = disabled || busy || !clientId || !onAppleLogin
+
   return (
-    <button
-      type="button"
-      disabled={disabled}
-      title="Apple Sign-In coming soon"
-      className="
-        w-full flex items-center justify-center gap-2.5 py-2.5 rounded-xl
-        border border-gray-700 bg-gray-900/60 text-white text-sm font-medium
-        opacity-50 cursor-not-allowed select-none
-      "
-    >
-      <svg viewBox="0 0 24 24" className="w-4.5 h-4.5 fill-current shrink-0" aria-hidden>
-        <path d="M16.462 1.184a4.694 4.694 0 01-3.293 3.574 4.21 4.21 0 01-3.18-3.38 4.693 4.693 0 013.38-.49 4.23 4.23 0 013.093.296zM20.5 17.6c-.41.94-.886 1.808-1.43 2.602-.755 1.077-1.374 1.822-1.85 2.232-.74.68-1.53 1.027-2.374 1.047-.607 0-1.34-.173-2.19-.524-.855-.35-1.64-.524-2.357-.524-.752 0-1.559.174-2.424.524-.866.35-1.562.533-2.094.55-.81.035-1.617-.32-2.424-1.065-.517-.453-1.163-1.225-1.936-2.316C.713 18.925.06 17.374.06 15.774c0-1.457.314-2.713.946-3.762A5.538 5.538 0 013.12 9.956a5.27 5.27 0 012.651-.747c.657 0 1.52.203 2.595.602 1.073.4 1.762.603 2.064.603.226 0 .993-.237 2.293-.71 1.23-.438 2.268-.62 3.12-.548 2.307.186 4.04 1.097 5.19 2.736-2.063 1.25-3.082 3-3.054 5.244.025 1.748.65 3.202 1.872 4.357.556.529 1.176.937 1.862 1.226-.15.434-.308.85-.476 1.24l.013-.36z"/>
-      </svg>
-      {t('auth.continueWithApple')}
-    </button>
+    <div className="space-y-1">
+      <button
+        type="button"
+        onClick={() => { void handleClick() }}
+        disabled={isDisabled}
+        title={!clientId ? 'Apple Sign-In not configured' : undefined}
+        className={`
+          w-full flex items-center justify-center gap-2.5 py-2.5 rounded-xl
+          border border-gray-700 bg-gray-900/60 text-white text-sm font-medium
+          transition-all duration-150
+          ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-800/60 active:scale-[0.98] cursor-pointer'}
+        `}
+      >
+        <svg viewBox="0 0 24 24" className="w-4.5 h-4.5 fill-current shrink-0" aria-hidden>
+          <path d="M16.462 1.184a4.694 4.694 0 01-3.293 3.574 4.21 4.21 0 01-3.18-3.38 4.693 4.693 0 013.38-.49 4.23 4.23 0 013.093.296zM20.5 17.6c-.41.94-.886 1.808-1.43 2.602-.755 1.077-1.374 1.822-1.85 2.232-.74.68-1.53 1.027-2.374 1.047-.607 0-1.34-.173-2.19-.524-.855-.35-1.64-.524-2.357-.524-.752 0-1.559.174-2.424.524-.866.35-1.562.533-2.094.55-.81.035-1.617-.32-2.424-1.065-.517-.453-1.163-1.225-1.936-2.316C.713 18.925.06 17.374.06 15.774c0-1.457.314-2.713.946-3.762A5.538 5.538 0 013.12 9.956a5.27 5.27 0 012.651-.747c.657 0 1.52.203 2.595.602 1.073.4 1.762.603 2.064.603.226 0 .993-.237 2.293-.71 1.23-.438 2.268-.62 3.12-.548 2.307.186 4.04 1.097 5.19 2.736-2.063 1.25-3.082 3-3.054 5.244.025 1.748.65 3.202 1.872 4.357.556.529 1.176.937 1.862 1.226-.15.434-.308.85-.476 1.24l.013-.36z"/>
+        </svg>
+        {busy ? 'Signing in…' : t('auth.continueWithApple')}
+      </button>
+      {appleError && (
+        <p className="text-red-400 text-xs text-center">{appleError}</p>
+      )}
+    </div>
   )
 }
 
@@ -281,12 +340,14 @@ function useGoogleButton(
 function LoginScreen({
   onEmailLogin,
   onGoogleLogin,
+  onAppleLogin,
   onShowSignUp,
   error,
   busy,
 }: {
   onEmailLogin: (email: string, password: string) => Promise<void>
   onGoogleLogin: (credential: string) => Promise<void>
+  onAppleLogin: (idToken: string) => Promise<void>
   onShowSignUp: () => void
   error: string | null
   busy: boolean
@@ -326,7 +387,7 @@ function LoginScreen({
             {(import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined) && (
               <div ref={googleBtnRef} className="w-full overflow-hidden rounded-xl" />
             )}
-            <AppleButton disabled />
+            <AppleButton onAppleLogin={onAppleLogin} disabled={busy} />
           </div>
 
           <div className="flex items-center gap-3 text-xs text-gray-600">
@@ -387,12 +448,14 @@ function LoginScreen({
 function SignUpScreen({
   onRegister,
   onGoogleLogin,
+  onAppleLogin,
   onShowSignIn,
   error,
   busy,
 }: {
   onRegister: (displayName: string, email: string, password: string) => Promise<void>
   onGoogleLogin: (credential: string) => Promise<void>
+  onAppleLogin: (idToken: string) => Promise<void>
   onShowSignIn: () => void
   error: string | null
   busy: boolean
@@ -442,7 +505,7 @@ function SignUpScreen({
             {(import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined) && (
               <div ref={googleBtnRef} className="w-full overflow-hidden rounded-xl" />
             )}
-            <AppleButton disabled />
+            <AppleButton onAppleLogin={onAppleLogin} disabled={busy} />
           </div>
 
           <div className="flex items-center gap-3 text-xs text-gray-600">
@@ -2323,6 +2386,25 @@ export default function App() {
     }
   }, [])
 
+  const handleAppleLogin = useCallback(async (idToken: string) => {
+    setLoginBusy(true)
+    setLoginError(null)
+    try {
+      const user = await api.loginWithApple(idToken)
+      if (user.is_admin && user.admin_token) {
+        setAdminSession(user.admin_token)
+      } else {
+        clearAdminSession()
+      }
+      setCredentialUser(user)
+      localStorage.setItem(PASSWORD_SESSION_KEY, JSON.stringify(user))
+    } catch (e) {
+      setLoginError(e instanceof Error ? e.message : 'Apple sign-in failed')
+    } finally {
+      setLoginBusy(false)
+    }
+  }, [])
+
   const handleRegister = useCallback(async (displayName: string, email: string, password: string) => {
     setLoginBusy(true)
     setLoginError(null)
@@ -2619,6 +2701,7 @@ export default function App() {
         <SignUpScreen
           onRegister={handleRegister}
           onGoogleLogin={handleGoogleLogin}
+          onAppleLogin={handleAppleLogin}
           onShowSignIn={() => { setShowSignUp(false); setLoginError(null) }}
           error={loginError}
           busy={loginBusy}
@@ -2629,6 +2712,7 @@ export default function App() {
       <LoginScreen
         onEmailLogin={handleEmailLogin}
         onGoogleLogin={handleGoogleLogin}
+        onAppleLogin={handleAppleLogin}
         onShowSignUp={() => { setShowSignUp(true); setLoginError(null) }}
         error={loginError}
         busy={loginBusy}

@@ -196,6 +196,10 @@ class GoogleLoginRequest(BaseModel):
     id_token: str
 
 
+class AppleLoginRequest(BaseModel):
+    id_token: str
+
+
 class CompleteOnboardingRequest(BaseModel):
     spotify_id: str
     email: str
