@@ -239,7 +239,9 @@ function AppleButton({ onAppleLogin, disabled }: { onAppleLogin?: (idToken: stri
     if (!clientId) return
 
     const init = () => {
-      if (!window.AppleID) return
+      if (!window.AppleID || !containerRef.current) return
+      // Set width to match container so the SDK iframe fills the full width
+      containerRef.current.setAttribute('data-width', String(containerRef.current.clientWidth || 384))
       window.AppleID.auth.init({
         clientId,
         scope: 'name email',
@@ -291,7 +293,6 @@ function AppleButton({ onAppleLogin, disabled }: { onAppleLogin?: (idToken: stri
         data-color="black"
         data-border="false"
         data-type="continue"
-        data-width="380"
         data-height="44"
         data-border-radius="8"
         data-logo-size="medium"
