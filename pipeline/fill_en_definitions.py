@@ -28,7 +28,7 @@ from collections import defaultdict
 from typing import Optional
 
 KAIKKI_BASE = "https://kaikki.org/dictionary/English/meaning"
-PREFERRED_POS = {"verb", "noun", "adj", "adv"}
+PREFERRED_POS = {"verb", "noun", "adj", "adv", "pron", "det", "prep", "conj", "intj"}
 
 
 def _is_clean_ru_word(word: str) -> bool:
@@ -66,8 +66,18 @@ def fetch_kaikki(lemma: str) -> tuple[Optional[str], Optional[str]]:
     if not entries:
         return None, None
 
-    # Prefer entries with a useful POS, then fall back to first entry
-    best = next((e for e in entries if e.get("pos") in PREFERRED_POS), entries[0])
+    # Selection priority:
+    # 1. Pronoun/determiner entry (function words — pron/det are the primary form)
+    # 2. Content word entry (noun/verb/adj/adv)
+    # 3. Any preferred POS entry
+    # 4. First available entry
+    function_pos = {"pron", "det"}
+    content_pos = {"noun", "verb", "adj", "adv"}
+    best = (
+        next((e for e in entries if e.get("pos") in function_pos), None)
+        or next((e for e in entries if e.get("pos") in content_pos), None)
+        or next((e for e in entries if e.get("pos") in PREFERRED_POS), entries[0])
+    )
 
     # English gloss: first non-trivial gloss from senses
     SKIP_PREFIXES = (
