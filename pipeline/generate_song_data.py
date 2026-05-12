@@ -883,23 +883,20 @@ def _kaikki_en_lookup(lemma: str, pos_hint: str = "") -> tuple[str, str]:
         return "", ""
 
     preferred_pos = {"verb", "noun", "adj", "adv", "pron", "det", "prep", "conj", "intj"}
-    function_pos = {"pron", "det"}
     content_pos = {"noun", "verb", "adj", "adv"}
-    # Prefer entry matching the caller's POS hint, then any preferred POS, then first entry
-    if pos_hint and pos_hint in preferred_pos:
-        best = (
-            next((e for e in entries if e.get("pos") == pos_hint), None)
-            or next((e for e in entries if e.get("pos") in preferred_pos), entries[0])
+
+    def _entry_score(e: dict, hint: str = "") -> tuple[int, int, int]:
+        """Score by: hint-match, clean-RU-count, content-pos bonus."""
+        ru_count = sum(
+            1 for t in e.get("translations", [])
+            if t.get("lang_code") == "ru" and _is_clean_ru_word(t.get("word", ""))
         )
-    else:
-        # Without a POS hint: prefer function-word entries (pron/det) first so that
-        # pronouns/determiners get their proper translations (e.g. you → ты/вы, not вы́кать).
-        # Then fall back to content words, then anything in preferred_pos.
-        best = (
-            next((e for e in entries if e.get("pos") in function_pos), None)
-            or next((e for e in entries if e.get("pos") in content_pos), None)
-            or next((e for e in entries if e.get("pos") in preferred_pos), entries[0])
-        )
+        hint_match = 1 if (hint and e.get("pos") == hint) else 0
+        pos_bonus = 1 if e.get("pos") in content_pos else 0
+        return (hint_match, ru_count, pos_bonus)
+
+    preferred_entries = [e for e in entries if e.get("pos") in preferred_pos] or entries
+    best = max(preferred_entries, key=lambda e: _entry_score(e, pos_hint))
 
     skip_prefixes = (
         "simple past", "past participle", "plural of", "present participle",

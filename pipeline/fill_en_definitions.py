@@ -66,18 +66,21 @@ def fetch_kaikki(lemma: str) -> tuple[Optional[str], Optional[str]]:
     if not entries:
         return None, None
 
-    # Selection priority:
-    # 1. Pronoun/determiner entry (function words — pron/det are the primary form)
-    # 2. Content word entry (noun/verb/adj/adv)
-    # 3. Any preferred POS entry
-    # 4. First available entry
-    function_pos = {"pron", "det"}
+    # Pick the entry that maximises clean RU translation count.
+    # Tie-break: prefer content-word POS (noun/verb/adj/adv) for better EN glosses,
+    # then function-word POS (pron/det), then first entry.
     content_pos = {"noun", "verb", "adj", "adv"}
-    best = (
-        next((e for e in entries if e.get("pos") in function_pos), None)
-        or next((e for e in entries if e.get("pos") in content_pos), None)
-        or next((e for e in entries if e.get("pos") in PREFERRED_POS), entries[0])
-    )
+
+    def _entry_score(e: dict) -> tuple[int, int]:
+        ru_count = sum(
+            1 for t in e.get("translations", [])
+            if t.get("lang_code") == "ru" and _is_clean_ru_word(t.get("word", ""))
+        )
+        pos_bonus = 1 if e.get("pos") in content_pos else 0
+        return (ru_count, pos_bonus)
+
+    preferred_entries = [e for e in entries if e.get("pos") in PREFERRED_POS] or entries
+    best = max(preferred_entries, key=_entry_score)
 
     # English gloss: first non-trivial gloss from senses
     SKIP_PREFIXES = (
