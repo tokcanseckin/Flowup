@@ -618,13 +618,13 @@ function SongBrowser({
   const nativeLangs = useMemo(() => {
     if (!learnLang) return []
     const langs = new Set<string>()
-    playlists.filter(p => p.language_code === learnLang).forEach(p => p.target_langs.forEach(l => langs.add(l)))
+    playlists.filter(p => p.language_code === learnLang).forEach(p => p.target_langs.forEach(l => langs.add(l.toLowerCase())))
     return Array.from(langs)
   }, [playlists, learnLang])
 
   const matchingPlaylists = useMemo(() => {
     if (!learnLang || !nativeLang) return []
-    return playlists.filter(p => p.language_code === learnLang && p.target_langs.includes(nativeLang))
+    return playlists.filter(p => p.language_code === learnLang && p.target_langs.map(l => l.toLowerCase()).includes(nativeLang))
   }, [playlists, learnLang, nativeLang])
 
   useEffect(() => {
