@@ -1974,7 +1974,6 @@ export default function App() {
   const [playlists,    setPlaylists]    = useState<PlaylistSummary[]>([])
   const [activePlaylistId, setActivePlaylistId] = useState<number | null>(null)
   const [activePlaylist, setActivePlaylist] = useState<PlaylistDetail | null>(null)
-  const [songsLoading, setSongsLoading] = useState(false)
   const [playlistsLoading, setPlaylistsLoading] = useState(false)
   const [playlistDetailLoading, setPlaylistDetailLoading] = useState(false)
   const [songsError,   setSongsError]   = useState<string | null>(null)
@@ -2011,15 +2010,12 @@ export default function App() {
   const isAdmin = Boolean(credentialUser?.is_admin)
 
   const loadSongs = useCallback(async () => {
-    setSongsLoading(true)
     setSongsError(null)
     try {
       const nextSongs = await api.listSongs()
       setSongs(nextSongs)
     } catch (e) {
       setSongsError(e instanceof Error ? e.message : 'Failed to load songs')
-    } finally {
-      setSongsLoading(false)
     }
   }, [])
 
