@@ -385,7 +385,7 @@ export default function LyricsPlayer({
   }>({ timer: null, key: null, holdShown: false, target: null })
 
   const inspectInfo = resolveInspectInfo(lines, inspectState)
-  const { entries: wordHistoryEntries, recordLookup } = useWordHistory()
+  const { entries: wordHistoryEntries, recordLookup } = useWordHistory(true)
   // Only underline words looked up in the same language as this song
   const lookedUpLemmas = useMemo(
     () => new Set(wordHistoryEntries.filter(e => e.language === langCode && e.target_lang === targetLang).map(e => e.lemma)),

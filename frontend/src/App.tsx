@@ -232,21 +232,10 @@ function AppleButton({ onAppleLogin, disabled }: { onAppleLogin?: (idToken: stri
   const clientId = import.meta.env.VITE_APPLE_CLIENT_ID as string | undefined
   const redirectURI = import.meta.env.VITE_APPLE_REDIRECT_URI as string | undefined
   const [appleError, setAppleError] = useState<string | null>(null)
-  const containerRef = useRef<HTMLDivElement>(null)
-  const [buttonWidth, setButtonWidth] = useState<number>(0)
 
-  // Step 1: measure the container width after mount, before loading the SDK.
+  // Load the Apple SDK and init auth config once on mount.
   useEffect(() => {
-    if (containerRef.current) {
-      setButtonWidth(containerRef.current.clientWidth)
-    }
-  }, [])
-
-  // Step 2: load SDK only after width is known so data-width is in the DOM
-  // when the script auto-processes #appleid-signin.
-  useEffect(() => {
-    if (!clientId || !buttonWidth) return
-
+    if (!clientId) return
     const init = () => {
       if (!window.AppleID) return
       window.AppleID.auth.init({
@@ -256,36 +245,26 @@ function AppleButton({ onAppleLogin, disabled }: { onAppleLogin?: (idToken: stri
         usePopup: true,
       })
     }
-
     const existing = document.querySelector('script[src*="appleid.cdn-apple.com"]')
-    if (window.AppleID) {
-      init()
-    } else if (existing) {
-      existing.addEventListener('load', init, { once: true })
-    } else {
+    if (window.AppleID) { init() }
+    else if (existing) { existing.addEventListener('load', init, { once: true }) }
+    else {
       const script = document.createElement('script')
       script.src = 'https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js'
       script.async = true
       script.onload = init
       document.head.appendChild(script)
     }
-  }, [clientId, redirectURI, buttonWidth])
+  }, [clientId, redirectURI])
 
-  // Apple fires these events when the SDK-rendered button completes sign-in.
-  useEffect(() => {
-    if (!onAppleLogin) return
-    const handleSuccess = (e: Event) => {
-      void onAppleLogin((e as CustomEvent).detail.authorization.id_token)
-    }
-    const handleFailure = (e: Event) => {
-      const code = (e as CustomEvent).detail?.error as string | undefined
+  const handleClick = useCallback(async () => {
+    if (!window.AppleID) return
+    try {
+      const res = await window.AppleID.auth.signIn()
+      if (onAppleLogin) await onAppleLogin(res.authorization.id_token)
+    } catch (err: unknown) {
+      const code = (err as { error?: string })?.error
       if (code !== 'popup_closed_by_user') setAppleError('Apple sign-in failed — please try again')
-    }
-    document.addEventListener('AppleIDSignInOnSuccess', handleSuccess)
-    document.addEventListener('AppleIDSignInOnFailure', handleFailure)
-    return () => {
-      document.removeEventListener('AppleIDSignInOnSuccess', handleSuccess)
-      document.removeEventListener('AppleIDSignInOnFailure', handleFailure)
     }
   }, [onAppleLogin])
 
@@ -293,19 +272,17 @@ function AppleButton({ onAppleLogin, disabled }: { onAppleLogin?: (idToken: stri
 
   return (
     <div className="space-y-1">
-      {/* data-width is set before the SDK loads so the iframe renders at the correct size */}
-      <div
-        ref={containerRef}
-        id="appleid-signin"
-        data-color="black"
-        data-border="false"
-        data-type="continue"
-        data-width={buttonWidth || undefined}
-        data-height="44"
-        data-border-radius="8"
-        data-logo-size="medium"
-        className={`w-full ${disabled ? 'pointer-events-none opacity-50' : ''}`}
-      />
+      <button
+        type="button"
+        onClick={() => { void handleClick() }}
+        disabled={disabled}
+        className="w-full flex items-center justify-center gap-3 h-11 rounded-xl bg-white text-black text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 transition-colors"
+      >
+        <svg viewBox="0 0 24 24" className="w-5 h-5 shrink-0" fill="currentColor">
+          <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.7 9.05 7.4c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.55-1.32 3.09-2.54 4zm-3.03-17.6c.06 1.96-1.52 3.6-3.36 3.44-.25-1.8 1.61-3.6 3.36-3.44z"/>
+        </svg>
+        Continue with Apple
+      </button>
       {appleError && (
         <p className="text-red-400 text-xs text-center">{appleError}</p>
       )}
@@ -313,38 +290,56 @@ function AppleButton({ onAppleLogin, disabled }: { onAppleLogin?: (idToken: stri
   )
 }
 
-function useGoogleButton(
-  ref: React.RefObject<HTMLDivElement | null>,
-  onGoogleLogin: (credential: string) => Promise<void>,
-  text: 'continue_with' | 'signup_with' = 'continue_with',
-) {
-  useEffect(() => {
-    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined
-    if (!clientId || !ref.current) return
+function GoogleButton({ onGoogleLogin, disabled }: { onGoogleLogin: (credential: string) => Promise<void>; disabled?: boolean }) {
+  const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined
 
+  useEffect(() => {
+    if (!clientId) return
     const init = () => {
-      if (!window.google || !ref.current) return
+      if (!window.google) return
       window.google.accounts.id.initialize({
         client_id: clientId,
         callback: (response) => { void onGoogleLogin(response.credential) },
         auto_select: false,
       })
-      window.google.accounts.id.renderButton(ref.current, {
-        theme: 'filled_black',
-        size: 'large',
-        width: ref.current.clientWidth || 384,
-        text,
-      })
     }
+    if (window.google) { init() }
+    else {
+      const existing = document.querySelector('script[src*="accounts.google.com/gsi"]')
+      if (existing) { existing.addEventListener('load', init, { once: true }) }
+      else {
+        const script = document.createElement('script')
+        script.src = 'https://accounts.google.com/gsi/client'
+        script.async = true
+        script.onload = init
+        document.head.appendChild(script)
+      }
+    }
+  }, [clientId, onGoogleLogin])
 
-    if (window.google) {
-      init()
-    } else {
-      const script = document.querySelector('script[src*="accounts.google.com/gsi"]')
-      script?.addEventListener('load', init, { once: true })
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const handleClick = useCallback(() => {
+    if (!window.google) return
+    window.google.accounts.id.prompt()
   }, [])
+
+  if (!clientId) return null
+
+  return (
+    <button
+      type="button"
+      onClick={handleClick}
+      disabled={disabled}
+      className="w-full flex items-center justify-center gap-3 h-11 rounded-xl bg-white text-black text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 transition-colors"
+    >
+      <svg viewBox="0 0 24 24" className="w-5 h-5 shrink-0" xmlns="http://www.w3.org/2000/svg">
+        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+      </svg>
+      Continue with Google
+    </button>
+  )
 }
 
 // ── Login screen ──────────────────────────────────────────────────────────────
@@ -366,10 +361,7 @@ function LoginScreen({
 }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const googleBtnRef = useRef<HTMLDivElement>(null)
   const t = useT()
-
-  useGoogleButton(googleBtnRef, onGoogleLogin, 'continue_with')
 
   const handleSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault()
@@ -396,9 +388,7 @@ function LoginScreen({
 
           {/* Social buttons */}
           <div className="space-y-2.5">
-            {(import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined) && (
-              <div ref={googleBtnRef} className="w-full overflow-hidden rounded-xl" />
-            )}
+            <GoogleButton onGoogleLogin={onGoogleLogin} disabled={busy} />
             <AppleButton onAppleLogin={onAppleLogin} disabled={busy} />
           </div>
 
@@ -477,10 +467,7 @@ function SignUpScreen({
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
   const [localError, setLocalError] = useState<string | null>(null)
-  const googleBtnRef = useRef<HTMLDivElement>(null)
   const t = useT()
-
-  useGoogleButton(googleBtnRef, onGoogleLogin, 'signup_with')
 
   const handleSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault()
@@ -514,9 +501,7 @@ function SignUpScreen({
 
           {/* Social buttons */}
           <div className="space-y-2.5">
-            {(import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined) && (
-              <div ref={googleBtnRef} className="w-full overflow-hidden rounded-xl" />
-            )}
+            <GoogleButton onGoogleLogin={onGoogleLogin} disabled={busy} />
             <AppleButton onAppleLogin={onAppleLogin} disabled={busy} />
           </div>
 
@@ -712,12 +697,7 @@ function SongBrowser({
 
   useEffect(() => {
     if (!nativeLang) return
-    const el = playlistsSectionRef.current
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'end' })
-    } else {
-      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
-    }
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
   }, [nativeLang])
 
   const songList = (
@@ -2268,11 +2248,13 @@ export default function App() {
   })
   const [loginBusy, setLoginBusy] = useState(false)
   const [loginError, setLoginError] = useState<string | null>(null)
-  const [showSignUp, setShowSignUp] = useState(false)
+  const [showSignUp, setShowSignUp] = useState(() =>
+    typeof window !== 'undefined' && window.location.pathname === '/signup'
+  )
 
   const { favoriteSongIds, toggleFavorite } = useFavorites(!!credentialUser)
   const { listenedSongIds, markListened, unmarkListened } = useListened(!!credentialUser)
-  const { entries: wordLookupEntries } = useWordHistory()
+  const { entries: wordLookupEntries } = useWordHistory(!!credentialUser)
 
   const [songs,        setSongs]        = useState<SongSummary[]>([])
   const [playlists,    setPlaylists]    = useState<PlaylistSummary[]>(() => {
@@ -2328,7 +2310,11 @@ export default function App() {
   }, [])
 
   useEffect(() => {
-    const onPopState = () => setCurrentPath(window.location.pathname || '/browse')
+    const onPopState = () => {
+      const path = window.location.pathname || '/browse'
+      setCurrentPath(path)
+      setShowSignUp(path === '/signup')
+    }
     window.addEventListener('popstate', onPopState)
     return () => window.removeEventListener('popstate', onPopState)
   }, [])
@@ -2338,6 +2324,28 @@ export default function App() {
   const settingsOwnerSpotifyId = credentialUser?.spotify_id ?? null
   const isAuthenticated = !!credentialUser
   const isAdmin = Boolean(credentialUser?.is_admin)
+
+  // On mount, correct the URL to /login or /signup when showing auth screens
+  useEffect(() => {
+    if (isAuthenticated) return
+    const path = window.location.pathname
+    if (path !== '/login' && path !== '/signup') {
+      const target = showSignUp ? '/signup' : '/login'
+      window.history.replaceState(null, '', target)
+      setCurrentPath(target)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // After auth, redirect away from /login or /signup
+  useEffect(() => {
+    if (!isAuthenticated) return
+    const path = window.location.pathname
+    if (path === '/login' || path === '/signup') {
+      window.history.replaceState(null, '', '/browse')
+      setCurrentPath('/browse')
+    }
+  }, [isAuthenticated])
 
   const loadSongs = useCallback(async () => {
     setSongsError(null)
@@ -2725,7 +2733,7 @@ export default function App() {
           onRegister={handleRegister}
           onGoogleLogin={handleGoogleLogin}
           onAppleLogin={handleAppleLogin}
-          onShowSignIn={() => { setShowSignUp(false); setLoginError(null) }}
+          onShowSignIn={() => { setShowSignUp(false); setLoginError(null); navigateToPath('/login') }}
           error={loginError}
           busy={loginBusy}
         />
@@ -2736,7 +2744,7 @@ export default function App() {
         onEmailLogin={handleEmailLogin}
         onGoogleLogin={handleGoogleLogin}
         onAppleLogin={handleAppleLogin}
-        onShowSignUp={() => { setShowSignUp(true); setLoginError(null) }}
+        onShowSignUp={() => { setShowSignUp(true); setLoginError(null); navigateToPath('/signup') }}
         error={loginError}
         busy={loginBusy}
       />

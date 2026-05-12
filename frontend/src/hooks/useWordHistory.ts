@@ -17,7 +17,7 @@ function saveEntries(entries: WordHistoryEntry[]) {
   } catch { /* storage full or unavailable */ }
 }
 
-export function useWordHistory() {
+export function useWordHistory(isAuthenticated = false) {
   // Start empty — only server (DB) data marks words as looked up.
   // Optimistic in-session lookups are still added to state immediately via recordLookup.
   const [entries, setEntries] = useState<WordHistoryEntry[]>([])
@@ -26,6 +26,7 @@ export function useWordHistory() {
 
   // On mount: fetch from backend (authoritative source).
   useEffect(() => {
+    if (!isAuthenticated) return
     if (fetchedRef.current) return
     fetchedRef.current = true
 
@@ -35,7 +36,7 @@ export function useWordHistory() {
       setEntries(serverList)
       saveEntries(serverList)
     }).catch(() => { /* unauthenticated or offline — entries stay empty */ })
-  }, [])
+  }, [isAuthenticated])
 
   const recordLookup = useCallback((word: SongWord, song: SongDetail, targetLang: string) => {
     const newEntry: WordHistoryEntry = {
