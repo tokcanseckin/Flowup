@@ -660,7 +660,7 @@ function SongBrowser({
                   {/* dot indicator */}
                   <svg width="8" height="8" viewBox="0 0 8 8" aria-hidden className="shrink-0">
                     {openedSongIds.has(song.id)
-                      ? <circle cx="4" cy="4" r="4" fill="#006D36" />
+                      ? <circle cx="4" cy="4" r="4" fill="#000000" />
                       : <circle cx="4" cy="4" r="4" fill="white" />}
                   </svg>
                   {/* thumbnail */}
