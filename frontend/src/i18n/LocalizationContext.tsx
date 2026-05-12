@@ -6,12 +6,19 @@ export type UILanguage = 'en' | 'tr' | 'ru'
 const LANG_STORAGE_KEY = 'flowup.uiLanguage'
 const LOC_CACHE_KEY = 'flowup.localizations'
 
+function detectBrowserLang(): UILanguage {
+  const primary = (navigator.language ?? '').split('-')[0].toLowerCase()
+  if (primary === 'tr') return 'tr'
+  if (primary === 'ru') return 'ru'
+  return 'en'
+}
+
 function readStoredLang(): UILanguage {
   try {
     const v = localStorage.getItem(LANG_STORAGE_KEY)
     if (v === 'en' || v === 'tr' || v === 'ru') return v
   } catch {}
-  return 'en'
+  return detectBrowserLang()
 }
 
 function readCachedLocalizations(): Record<string, LocalizationItem> {
