@@ -34,6 +34,12 @@ import unicodedata
 from difflib import SequenceMatcher
 from typing import Optional
 
+try:
+    from transliterate import translit as _cyr_translit
+    _HAS_TRANSLITERATE = True
+except ImportError:
+    _HAS_TRANSLITERATE = False
+
 import requests
 import yt_dlp
 
@@ -106,10 +112,13 @@ def search_youtube(
     best_url is None if no confident match was found.
     all_candidates is a list of dicts sorted by score descending.
     """
-    queries = [
-        f"{artist} {title} official audio",
-        f"{artist} {title}",
-    ]
+    def _make_queries(t: str, a: str) -> list[str]:
+        return [
+            f"{a} {t} official audio",
+            f"{a} {t}",
+        ]
+
+    queries = _make_queries(title, artist)
 
     seen_ids: set[str] = set()
     raw_results: list[dict] = []
@@ -196,6 +205,25 @@ def search_youtube(
             best_url = url
 
     all_candidates.sort(key=lambda c: c["score"], reverse=True)
+
+    # ── Transliteration fallback ───────────────────────────────────────────────
+    # If no match was found and the title/artist look Cyrillic, retry with
+    # transliterated Latin versions (some artists publish under Latin titles).
+    if best_url is None and _HAS_TRANSLITERATE:
+        has_cyrillic = any('\u0400' <= ch <= '\u04FF' for ch in title + artist)
+        if has_cyrillic:
+            try:
+                lat_title = _cyr_translit(title, 'ru', reversed=True)
+                lat_artist = _cyr_translit(artist, 'ru', reversed=True)
+            except Exception:
+                lat_title, lat_artist = title, artist
+
+            if lat_title != title or lat_artist != artist:
+                print(f"    [translit] Retrying with: {lat_artist!r} — {lat_title!r}")
+                lat_url, lat_candidates = search_youtube(lat_title, lat_artist)
+                if lat_url:
+                    return lat_url, lat_candidates
+
     return best_url, all_candidates
 
 

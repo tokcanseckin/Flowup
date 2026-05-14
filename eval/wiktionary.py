@@ -485,6 +485,14 @@ def _fetch_via_en_wikt(word: str, preferred_pos: str = "") -> list[str]:
         # e.g. "too, too much" → ["too", "too much"]
         terms = [t.strip() for t in re.split(r"[,;]", gloss) if t.strip()]
         for term in terms[:3]:
+            # Normalise English gloss terms for wiktionary lookup:
+            # strip parenthetical qualifiers like "(by vehicle)" and the
+            # infinitive "to " prefix so "to carry (by vehicle)" → "carry".
+            term = re.sub(r"\s*\(.*?\)", "", term).strip()
+            if term.lower().startswith("to "):
+                term = term[3:].strip()
+            if not term:
+                continue
             # Skip any term that contains Cyrillic — it's not an English pivot word
             # (can happen when _clean_def extracts a link title from a Russian gloss)
             if any("\u0400" <= c <= "\u04FF" for c in term):
