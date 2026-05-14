@@ -599,7 +599,32 @@ def _is_placeholder_def(s: Optional[str]) -> bool:
     if not s:
         return True
     s = s.strip()
-    return len(s) < 60 and s.startswith("[") and s.endswith("]")
+    if not (len(s) < 60 and s.startswith("[") and s.endswith("]")):
+        return False
+    # JSON arrays like '["vagon"]' are valid definitions, not placeholders.
+    # Real placeholders look like [lemma_form] — no quotes, a single token.
+    try:
+        parsed = json.loads(s)
+        if isinstance(parsed, list) and parsed:
+            return False  # non-empty JSON array → valid definition
+    except (ValueError, TypeError):
+        pass
+    return True
+
+
+def _parse_definition(raw: Optional[str]) -> Optional[str]:
+    """If raw is a JSON array, join elements with ', '. Otherwise return as-is."""
+    if not raw:
+        return raw
+    stripped = raw.strip()
+    if stripped.startswith("[") and stripped.endswith("]"):
+        try:
+            parsed = json.loads(stripped)
+            if isinstance(parsed, list) and parsed:
+                return ", ".join(str(x) for x in parsed if x)
+        except (ValueError, TypeError):
+            pass
+    return raw
 
 
 def _word_response(word: Word, lang_code: str = "ru", target_lang: Optional[str] = None) -> WordResponse:
@@ -608,8 +633,8 @@ def _word_response(word: Word, lang_code: str = "ru", target_lang: Optional[str]
     definition: Optional[str] = None
     if target_lang and word.definitions:
         for wd in word.definitions:
-            if wd.target_lang == target_lang and not _is_placeholder_def(wd.definition):
-                definition = wd.definition
+            if wd.target_lang.lower() == target_lang.lower() and not _is_placeholder_def(wd.definition):
+                definition = _parse_definition(wd.definition)
                 break
     if definition is None or _is_placeholder_def(definition):
         definition = word.dictionary_definition
@@ -617,7 +642,7 @@ def _word_response(word: Word, lang_code: str = "ru", target_lang: Optional[str]
     if _is_placeholder_def(definition) and word.definitions:
         for wd in word.definitions:
             if not _is_placeholder_def(wd.definition):
-                definition = wd.definition
+                definition = _parse_definition(wd.definition)
                 break
     return WordResponse(
         key=word.key_index,
@@ -634,7 +659,7 @@ def _line_response(line: Line, override_words: Optional[list] = None, lang_code:
     translation: str = line.translation
     if target_lang and line.translations:
         for lt in line.translations:
-            if lt.target_lang == target_lang:
+            if lt.target_lang.lower() == target_lang.lower():
                 translation = lt.text
                 break
     return LineResponse(
@@ -775,9 +800,21 @@ def _ingest_song(body: SongIngest, db: Session) -> Song:
             for def_lang, def_text in word_data.definitions.items():
                 db.add(WordDefinition(word_id=word.id, target_lang=def_lang, definition=def_text))
 
+    _sync_song_target_langs(song, db)
     db.commit()
     db.refresh(song)
     return song
+
+
+def _sync_song_target_langs(song: Song, db: Session) -> None:
+    """Derive song.target_langs from the distinct LineTranslation.target_lang values for its default lines."""
+    seen: set[str] = set()
+    for line in song.lines:
+        if line.source is not None:
+            continue
+        for lt in line.translations:
+            seen.add(lt.target_lang.lower())
+    song.target_langs = json.dumps(sorted(seen))
 
 
 def _populate_source_lines(song: Song, db: Session) -> None:
@@ -1120,6 +1157,9 @@ def list_songs(db: Session = Depends(get_db)):
 
 @app.get("/api/songs/{song_id}", response_model=SongDetailResponse)
 def get_song(song_id: int, source: Optional[str] = Query(default=None), target_lang: Optional[str] = Query(default=None), db: Session = Depends(get_db)):
+    # Normalize to lowercase so stored 'tr' matches query '?target_lang=TR'
+    if target_lang:
+        target_lang = target_lang.lower()
     # Cache keyed by (song_id, source, target_lang) — skip cache when target_lang specified (varies per user preference)
     cache_key = (song_id, source or None) if not target_lang else None
     if cache_key is not None:
@@ -1288,7 +1328,7 @@ def update_admin_song(song_id: int, body: AdminSongUpdate, db: Session = Depends
     if "apple_music_url" in body.model_fields_set:
         song.apple_music_url = body.apple_music_url or None
     if "target_langs" in body.model_fields_set and body.target_langs is not None:
-        song.target_langs = json.dumps(body.target_langs)
+        song.target_langs = json.dumps([lang.lower() for lang in body.target_langs])
 
     if body.playlist_ids is not None:
         requested_ids = set(body.playlist_ids)
@@ -1479,6 +1519,8 @@ def update_song_translations(
             existing.text = item.text
         else:
             db.add(LineTranslation(line_id=item.id, target_lang=target_lang, text=item.text))
+    db.flush()
+    _sync_song_target_langs(song, db)
     db.commit()
     _cache_invalidate(song_id)
     return {"ok": True}
@@ -1844,7 +1886,7 @@ def update_playlist(playlist_id: int, body: PlaylistUpdate, db: Session = Depend
     if body.target_lang is not None:
         pl.target_lang = body.target_lang
     if body.target_langs is not None:
-        pl.target_langs = json.dumps(body.target_langs)
+        pl.target_langs = json.dumps([l.lower() for l in body.target_langs])
     if body.is_hidden is not None:
         pl.is_hidden = body.is_hidden
     db.commit()

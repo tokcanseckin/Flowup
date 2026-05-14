@@ -633,7 +633,7 @@ const LANG_FLAG: Record<string, string> = {
 function langFlag(code: string): string { return LANG_FLAG[code] ?? '🌐' }
 
 function SongBrowser({
-  songs, playlists, activePlaylistId, activePlaylist, loading, error, onSelect, onPrefetch, onSelectPlaylist, onLogout, onOpenSettings, onOpenAdmin, onOpenAccount, isAdmin, user, openedSongIds, favoriteSongIds, toggleFavorite, markAsNotListened, wordsLookedUpCount,
+  songs, playlists, activePlaylistId, activePlaylist, loading, error, onSelect, onPrefetch, onSelectPlaylist, onLogout, onOpenSettings, onOpenAdmin, onOpenAccount, isAdmin, user, openedSongIds, favoriteSongIds, toggleFavorite, markAsNotListened, wordsLookedUpCount, onBrowseTargetLang,
 }: {
   songs: SongSummary[]
   playlists: PlaylistSummary[]
@@ -655,6 +655,7 @@ function SongBrowser({
   toggleFavorite: (id: number) => void
   markAsNotListened: (id: number) => void
   wordsLookedUpCount: number
+  onBrowseTargetLang: (musicLang: string, targetLang: string) => void
 }) {
   const t = useT()
   const tc = useContentT()
@@ -1080,7 +1081,7 @@ function SongBrowser({
                       <button
                         key={code}
                         type="button"
-                        onClick={() => setNativeLang(code)}
+                        onClick={() => { setNativeLang(code); if (learnLang) onBrowseTargetLang(learnLang, code) }}
                         className={`rounded-2xl border p-5 flex items-center gap-4 transition-all cursor-pointer text-left ${selected ? 'border-white/30' : 'border-zinc-700/70 hover:border-white/15'}`}
                         style={{ background: selected ? 'rgba(255,255,255,0.07)' : '#18191f' }}
                         onMouseEnter={e => { if (!selected) (e.currentTarget as HTMLElement).style.background = '#22232a' }}
@@ -1703,7 +1704,7 @@ function useAlbumLyricsTheme(albumArtUrl: string | null): [{ panelGradient: stri
 // ── Player view ────────────────────────────────────────────────────────────────
 
 function PlayerView({
-  song, user, onBack, onLogout, onOpenSettings, onOpenAdmin, onOpenAccount, isAdmin, onPrev, onNext, canPrev, canNext, settings, onUpdate, storedMusicUserToken, onMusicUserToken, favoriteSongIds, toggleFavorite, targetLang,
+  song, user, onBack, onLogout, onOpenSettings, onOpenAdmin, onOpenAccount, isAdmin, onPrev, onNext, canPrev, canNext, settings, onUpdate, storedMusicUserToken, onMusicUserToken, favoriteSongIds, toggleFavorite, targetLang, onTargetLangChange,
 }: {
   song: SongDetail
   user: { display_name: string | null; email: string | null } | null
@@ -1724,6 +1725,7 @@ function PlayerView({
   favoriteSongIds: Set<number>
   toggleFavorite: (id: number) => void
   targetLang?: string
+  onTargetLangChange?: (lang: string) => void
 }) {
   const [infoVisible, setInfoVisible] = useState(false)
   const [playerMenuOpen, setPlayerMenuOpen] = useState(false)
@@ -1976,6 +1978,19 @@ function PlayerView({
             >
               {t('nav.admin')}
             </button>
+          )}
+          {/* Target language selector */}
+          {song.target_langs && song.target_langs.length > 0 && onTargetLangChange && (
+            <select
+              value={targetLang ?? ''}
+              onChange={e => onTargetLangChange(e.target.value)}
+              className="text-xs rounded-lg border border-indigo-700/70 bg-gray-800/70 px-2 py-1 text-indigo-300 focus:outline-none focus:border-indigo-500 cursor-pointer"
+              aria-label="Translation language"
+            >
+              {song.target_langs.map(lang => (
+                <option key={lang} value={lang}>{lang.toUpperCase()}</option>
+              ))}
+            </select>
           )}
           {/* UI language selector */}
           <select
@@ -2271,6 +2286,13 @@ export default function App() {
   const [activePlaylist, setActivePlaylist] = useState<PlaylistDetail | null>(null)
   // null = use playlist default; '' = no translation; 'en' etc = user-chosen override
   const [overrideTargetLang, setOverrideTargetLang] = useState<string | null>(null)
+  // Maps music language code → preferred target language chosen in /browse (e.g. { ru: 'tr' })
+  const [browseTargetLangMap, setBrowseTargetLangMap] = useState<Record<string, string>>(() => {
+    try {
+      const raw = localStorage.getItem('browse.targetLangMap')
+      return raw ? JSON.parse(raw) as Record<string, string> : {}
+    } catch { return {} }
+  })
 
   const playlistWordCount = useMemo(() => {
     if (!activePlaylist) return 0
@@ -2292,7 +2314,13 @@ export default function App() {
   )
   const effectiveTargetLang = overrideTargetLang !== null
     ? (overrideTargetLang || undefined)
-    : (availableTargetLangs[0] ?? undefined)
+    : (() => {
+        const songLangCode = activeSong?.language.code
+        const browsePref = songLangCode ? browseTargetLangMap[songLangCode] : undefined
+        const lowerPref = browsePref?.toLowerCase()
+        const match = lowerPref ? availableTargetLangs.find(l => l.toLowerCase() === lowerPref) : undefined
+        return match ?? availableTargetLangs[0] ?? browsePref
+      })()
 
   const [songLoading,  setSongLoading]  = useState(false)
   const [lastSelectedSongId, setLastSelectedSongId] = useState<number | null>(null)
@@ -2479,6 +2507,14 @@ export default function App() {
     api.saveAppleMusicToken(token).catch(console.error)
   }, [credentialUser])
 
+  const handleBrowseTargetLang = useCallback((musicLang: string, targetLang: string) => {
+    setBrowseTargetLangMap(prev => {
+      const next = { ...prev, [musicLang]: targetLang }
+      try { localStorage.setItem('browse.targetLangMap', JSON.stringify(next)) } catch { /* ignore */ }
+      return next
+    })
+  }, [])
+
   const handleSelectSong = useCallback(async (id: number, options?: { updateRoute?: boolean }) => {
     markListened(id)
     // Navigate immediately so the UI responds at once; song data loads in background.
@@ -2486,9 +2522,14 @@ export default function App() {
       navigateToPath(songPath(id))
     }
     const source = settings.preferredSource
+    const songSummary = songs.find(s => s.id === id)
+    const songLang = songSummary?.language_code ?? activePlaylist?.language_code
+    const browsePref = songLang ? browseTargetLangMap[songLang] : undefined
+    const lowerPref = browsePref?.toLowerCase()
+    const matchedLang = lowerPref ? availableTargetLangs.find(l => l.toLowerCase() === lowerPref) : undefined
     const targetLang = overrideTargetLang !== null
       ? (overrideTargetLang || undefined)
-      : (availableTargetLangs[0] ?? undefined)
+      : matchedLang ?? availableTargetLangs[0] ?? browsePref
     const key = _songCacheKey(id, source)
     const cached = !targetLang ? _songCache.get(key) : undefined
     if (cached) {
@@ -2510,7 +2551,7 @@ export default function App() {
     } finally {
       setSongLoading(false)
     }
-  }, [settings.preferredSource, navigateToPath, availableTargetLangs, overrideTargetLang])
+  }, [settings.preferredSource, navigateToPath, availableTargetLangs, overrideTargetLang, songs, activePlaylist, browseTargetLangMap])
 
   const handlePrefetchSong = useCallback((id: number) => {
     const source = settings.preferredSource
@@ -2528,6 +2569,16 @@ export default function App() {
     void _fetchSong(activeSong.id, source, targetLang).then(d => { setActiveSong(d) }).catch(() => {})
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [settings.preferredSource])
+
+  // Re-fetch active song when the effective target language changes (e.g. after
+  // the initial no-target-lang fetch reveals available target langs, causing
+  // effectiveTargetLang to go from undefined → 'tr').
+  useEffect(() => {
+    if (!activeSong || !effectiveTargetLang) return
+    const source = settings.preferredSource
+    void _fetchSong(activeSong.id, source, effectiveTargetLang).then(d => { setActiveSong(d) }).catch(() => {})
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [effectiveTargetLang])
 
   useEffect(() => {
     restoreDoneRef.current = false
@@ -2828,6 +2879,7 @@ export default function App() {
         favoriteSongIds={favoriteSongIds}
         toggleFavorite={toggleFavorite}
         targetLang={effectiveTargetLang}
+        onTargetLangChange={(lang) => setOverrideTargetLang(lang)}
       />
     )
   }
@@ -2854,6 +2906,7 @@ export default function App() {
       toggleFavorite={toggleFavorite}
       markAsNotListened={unmarkListened}
       wordsLookedUpCount={playlistWordCount}
+      onBrowseTargetLang={handleBrowseTargetLang}
     />
   )
 }

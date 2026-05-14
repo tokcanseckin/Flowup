@@ -179,6 +179,7 @@ export default function AdminPanel({
   const [playlistTargetLangsText, setPlaylistTargetLangsText] = useState('')
   const [newPlaylistDraft, setNewPlaylistDraft] = useState<PlaylistDraft>(emptyPlaylistDraft())
   const [newPlaylistTargetLangsText, setNewPlaylistTargetLangsText] = useState('')
+  const [songTargetLangsText, setSongTargetLangsText] = useState('')
   const [playlistSongIds, setPlaylistSongIds] = useState<number[]>([])
   const [playlistLoading, setPlaylistLoading] = useState(false)
   const [playlistSaving, setPlaylistSaving] = useState(false)
@@ -349,17 +350,27 @@ export default function AdminPanel({
           target_langs: detail.target_langs ?? [],
           playlist_ids: [...detail.playlist_ids],
         })
+        setSongTargetLangsText((detail.target_langs ?? []).join(', '))
         // Load lyrics for the current source
         const sourceLinesEntry = detail.source_lines.find(s => s.source === lyricsSource)
         const linesToLoad = lyricsSource === 'default'
           ? detail.lines
           : (sourceLinesEntry?.lines ?? detail.lines)
         setLyricsDraft(linesToLoad.map(line => ({ ...line })))
-        // Fetch available target langs and auto-select the first one.
+        // Fetch available target langs and auto-select based on browse preference.
         void api.getSongTargetLangs(selectedSongId).then(({ target_langs }) => {
           if (cancelled) return
           setAvailableTargetLangs(target_langs)
-          setLyricsTargetLang(target_langs[0] ?? '')
+          let preferred = target_langs[0] ?? ''
+          try {
+            const raw = localStorage.getItem('browse.targetLangMap')
+            if (raw) {
+              const map = JSON.parse(raw) as Record<string, string>
+              const browsePref = map[detail.language.code]
+              if (browsePref && target_langs.includes(browsePref)) preferred = browsePref
+            }
+          } catch { /* ignore */ }
+          setLyricsTargetLang(preferred)
         }).catch(() => {})
       })
       .catch((error: unknown) => {
@@ -1214,7 +1225,7 @@ export default function AdminPanel({
                           {urlLookupError.appleMusic && <p className="text-xs text-red-400">{urlLookupError.appleMusic}</p>}
                         </div>
                       </div>
-                      <label className="block text-xs text-gray-500">Target langs <span className="text-gray-600">(comma-separated)</span><input value={songDraft.target_langs.join(', ')} onChange={e => setSongDraft(prev => prev ? { ...prev, target_langs: e.target.value.split(',').map(s => s.trim().toUpperCase()).filter(Boolean) } : prev)} placeholder="e.g. EN, DE" className="mt-1 w-full rounded-xl border border-indigo-700/60 bg-indigo-950/20 px-3 py-2 text-sm text-indigo-200 placeholder-indigo-800 focus:outline-none focus:border-indigo-400" /></label>
+                      <label className="block text-xs text-gray-500">Target langs <span className="text-gray-600">(comma-separated)</span><input value={songTargetLangsText} onChange={e => { setSongTargetLangsText(e.target.value); setSongDraft(prev => prev ? { ...prev, target_langs: e.target.value.split(',').map(s => s.trim().toUpperCase()).filter(Boolean) } : prev) }} placeholder="e.g. EN, DE" className="mt-1 w-full rounded-xl border border-indigo-700/60 bg-indigo-950/20 px-3 py-2 text-sm text-indigo-200 placeholder-indigo-800 focus:outline-none focus:border-indigo-400" /></label>
                       <div>
                         <p className="text-xs text-gray-500 mb-2">Playlist membership</p>
                         <div className="grid gap-2 md:grid-cols-2">
