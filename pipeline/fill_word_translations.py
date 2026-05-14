@@ -6,9 +6,6 @@ Reads every word in songs that match the given source language, runs the
 kaikki_1 lookup, and writes results into word_definitions(word_id, target_lang,
 definition).  Existing rows for the pair are skipped by default (idempotent).
 
-English (ru→en) is also supported via --pair ru_en, which migrates
-words.dictionary_definition into word_definitions instead of calling kaikki.
-
 Requires DATABASE_URL environment variable (PostgreSQL).
 
 Usage:
@@ -19,9 +16,6 @@ Usage:
 
     # Fill all Russian songs with Turkish translations
     python pipeline/fill_word_translations.py --pair ru_tr
-
-    # Migrate existing English definitions into word_definitions (ru→en)
-    python pipeline/fill_word_translations.py --pair ru_en
 
     # One song only
     python pipeline/fill_word_translations.py --pair ru_tr --song-id 42
@@ -62,10 +56,8 @@ def _find_kaikki_db(pair: str) -> Path | None:
 
 
 # ── Pair registry ─────────────────────────────────────────────────────────────
-# "en" is special: uses words.dictionary_definition migration, no kaikki.
 SUPPORTED_PAIRS: dict[tuple[str, str], str] = {
     ("ru", "tr"): "ru_tr",
-    ("ru", "en"): "ru_en",   # migration mode — copies existing column
     # Add future pairs here, e.g.:
     # ("ru", "de"): "ru_de",
 }
@@ -122,51 +114,6 @@ def _upsert_definition(
         return "updated"
     session.add(WordDefinition(word_id=word_id, target_lang=target_lang, definition=definition))
     return "inserted"
-
-
-# ── English migration mode ────────────────────────────────────────────────────
-
-def fill_ru_en(
-    session: Session,
-    song_id: int | None,
-    overwrite: bool,
-    dry_run: bool,
-) -> None:
-    """Migrate words.dictionary_definition → word_definitions[target_lang='en']."""
-    songs = _fetch_songs(session, "ru", song_id)
-    if not songs:
-        _log("No Russian songs found.")
-        return
-
-    total_inserted = total_skipped = total_empty = 0
-    t0 = time.monotonic()
-
-    for song in songs:
-        _log(f"\nSong {song.id}: {song.artist} — {song.title}")
-        words = _words_for_song(session, song.id)
-        inserted = skipped = empty = 0
-
-        for word in words:
-            if not word.dictionary_definition or not word.dictionary_definition.strip():
-                empty += 1
-                continue
-            action = _upsert_definition(session, word.id, "en", word.dictionary_definition.strip(), overwrite, dry_run)
-            if action in ("inserted", "updated", "dry"):
-                inserted += 1
-            elif action == "skipped":
-                skipped += 1
-
-        if not dry_run:
-            session.commit()
-
-        _log(f"  words: {len(words)} | filled: {inserted} | skipped: {skipped} | no EN def: {empty}")
-        total_inserted += inserted
-        total_skipped  += skipped
-        total_empty    += empty
-
-    elapsed = time.monotonic() - t0
-    _log(f"\n{'[DRY RUN] ' if dry_run else ''}Done in {elapsed:.1f}s")
-    _log(f"Total filled: {total_inserted} | skipped: {total_skipped} | no EN def: {total_empty}")
 
 
 # ── Kaikki lookup mode ────────────────────────────────────────────────────────
@@ -293,23 +240,20 @@ def main() -> None:
     if dry_run := args.dry_run:
         _log("[DRY RUN MODE — no writes]")
 
+    kaikki_db = Path(args.db_path) if args.db_path else _find_kaikki_db(pair)
+    if kaikki_db is None:
+        sys.exit(
+            f"Kaikki DB for pair '{pair}' not found.\n"
+            f"Expected at:\n"
+            f"  {REPO_ROOT}/backend/dictionaries/{pair}/{pair}.db\n"
+            f"  {REPO_ROOT}/eval/pipelines/{src_lang}_{tgt_lang}/kaikki_1/data/{pair}.db\n"
+            f"Build it first: python -m eval.pipelines.{src_lang}_{tgt_lang}.kaikki_1.build_db"
+        )
+
+    _log(f"pair: {pair} | DB: {kaikki_db}")
     session: Session = SessionLocal()
     try:
-        if tgt_lang == "en":
-            _log("Mode: migrate words.dictionary_definition → word_definitions[en]")
-            fill_ru_en(session, args.song_id, args.overwrite, dry_run)
-        else:
-            kaikki_db = Path(args.db_path) if args.db_path else _find_kaikki_db(pair)
-            if kaikki_db is None:
-                sys.exit(
-                    f"Kaikki DB for pair '{pair}' not found.\n"
-                    f"Expected at:\n"
-                    f"  {REPO_ROOT}/backend/dictionaries/{pair}/{pair}.db\n"
-                    f"  {REPO_ROOT}/eval/pipelines/{src_lang}_{tgt_lang}/kaikki_1/data/{pair}.db\n"
-                    f"Build it first: python -m eval.pipelines.{src_lang}_{tgt_lang}.kaikki_1.build_db"
-                )
-            _log(f"Mode: kaikki lookup | pair: {pair} | DB: {kaikki_db}")
-            fill_kaikki(session, src_lang, tgt_lang, kaikki_db, args.song_id, args.overwrite, dry_run)
+        fill_kaikki(session, src_lang, tgt_lang, kaikki_db, args.song_id, args.overwrite, dry_run)
     finally:
         session.close()
 
