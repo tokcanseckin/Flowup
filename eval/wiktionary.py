@@ -114,6 +114,10 @@ def _coarse_pos(grammar: str) -> str:
     return ""
 
 
+class _RateLimited(Exception):
+    """Raised by _wiki_get when HTTP 429 persists after all internal retries."""
+
+
 def _extract_wikilinks(text: str) -> list[str]:
     """Return unique [[wikilink]] targets from a block of wikitext."""
     result: list[str] = []
@@ -147,9 +151,12 @@ def _wiki_get(api_url: str, params: dict, retries: int = 3) -> dict:
             with urllib.request.urlopen(req, timeout=10) as resp:
                 return json.loads(resp.read().decode("utf-8"))
         except urllib.error.HTTPError as exc:
-            if exc.code == 429 and attempt < retries - 1:
-                time.sleep(delay)
-                delay *= 2
+            if exc.code == 429:
+                if attempt < retries - 1:
+                    time.sleep(delay)
+                    delay *= 2
+                else:
+                    raise _RateLimited()
             else:
                 raise
     return {}
@@ -475,6 +482,8 @@ def _fetch_via_en_wikt(word: str, preferred_pos: str = "") -> list[str]:
     try:
         glosses = _fetch_en_glosses(word, preferred_pos=preferred_pos)
         time.sleep(2.0)
+    except _RateLimited:
+        raise
     except Exception:
         return []
 
@@ -501,6 +510,8 @@ def _fetch_via_en_wikt(word: str, preferred_pos: str = "") -> list[str]:
             try:
                 candidates = _fetch_tr_for_en_word(term, preferred_pos=preferred_pos)
                 time.sleep(2.0)
+            except _RateLimited:
+                raise
             except Exception:
                 candidates = []
             # Fallback: try en.wiktionary's ==Turkish== section for this term.
@@ -510,6 +521,8 @@ def _fetch_via_en_wikt(word: str, preferred_pos: str = "") -> list[str]:
                 try:
                     candidates = _fetch_tr_from_english(term)
                     time.sleep(2.0)
+                except _RateLimited:
+                    raise
                 except Exception:
                     candidates = []
             for w in candidates:
@@ -598,6 +611,13 @@ class WiktionaryLookup:
         try:
             tr_words = _fetch_from_tr_wikt(key, preferred_pos=pos)
             time.sleep(2.0)
+        except _RateLimited:
+            time.sleep(30.0)
+            try:
+                tr_words = _fetch_from_tr_wikt(key, preferred_pos=pos)
+                time.sleep(2.0)
+            except Exception:
+                return []  # still rate-limited — skip, will retry next run
         except Exception:
             pass
 
@@ -605,6 +625,12 @@ class WiktionaryLookup:
             # Fallback: en.wiktionary.org two-hop (Russian → English → Turkish)
             try:
                 tr_words = _fetch_via_en_wikt(key, preferred_pos=pos)
+            except _RateLimited:
+                time.sleep(30.0)
+                try:
+                    tr_words = _fetch_via_en_wikt(key, preferred_pos=pos)
+                except Exception:
+                    return []  # still rate-limited — skip, will retry next run
             except Exception:
                 pass
 
@@ -613,7 +639,14 @@ class WiktionaryLookup:
             try:
                 raw = self._get_argos().translate(key)
                 if raw and raw.strip() and raw.strip().lower() != key.lower():
-                    tr_words = [raw.strip()]
+                    tokens = raw.strip().split()
+                    seen_t: set[str] = set()
+                    unique_tokens: list[str] = []
+                    for t in tokens:
+                        if t.lower() not in seen_t:
+                            unique_tokens.append(t)
+                            seen_t.add(t.lower())
+                    tr_words = [" ".join(unique_tokens)]
             except Exception:
                 pass
 

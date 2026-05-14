@@ -92,6 +92,27 @@ After stripping, `"to convey"` → `"convey"` → `['taşımak', 'iletmek', 'get
 
 ---
 
+### Bug D — Rate-limiting silently falls through to Argos, producing repeated tokens ✅ Fixed
+
+**Root cause (two-part):**
+
+1. **Rate-limit silent swallowing.** All call sites in `lookup()` used bare `except Exception: pass`, so HTTP 429 responses from tr.wiktionary (returned by `_wiki_get` after exhausting its internal retry budget) were silently discarded. The pipeline fell through to Argos as if the word simply had no wiktionary entry.
+
+2. **Argos repetition.** When Argos NMT receives certain short Russian words as input, it produces a repetitive output string — a single string element where the translated token is repeated dozens or hundreds of times (e.g. `"hotel hotel hotel hotel..."`, `"ıslak ıslak ıslak ıslak"`, `"çeyrek çeyrek çeyrek çeyrek"`). These were stored verbatim in the cache and CSV.
+
+Both issues were confirmed by inspecting `wikt_cache.db` directly: all corrupted entries (`отель|noun`, `у|preposition`, `мокрый|adjective`, `квартал|noun`, `давно|adverb`) were single-element lists whose sole element was an Argos repetition string. Manual calls to `_fetch_from_tr_wikt` for the same words succeeded without rate-limiting, confirming Argos was only reached because the 429 was swallowed.
+
+**Fix — rate-limit handling:**
+- Added a `_RateLimited` exception class.
+- `_wiki_get`: after exhausting all HTTP 429 retries, raises `_RateLimited` instead of re-raising `HTTPError`.
+- `_fetch_via_en_wikt`: added `except _RateLimited: raise` before each `except Exception` guard so the exception propagates to the caller.
+- `lookup()`: catches `_RateLimited` for both tier 1 and tier 2, sleeps 30 s, retries once. If the retry still raises any exception, returns `[]` immediately without caching — the word will be retried on the next pipeline run.
+
+**Fix — Argos token dedup:**
+- After calling Argos, split the raw output on whitespace and deduplicate tokens case-insensitively, preserving order. Rejoin with a single space. `"hotel hotel hotel..."` → `"hotel"`, `"Uzun zaman önce uzun zaman önce"` → `"Uzun zaman önce"`.
+
+---
+
 ## Key Observations
 
 - **tr.wiktionary is the most reliable source** for common Russian nouns and adjectives that have direct Turkish entries. Coverage is high for high-frequency words.
@@ -106,8 +127,9 @@ After stripping, `"to convey"` → `"convey"` → `['taşımak', 'iletmek', 'get
 
 | Item | Status |
 |---|---|
-| Fix A: lowercase / validate Argos output | ⏳ Pending |
 | Clear stale cache entries (`DELETE FROM cache`) | ⏳ Pending |
 | Regenerate `eval/data/song12_words.csv` with all fixes | ⏳ Pending |
 | Fix B: strip `"to "` prefix and parentheticals in two-hop | ✅ Done (`5ef0762`) |
 | Fix C: scope `_fetch_tr_from_english` to `==Turkish==` section | ✅ Done (`7339cf4`) |
+| Fix D: `_RateLimited` propagation + 30 s retry-once in `lookup()` | ✅ Done |
+| Fix D: Argos token deduplication | ✅ Done |
