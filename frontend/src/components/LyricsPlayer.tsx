@@ -1028,15 +1028,21 @@ function InspectPanel({ info, onClose, compact = false, accentTextColor = 'hsl(3
             const pos = parts[0]
             const ASPECTS = new Set(['Perfective', 'Imperfective'])
             const aspect = parts.find(p => ASPECTS.has(p)) ?? null
-            const detail = parts.slice(1).filter(p => !ASPECTS.has(p)).join(' · ')
+            // Translate a grammar token via localization key grammar.<term>
+            const tg = (term: string) => {
+              const key = 'grammar.' + term.replace(/\s+/g, '_').replace(/[()]/g, '').replace(/_+/g, '_').replace(/_$/, '')
+              const translated = t(key)
+              return translated !== key ? translated : term
+            }
+            const detail = parts.slice(1).filter(p => !ASPECTS.has(p)).map(tg).join(' · ')
             return (
               <div className="mt-3 flex flex-wrap items-baseline gap-2">
                 <span className="px-0 py-0 text-base leading-none font-bold text-sky-500 uppercase tracking-wide">
-                  {pos}
+                  {tg(pos)}
                 </span>
                 {aspect && (
                   <span className="px-0 py-0 text-base leading-none font-semibold text-emerald-400 uppercase tracking-wide">
-                    {aspect}
+                    {tg(aspect)}
                   </span>
                 )}
                 {detail && (

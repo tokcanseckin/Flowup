@@ -441,6 +441,68 @@ _INITIAL_LOCALIZATIONS: list[dict] = [
      "en": "Now you're here to feel them land the way a native speaker feels them. Slang that doesn't translate, rhythm that only makes sense when you stop thinking about it, lyrics where the joke is in the delivery.",
      "tr": "Şimdi onları anadili İngilizce olan birinin hissettiği şekilde hissetmek için buradasınız. Tercüme etmeyen argo, sadece düşünmeyi bıraktığınızda mantıklı olan ritim, şakanın sunumda olduğu şarkı sözleri.",
      "ru": "Теперь вы здесь, чтобы почувствовать, как они приземляются так, как их чувствует носитель языка. Сленг, который не переводится, ритм, который имеет смысл только тогда, когда вы перестаете думать об этом, тексты, где шутка в доставке."},
+    # Grammar terms (for the word-inspect panel)
+    # Parts of speech
+    {"key": "grammar.Noun",             "en": "Noun",              "tr": "İsim",              "ru": "Существительное"},
+    {"key": "grammar.Verb",             "en": "Verb",              "tr": "Fiil",              "ru": "Глагол"},
+    {"key": "grammar.Adjective",        "en": "Adjective",         "tr": "Sıfat",             "ru": "Прилагательное"},
+    {"key": "grammar.Adverb",           "en": "Adverb",            "tr": "Zarf",              "ru": "Наречие"},
+    {"key": "grammar.Preposition",      "en": "Preposition",       "tr": "Edat",              "ru": "Предлог"},
+    {"key": "grammar.Conjunction",      "en": "Conjunction",       "tr": "Bağlaç",            "ru": "Союз"},
+    {"key": "grammar.Particle",         "en": "Particle",          "tr": "Parçacık",          "ru": "Частица"},
+    {"key": "grammar.Participle",       "en": "Participle",        "tr": "Sıfat-fiil",        "ru": "Причастие"},
+    {"key": "grammar.Pronoun",          "en": "Pronoun",           "tr": "Zamir",             "ru": "Местоимение"},
+    {"key": "grammar.Numeral",          "en": "Numeral",           "tr": "Sayı sıfatı",       "ru": "Числительное"},
+    {"key": "grammar.Interjection",     "en": "Interjection",      "tr": "Ünlem",             "ru": "Междометие"},
+    {"key": "grammar.Determiner",       "en": "Determiner",        "tr": "Belirteç",          "ru": "Артикль"},
+    {"key": "grammar.Proper_Noun",      "en": "Proper Noun",       "tr": "Özel İsim",         "ru": "Имя собственное"},
+    {"key": "grammar.Auxiliary_Verb",   "en": "Auxiliary Verb",    "tr": "Yardımcı Fiil",     "ru": "Вспомогательный глагол"},
+    {"key": "grammar.Gerund",           "en": "Gerund",            "tr": "Ulaç",              "ru": "Деепричастие"},
+    {"key": "grammar.Adj_short",        "en": "Adj (short)",       "tr": "Kısa sıfat",        "ru": "Краткое прилагательное"},
+    {"key": "grammar.Participle_short", "en": "Participle (short)","tr": "Kısa sıfat-fiil",   "ru": "Краткое причастие"},
+    {"key": "grammar.Verb_infinitive",  "en": "Infinitive",        "tr": "Mastar",            "ru": "Инфинитив"},
+    {"key": "grammar.Punctuation",      "en": "Punctuation",       "tr": "Noktalama",         "ru": "Знак препинания"},
+    # Number
+    {"key": "grammar.Singular",         "en": "Singular",          "tr": "Tekil",             "ru": "Ед. ч."},
+    {"key": "grammar.Plural",           "en": "Plural",            "tr": "Çoğul",             "ru": "Мн. ч."},
+    # Gender
+    {"key": "grammar.Masculine",        "en": "Masculine",         "tr": "Eril",              "ru": "Муж."},
+    {"key": "grammar.Feminine",         "en": "Feminine",          "tr": "Dişil",             "ru": "Жен."},
+    {"key": "grammar.Neuter",           "en": "Neuter",            "tr": "Yansız",            "ru": "Ср."},
+    # Case
+    {"key": "grammar.Nominative",       "en": "Nominative",        "tr": "Yalın hal",         "ru": "Им."},
+    {"key": "grammar.Genitive",         "en": "Genitive",          "tr": "İyelik hali",       "ru": "Род."},
+    {"key": "grammar.Genitive_2",       "en": "Genitive 2",        "tr": "İyelik hali 2",     "ru": "Род. 2"},
+    {"key": "grammar.Dative",           "en": "Dative",            "tr": "Yönelme hali",      "ru": "Дат."},
+    {"key": "grammar.Accusative",       "en": "Accusative",        "tr": "Belirtme hali",     "ru": "Вин."},
+    {"key": "grammar.Instrumental",     "en": "Instrumental",      "tr": "Araç hali",         "ru": "Твор."},
+    {"key": "grammar.Prepositional",    "en": "Prepositional",     "tr": "Edat hali",         "ru": "Пред."},
+    {"key": "grammar.Vocative",         "en": "Vocative",          "tr": "Seslenme hali",     "ru": "Зват."},
+    {"key": "grammar.Abs",              "en": "Abs",               "tr": "Mutlak hal",        "ru": "Абсолютив"},
+    # Aspect
+    {"key": "grammar.Perfective",       "en": "Perfective",        "tr": "Bitimli görünüş",   "ru": "Сов."},
+    {"key": "grammar.Imperfective",     "en": "Imperfective",      "tr": "Süreğen görünüş",   "ru": "Несов."},
+    # Tense
+    {"key": "grammar.Present",          "en": "Present",           "tr": "Şimdiki zaman",     "ru": "Наст."},
+    {"key": "grammar.Past",             "en": "Past",              "tr": "Geçmiş zaman",      "ru": "Прош."},
+    {"key": "grammar.Future",           "en": "Future",            "tr": "Gelecek zaman",     "ru": "Буд."},
+    {"key": "grammar.Imperfect",        "en": "Imperfect",         "tr": "Geçmiş süreç kipi", "ru": "Имперфект"},
+    # Person
+    {"key": "grammar.1st_Person",       "en": "1st Person",        "tr": "1. şahıs",          "ru": "1-е л."},
+    {"key": "grammar.2nd_Person",       "en": "2nd Person",        "tr": "2. şahıs",          "ru": "2-е л."},
+    {"key": "grammar.3rd_Person",       "en": "3rd Person",        "tr": "3. şahıs",          "ru": "3-е л."},
+    # Mood
+    {"key": "grammar.Imperative",       "en": "Imperative",        "tr": "Emir kipi",         "ru": "Повел."},
+    {"key": "grammar.Conditional",      "en": "Conditional",       "tr": "Koşullu kip",       "ru": "Условное"},
+    {"key": "grammar.Indicative",       "en": "Indicative",        "tr": "Bildirme kipi",     "ru": "Изъявит."},
+    {"key": "grammar.Subjunctive",      "en": "Subjunctive",       "tr": "Dilek kipi",        "ru": "Сослагат."},
+    # Other
+    {"key": "grammar.Comparative",      "en": "Comparative",       "tr": "Karşılaştırmalı",   "ru": "Сравн."},
+    {"key": "grammar.Predicative",      "en": "Predicative",       "tr": "Yüklem işlevi",     "ru": "Предикатив"},
+    {"key": "grammar.Definite",         "en": "Definite",          "tr": "Belirli",           "ru": "Определённый"},
+    {"key": "grammar.Indefinite",       "en": "Indefinite",        "tr": "Belirsiz",          "ru": "Неопределённый"},
+    {"key": "grammar.Other",            "en": "Other",             "tr": "Diğer",             "ru": "Другое"},
+    {"key": "grammar.Unknown",          "en": "Unknown",           "tr": "Bilinmiyor",        "ru": "Неизвестно"},
 ]
 
 
