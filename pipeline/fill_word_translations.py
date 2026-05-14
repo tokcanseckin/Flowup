@@ -154,6 +154,21 @@ def _upsert_definition(
     return "inserted"
 
 
+def _sync_song_target_langs(session: Session, song: Song, dry_run: bool) -> None:
+    """Derive and update song.target_langs from its LineTranslation rows (default lines only)."""
+    seen: set[str] = set()
+    for line in song.lines:
+        if line.source is not None:
+            continue
+        for lt in line.translations:
+            seen.add(lt.target_lang.lower())
+    new_langs = json.dumps(sorted(seen))
+    if song.target_langs != new_langs:
+        if not dry_run:
+            song.target_langs = new_langs
+        _log(f"  target_langs: {song.target_langs} → {new_langs}")
+
+
 def _run_fill_loop(
     session: Session,
     src_lang: str,
@@ -200,6 +215,7 @@ def _run_fill_loop(
                 skipped += 1
 
         if not dry_run:
+            _sync_song_target_langs(session, song, dry_run)
             session.commit()
 
         coverage = f"{hit/(hit+miss)*100:.0f}%" if (hit + miss) > 0 else "n/a"
