@@ -594,6 +594,19 @@ def _enrich_definition(raw_def: Optional[str], lemma: str, lang_code: str = "ru"
     return raw_def or _or_lookup_local(bare_lemma)
 
 
+# Language code aliases — normalize regional variants to the canonical code stored in the DB.
+_LANG_ALIASES: dict[str, str] = {
+    "en-us": "en",
+    "en-gb": "en",
+    "en-au": "en",
+}
+
+
+def _canon_lang(lang: str) -> str:
+    """Lowercase and resolve regional aliases (e.g. en-us → en)."""
+    return _LANG_ALIASES.get(lang.lower(), lang.lower())
+
+
 def _is_placeholder_def(s: Optional[str]) -> bool:
     """Return True for '[lemma]'-style placeholder definitions inserted by the pipeline."""
     if not s:
@@ -779,7 +792,7 @@ def _ingest_song(body: SongIngest, db: Session) -> Song:
 
         # Write normalized per-target-language translations
         for tl_lang, tl_text in line_data.translations.items():
-            db.add(LineTranslation(line_id=line.id, target_lang=tl_lang, text=tl_text))
+            db.add(LineTranslation(line_id=line.id, target_lang=_canon_lang(tl_lang), text=tl_text))
 
         for word_data in line_data.words:
             # Use legacy `dictionary_definition` OR first value from `definitions` dict
@@ -798,7 +811,7 @@ def _ingest_song(body: SongIngest, db: Session) -> Song:
 
             # Write normalized per-target-language definitions
             for def_lang, def_text in word_data.definitions.items():
-                db.add(WordDefinition(word_id=word.id, target_lang=def_lang, definition=def_text))
+                db.add(WordDefinition(word_id=word.id, target_lang=_canon_lang(def_lang), definition=def_text))
 
     _sync_song_target_langs(song, db)
     db.commit()
@@ -1157,9 +1170,9 @@ def list_songs(db: Session = Depends(get_db)):
 
 @app.get("/api/songs/{song_id}", response_model=SongDetailResponse)
 def get_song(song_id: int, source: Optional[str] = Query(default=None), target_lang: Optional[str] = Query(default=None), db: Session = Depends(get_db)):
-    # Normalize to lowercase so stored 'tr' matches query '?target_lang=TR'
+    # Normalize to lowercase and resolve aliases (e.g. en-us → en)
     if target_lang:
-        target_lang = target_lang.lower()
+        target_lang = _canon_lang(target_lang)
     # Cache keyed by (song_id, source, target_lang) — skip cache when target_lang specified (varies per user preference)
     cache_key = (song_id, source or None) if not target_lang else None
     if cache_key is not None:
@@ -1507,6 +1520,7 @@ def update_song_translations(
     _: User = Depends(_require_admin),
 ):
     """Upsert LineTranslation rows for the given target_lang."""
+    target_lang = _canon_lang(target_lang)
     song = db.get(Song, song_id)
     if not song:
         raise HTTPException(status_code=404, detail="Song not found")
