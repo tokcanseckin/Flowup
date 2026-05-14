@@ -44,3 +44,10 @@ pipeline/*_output.json
 backend/flowup.db-shm
 backend/flowup.db-wal
 migrate_sqlite_to_postgres.py
+
+# Large eval source files (>100MB, not suitable for GitHub)
+eval/sources/
+eval/data/kaikki-ru.jsonl
+
+# Pipeline log files
+pipeline/*.log
