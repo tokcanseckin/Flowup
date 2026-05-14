@@ -50,7 +50,10 @@ from typing import Any
 # ── Paths ─────────────────────────────────────────────────────────────────────
 
 REPO_ROOT = Path(__file__).parent.parent.resolve()
+PIPELINE_DIR = Path(__file__).parent.resolve()  # pipeline/
 sys.path.insert(0, str(REPO_ROOT))
+if str(PIPELINE_DIR) not in sys.path:
+    sys.path.insert(0, str(PIPELINE_DIR))
 
 # Import backend models (requires DATABASE_URL env var)
 from backend.database import SessionLocal, Song, Line, Word, WordDefinition  # type: ignore
@@ -62,6 +65,7 @@ from sqlalchemy.orm import Session
 # any additional keys required by that backend's fill_* function.
 #
 PAIR_REGISTRY: dict[tuple[str, str], dict[str, Any]] = {
+    # ── Russian → Turkish (kaikki_1, production-ready) ────────────────────────
     ("ru", "tr"): {
         "backend": "kaikki",
         "db_candidates": [
@@ -69,14 +73,28 @@ PAIR_REGISTRY: dict[tuple[str, str], dict[str, Any]] = {
             "eval/pipelines/ru_tr/kaikki_1/data/ru_tr.db",
         ],
     },
-    # ── Add future pairs here ──────────────────────────────────────────────
-    # ("ru", "de"): {
+    # ── English → Russian (kaikki) ── stub: build en_ru.db first ─────────────
+    # ("en", "ru"): {
     #     "backend": "kaikki",
     #     "db_candidates": [
-    #         "backend/dictionaries/ru_de/ru_de.db",
-    #         "eval/pipelines/ru_de/kaikki_1/data/ru_de.db",
+    #         "backend/dictionaries/en_ru/en_ru.db",
     #     ],
     # },
+    # ── Russian → English (kaikki) ── stub: build ru_en.db first ─────────────
+    # ("ru", "en"): {
+    #     "backend": "kaikki",
+    #     "db_candidates": [
+    #         "backend/dictionaries/ru_en/ru_en.db",
+    #     ],
+    # },
+    # ── Italian → English (kaikki) ── stub: build it_en.db first ─────────────
+    # ("it", "en"): {
+    #     "backend": "kaikki",
+    #     "db_candidates": [
+    #         "backend/dictionaries/it_en/it_en.db",
+    #     ],
+    # },
+    # ── Add further pairs here — pattern: ("src", "tgt"): { "backend": "kaikki", ... }
     # ("tr", "en"): {
     #     "backend": "wiktionary",   # implement fill_wiktionary() below
     # },
@@ -230,7 +248,7 @@ def fill_kaikki(
             f"Build it first: python -m eval.pipelines.{src_lang}_{tgt_lang}.kaikki_1.build_db"
         )
 
-    from eval.pipelines.ru_tr.kaikki_1.lookup import Lookup  # type: ignore
+    from nlp.kaikki import Lookup  # pipeline/nlp/kaikki.py
 
     _log(f"Backend: kaikki | DB: {db_path}")
     lookup = Lookup(src_lang, tgt_lang, db_path=db_path)
