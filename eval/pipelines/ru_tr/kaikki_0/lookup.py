@@ -92,3 +92,16 @@ class LemmaLookup:
 
     def __exit__(self, *_) -> None:
         self.close()
+
+
+class Lookup:
+    """Thin adapter so run.py can load this pipeline via the standard interface."""
+
+    def __init__(self, src: str, tgt: str) -> None:
+        self._inner = LemmaLookup()
+
+    def lookup(self, lemma: str, grammar: str = "") -> list[str]:
+        return self._inner.lookup(lemma)
+
+    def close(self) -> None:
+        self._inner.close()

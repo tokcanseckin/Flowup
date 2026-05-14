@@ -1,23 +1,32 @@
 """
 Translation evaluation harness.
 
-Picks a random Russian song (or a specific one), samples N lines,
-runs Argos full-line translation (ru→tr), and prints a report showing
-word-level coverage alongside the translated output.
+Picks a random song (or a specific one), samples N lines, optionally
+translates them, and prints a word-coverage report.
+
+The lookup method and (optionally) the line translator are loaded from a
+*pipeline* folder, so this harness is independent of both the language pair
+and the method being tested.
+
+Each pipeline folder (e.g. eval/pipelines/ru-tr/kaikki_1/) must contain:
+  lookup.py   — class Lookup(src, tgt) with .lookup(lemma, grammar) -> list[str]
+                and .close()
+  translate.py (optional) — class Translator(src, tgt) with .translate(text) -> str
+                and .close()
 
 Usage:
-    python -m eval.run                          # random ru song, 10 lines
-    python -m eval.run --song-id 150            # specific song
-    python -m eval.run --src ru --tgt tr -n 15
-    python -m eval.run --api https://singoling.com --src ru --tgt tr
+    python -m eval.run --pipeline ru-tr/kaikki_1
+    python -m eval.run --pipeline ru-tr/wiktionary_1 --song-id 150
+    python -m eval.run --pipeline ru-tr/kaikki_1 --src ru --tgt tr -n 15
+    python -m eval.run --pipeline ru-tr/kaikki_1 --api https://singoling.com
 """
 
 from __future__ import annotations
 
 import argparse
+import importlib
 import json
 import random
-import textwrap
 import urllib.request
 from dataclasses import dataclass, field
 from typing import Optional
@@ -63,6 +72,7 @@ class EvalReport:
     song_artist: str
     src: str
     tgt: str
+    pipeline: str = ""
     lines: list[LineEntry] = field(default_factory=list)
 
 
@@ -88,9 +98,25 @@ def fetch_song(api: str, song_id: int) -> dict:
 # Core evaluation
 # ──────────────────────────────────────────────────────────────────────────────
 
-def evaluate(api: str, src: str, tgt: str, n: int, song_id: Optional[int]) -> EvalReport:
-    from eval.argos_translator import ArgosTranslator
+def _load_pipeline(pipeline: str, src: str, tgt: str):
+    """Dynamically import Lookup (required) and Translator (optional) from a pipeline folder."""
+    module_base = "eval.pipelines." + pipeline.replace("/", ".").replace("-", "_")
 
+    lookup_mod = importlib.import_module(f"{module_base}.lookup")
+    lookup = lookup_mod.Lookup(src, tgt)
+
+    translator = None
+    try:
+        translate_mod = importlib.import_module(f"{module_base}.translate")
+        translator = translate_mod.Translator(src, tgt)
+        print(f"Loaded translator from {pipeline}/translate.py")
+    except ModuleNotFoundError:
+        pass  # line translation is optional
+
+    return lookup, translator
+
+
+def evaluate(api: str, src: str, tgt: str, n: int, song_id: Optional[int], pipeline: str) -> EvalReport:
     # 1. Pick song
     if song_id is None:
         candidates = fetch_songs(api, src)
@@ -108,6 +134,7 @@ def evaluate(api: str, src: str, tgt: str, n: int, song_id: Optional[int]) -> Ev
         song_artist=data.get("artist", "?"),
         src=src,
         tgt=tgt,
+        pipeline=pipeline,
     )
 
     # 2. Collect lines that have words
@@ -134,24 +161,22 @@ def evaluate(api: str, src: str, tgt: str, n: int, song_id: Optional[int]) -> Ev
     sampled = random.sample(eligible, min(n, len(eligible)))
     sampled.sort(key=lambda l: l.position)
 
-    # 3. Load Argos translator (full-line only)
-    print(f"Loading Argos {src}→{tgt} model …")
-    translator = ArgosTranslator(src, tgt)
+    # 3. Load pipeline plugins
+    print(f"Loading pipeline '{pipeline}' …")
+    lookup, translator = _load_pipeline(pipeline, src, tgt)
 
-    # 3b. Load Wiktionary TR per-word lookup (cached)
-    from eval.wiktionary import WiktionaryLookup
-    print("Loading Wiktionary ru→tr lookup (cached) …")
-    lookup = WiktionaryLookup()
-
-    # 4. Translate each line + populate per-word TR definitions
-    print(f"Translating {len(sampled)} lines …\n")
+    # 4. Translate each line (if translator available) + populate per-word definitions
+    print(f"Processing {len(sampled)} lines …\n")
     for line in sampled:
-        line.argos_translation = translator.translate(line.text)
+        if translator is not None:
+            line.argos_translation = translator.translate(line.text)
         for word in line.words:
             word.tr_definitions = lookup.lookup(word.lemma, grammar=word.grammar)
         report.lines.append(line)
 
     lookup.close()
+    if translator is not None:
+        translator.close()
 
     return report
 
@@ -214,8 +239,8 @@ def print_report(report: EvalReport) -> None:
         print(_render_line(lines.index(line), line, label="WORST"))
 
     print("\n" + _SEP)
-    print(f"  Definition source  : en.wiktionary.org ru→tr lookup (cached in eval/data/wikt_cache.db)")
-    print(f"  Line translation   : Argos Translate offline ({report.src}→{report.tgt})")
+    print(f"  Pipeline           : {report.pipeline}")
+    print(f"  Line translation   : {'included' if any(l.argos_translation for l in report.lines) else 'not available'}")
     print(_SEP)
 
 
@@ -225,6 +250,7 @@ def print_report(report: EvalReport) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Evaluate word definitions + line translation for a language pair.")
+    parser.add_argument("--pipeline", required=True, help="Pipeline path, e.g. ru-tr/kaikki_1")
     parser.add_argument("--api", default="https://singoling.com", help="Base API URL")
     parser.add_argument("--src", default="ru", help="Source language code (default: ru)")
     parser.add_argument("--tgt", default="tr", help="Target language code (default: tr)")
@@ -232,7 +258,7 @@ def main() -> None:
     parser.add_argument("-n", type=int, default=10, help="Number of lines to sample (default: 10)")
     args = parser.parse_args()
 
-    report = evaluate(args.api, args.src, args.tgt, args.n, args.song_id)
+    report = evaluate(args.api, args.src, args.tgt, args.n, args.song_id, args.pipeline)
     print_report(report)
 
 

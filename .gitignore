@@ -46,7 +46,9 @@ backend/flowup.db-wal
 migrate_sqlite_to_postgres.py
 
 # Large eval source files (>100MB, not suitable for GitHub)
+# All raw source dumps live in eval/sources/ — never in individual pipeline folders
 eval/sources/
+eval/pipelines/**/sources/
 eval/data/kaikki-ru.jsonl
 
 # Pipeline log files
