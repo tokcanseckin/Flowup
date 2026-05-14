@@ -3,8 +3,9 @@
 fill_word_translations.py — Populate word_definitions with a new language pair.
 
 Reads every word in songs that match the given source language, runs the
-kaikki_1 lookup, and writes results into word_definitions(word_id, target_lang,
-definition).  Existing rows for the pair are skipped by default (idempotent).
+configured lookup backend, and writes results into word_definitions
+(word_id, target_lang, definition).  Existing rows are skipped by default
+(idempotent).
 
 Requires DATABASE_URL environment variable (PostgreSQL).
 
@@ -22,6 +23,19 @@ Usage:
 
     # Overwrite existing rows (re-fill)
     python pipeline/fill_word_translations.py --pair ru_tr --overwrite
+
+    # Override the lookup DB path (kaikki backend only)
+    python pipeline/fill_word_translations.py --pair ru_tr --db-path /path/to/ru_tr.db
+
+Adding a new pair
+-----------------
+Edit PAIR_REGISTRY below.  Each entry is a dict with at minimum:
+
+    "backend": one of "kaikki" | ... (add new backends as fill_* functions below)
+
+Backend-specific keys:
+    kaikki:
+        "db_candidates": list[str]  — relative repo paths tried in order
 """
 
 from __future__ import annotations
@@ -31,6 +45,7 @@ import json
 import sys
 import time
 from pathlib import Path
+from typing import Any
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
 
@@ -41,25 +56,30 @@ sys.path.insert(0, str(REPO_ROOT))
 from backend.database import SessionLocal, Song, Line, Word, WordDefinition  # type: ignore
 from sqlalchemy.orm import Session
 
-# ── Kaikki DB auto-discovery ──────────────────────────────────────────────────
-
-def _find_kaikki_db(pair: str) -> Path | None:
-    src, tgt = pair.split("_", 1)
-    candidates = [
-        REPO_ROOT / "backend" / "dictionaries" / pair / f"{pair}.db",
-        REPO_ROOT / "eval" / "pipelines" / f"{src}_{tgt}" / "kaikki_1" / "data" / f"{pair}.db",
-    ]
-    for p in candidates:
-        if p.exists():
-            return p
-    return None
-
-
 # ── Pair registry ─────────────────────────────────────────────────────────────
-SUPPORTED_PAIRS: dict[tuple[str, str], str] = {
-    ("ru", "tr"): "ru_tr",
-    # Add future pairs here, e.g.:
-    # ("ru", "de"): "ru_de",
+#
+# Each key is (src_lang, tgt_lang).  The value dict must have "backend" and
+# any additional keys required by that backend's fill_* function.
+#
+PAIR_REGISTRY: dict[tuple[str, str], dict[str, Any]] = {
+    ("ru", "tr"): {
+        "backend": "kaikki",
+        "db_candidates": [
+            "backend/dictionaries/ru_tr/ru_tr.db",
+            "eval/pipelines/ru_tr/kaikki_1/data/ru_tr.db",
+        ],
+    },
+    # ── Add future pairs here ──────────────────────────────────────────────
+    # ("ru", "de"): {
+    #     "backend": "kaikki",
+    #     "db_candidates": [
+    #         "backend/dictionaries/ru_de/ru_de.db",
+    #         "eval/pipelines/ru_de/kaikki_1/data/ru_de.db",
+    #     ],
+    # },
+    # ("tr", "en"): {
+    #     "backend": "wiktionary",   # implement fill_wiktionary() below
+    # },
 }
 
 
@@ -69,7 +89,7 @@ def _log(msg: str) -> None:
     print(msg, flush=True)
 
 
-# ── Core helpers ──────────────────────────────────────────────────────────────
+# ── Shared DB helpers ─────────────────────────────────────────────────────────
 
 def _fetch_songs(session: Session, src_lang: str, song_id: int | None) -> list[Song]:
     q = session.query(Song).filter(Song.language_code == src_lang)
@@ -116,27 +136,22 @@ def _upsert_definition(
     return "inserted"
 
 
-# ── Kaikki lookup mode ────────────────────────────────────────────────────────
-
-def fill_kaikki(
+def _run_fill_loop(
     session: Session,
     src_lang: str,
     tgt_lang: str,
-    db_path: Path,
     song_id: int | None,
     overwrite: bool,
     dry_run: bool,
+    lookup_fn,           # callable(lemma: str) -> list[str]
+    close_fn=None,       # optional cleanup callable
 ) -> None:
-    from eval.pipelines.ru_tr.kaikki_1.lookup import Lookup  # type: ignore
-
-    _log(f"Loading kaikki Lookup from {db_path} …")
-    lookup = Lookup(src_lang, tgt_lang, db_path=db_path)
-    _log("  Lookup ready.")
-
+    """Generic song→word loop shared by all backends."""
     songs = _fetch_songs(session, src_lang, song_id)
     if not songs:
         _log(f"No songs found for language '{src_lang}'.")
-        lookup.close()
+        if close_fn:
+            close_fn()
         return
 
     total_hit = total_miss = total_skipped = 0
@@ -152,7 +167,7 @@ def fill_kaikki(
                 skipped += 1
                 continue
 
-            results = lookup.lookup(word.lemma)
+            results = lookup_fn(word.lemma)
             if not results:
                 if not dry_run:
                     _upsert_definition(session, word.id, tgt_lang, "", overwrite=True, dry_run=False)
@@ -175,7 +190,8 @@ def fill_kaikki(
         total_miss    += miss
         total_skipped += skipped
 
-    lookup.close()
+    if close_fn:
+        close_fn()
 
     elapsed = time.monotonic() - t0
     overall = f"{total_hit/(total_hit+total_miss)*100:.1f}%" if (total_hit + total_miss) > 0 else "n/a"
@@ -183,9 +199,62 @@ def fill_kaikki(
     _log(f"Total hit: {total_hit} | miss: {total_miss} | skipped: {total_skipped} | overall coverage: {overall}")
 
 
+# ── Backend: kaikki ───────────────────────────────────────────────────────────
+
+def _resolve_kaikki_db(config: dict[str, Any], db_path_override: str | None) -> Path | None:
+    if db_path_override:
+        return Path(db_path_override)
+    for rel in config.get("db_candidates", []):
+        p = REPO_ROOT / rel
+        if p.exists():
+            return p
+    return None
+
+
+def fill_kaikki(
+    session: Session,
+    src_lang: str,
+    tgt_lang: str,
+    config: dict[str, Any],
+    song_id: int | None,
+    overwrite: bool,
+    dry_run: bool,
+    db_path_override: str | None = None,
+) -> None:
+    db_path = _resolve_kaikki_db(config, db_path_override)
+    if db_path is None:
+        candidates = "\n".join(f"  {REPO_ROOT / r}" for r in config.get("db_candidates", []))
+        sys.exit(
+            f"Kaikki DB for '{src_lang}_{tgt_lang}' not found.\n"
+            f"Expected at:\n{candidates}\n"
+            f"Build it first: python -m eval.pipelines.{src_lang}_{tgt_lang}.kaikki_1.build_db"
+        )
+
+    from eval.pipelines.ru_tr.kaikki_1.lookup import Lookup  # type: ignore
+
+    _log(f"Backend: kaikki | DB: {db_path}")
+    lookup = Lookup(src_lang, tgt_lang, db_path=db_path)
+    _log("  Lookup ready.")
+
+    _run_fill_loop(
+        session, src_lang, tgt_lang, song_id, overwrite, dry_run,
+        lookup_fn=lookup.lookup,
+        close_fn=lookup.close,
+    )
+
+
+# ── Backend dispatch ──────────────────────────────────────────────────────────
+
+_BACKENDS = {
+    "kaikki": fill_kaikki,
+    # "wiktionary": fill_wiktionary,  # add here when implemented
+}
+
+
 # ── CLI ───────────────────────────────────────────────────────────────────────
 
 def _build_parser() -> argparse.ArgumentParser:
+    supported = ", ".join(f"{s}_{t}" for s, t in PAIR_REGISTRY)
     p = argparse.ArgumentParser(
         description="Populate word_definitions for a language pair.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -194,7 +263,7 @@ def _build_parser() -> argparse.ArgumentParser:
     p.add_argument(
         "--pair",
         required=True,
-        help="Language pair to fill, e.g. 'ru_tr' or 'ru_en'.",
+        help=f"Language pair to fill. Supported: {supported}.",
     )
     p.add_argument(
         "--song-id",
@@ -218,7 +287,7 @@ def _build_parser() -> argparse.ArgumentParser:
         "--db-path",
         dest="db_path",
         default=None,
-        help="Override kaikki DB path (auto-detected by default).",
+        help="Override the lookup DB path (kaikki backend only).",
     )
     return p
 
@@ -232,28 +301,31 @@ def main() -> None:
         sys.exit(f"Invalid pair '{pair}'. Expected format: src_tgt, e.g. ru_tr")
 
     src_lang, tgt_lang = parts
+    key = (src_lang, tgt_lang)
 
-    if (src_lang, tgt_lang) not in SUPPORTED_PAIRS:
-        supported = ", ".join(f"{s}_{t}" for s, t in SUPPORTED_PAIRS)
+    if key not in PAIR_REGISTRY:
+        supported = ", ".join(f"{s}_{t}" for s, t in PAIR_REGISTRY)
         sys.exit(f"Pair '{pair}' not in registry. Supported: {supported}")
 
-    if dry_run := args.dry_run:
+    config = PAIR_REGISTRY[key]
+    backend = config["backend"]
+
+    if backend not in _BACKENDS:
+        sys.exit(f"Unknown backend '{backend}' for pair '{pair}'. Add fill_{backend}() to this script.")
+
+    dry_run = args.dry_run
+    if dry_run:
         _log("[DRY RUN MODE — no writes]")
 
-    kaikki_db = Path(args.db_path) if args.db_path else _find_kaikki_db(pair)
-    if kaikki_db is None:
-        sys.exit(
-            f"Kaikki DB for pair '{pair}' not found.\n"
-            f"Expected at:\n"
-            f"  {REPO_ROOT}/backend/dictionaries/{pair}/{pair}.db\n"
-            f"  {REPO_ROOT}/eval/pipelines/{src_lang}_{tgt_lang}/kaikki_1/data/{pair}.db\n"
-            f"Build it first: python -m eval.pipelines.{src_lang}_{tgt_lang}.kaikki_1.build_db"
-        )
+    _log(f"pair: {pair} | backend: {backend}")
 
-    _log(f"pair: {pair} | DB: {kaikki_db}")
     session: Session = SessionLocal()
     try:
-        fill_kaikki(session, src_lang, tgt_lang, kaikki_db, args.song_id, args.overwrite, dry_run)
+        _BACKENDS[backend](
+            session, src_lang, tgt_lang, config,
+            args.song_id, args.overwrite, dry_run,
+            db_path_override=args.db_path,
+        )
     finally:
         session.close()
 

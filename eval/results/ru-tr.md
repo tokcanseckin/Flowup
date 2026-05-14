@@ -2,124 +2,146 @@
 
 ## Overview
 
-This document summarises the architecture, bugs found, and fixes applied to the Russian→Turkish word-level lookup pipeline built in `eval/`.
+This document summarises the architecture, bugs found, and fixes applied to the Russian→Turkish word-level lookup pipeline (`eval/pipelines/ru_tr/kaikki_1/`).
 
 ---
 
-## Pipeline Architecture
+## Pipeline Architecture (`kaikki_1`)
 
-The lookup engine (`eval/wiktionary.py`) uses a three-tier cascade for each Russian lemma:
+The lookup engine (`lookup.py`) uses a three-tier cascade for each Russian lemma, backed entirely by local SQLite databases (no network calls at query time):
 
 ```
-1. tr.wiktionary  (single-hop, direct)
+1. Direct lookup  — ru_tr.db (kaikki.org dump), POS-filtered
    ↓ if empty
-2. en.wiktionary  (two-hop: Russian → English glosses → Turkish)
+2. Lemmatize      — pymorphy3 normal_form, retry direct lookup
    ↓ if empty
-3. Argos          (offline NMT fallback, ru→en→tr pivot)
+3. Two-hop        — ru→en→tr  AND  ru→de→tr  (ranked by agreement)
+                    with OpenRussian EN-definition fallback
 ```
 
-### Tier 1 — tr.wiktionary direct (`_fetch_from_tr_wikt`)
+### Tier 1 & 2 — Direct lookup (`_direct_lookup`)
 
-Fetches the Turkish Wiktionary page for the Russian word, locates the `==Rusça==` (Russian) section, and extracts `[[wikilink]]` targets as Turkish translation candidates.
+Queries `data/ru_tr.db` (schema: `lemma, pos, tr_word, tr_sense`) built from the kaikki.org Russian Wiktionary JSONL dump. When a POS tag is known, the query first restricts to `AND pos = ?`; if that returns nothing, it falls back to the unfiltered query so no word is silently missed.
 
-### Tier 2 — en.wiktionary two-hop (`_fetch_via_en_wikt`)
+pymorphy3 (`_lemmatize`) reduces inflected surface forms to their dictionary headword before the second attempt (e.g. `побе́ды` → `победа`).
 
-1. **`_fetch_en_glosses`**: calls the en.wiktionary REST API to get English glosses for the Russian word (e.g. `везти` → `["to convey", "to carry (by vehicle)", "to transport"]`).
-2. For each gloss term, calls **`_fetch_tr_for_en_word`**: looks up the English word on tr.wiktionary's `==İngilizce==` (English) section to find its Turkish equivalents.
-3. Fallback within tier 2: **`_fetch_tr_from_english`** checks the en.wiktionary page for the English word and looks for a `==Turkish==` section (catches loanwords that exist on en.wiktionary as Turkish entries).
+### Tier 3 — Two-hop fallback (`_two_hop`)
 
-### Tier 3 — Argos NMT fallback (`ArgosTranslator`)
+Uses four additional hop databases (`data/ru_en.db`, `data/ru_de.db`, `data/en_tr.db`, `data/de_tr.db`) all built from kaikki.org dumps.
 
-Offline neural machine translation via `argostranslate`. Uses `ru→en→tr` as a pivot chain since direct `ru→tr` packages are unavailable. The normalised Russian lemma (stress marks stripped, lowercased) is passed as input.
+Result ranking:
+1. **agreed** — words appearing in both EN→TR and DE→TR paths (highest confidence)
+2. **de_only** — DE→TR only (German→Turkish alignment is clean for Slavic concepts)
+3. **en_only** — EN→TR only
+4. **or_only** — OpenRussian EN definitions → EN→TR (last resort)
 
-### Additional data sources
+When the DE path is empty and a POS tag is known, all EN pivots are used (relying on POS filtering to remove noise). Without a known POS, only the first EN pivot is used to limit semantic drift.
 
-- **`eval/kaikki_db.py`** / **`eval/data/ru_tr.db`**: a local SQLite database built from the kaikki.org Russian dictionary dump (~800 MB JSONL). Stores Russian lemma → Turkish word/sense pairs. Used independently in `eval/lookup.py` as an alternative or complement to the wiktionary pipeline.
-- **`eval/data/wikt_cache.db`**: SQLite cache for all wiktionary network calls. Cache key: `normalised_lemma|coarse_pos`.
+### POS detection and filtering
+
+`_detect_pos` uses pymorphy3 to map Russian morphological tags to kaikki POS values (`noun`, `verb`, `adj`, `adv`, …).
+
+`_tr_pos_filter` applies Turkish morphological heuristics to two-hop results:
+- **verb** source → keep only words ending in `-mak`/`-mek` (Turkish infinitive suffix)
+- **noun** source → exclude words ending in `-mak`/`-mek`
+
+### Output cleaning
+
+`_clean` strips parenthetical and bracket annotations from raw DB entries before returning results:
+- `\s*\([^)]*\)` — removes `(veraltend)`, `(figurative)`, etc.
+- `\s*\[[^\]]*\]` — removes `[4, 5]` sense indices etc.
+
+`_filter_proper_nouns` removes multi-word results where any token starts with an uppercase letter (e.g. `Fetih Suresi` leaking through the `victory` pivot).
+
+Results are capped at `_MAX_RESULTS = 4`.
 
 ---
 
-## Test Case: Song 12
+## Databases
 
-Lookup was run against all unique lemmas from Song 12, producing `eval/data/song12_words.csv` (55 words). The CSV schema is:
+| File | Rows | Description |
+|---|---|---|
+| `data/ru_tr.db` | ~43 k entries | kaikki.org ru→tr, schema: `lemma, pos, tr_word, tr_sense` |
+| `data/ru_en.db` | ~230 k | kaikki.org ru→en hop |
+| `data/ru_de.db` | ~115 k | kaikki.org ru→de hop |
+| `data/en_tr.db` | ~80 k | kaikki.org en→tr hop |
+| `data/de_tr.db` | ~43 k | kaikki.org de→tr hop |
+
+---
+
+## Test Case: Song 12 (Группа Крови — Кино)
+
+Coverage report: `eval/pipelines/ru_tr/kaikki_1/song12_lookup.csv`
+
+**Result: 55 / 58 unique lemmas covered (94%)**
+
+CSV schema:
 
 | Column | Description |
 |---|---|
 | `display_form` | Surface form as it appears in the lyrics |
-| `lemma` | Normalised dictionary form |
-| `pos` | Coarse part-of-speech |
-| `full_grammar` | Full morphological analysis string |
-| `tr_definitions` | Pipe-separated Turkish translations |
+| `lemma` | Stress-marked dictionary form from song data |
+| `hit` | `1` if at least one Turkish translation found, else `0` |
+| `translations` | Semicolon-separated Turkish translations (max 4) |
+
+**Misses (hit=0):**
+- `ослепи́тельный` — "dazzling" (not in any hop DB)
+- `поря́дковый` — "ordinal" (not in any hop DB)
+- `бы` — modal particle (not a lexical word)
 
 ---
 
 ## Bugs Found and Fixes Applied
 
-### Bug A — Argos capitalises output: `полупустой` → `['Yarısı']`
+### Fix 1 — Parenthetical noise in translations ✅
 
-**Root cause:** Argos receives the Russian lemma `"полупустой"` (half-empty). Argos treats the hyphenated intermediate English form `"half-empty"` as an opaque token and outputs `"Yarısı"` — which is the Turkish possessive of "half" ("its half"), not "half-empty". Argos always capitalises the first word of its output, so the result is title-cased and semantically wrong.
+**Problem:** Raw DB entries contained annotations like `nüsha (veraltend)`, `( )`, causing garbage in output.
 
-**Status:** Root cause confirmed. Fix: lowercase the Argos output before storing (pending implementation).
-
----
-
-### Bug B — Two-hop fails for verbs: `везти` → `['taşıyabilir']` ✅ Fixed
-
-**Root cause:** `_fetch_en_glosses` returns English glosses in infinitive form with parenthetical qualifiers:
-
-```
-"to convey"
-"to carry (by vehicle)"
-"to deliver"
-"to transport"
-```
-
-These strings were passed verbatim to `_fetch_tr_for_en_word`, which looks them up on tr.wiktionary. Turkish Wiktionary has no page titled `"to convey"` — it has `"convey"`. The lookup returned empty for all terms, so the pipeline fell through to the Argos fallback, which produced the conjugated form `"taşıyabilir"` ("can carry").
-
-**Fix** (commit `5ef0762`, `_fetch_via_en_wikt`): before passing each gloss term to the lookup functions, strip:
-1. Parenthetical qualifiers: `re.sub(r"\s*\(.*?\)", "", term).strip()`
-2. The `"to "` infinitive prefix: if the term starts with `"to "`, drop the first three characters.
-
-After stripping, `"to convey"` → `"convey"` → `['taşımak', 'iletmek', 'getirmek', 'ulaştırmak', 'ifade etmek']`. This matches the correct output from the first known-good CSV run.
+**Fix:** `_clean()` applies `re.sub(r'\s*\([^)]*\)', '', word)` to every result from both direct and hop lookups.
 
 ---
 
-### Bug C — English words leaking into Turkish output ✅ Fixed
+### Fix 2 — Bracket sense indices in translations ✅
 
-**Root cause:** `_fetch_tr_from_english` used to scan the **entire** en.wiktionary page for `{{t|tr|…}}` translation templates. For common English words (e.g. `"underground"`), these templates appear in the **English** section of the page, not the Turkish section, and many source-language words (English, French, etc.) leaked into the Turkish output.
+**Problem:** Hop DB entries contained strings like `[4, 5] tetikleme` (sense index from source Wiktionary).
 
-**Fix** (commit `7339cf4`, `_fetch_tr_from_english`): split the wikitext by `==` level-2 headers, find the `==Turkish==` section (case-insensitive), and extract wikilinks from **that section only**. Words without a `==Turkish==` section return `[]`. This correctly handles loanwords that do appear as Turkish entries on en.wiktionary (e.g. Russian borrowings that passed into Turkish).
+**Fix:** `_clean()` extended to also strip `re.sub(r'\s*\[[^\]]*\]', '', word)`. Example: `курок` → `horoz; tetik; tetikleme` (was `[4, 5] tetikleme; horoz; tetik`).
 
 ---
 
-### Bug D — Rate-limiting silently falls through to Argos, producing repeated tokens ✅ Fixed
+### Fix 3 — Verbs returning noun translations ✅
 
-**Root cause (two-part):**
+**Problem:** `ставить` (to put/place) returned `mekân; meydan; yer` (location nouns) because `ru_tr.db` had no direct entry and the two-hop path via `place` (EN pivot) returned its noun senses.
 
-1. **Rate-limit silent swallowing.** All call sites in `lookup()` used bare `except Exception: pass`, so HTTP 429 responses from tr.wiktionary (returned by `_wiki_get` after exhausting its internal retry budget) were silently discarded. The pipeline fell through to Argos as if the word simply had no wiktionary entry.
+**Root cause:** When DE cross-validation was empty, EN pivots were restricted to `en_words[:1]` regardless of whether POS was known. With `src_pos=None` (wrongly), all noisy pivots were included. But the actual problem was that `_two_hop` wasn't receiving `src_pos` at all.
 
-2. **Argos repetition.** When Argos NMT receives certain short Russian words as input, it produces a repetitive output string — a single string element where the translated token is repeated dozens or hundreds of times (e.g. `"hotel hotel hotel hotel..."`, `"ıslak ıslak ıslak ıslak"`, `"çeyrek çeyrek çeyrek çeyrek"`). These were stored verbatim in the cache and CSV.
+**Fix:** Pass `src_pos` into `_two_hop`; when POS is known and DE is empty, use all EN pivots and rely on `_tr_pos_filter` to remove non-verb results. `ставить` now returns `ayarlamak; belirlemek; canlandırmak; dizmek`.
 
-Both issues were confirmed by inspecting `wikt_cache.db` directly: all corrupted entries (`отель|noun`, `у|preposition`, `мокрый|adjective`, `квартал|noun`, `давно|adverb`) were single-element lists whose sole element was an Argos repetition string. Manual calls to `_fetch_from_tr_wikt` for the same words succeeded without rate-limiting, confirming Argos was only reached because the 429 was swallowed.
+---
 
-**Fix — rate-limit handling:**
-- Added a `_RateLimited` exception class.
-- `_wiki_get`: after exhausting all HTTP 429 retries, raises `_RateLimited` instead of re-raising `HTTPError`.
-- `_fetch_via_en_wikt`: added `except _RateLimited: raise` before each `except Exception` guard so the exception propagates to the caller.
-- `lookup()`: catches `_RateLimited` for both tier 1 and tier 2, sleeps 30 s, retries once. If the retry still raises any exception, returns `[]` immediately without caching — the word will be retried on the next pipeline run.
+### Fix 4 — Proper nouns leaking through hop path ✅
 
-**Fix — Argos token dedup:**
-- After calling Argos, split the raw output on whitespace and deduplicate tokens case-insensitively, preserving order. Rejoin with a single space. `"hotel hotel hotel..."` → `"hotel"`, `"Uzun zaman önce uzun zaman önce"` → `"Uzun zaman önce"`.
+**Problem:** `победа` → `zafer; Fetih Suresi; başarım; …` — "Fetih Suresi" (Quranic surah meaning "The Conquest") appears in `en_tr.db` under `victory` because Wiktionary editors added it as a semantic equivalent. It leaked through the noun non-filter (doesn't end in `-mak/-mek`).
+
+**Fix:** `_filter_proper_nouns()` removes any multi-word result where any token starts with an uppercase letter. Applied to two-hop results before POS filtering. `победа` now returns `zafer; başarım; galebe; galibiyet`.
+
+---
+
+### Fix 5 — Result count cap ✅
+
+**Problem:** Some lemmas (e.g. `вовремя`, `номер`) returned 10–30+ translations, which is noise rather than signal.
+
+**Fix:** `_MAX_RESULTS = 4` applied on all return paths in `lookup()`.
 
 ---
 
 ## Key Observations
 
-- **tr.wiktionary is the most reliable source** for common Russian nouns and adjectives that have direct Turkish entries. Coverage is high for high-frequency words.
-- **The two-hop path is essential for verbs.** Russian verbs are rarely listed directly on tr.wiktionary under the `==Rusça==` section; the en.wiktionary pivot consistently finds the correct Turkish infinitives.
-- **Argos is semantically unreliable for compound/hyphenated words.** It treats hyphenated tokens as unknown single units rather than decomposing them. It is also morphologically unreliable — it may produce conjugated verb forms or possessive noun forms rather than citation forms.
-- **Argos always capitalises output** (first word), so any Argos result stored in the cache or CSV appears title-cased if not normalised.
-- **Cache key design matters.** Using `normalised_lemma|coarse_pos` as the cache key allows the same lemma with different parts of speech (e.g. `в` as preposition vs. noun) to store separate results.
+- **Direct ru→tr lookup has limited coverage (~40%)** — the kaikki.org Russian→Turkish dataset is sparse compared to the EN or DE paths.
+- **Two-hop via EN+DE is the workhorse** — agreement between EN and DE paths is a reliable quality signal.
+- **POS filtering is essential for verbs** — without the `-mak/-mek` filter, verb lookups return a mix of nouns, adjectives, and verbs from semantically related EN pivots.
+- **pymorphy3 lemmatization is critical** — inflected forms in lyrics (genitive, accusative, plural) must be reduced to normal form before DB lookup.
+- **Proper noun filtering at the hop output level** is a simple but effective heuristic for removing encyclopaedic entries (surah names, place names) that appear in Wiktionary translation tables.
 
 ---
 
@@ -127,9 +149,6 @@ Both issues were confirmed by inspecting `wikt_cache.db` directly: all corrupted
 
 | Item | Status |
 |---|---|
-| Clear stale cache entries (`DELETE FROM cache`) | ⏳ Pending |
-| Regenerate `eval/data/song12_words.csv` with all fixes | ⏳ Pending |
-| Fix B: strip `"to "` prefix and parentheticals in two-hop | ✅ Done (`5ef0762`) |
-| Fix C: scope `_fetch_tr_from_english` to `==Turkish==` section | ✅ Done (`7339cf4`) |
-| Fix D: `_RateLimited` propagation + 30 s retry-once in `lookup()` | ✅ Done |
-| Fix D: Argos token deduplication | ✅ Done |
+| Direct ru→tr coverage for `ослепительный`, `порядковый` | ⏳ Not in DB |
+| `бы` (modal particle) — intentional miss | — |
+| Extend pipeline to additional songs | ⏳ Pending |

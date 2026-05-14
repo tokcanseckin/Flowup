@@ -1315,6 +1315,64 @@ def update_admin_song(song_id: int, body: AdminSongUpdate, db: Session = Depends
     return _admin_song_detail(song, db)
 
 
+@app.post("/api/admin/songs/{song_id}/find-youtube")
+async def find_youtube_url(song_id: int, db: Session = Depends(get_db), _: User = Depends(_require_admin)):
+    """Search YouTube for a studio recording matching the song's title and artist, save and return the URL."""
+    song = db.get(Song, song_id)
+    if not song:
+        raise HTTPException(status_code=404, detail="Song not found")
+
+    title = song.title
+    artist = song.artist or song.title
+
+    try:
+        import sys as _sys
+        _pipeline_dir = str(Path(__file__).parent.parent / "pipeline")
+        if _pipeline_dir not in _sys.path:
+            _sys.path.insert(0, _pipeline_dir)
+        from fill_youtube_urls import search_youtube  # type: ignore[import]
+        loop = asyncio.get_event_loop()
+        url, _ = await loop.run_in_executor(None, search_youtube, title, artist)
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"YouTube search failed: {exc}") from exc
+
+    if url:
+        song.youtube_url = url
+        db.commit()
+        _cache_invalidate(song_id)
+
+    return {"url": url}
+
+
+@app.post("/api/admin/songs/{song_id}/find-apple-music")
+async def find_apple_music_url(song_id: int, db: Session = Depends(get_db), _: User = Depends(_require_admin)):
+    """Search iTunes for a track matching the song's title and artist, save and return the URL."""
+    song = db.get(Song, song_id)
+    if not song:
+        raise HTTPException(status_code=404, detail="Song not found")
+
+    title = song.title
+    artist = song.artist or song.title
+
+    try:
+        import sys as _sys
+        _pipeline_dir = str(Path(__file__).parent.parent / "pipeline")
+        if _pipeline_dir not in _sys.path:
+            _sys.path.insert(0, _pipeline_dir)
+        from fill_apple_music_urls import search_apple_music  # type: ignore[import]
+        loop = asyncio.get_event_loop()
+        url, _ = await loop.run_in_executor(None, search_apple_music, title, artist)
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"Apple Music search failed: {exc}") from exc
+
+    if url:
+        song.apple_music_url = url
+        db.commit()
+        _cache_invalidate(song_id)
+
+    return {"url": url}
+
+
 @app.put("/api/admin/songs/{song_id}/lyrics", response_model=AdminSongDetailResponse)
 def update_admin_song_lyrics(song_id: int, body: AdminLyricsUpdate, db: Session = Depends(get_db), _: User = Depends(_require_admin)):
     """Update the default (Spotify-timed) lyrics in-place. Preserves word associations."""

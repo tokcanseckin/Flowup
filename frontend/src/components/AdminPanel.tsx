@@ -171,10 +171,14 @@ export default function AdminPanel({
 
   const [selectedSongTask, setSelectedSongTask] = useState<AlignmentTask | null>(null)
   const [selectedSongTaskLoading, setSelectedSongTaskLoading] = useState(false)
+  const [urlLookupLoading, setUrlLookupLoading] = useState<{ youtube: boolean; appleMusic: boolean }>({ youtube: false, appleMusic: false })
+  const [urlLookupError, setUrlLookupError] = useState<{ youtube: string | null; appleMusic: string | null }>({ youtube: null, appleMusic: null })
 
   const [playlistDetail, setPlaylistDetail] = useState<PlaylistDetail | null>(null)
   const [playlistDraft, setPlaylistDraft] = useState<PlaylistDraft>(emptyPlaylistDraft())
+  const [playlistTargetLangsText, setPlaylistTargetLangsText] = useState('')
   const [newPlaylistDraft, setNewPlaylistDraft] = useState<PlaylistDraft>(emptyPlaylistDraft())
+  const [newPlaylistTargetLangsText, setNewPlaylistTargetLangsText] = useState('')
   const [playlistSongIds, setPlaylistSongIds] = useState<number[]>([])
   const [playlistLoading, setPlaylistLoading] = useState(false)
   const [playlistSaving, setPlaylistSaving] = useState(false)
@@ -403,6 +407,7 @@ export default function AdminPanel({
     if (!selectedPlaylistId) {
       setPlaylistDetail(null)
       setPlaylistDraft(emptyPlaylistDraft())
+      setPlaylistTargetLangsText('')
       setPlaylistSongIds([])
       return
     }
@@ -422,6 +427,7 @@ export default function AdminPanel({
           target_langs: detail.target_langs ?? [],
           is_hidden: detail.is_hidden ?? false,
         })
+        setPlaylistTargetLangsText((detail.target_langs ?? []).join(', '))
         setPlaylistSongIds(detail.songs.map(song => song.song_id))
       })
       .catch((error: unknown) => {
@@ -637,6 +643,42 @@ export default function AdminPanel({
     }
   }, [onRefreshPlaylists, onRefreshSongs, selectedSongId, songDraft])
 
+  const handleFindYouTubeUrl = useCallback(async () => {
+    if (!selectedSongId) return
+    setUrlLookupLoading(prev => ({ ...prev, youtube: true }))
+    setUrlLookupError(prev => ({ ...prev, youtube: null }))
+    try {
+      const result = await api.findYouTubeUrl(selectedSongId)
+      if (result.url) {
+        setSongDraft(prev => prev ? { ...prev, youtube_url: result.url! } : prev)
+      } else {
+        setUrlLookupError(prev => ({ ...prev, youtube: 'No match found' }))
+      }
+    } catch (err) {
+      setUrlLookupError(prev => ({ ...prev, youtube: err instanceof Error ? err.message : 'Search failed' }))
+    } finally {
+      setUrlLookupLoading(prev => ({ ...prev, youtube: false }))
+    }
+  }, [selectedSongId])
+
+  const handleFindAppleMusicUrl = useCallback(async () => {
+    if (!selectedSongId) return
+    setUrlLookupLoading(prev => ({ ...prev, appleMusic: true }))
+    setUrlLookupError(prev => ({ ...prev, appleMusic: null }))
+    try {
+      const result = await api.findAppleMusicUrl(selectedSongId)
+      if (result.url) {
+        setSongDraft(prev => prev ? { ...prev, apple_music_url: result.url! } : prev)
+      } else {
+        setUrlLookupError(prev => ({ ...prev, appleMusic: 'No match found' }))
+      }
+    } catch (err) {
+      setUrlLookupError(prev => ({ ...prev, appleMusic: err instanceof Error ? err.message : 'Search failed' }))
+    } finally {
+      setUrlLookupLoading(prev => ({ ...prev, appleMusic: false }))
+    }
+  }, [selectedSongId])
+
   const handleSaveLyrics = useCallback(async () => {
     if (!selectedSongId) return
     setLyricsSaving(true)
@@ -806,6 +848,7 @@ export default function AdminPanel({
       await onRefreshPlaylists()
       setSelectedPlaylistId(created.id)
       setNewPlaylistDraft(emptyPlaylistDraft())
+      setNewPlaylistTargetLangsText('')
       setTab('playlists')
       onNavigateRoute?.('playlists', created.id)
     } catch (error) {
@@ -1154,8 +1197,22 @@ export default function AdminPanel({
                       </div>
                       <label className="block text-xs text-gray-500">Title<input value={songDraft.title} onChange={e => setSongDraft(prev => prev ? { ...prev, title: e.target.value } : prev)} className="mt-1 w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" /></label>
                       <div className="grid gap-4 md:grid-cols-2">
-                        <label className="block text-xs text-gray-500">YouTube URL<input value={songDraft.youtube_url} onChange={e => setSongDraft(prev => prev ? { ...prev, youtube_url: e.target.value } : prev)} className="mt-1 w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" /></label>
-                        <label className="block text-xs text-gray-500">Apple Music URL<input value={songDraft.apple_music_url} onChange={e => setSongDraft(prev => prev ? { ...prev, apple_music_url: e.target.value } : prev)} className="mt-1 w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" /></label>
+                        <div className="space-y-1">
+                          <span className="text-xs text-gray-500">YouTube URL</span>
+                          <div className="flex gap-2 mt-1">
+                            <input value={songDraft.youtube_url} onChange={e => setSongDraft(prev => prev ? { ...prev, youtube_url: e.target.value } : prev)} className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
+                            <button type="button" onClick={() => void handleFindYouTubeUrl()} disabled={urlLookupLoading.youtube} title="Search YouTube for a match" className="shrink-0 rounded-lg border border-gray-700 px-3 py-1 text-xs text-gray-300 hover:border-indigo-500 hover:text-indigo-300 disabled:opacity-50">{urlLookupLoading.youtube ? '…' : 'Find'}</button>
+                          </div>
+                          {urlLookupError.youtube && <p className="text-xs text-red-400">{urlLookupError.youtube}</p>}
+                        </div>
+                        <div className="space-y-1">
+                          <span className="text-xs text-gray-500">Apple Music URL</span>
+                          <div className="flex gap-2 mt-1">
+                            <input value={songDraft.apple_music_url} onChange={e => setSongDraft(prev => prev ? { ...prev, apple_music_url: e.target.value } : prev)} className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
+                            <button type="button" onClick={() => void handleFindAppleMusicUrl()} disabled={urlLookupLoading.appleMusic} title="Search iTunes for a match" className="shrink-0 rounded-lg border border-gray-700 px-3 py-1 text-xs text-gray-300 hover:border-indigo-500 hover:text-indigo-300 disabled:opacity-50">{urlLookupLoading.appleMusic ? '…' : 'Find'}</button>
+                          </div>
+                          {urlLookupError.appleMusic && <p className="text-xs text-red-400">{urlLookupError.appleMusic}</p>}
+                        </div>
                       </div>
                       <label className="block text-xs text-gray-500">Target langs <span className="text-gray-600">(comma-separated)</span><input value={songDraft.target_langs.join(', ')} onChange={e => setSongDraft(prev => prev ? { ...prev, target_langs: e.target.value.split(',').map(s => s.trim().toUpperCase()).filter(Boolean) } : prev)} placeholder="e.g. EN, DE" className="mt-1 w-full rounded-xl border border-indigo-700/60 bg-indigo-950/20 px-3 py-2 text-sm text-indigo-200 placeholder-indigo-800 focus:outline-none focus:border-indigo-400" /></label>
                       <div>
@@ -1358,7 +1415,7 @@ export default function AdminPanel({
                         <input value={playlistDraft.difficulty_level} onChange={e => setPlaylistDraft(prev => ({ ...prev, difficulty_level: e.target.value }))} placeholder="Difficulty level" className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
                         <input value={playlistDraft.language_code} onChange={e => setPlaylistDraft(prev => ({ ...prev, language_code: e.target.value }))} placeholder="Language code (e.g. ru)" className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
                         <label className="block text-xs text-gray-500">Target langs <span className="text-gray-600">(comma-separated)</span>
-                          <input value={playlistDraft.target_langs.join(', ')} onChange={e => setPlaylistDraft(prev => ({ ...prev, target_langs: e.target.value.split(',').map(s => s.trim().toUpperCase()).filter(Boolean) }))} placeholder="e.g. EN, DE" className="mt-1 w-full rounded-xl border border-indigo-700/60 bg-indigo-950/20 px-3 py-2 text-sm text-indigo-200 placeholder-indigo-800 focus:outline-none focus:border-indigo-400" />
+                          <input value={playlistTargetLangsText} onChange={e => { setPlaylistTargetLangsText(e.target.value); setPlaylistDraft(prev => ({ ...prev, target_langs: e.target.value.split(',').map(s => s.trim().toUpperCase()).filter(Boolean) })) }} placeholder="e.g. EN, DE" className="mt-1 w-full rounded-xl border border-indigo-700/60 bg-indigo-950/20 px-3 py-2 text-sm text-indigo-200 placeholder-indigo-800 focus:outline-none focus:border-indigo-400" />
                         </label>
                       </div>
                       <label className="flex items-center gap-3 cursor-pointer select-none">
@@ -1393,7 +1450,7 @@ export default function AdminPanel({
                       <input value={newPlaylistDraft.difficulty_level} onChange={e => setNewPlaylistDraft(prev => ({ ...prev, difficulty_level: e.target.value }))} placeholder="Difficulty level" className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
                       <input value={newPlaylistDraft.language_code} onChange={e => setNewPlaylistDraft(prev => ({ ...prev, language_code: e.target.value }))} placeholder="Language code (e.g. ru)" className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
                       <label className="block text-xs text-gray-500">Target langs <span className="text-gray-600">(comma-separated)</span>
-                        <input value={newPlaylistDraft.target_langs.join(', ')} onChange={e => setNewPlaylistDraft(prev => ({ ...prev, target_langs: e.target.value.split(',').map(s => s.trim().toUpperCase()).filter(Boolean) }))} placeholder="e.g. EN, DE" className="mt-1 w-full rounded-xl border border-indigo-700/60 bg-indigo-950/20 px-3 py-2 text-sm text-indigo-200 placeholder-indigo-800 focus:outline-none focus:border-indigo-400" />
+                        <input value={newPlaylistTargetLangsText} onChange={e => { setNewPlaylistTargetLangsText(e.target.value); setNewPlaylistDraft(prev => ({ ...prev, target_langs: e.target.value.split(',').map(s => s.trim().toUpperCase()).filter(Boolean) })) }} placeholder="e.g. EN, DE" className="mt-1 w-full rounded-xl border border-indigo-700/60 bg-indigo-950/20 px-3 py-2 text-sm text-indigo-200 placeholder-indigo-800 focus:outline-none focus:border-indigo-400" />
                       </label>
                     </div>
                     <label className="flex items-center gap-3 cursor-pointer select-none">

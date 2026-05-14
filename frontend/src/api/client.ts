@@ -444,6 +444,18 @@ export const api = {
       headers: getAdminHeaders(),
     }),
 
+  findYouTubeUrl: (songId: number): Promise<{ url: string | null }> =>
+    apiFetch(`/admin/songs/${songId}/find-youtube`, {
+      method: 'POST',
+      headers: getAdminHeaders(),
+    }),
+
+  findAppleMusicUrl: (songId: number): Promise<{ url: string | null }> =>
+    apiFetch(`/admin/songs/${songId}/find-apple-music`, {
+      method: 'POST',
+      headers: getAdminHeaders(),
+    }),
+
   updateAdminLyrics: (songId: number, body: {
     lines: Array<{
       id: number
