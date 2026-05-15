@@ -1032,18 +1032,18 @@ function SongBrowser({
                       key={code}
                       type="button"
                       onClick={() => { setLearnLang(code); setNativeLang(null) }}
-                      className={`rounded-2xl border p-5 flex items-center gap-4 transition-all cursor-pointer text-left ${selected ? 'border-white/30' : 'border-zinc-700/70 hover:border-white/15'}`}
-                      style={{ background: selected ? 'rgba(255,255,255,0.07)' : '#18191f' }}
+                      className={`rounded-2xl border p-5 flex items-center gap-4 transition-all cursor-pointer text-left ${selected ? 'border-white' : 'border-zinc-700/70 hover:border-white/15'}`}
+                      style={{ background: selected ? '#ffffff' : '#18191f' }}
                       onMouseEnter={e => { if (!selected) (e.currentTarget as HTMLElement).style.background = '#22232a' }}
                       onMouseLeave={e => { if (!selected) (e.currentTarget as HTMLElement).style.background = '#18191f' }}
                     >
                       <span className="text-4xl shrink-0" role="img" aria-label={code}>{langFlag(code)}</span>
                       <div className="min-w-0">
-                        <p className="text-white font-semibold text-sm">{t(`language.${code}`)}</p>
-                        {plCount > 0 && <p className="text-gray-600 text-xs mt-0.5">{plCount} {plCount === 1 ? t('browse.playlist') : t('browse.playlists')}</p>}
+                        <p className={`font-semibold text-sm ${selected ? 'text-zinc-900' : 'text-white'}`}>{t(`language.${code}`)}</p>
+                        {plCount > 0 && <p className={`text-xs mt-0.5 ${selected ? 'text-zinc-500' : 'text-gray-600'}`}>{plCount} {plCount === 1 ? t('browse.playlist') : t('browse.playlists')}</p>}
                       </div>
                       {selected && (
-                        <svg viewBox="0 0 24 24" className="w-4 h-4 shrink-0 ml-auto" fill="rgba(255,255,255,0.5)">
+                        <svg viewBox="0 0 24 24" className="w-4 h-4 shrink-0 ml-auto" fill="rgba(0,0,0,0.4)">
                           <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
                         </svg>
                       )}
@@ -1085,17 +1085,17 @@ function SongBrowser({
                         key={code}
                         type="button"
                         onClick={() => { setNativeLang(code); if (learnLang) onBrowseTargetLang(learnLang, code) }}
-                        className={`rounded-2xl border p-5 flex items-center gap-4 transition-all cursor-pointer text-left ${selected ? 'border-white/30' : 'border-zinc-700/70 hover:border-white/15'}`}
-                        style={{ background: selected ? 'rgba(255,255,255,0.07)' : '#18191f' }}
+                        className={`rounded-2xl border p-5 flex items-center gap-4 transition-all cursor-pointer text-left ${selected ? 'border-white' : 'border-zinc-700/70 hover:border-white/15'}`}
+                        style={{ background: selected ? '#ffffff' : '#18191f' }}
                         onMouseEnter={e => { if (!selected) (e.currentTarget as HTMLElement).style.background = '#22232a' }}
                         onMouseLeave={e => { if (!selected) (e.currentTarget as HTMLElement).style.background = '#18191f' }}
                       >
                         <span className="text-4xl shrink-0" role="img" aria-label={code}>{langFlag(code)}</span>
                         <div className="min-w-0">
-                          <p className="text-white font-semibold text-sm">{t(`language.${code}`)}</p>
+                          <p className={`font-semibold text-sm ${selected ? 'text-zinc-900' : 'text-white'}`}>{t(`language.${code}`)}</p>
                         </div>
                         {selected && (
-                          <svg viewBox="0 0 24 24" className="w-4 h-4 shrink-0 ml-auto" fill="rgba(255,255,255,0.5)">
+                          <svg viewBox="0 0 24 24" className="w-4 h-4 shrink-0 ml-auto" fill="rgba(0,0,0,0.4)">
                             <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
                           </svg>
                         )}
