@@ -18,29 +18,26 @@ import { useLocalization, useT, useContentT } from './i18n/LocalizationContext'
 const _songCache = new Map<string, SongDetail>()
 const _inFlight  = new Map<string, Promise<SongDetail>>()
 
-function _songCacheKey(id: number, source?: string): string {
-  return `${id}:${source ?? ''}`
+function _songCacheKey(id: number, source?: string, targetLang?: string): string {
+  return `${id}:${source ?? ''}:${targetLang ?? ''}`
 }
 
 /** Fetch a song, using the module-level cache. Deduplicates concurrent requests. */
 function _fetchSong(id: number, source?: string, targetLang?: string): Promise<SongDetail> {
-  const key = _songCacheKey(id, source)
-  // When targetLang is set, skip cache (translations vary per preference)
-  if (!targetLang) {
-    const cached = _songCache.get(key)
-    if (cached) return Promise.resolve(cached)
-    const inflight = _inFlight.get(key)
-    if (inflight) return inflight
-  }
+  const key = _songCacheKey(id, source, targetLang)
+  const cached = _songCache.get(key)
+  if (cached) return Promise.resolve(cached)
+  const inflight = _inFlight.get(key)
+  if (inflight) return inflight
   const p = api.getSong(id, source, targetLang || undefined).then(detail => {
-    if (!targetLang) _songCache.set(key, detail)
+    _songCache.set(key, detail)
     _inFlight.delete(key)
     return detail
   }).catch(err => {
     _inFlight.delete(key)
     throw err
   })
-  if (!targetLang) _inFlight.set(key, p)
+  _inFlight.set(key, p)
   return p
 }
 
@@ -2564,8 +2561,8 @@ export default function App() {
     const targetLang = overrideTargetLang !== null
       ? (overrideTargetLang || undefined)
       : matchedLang ?? availableTargetLangs[0] ?? browsePref
-    const key = _songCacheKey(id, source)
-    const cached = !targetLang ? _songCache.get(key) : undefined
+    const key = _songCacheKey(id, source, targetLang)
+    const cached = _songCache.get(key)
     if (cached) {
       // Instant render from cache.
       setActiveSong(cached)
@@ -2598,7 +2595,7 @@ export default function App() {
     if (!activeSong) return
     const source = settings.preferredSource
     const targetLang = effectiveTargetLang
-    const key = _songCacheKey(activeSong.id, source)
+    const key = _songCacheKey(activeSong.id, source, targetLang)
     _songCache.delete(key)  // force fresh fetch for new source
     void _fetchSong(activeSong.id, source, targetLang).then(d => { setActiveSong(d) }).catch(() => {})
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -2800,7 +2797,7 @@ export default function App() {
     if (!next) return
     const source = settings.preferredSource
     const timer = window.setTimeout(() => {
-      void _fetchSong(next.id, source).catch(() => {})
+      void _fetchSong(next.id, source, effectiveTargetLang).catch(() => {})
     }, 2000)
     return () => window.clearTimeout(timer)
   }, [activeSong, activeSongIndex, displayedSongs, settings.preferredSource])
