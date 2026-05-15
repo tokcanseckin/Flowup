@@ -2527,6 +2527,9 @@ export default function App() {
     _songCache.clear()
     _inFlight.clear()
     localStorage.removeItem(PASSWORD_SESSION_KEY)
+    localStorage.removeItem('flowup.openedSongs.v1')
+    localStorage.removeItem('flowup_favorite_songs')
+    sessionStorage.clear()
     navigateToPath('/browse', true)
   }, [navigateToPath])
 
