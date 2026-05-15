@@ -793,6 +793,7 @@ export default function LyricsPlayer({
               compact
               onClose={clearInspect}
               accentTextColor={accentTextColor}
+              songTitle={songData.title}
             />
           </div>
         )}
@@ -832,6 +833,7 @@ export default function LyricsPlayer({
                 info={inspectInfo}
                 onClose={clearInspect}
                 accentTextColor={accentTextColor}
+                songTitle={songData.title}
               />
             ) : (
               <div className="rounded-xl border border-white/20 px-8 py-7 text-white/85 animate-panel-in">
@@ -964,12 +966,38 @@ interface InspectPanelProps {
   onClose: () => void
   compact?: boolean
   accentTextColor?: string
+  songTitle?: string
 }
 
-function InspectPanel({ info, onClose, compact = false, accentTextColor = 'hsl(320, 88%, 38%)' }: InspectPanelProps) {
+function InspectPanel({ info, onClose, compact = false, accentTextColor = 'hsl(320, 88%, 38%)', songTitle }: InspectPanelProps) {
   const t = useT()
   const isWord = info.kind === 'word'
   const cleanDisplayForm = isWord ? stripBoundaryPunctuation(info.word.display_form) : null
+
+  const [menuOpen, setMenuOpen] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!menuOpen) return
+    function handleClickOutside(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [menuOpen])
+
+  function handleReportProblem() {
+    setMenuOpen(false)
+    const subject = isWord
+      ? `Report a problem: "${info.word.display_form}"${songTitle ? ` in ${songTitle}` : ''}`
+      : `Report a problem${songTitle ? `: ${songTitle}` : ''}`
+    const body = isWord
+      ? `Word: ${info.word.display_form}\nLemma: ${info.word.lemma}\nGrammar: ${info.word.grammar ?? ''}\nDefinition: ${info.word.dictionary_definition ?? ''}\n\nPlease describe the problem:\n`
+      : `Line: ${info.line.original_line}\n\nPlease describe the problem:\n`
+    window.open(`mailto:support@singoling.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`)
+  }
 
   return (
     <div
@@ -984,14 +1012,44 @@ function InspectPanel({ info, onClose, compact = false, accentTextColor = 'hsl(3
         <p className="text-xs leading-none font-bold text-zinc-900 uppercase tracking-wide">
           {isWord ? t('inspect.definition') : t('inspect.translation')}
         </p>
-        <button
-          type="button"
-          onClick={onClose}
-          className="text-xs text-gray-500 hover:text-gray-700 transition-colors"
-          aria-label="Close inspector"
-        >
-          {t('inspect.close')}
-        </button>
+        <div className="flex items-center gap-1.5">
+          <div className="relative" ref={menuRef}>
+            <button
+              type="button"
+              onClick={() => setMenuOpen(o => !o)}
+              className="text-gray-400 hover:text-gray-600 transition-colors p-0.5 rounded"
+              aria-label="More options"
+            >
+              <svg viewBox="0 0 20 20" className="w-3.5 h-3.5 fill-current">
+                <circle cx="4" cy="10" r="1.5" />
+                <circle cx="10" cy="10" r="1.5" />
+                <circle cx="16" cy="10" r="1.5" />
+              </svg>
+            </button>
+            {menuOpen && (
+              <div className="absolute right-0 top-full mt-1 z-50 min-w-[160px] rounded-lg border border-gray-200 bg-white shadow-lg py-1">
+                <button
+                  type="button"
+                  onClick={handleReportProblem}
+                  className="w-full text-left px-3 py-2 text-xs text-red-500 hover:bg-red-50 transition-colors flex items-center gap-2"
+                >
+                  <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 shrink-0 fill-none stroke-current" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" /><line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" />
+                  </svg>
+                  {t('browser.reportProblem')}
+                </button>
+              </div>
+            )}
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-xs text-gray-500 hover:text-gray-700 transition-colors"
+            aria-label="Close inspector"
+          >
+            {t('inspect.close')}
+          </button>
+        </div>
       </div>
 
       {isWord ? (
