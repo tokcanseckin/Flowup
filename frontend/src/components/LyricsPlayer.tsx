@@ -65,6 +65,29 @@ function stripBoundaryPunctuation(value: string): string {
   return value.replace(/^[^\p{L}\p{N}(]+|[^\p{L}\p{N})]+$/gu, '').trim()
 }
 
+/**
+ * Wraps each base-char + U+0301 (combining acute accent / stress mark) cluster
+ * in a display:inline-block span. Chrome misplaces combining marks in certain
+ * shaping contexts; the inline-block creates an isolated context that forces
+ * correct positioning over the base Cyrillic vowel.
+ */
+function renderStressed(text: string): React.ReactNode {
+  if (!text.includes('\u0301')) return text
+  const segments: React.ReactNode[] = []
+  const re = /[\s\S]\u0301?/gu
+  let match: RegExpExecArray | null
+  let key = 0
+  while ((match = re.exec(text)) !== null) {
+    const seg = match[0]
+    if (seg.length > 1) {
+      segments.push(<span key={key++} style={{ display: 'inline-block' }}>{seg}</span>)
+    } else {
+      segments.push(seg)
+    }
+  }
+  return <>{segments}</>
+}
+
 function parseHueFromColor(color: string | undefined): number | null {
   if (!color) return null
   const m = color.match(/hsla?\(\s*([0-9.]+)/i)
@@ -942,7 +965,7 @@ function ActiveLineContent({
                   textUnderlineOffset: '4px',
                 } : undefined}
               >
-                {word.display_form}
+                {renderStressed(word.display_form)}
               </span>
               {!hideWordIndexes && displayIdx >= 0 && (
                 <sup
@@ -1074,7 +1097,7 @@ function InspectPanel({ info, onClose, compact = false, accentTextColor = 'hsl(3
           <div className="my-4 border-t border-zinc-300" />
 
           {/* ── Tapped word form ── */}
-          <p className="stressed text-xl leading-tight font-semibold text-black">{cleanDisplayForm || info.word.display_form}</p>
+          <p className="stressed text-xl leading-tight font-semibold text-black">{renderStressed(cleanDisplayForm || info.word.display_form)}</p>
 
           {/* ── POS + morphological details ── */}
           {info.word.grammar && (() => {
