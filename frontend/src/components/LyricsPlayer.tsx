@@ -972,7 +972,7 @@ interface InspectPanelProps {
   songId?: number | null
 }
 
-function InspectPanel({ info, onClose, compact = false, accentTextColor = 'hsl(320, 88%, 38%)', songTitle, songId }: InspectPanelProps) {
+function InspectPanel({ info, onClose, compact = false, accentTextColor = 'hsl(320, 88%, 38%)', songId }: InspectPanelProps) {
   const t = useT()
   const isWord = info.kind === 'word'
   const cleanDisplayForm = isWord ? stripBoundaryPunctuation(info.word.display_form) : null
