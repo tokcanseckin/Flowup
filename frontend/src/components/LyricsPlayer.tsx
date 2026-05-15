@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { SongDetail, api } from '../api/client'
+import { SongDetail } from '../api/client'
 import { useWordHistory } from '../hooks/useWordHistory'
 import translateIconImg from '../../images/translate_icon@2x.png'
 import { useT } from '../i18n/LocalizationContext'
+import ReportModal from './ReportModal'
 
 // ── Stop-word sets (keyed by language code) ─────────────────────────────────
 // These words are still clickable, but don't consume a keyboard index (1-9).
@@ -978,7 +979,7 @@ function InspectPanel({ info, onClose, compact = false, accentTextColor = 'hsl(3
   const cleanDisplayForm = isWord ? stripBoundaryPunctuation(info.word.display_form) : null
 
   const [menuOpen, setMenuOpen] = useState(false)
-  const [reportSent, setReportSent] = useState<'idle' | 'sending' | 'done' | 'error'>('idle')
+  const [showReportModal, setShowReportModal] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -992,23 +993,9 @@ function InspectPanel({ info, onClose, compact = false, accentTextColor = 'hsl(3
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [menuOpen])
 
-  function handleReportProblem() {
-    setMenuOpen(false)
-    if (reportSent !== 'idle') return
-    setReportSent('sending')
-    const payload = isWord
-      ? { kind: 'word' as const, song_id: songId ?? undefined, word: info.word.display_form, lemma: info.word.lemma, context: info.line.original_line }
-      : { kind: 'line' as const, song_id: songId ?? undefined, context: info.line.original_line }
-    api.createReport(payload)
-      .then(() => {
-        setReportSent('done')
-        setTimeout(() => setReportSent('idle'), 3000)
-      })
-      .catch(() => {
-        setReportSent('error')
-        setTimeout(() => setReportSent('idle'), 3000)
-      })
-  }
+  const reportPayload = isWord
+    ? { kind: 'word' as const, song_id: songId ?? undefined, word: info.word.display_form, lemma: info.word.lemma, context: info.line.original_line }
+    : { kind: 'line' as const, song_id: songId ?? undefined, context: info.line.original_line }
 
   return (
     <div
@@ -1047,17 +1034,17 @@ function InspectPanel({ info, onClose, compact = false, accentTextColor = 'hsl(3
               <div className="absolute right-0 top-full mt-1 z-50 min-w-[160px] rounded-lg border border-gray-200 bg-white shadow-lg py-1">
                 <button
                   type="button"
-                  onClick={handleReportProblem}
-                  disabled={reportSent !== 'idle'}
-                  className="w-full text-left px-3 py-2 text-xs text-red-500 hover:bg-red-50 transition-colors flex items-center gap-2 disabled:opacity-60"
+                  onClick={() => { setMenuOpen(false); setShowReportModal(true) }}
+                  className="w-full text-left px-3 py-2 text-xs text-red-500 hover:bg-red-50 transition-colors flex items-center gap-2"
                 >
                   <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 shrink-0 fill-none stroke-current" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" /><line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" />
                   </svg>
-                  {reportSent === 'sending' ? 'Sending…' : reportSent === 'done' ? 'Reported!' : reportSent === 'error' ? 'Failed' : t('browser.reportProblem')}
+                  {t('browser.reportProblem')}
                 </button>
               </div>
             )}
+            <ReportModal open={showReportModal} onClose={() => setShowReportModal(false)} payload={reportPayload} />
           </div>
         </div>
       </div>
