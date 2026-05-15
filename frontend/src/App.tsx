@@ -1980,8 +1980,8 @@ function PlayerView({
               {t('nav.admin')}
             </button>
           )}
-          {/* Target language selector */}
-          {song.target_langs && song.target_langs.length > 0 && onTargetLangChange && (
+          {/* Target language selector — admin only */}
+          {isAdmin && song.target_langs && song.target_langs.length > 0 && onTargetLangChange && (
             <select
               value={targetLang ?? ''}
               onChange={e => onTargetLangChange(e.target.value)}
