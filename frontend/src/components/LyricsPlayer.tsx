@@ -934,7 +934,7 @@ function ActiveLineContent({
               onPointerLeave={() => endPointerPress(true)}
             >
               <span
-                className="stressed lyrics-text text-white text-2xl font-semibold tracking-wide"
+                className="stressed lyrics-text text-white text-2xl font-semibold"
                 style={isLooked ? {
                   textDecorationLine: 'underline',
                   textDecorationColor: 'rgba(74,222,128,0.55)',
