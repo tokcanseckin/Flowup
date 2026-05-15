@@ -106,8 +106,11 @@
     }
   }
 
-  /* Stress-mark accent (U+0301) renders sharply */
+  /* Stress-mark accent (U+0301) renders sharply.
+     Noto Sans has explicit Cyrillic GPOS rules for combining marks;
+     Inter does not, causing Chrome to misplace the accent. */
   .stressed {
+    font-family: 'Noto Sans', sans-serif;
     font-variant-ligatures: none;
   }
 
