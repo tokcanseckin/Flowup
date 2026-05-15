@@ -94,7 +94,13 @@ def _or_en_tokens(key: str) -> list[str]:
 # ---------------------------------------------------------------------------
 
 _STRIP_CHARS = ".,!?;:—–-«»\"'"
-_HOP_DB_NAMES = ["ru_en", "ru_de", "en_tr", "de_tr"]
+
+# German personal / reflexive pronouns — closed class used for pron-pos filtering.
+_GERMAN_PERSONAL_PRONOUNS: frozenset[str] = frozenset({
+    "ich", "du", "er", "sie", "es", "wir", "ihr", "Sie",
+    "man", "sich", "uns", "euch", "mich", "dich",
+    "mir", "dir", "ihm", "ihnen", "Ihnen",
+})
 
 # Map pymorphy3 POS tags to the kaikki DB pos values.
 _PYMORPHY_TO_POS: dict[str, str] = {
@@ -123,6 +129,10 @@ def _normalise(lemma: str) -> str:
 
 
 # ---------------------------------------------------------------------------
+# Target-language POS filters (registered in _POS_FILTERS below the class)
+# ---------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------
 # Lookup class
 # ---------------------------------------------------------------------------
 
@@ -147,21 +157,31 @@ class Lookup:
         if not db_path.exists():
             raise FileNotFoundError(
                 f"Kaikki DB not found at {db_path}.\n"
-                "Build it first:\n"
-                "  python -m eval.pipelines.ru_tr.kaikki_1.build_db --download\n"
+                "Build it first: python -m eval.pipelines.{src}_{tgt}.kaikki_1.build_db\n"
                 "Then copy/symlink it to the location above."
             )
+        self._src = src
+        self._tgt = tgt
+        self._tgt_col = f"{tgt}_word"
+
         self._conn = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
         self._conn.row_factory = sqlite3.Row
 
-        # Hop DBs live alongside the primary DB (same directory).
-        self._hop: dict[str, sqlite3.Connection] = {}
-        for name in _HOP_DB_NAMES:
-            p = db_path.parent / f"{name}.db"
-            if p.exists():
-                c = sqlite3.connect(f"file:{p}?mode=ro", uri=True)
-                c.row_factory = sqlite3.Row
-                self._hop[name] = c
+        # Discover hop pairs automatically: any {src}_{pivot}.db + {pivot}_{tgt}.db
+        # found alongside the primary DB.  Works for any language pair.
+        db_dir = db_path.parent
+        self._hop_pairs: dict[str, tuple[sqlite3.Connection, sqlite3.Connection]] = {}
+        for sp_path in sorted(db_dir.glob(f"{src}_*.db")):
+            pivot = sp_path.stem[len(src) + 1:]
+            if pivot == tgt:
+                continue  # that is the primary DB itself
+            pt_path = db_dir / f"{pivot}_{tgt}.db"
+            if pt_path.exists():
+                sp_conn = sqlite3.connect(f"file:{sp_path}?mode=ro", uri=True)
+                sp_conn.row_factory = sqlite3.Row
+                pt_conn = sqlite3.connect(f"file:{pt_path}?mode=ro", uri=True)
+                pt_conn.row_factory = sqlite3.Row
+                self._hop_pairs[pivot] = (sp_conn, pt_conn)
 
         # pymorphy3 is only needed for Russian source language.
         self._morph = None
@@ -192,10 +212,32 @@ class Lookup:
 
     @staticmethod
     def _clean(word: str) -> str:
-        """Strip parenthetical/bracket annotations and trim."""
+        """Strip parenthetical/bracket annotations and trim.
+
+        Also collapses slash-separated inflectional variants (Wiktionary
+        convention, e.g. 'laß/lasse/lassen') to the longest single form.
+        """
         word = re.sub(r"\s*\([^)]*\)", "", word)
         word = re.sub(r"\s*\[[^\]]*\]", "", word)
-        return word.strip()
+        word = word.strip()
+        if "/" in word:
+            parts = [p.strip() for p in word.split("/") if p.strip()]
+            if parts:
+                word = max(parts, key=len)
+        return word
+
+    @staticmethod
+    def _alternate_spellings(lemma: str) -> list[str]:
+        """Return alternative Russian spellings when primary lookup fails.
+
+        pymorphy3 sometimes produces archaic forms while ruwiktionary uses the
+        modern spelling (e.g. счастие → счастье).  Swap -ие/-ье both ways.
+        """
+        if lemma.endswith("ие"):
+            return [lemma[:-2] + "ье"]
+        if lemma.endswith("ья"):
+            return [lemma[:-2] + "ия"]
+        return []
 
     @staticmethod
     def _filter_proper_nouns(words: list[str]) -> list[str]:
@@ -208,10 +250,7 @@ class Lookup:
 
     @staticmethod
     def _tr_pos_filter(words: list[str], pos: str | None) -> list[str]:
-        """Filter Turkish words by POS using morphological heuristics.
-
-        Turkish verb infinitives end in -mak/-mek.
-        """
+        """Filter Turkish words by POS. Verb infinitives end in -mak/-mek."""
         if pos == "verb":
             filtered = [w for w in words if w.endswith(("mak", "mek"))]
         elif pos == "noun":
@@ -220,64 +259,130 @@ class Lookup:
             return words
         return filtered if filtered else words
 
-    def _hop_words(self, db_name: str, lemma: str) -> list[str]:
-        conn = self._hop.get(db_name)
-        if not conn:
-            return []
+    @staticmethod
+    def _de_pos_filter(words: list[str], pos: str | None) -> list[str]:
+        """Filter German words by POS using German-specific rules.
+
+        Nouns are always capitalised. Verb infinitives end in -en/-eln/-ern
+        (len >= 4) or start with 'sich '. Pronouns are matched against the
+        closed-class personal pronoun set. Safe fallback: returns the original
+        list when filtering would leave nothing.
+        """
+        if pos == "noun":
+            filtered = [w for w in words if w and w[0].isupper()]
+        elif pos == "verb":
+            filtered = [
+                w for w in words
+                if w and (
+                    (w.lower().endswith(("en", "eln", "ern")) and len(w) >= 4)
+                    or w.lower().startswith("sich ")
+                )
+            ]
+        elif pos in ("adj", "adv"):
+            filtered = [w for w in words if w and w[0].islower()]
+        elif pos == "pron":
+            filtered = [w for w in words if w.lower() in _GERMAN_PERSONAL_PRONOUNS
+                        or w in _GERMAN_PERSONAL_PRONOUNS]
+        else:
+            return words
+        return filtered if filtered else words
+
+    def _tgt_pos_filter(self, words: list[str], pos: str | None) -> list[str]:
+        """Dispatch to the target-language POS filter."""
+        fn = _POS_FILTERS.get(self._tgt)
+        return fn(words, pos) if fn else words
+
+    def _hop_words_conn(self, conn: sqlite3.Connection, lemma: str) -> list[str]:
+        """Fetch and clean tgt_word results from a hop DB connection."""
         rows = conn.execute(
             "SELECT DISTINCT tgt_word FROM translations WHERE lemma = ?", (lemma,)
         ).fetchall()
-        return [c for r in rows if (c := self._clean(r["tgt_word"]))]
+        seen: set[str] = set()
+        result: list[str] = []
+        for r in rows:
+            c = self._clean(r["tgt_word"])
+            if c and c not in seen:
+                seen.add(c)
+                result.append(c)
+        return result
 
     def _two_hop(self, key: str, src_pos: str | None = None) -> list[str]:
-        """ru→en→tr and ru→de→tr, ranked by agreement."""
-        en_words = self._hop_words("ru_en", key)
-        de_words = self._hop_words("ru_de", key)
+        """Generic multi-pivot two-hop: {src}→{pivot}→{tgt} for each discovered pivot pair.
 
-        de_tr: set[str] = set()
-        for w in de_words:
-            de_tr.update(self._hop_words("de_tr", w.lower()))
+        When multiple pivots are available (e.g. en and de for ru→tr), words
+        that appear via multiple pivots are ranked first (agreement signal).
+        An OpenRussian bonus is added for Russian source with an English pivot.
+        """
+        if not self._hop_pairs:
+            return []
 
-        if de_tr:
-            en_pivots = en_words
-        else:
-            en_pivots = en_words if src_pos else en_words[:1]
+        pivot_tgt_sets: dict[str, set[str]] = {}
+        for pivot, (sp_conn, pt_conn) in self._hop_pairs.items():
+            pivot_words = self._hop_words_conn(sp_conn, key)
+            tgt_set: set[str] = set()
+            for w in pivot_words:
+                for tw in self._hop_words_conn(pt_conn, w.lower()):
+                    tgt_set.add(tw)
+            if tgt_set:
+                pivot_tgt_sets[pivot] = tgt_set
 
-        en_tr: set[str] = set()
-        for w in en_pivots:
-            en_tr.update(self._hop_words("en_tr", w.lower()))
+        # OpenRussian bonus: use English definition tokens as extra EN pivot words.
+        or_bonus: set[str] = set()
+        if self._src == "ru" and "en" in self._hop_pairs:
+            _, pt_conn = self._hop_pairs["en"]
+            for tok in _or_en_tokens(key):
+                for tw in self._hop_words_conn(pt_conn, tok):
+                    or_bonus.add(tw)
 
-        or_tr: set[str] = set()
-        for tok in _or_en_tokens(key):
-            or_tr.update(self._hop_words("en_tr", tok))
+        if not pivot_tgt_sets and not or_bonus:
+            return []
 
-        agreed  = sorted(en_tr & de_tr)
-        de_only = sorted(de_tr - en_tr)
-        en_only = sorted(en_tr - de_tr)
-        or_only = sorted(or_tr - en_tr - de_tr)
-        return agreed + de_only + en_only + or_only
+        all_sets = list(pivot_tgt_sets.values())
+        if not all_sets:
+            return sorted(or_bonus)
+        if len(all_sets) == 1:
+            main = all_sets[0]
+            return sorted(main) + sorted(or_bonus - main)
+
+        # Multiple pivots: agreed words first, then remainder, then OR-only.
+        agreed = set.intersection(*all_sets)
+        all_union = set.union(*all_sets)
+        or_only = or_bonus - all_union
+        return sorted(agreed) + sorted(all_union - agreed) + sorted(or_only)
 
     def _direct_lookup(self, key: str, pos: str | None) -> list[str]:
         """Fetch from the primary DB, preferring POS-filtered results."""
+        col = self._tgt_col
+
+        def _dedup(rows) -> list[str]:
+            seen: set[str] = set()
+            result: list[str] = []
+            for r in rows:
+                c = self._clean(r[col])
+                if c and c not in seen:
+                    seen.add(c)
+                    result.append(c)
+            return result
+
         if pos:
             rows = self._conn.execute(
-                "SELECT DISTINCT tr_word FROM definitions WHERE lemma = ? AND pos = ?",
+                f"SELECT DISTINCT {col} FROM definitions WHERE lemma = ? AND pos = ?",
                 (key, pos),
             ).fetchall()
             if rows:
-                return [c for r in rows if (c := self._clean(r["tr_word"]))]
+                return _dedup(rows)
         rows = self._conn.execute(
-            "SELECT DISTINCT tr_word FROM definitions WHERE lemma = ?",
+            f"SELECT DISTINCT {col} FROM definitions WHERE lemma = ?",
             (key,),
         ).fetchall()
-        return [c for r in rows if (c := self._clean(r["tr_word"]))]
+        return _dedup(rows)
 
     # ------------------------------------------------------------------
     # Public API
     # ------------------------------------------------------------------
 
     def lookup(self, lemma: str, grammar: str = "") -> list[str]:
-        """Return up to _MAX_RESULTS Turkish translations for *lemma*."""
+        """Return up to _MAX_RESULTS target-language translations for *lemma*."""
         key = _normalise(lemma)
         if not key:
             return []
@@ -287,27 +392,46 @@ class Lookup:
         if src_pos is None and normal != key:
             src_pos = self._detect_pos(normal)
 
-        # 1. Direct lookup (POS-filtered with unfiltered fallback)
-        result = self._direct_lookup(key, src_pos)
+        # 1. Direct lookup (SQL POS-filtered + target-language Python filter)
+        result = self._tgt_pos_filter(self._direct_lookup(key, src_pos), src_pos)
         if result:
             return result[: self._MAX_RESULTS]
 
         # 2. Lemmatized retry
         if normal != key:
-            result = self._direct_lookup(normal, src_pos)
+            result = self._tgt_pos_filter(self._direct_lookup(normal, src_pos), src_pos)
             if result:
                 return result[: self._MAX_RESULTS]
 
-        # 3. Two-hop fallback
+        # 3. Alternate spelling variants (Russian source: -ие/-ье swap)
+        if self._src == "ru":
+            for cand in self._alternate_spellings(key) + self._alternate_spellings(normal):
+                result = self._tgt_pos_filter(self._direct_lookup(cand, src_pos), src_pos)
+                if result:
+                    return result[: self._MAX_RESULTS]
+
+        # 4. Two-hop fallback
         for k in ([key, normal] if normal != key else [key]):
             result = self._two_hop(k, src_pos)
             if result:
                 result = self._filter_proper_nouns(result)
-                return self._tr_pos_filter(result, src_pos)[: self._MAX_RESULTS]
+                return self._tgt_pos_filter(result, src_pos)[: self._MAX_RESULTS]
 
         return []
 
     def close(self) -> None:
         self._conn.close()
-        for c in self._hop.values():
-            c.close()
+        for sp_conn, pt_conn in self._hop_pairs.values():
+            sp_conn.close()
+            pt_conn.close()
+
+
+# ---------------------------------------------------------------------------
+# POS filter registry — maps target language code to its filter function.
+# Add an entry here when adding a new language pair.
+# ---------------------------------------------------------------------------
+
+_POS_FILTERS: dict[str, object] = {
+    "tr": Lookup._tr_pos_filter,
+    "de": Lookup._de_pos_filter,
+}

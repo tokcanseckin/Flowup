@@ -125,6 +125,14 @@ def _translate_argos(texts: list[str], src: str, tgt: str) -> list[str] | None:
         if tr:
             _log(f"  [Argos] Translating {len(texts)} lines ({s}->{t}) using local model.")
             return [tr.translate(x) for x in texts]
+        # No direct package — try chained translation (e.g. ru→en→de via pivot).
+        try:
+            sample = argostranslate.translate.translate(texts[0], s, t)
+            if sample:
+                _log(f"  [Argos] Translating {len(texts)} lines ({s}->{t}) via chained model.")
+                return [argostranslate.translate.translate(x, s, t) for x in texts]
+        except Exception:
+            pass
 
     if not _ARGOS_AUTO_INSTALL:
         _log(f"  [Argos] No model for {s}->{t}. Set ARGOS_AUTO_INSTALL=1 to auto-install.")

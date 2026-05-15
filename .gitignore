@@ -20,6 +20,9 @@ frontend/.vite/
 .env.local
 *.env
 
+# Compiled dictionary SQLite DBs (large binaries, reproducible via build_db.py)
+backend/dictionaries/
+
 # Local databases
 flowup.db
 backend/.song_cache.json
