@@ -732,12 +732,15 @@ def _word_response(word: Word, lang_code: str = "ru", target_lang: Optional[str]
     )
 
 
-def _line_response(line: Line, override_words: Optional[list] = None, lang_code: str = "ru", target_lang: Optional[str] = None) -> LineResponse:
+def _line_response(line: Line, override_words: Optional[list] = None, lang_code: str = "ru", target_lang: Optional[str] = None, override_translations: Optional[list] = None) -> LineResponse:
     words = override_words if override_words is not None else line.words
-    # Check normalized LineTranslation table first (multi-lang support)
+    # Check normalized LineTranslation table first (multi-lang support).
+    # override_translations lets callers supply translations from a different line object
+    # (e.g. default lines when the response is built from source-specific lines).
     translation: str = line.translation
-    if target_lang and line.translations:
-        for lt in line.translations:
+    translations_to_check = override_translations if override_translations is not None else line.translations
+    if target_lang and translations_to_check:
+        for lt in translations_to_check:
             if lt.target_lang.lower() == target_lang.lower():
                 translation = lt.text
                 break
@@ -762,8 +765,18 @@ def _song_detail(song: Song, source: Optional[str] = None, target_lang: Optional
         source_lines = [l for l in song.lines if l.source == source]
         if source_lines:
             default_words_by_pos = {l.position: l.words for l in default_lines}
+            # Index default lines by position so source lines can inherit their translations.
+            # line_translations are only filled for default (source=None) lines, so we must
+            # pass the default line's translations when building responses for source lines.
+            default_translations_by_pos = {l.position: l.translations for l in default_lines}
             lines = [
-                _line_response(sl, override_words=default_words_by_pos.get(sl.position, []), lang_code=lang_code, target_lang=target_lang)
+                _line_response(
+                    sl,
+                    override_words=default_words_by_pos.get(sl.position, []),
+                    lang_code=lang_code,
+                    target_lang=target_lang,
+                    override_translations=default_translations_by_pos.get(sl.position),
+                )
                 for sl in sorted(source_lines, key=lambda l: l.position)
             ]
         else:
