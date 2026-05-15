@@ -28,6 +28,7 @@ import os
 import re
 import secrets
 import subprocess
+import sys
 import tempfile
 import threading
 import time
@@ -936,7 +937,7 @@ def _generate_song_with_pipeline(body: AdminSongCreate) -> SongIngest:
         output_path = Path(tmp.name)
 
     command = [
-        os.environ.get("PYTHON_EXECUTABLE", "python3"),
+        os.environ.get("PYTHON_EXECUTABLE", sys.executable),
         str(pipeline_script),
         "--lang",
         lang_code,
@@ -1621,7 +1622,7 @@ async def regenerate_song_lyrics(
         raise HTTPException(status_code=500, detail="Pipeline script not found")
 
     # Capture all needed info before closing the DI session
-    python_exe = os.environ.get("PYTHON_EXECUTABLE", "python3")
+    python_exe = os.environ.get("PYTHON_EXECUTABLE", sys.executable)
     lang_code = song.language_code
     artist = song.artist or "Unknown Artist"
     title = song.title
@@ -2671,7 +2672,7 @@ def worker_submit_result(
 
         try:
             cmd = [
-                os.environ.get("PYTHON_EXECUTABLE", "python3"),
+                os.environ.get("PYTHON_EXECUTABLE", sys.executable),
                 str(pipeline_script),
                 "--lang",         lang_code,
                 "--artist",       artist,
@@ -2775,7 +2776,7 @@ def _run_pipeline_with_lrc(task: AlignmentTask, lrc: str, db: Session) -> dict:
             out_path = Path(jf.name)
         try:
             cmd = [
-                os.environ.get("PYTHON_EXECUTABLE", "python3"),
+                os.environ.get("PYTHON_EXECUTABLE", sys.executable),
                 str(pipeline_script),
                 "--lang",          task.lang,
                 "--artist",        task.artist,
