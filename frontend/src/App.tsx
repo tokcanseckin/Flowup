@@ -171,7 +171,7 @@ function parseAppRoute(pathname: string): AppRoute {
     const tab = (settingsMatch[1] as SettingsTab) ?? 'preferences'
     return { page: 'settings', tab }
   }
-  const adminMatch = path.match(/^\/admin(?:\/(song|playlist|user|task|localization)(?:\/(\d+))?)?$/)
+  const adminMatch = path.match(/^\/admin(?:\/(song|playlist|user|task|localization|report)(?:\/(\d+))?)?$/)
   if (adminMatch) {
     const seg = adminMatch[1]
     const id = adminMatch[2] ? Number(adminMatch[2]) : null
