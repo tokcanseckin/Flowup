@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
-import { AdminSongDetail, AlignmentTask, AdminUser, LocalizationItem, PlaylistDetail, PlaylistSummary, SongSummary, api } from '../api/client'
+import { AdminSongDetail, AdminReport, AlignmentTask, AdminUser, LocalizationItem, PlaylistDetail, PlaylistSummary, SongSummary, api } from '../api/client'
 import SyncCalibrator from './SyncCalibrator'
 
 interface Props {
@@ -16,7 +16,7 @@ interface Props {
   onNavigateRoute?: (tab: TabKey, id: number | null) => void
 }
 
-type TabKey = 'songs' | 'playlists' | 'users' | 'tasks' | 'localizations'
+type TabKey = 'songs' | 'playlists' | 'users' | 'tasks' | 'localizations' | 'reports'
 
 type PlaylistDraft = {
   name: string
@@ -1048,6 +1048,7 @@ export default function AdminPanel({
           <button type="button" onClick={() => openTab('users')} className={`rounded-xl border px-4 py-2 text-sm font-semibold transition-colors ${tabButtonClass(tab === 'users')}`}>Users</button>
           <button type="button" onClick={() => openTab('tasks')} className={`rounded-xl border px-4 py-2 text-sm font-semibold transition-colors ${tabButtonClass(tab === 'tasks')}`}>Tasks</button>
           <button type="button" onClick={() => openTab('localizations')} className={`rounded-xl border px-4 py-2 text-sm font-semibold transition-colors ${tabButtonClass(tab === 'localizations')}`}>Localizations</button>
+          <button type="button" onClick={() => openTab('reports')} className={`rounded-xl border px-4 py-2 text-sm font-semibold transition-colors ${tabButtonClass(tab === 'reports')}`}>Reports</button>
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[320px_minmax(0,1fr)]">
@@ -1655,6 +1656,10 @@ export default function AdminPanel({
             {tab === 'localizations' && (
               <LocalizationsTab />
             )}
+
+            {tab === 'reports' && (
+              <ReportsTab />
+            )}
           </section>
         </div>
       </div>
@@ -1813,3 +1818,120 @@ function LocalizationsTab() {
     </div>
   )
 }
+
+function reportStatusClass(status: string): string {
+  if (status === 'open') return 'border-amber-700/50 bg-amber-950/30 text-amber-300'
+  if (status === 'resolved') return 'border-emerald-700/50 bg-emerald-950/30 text-emerald-300'
+  return 'border-gray-700/50 bg-gray-900/30 text-gray-400'
+}
+
+function ReportsTab() {
+  const [reports, setReports] = useState<AdminReport[]>([])
+  const [loading, setLoading] = useState(true)
+  const [statusFilter, setStatusFilter] = useState<string>('open')
+  const [updatingId, setUpdatingId] = useState<number | null>(null)
+
+  const load = useCallback((status: string) => {
+    setLoading(true)
+    api.listAdminReports(status === 'all' ? undefined : status)
+      .then(rows => setReports(rows))
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, [])
+
+  useEffect(() => { load(statusFilter) }, [load, statusFilter])
+
+  async function setStatus(id: number, status: string) {
+    setUpdatingId(id)
+    try {
+      const updated = await api.updateReportStatus(id, status)
+      setReports(prev => prev.map(r => r.id === updated.id ? updated : r))
+    } catch {}
+    setUpdatingId(null)
+  }
+
+  const cellCls = 'px-3 py-2.5 text-sm text-gray-300 align-top'
+
+  return (
+    <div className="rounded-3xl border border-gray-800/80 p-5 space-y-4" style={{ background: '#12121f' }}>
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <p className="text-white font-semibold">Reports</p>
+          <p className="text-xs text-gray-500">{reports.length} report{reports.length !== 1 ? 's' : ''}</p>
+        </div>
+        <div className="flex gap-2">
+          {(['open', 'resolved', 'dismissed', 'all'] as const).map(s => (
+            <button
+              key={s}
+              type="button"
+              onClick={() => setStatusFilter(s)}
+              className={`rounded-xl border px-3 py-1 text-xs font-medium transition-colors capitalize ${statusFilter === s ? 'border-indigo-500 bg-indigo-950/40 text-white' : 'border-gray-800 bg-gray-950/30 text-gray-400 hover:border-gray-700 hover:text-gray-200'}`}
+            >
+              {s}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {loading ? (
+        <p className="text-gray-500 text-sm">Loading…</p>
+      ) : reports.length === 0 ? (
+        <p className="text-gray-600 text-sm">No reports.</p>
+      ) : (
+        <div className="overflow-auto max-h-[65vh]">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="border-b border-gray-800">
+                <th className="px-3 py-2 text-xs font-medium text-gray-500 uppercase w-20">Kind</th>
+                <th className="px-3 py-2 text-xs font-medium text-gray-500 uppercase">Word / Context</th>
+                <th className="px-3 py-2 text-xs font-medium text-gray-500 uppercase">Song</th>
+                <th className="px-3 py-2 text-xs font-medium text-gray-500 uppercase">User</th>
+                <th className="px-3 py-2 text-xs font-medium text-gray-500 uppercase">Date</th>
+                <th className="px-3 py-2 text-xs font-medium text-gray-500 uppercase w-36">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {reports.map(r => (
+                <tr key={r.id} className="border-b border-gray-800/50 hover:bg-gray-800/20">
+                  <td className={cellCls}>
+                    <span className={`rounded-md border px-1.5 py-0.5 text-[10px] font-semibold uppercase ${r.kind === 'word' ? 'border-violet-700/50 bg-violet-950/30 text-violet-300' : r.kind === 'line' ? 'border-blue-700/50 bg-blue-950/30 text-blue-300' : 'border-gray-700/50 bg-gray-900/30 text-gray-400'}`}>{r.kind}</span>
+                  </td>
+                  <td className={cellCls}>
+                    {r.word && <p className="font-medium text-white">{r.word}{r.lemma ? ` · ${r.lemma}` : ''}</p>}
+                    {r.context && <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{r.context}</p>}
+                    {r.message && <p className="text-xs text-indigo-300 mt-0.5 italic">{r.message}</p>}
+                  </td>
+                  <td className={`${cellCls} text-xs text-gray-400`}>{r.song_title ?? '—'}</td>
+                  <td className={`${cellCls} text-xs text-gray-400`}>{r.user_display_name ?? `#${r.user_id ?? '?'}`}</td>
+                  <td className={`${cellCls} text-xs text-gray-500 whitespace-nowrap`}>{new Date(r.created_at * 1000).toLocaleDateString()}</td>
+                  <td className={cellCls}>
+                    <div className="flex flex-col gap-1">
+                      <span className={`rounded-md border px-1.5 py-0.5 text-[10px] font-semibold capitalize ${reportStatusClass(r.status)}`}>{r.status}</span>
+                      {r.status !== 'resolved' && (
+                        <button
+                          type="button"
+                          disabled={updatingId === r.id}
+                          onClick={() => void setStatus(r.id, 'resolved')}
+                          className="text-[10px] text-emerald-400 hover:text-emerald-300 disabled:opacity-50"
+                        >Resolve</button>
+                      )}
+                      {r.status !== 'dismissed' && (
+                        <button
+                          type="button"
+                          disabled={updatingId === r.id}
+                          onClick={() => void setStatus(r.id, 'dismissed')}
+                          className="text-[10px] text-gray-500 hover:text-gray-300 disabled:opacity-50"
+                        >Dismiss</button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  )
+}
+

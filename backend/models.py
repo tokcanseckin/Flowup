@@ -445,3 +445,36 @@ class LocalizationUpsert(BaseModel):
     tr: str = ''
     ru: str = ''
 
+
+# ── Report models ──────────────────────────────────────────────────────────────
+
+class ReportCreate(BaseModel):
+    """Body for POST /api/reports — submit a problem report."""
+    kind: str                    # 'word' | 'line' | 'song'
+    song_id: Optional[int] = None
+    word: Optional[str] = None   # display_form for word reports
+    lemma: Optional[str] = None
+    context: Optional[str] = None  # surrounding line text
+    message: Optional[str] = None  # optional user note
+
+
+class AdminReportResponse(BaseModel):
+    """Full report record returned to admins."""
+    id: int
+    kind: str
+    user_id: Optional[int]
+    user_display_name: Optional[str]
+    song_id: Optional[int]
+    song_title: Optional[str]
+    word: Optional[str]
+    lemma: Optional[str]
+    context: Optional[str]
+    message: Optional[str]
+    created_at: int
+    status: str
+
+
+class ReportStatusUpdate(BaseModel):
+    """Body for PATCH /api/admin/reports/{id} — update report status."""
+    status: str  # 'open' | 'resolved' | 'dismissed'
+

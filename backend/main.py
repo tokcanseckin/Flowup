@@ -50,7 +50,7 @@ from fastapi.responses import JSONResponse, Response, StreamingResponse
 from sqlalchemy import select as sa_select
 from sqlalchemy.orm import Session, noload
 
-from database import AlignmentTask, Line, LineTranslation, Localization, Playlist, PlaylistSong, Song, User, UserFavorite, UserListenedSong, UserWordLookup, Word, WordDefinition, create_tables, get_db
+from database import AlignmentTask, Line, LineTranslation, Localization, Playlist, PlaylistSong, Report, Song, User, UserFavorite, UserListenedSong, UserWordLookup, Word, WordDefinition, create_tables, get_db
 from models import (
     AdminLyricsUpdate,
     AdminSongDetailResponse,
@@ -95,6 +95,9 @@ from models import (
     WorkerTaskResponse,
     LocalizationItem,
     LocalizationUpsert,
+    ReportCreate,
+    AdminReportResponse,
+    ReportStatusUpdate,
 )
 from openrussian import ensure_loaded as _load_or, lookup as _or_lookup, lookup_local as _or_lookup_local
 import italian_dict as _italian_dict
@@ -3003,3 +3006,94 @@ def delete_localization(
     db.delete(row)
     db.commit()
     _invalidate_loc_cache()
+
+
+# ── Reports ────────────────────────────────────────────────────────────────────
+
+@app.post("/api/reports", status_code=201)
+def create_report(
+    body: ReportCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(_get_current_user),
+):
+    """Submit a problem report (any authenticated user)."""
+    import time as _time
+    song = db.get(Song, body.song_id) if body.song_id else None
+    report = Report(
+        kind=body.kind,
+        user_id=current_user.id,
+        song_id=song.id if song else None,
+        word=body.word,
+        lemma=body.lemma,
+        context=body.context,
+        message=body.message,
+        status="open",
+        created_at=int(_time.time()),
+    )
+    db.add(report)
+    db.commit()
+    return {"id": report.id}
+
+
+@app.get("/api/admin/reports", response_model=list[AdminReportResponse])
+def list_admin_reports(
+    status: str | None = None,
+    db: Session = Depends(get_db),
+    _: User = Depends(_require_admin),
+):
+    q = db.query(Report).order_by(Report.created_at.desc())
+    if status:
+        q = q.filter(Report.status == status)
+    reports = q.all()
+
+    result = []
+    for r in reports:
+        user = db.get(User, r.user_id) if r.user_id else None
+        song = db.get(Song, r.song_id) if r.song_id else None
+        result.append(AdminReportResponse(
+            id=r.id,
+            kind=r.kind,
+            user_id=r.user_id,
+            user_display_name=user.display_name if user else None,
+            song_id=r.song_id,
+            song_title=song.title if song else None,
+            word=r.word,
+            lemma=r.lemma,
+            context=r.context,
+            message=r.message,
+            created_at=r.created_at,
+            status=r.status,
+        ))
+    return result
+
+
+@app.patch("/api/admin/reports/{report_id}", response_model=AdminReportResponse)
+def update_report_status(
+    report_id: int,
+    body: ReportStatusUpdate,
+    db: Session = Depends(get_db),
+    _: User = Depends(_require_admin),
+):
+    report = db.get(Report, report_id)
+    if not report:
+        raise HTTPException(status_code=404, detail="Report not found")
+    report.status = body.status
+    db.commit()
+    db.refresh(report)
+    user = db.get(User, report.user_id) if report.user_id else None
+    song = db.get(Song, report.song_id) if report.song_id else None
+    return AdminReportResponse(
+        id=report.id,
+        kind=report.kind,
+        user_id=report.user_id,
+        user_display_name=user.display_name if user else None,
+        song_id=report.song_id,
+        song_title=song.title if song else None,
+        word=report.word,
+        lemma=report.lemma,
+        context=report.context,
+        message=report.message,
+        created_at=report.created_at,
+        status=report.status,
+    )
+

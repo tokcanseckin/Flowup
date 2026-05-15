@@ -139,6 +139,30 @@ export interface LocalizationItem {
   ru: string
 }
 
+export interface ReportCreate {
+  kind: string
+  song_id?: number | null
+  word?: string | null
+  lemma?: string | null
+  context?: string | null
+  message?: string | null
+}
+
+export interface AdminReport {
+  id: number
+  kind: string
+  user_id: number | null
+  user_display_name: string | null
+  song_id: number | null
+  song_title: string | null
+  word: string | null
+  lemma: string | null
+  context: string | null
+  message: string | null
+  created_at: number
+  status: string
+}
+
 export interface AlignmentTask {
   id: number
   status: 'pending' | 'processing' | 'done' | 'failed'
@@ -642,4 +666,26 @@ export const api = {
         throw new Error(body.detail ?? `API error ${r.status}`)
       }
     }),
+
+  // ── Reports ────────────────────────────────────────────────────────────────
+
+  createReport: (body: ReportCreate): Promise<{ id: number }> =>
+    apiFetch('/reports', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...getUserAuthHeaders() },
+      body: JSON.stringify(body),
+    }),
+
+  listAdminReports: (status?: string): Promise<AdminReport[]> =>
+    apiFetch(`/admin/reports${status ? `?status=${encodeURIComponent(status)}` : ''}`, {
+      headers: getAdminHeaders(),
+    }),
+
+  updateReportStatus: (id: number, status: string): Promise<AdminReport> =>
+    apiFetch(`/admin/reports/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', ...getAdminHeaders() },
+      body: JSON.stringify({ status }),
+    }),
 }
+

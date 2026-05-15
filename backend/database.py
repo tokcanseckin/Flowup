@@ -269,6 +269,22 @@ class Localization(Base):
     ru  = Column(Text, nullable=False, default='')
 
 
+class Report(Base):
+    """User-submitted problem reports (word errors, song issues, etc.)."""
+    __tablename__ = "reports"
+
+    id         = Column(Integer, primary_key=True)
+    kind       = Column(String(32), nullable=False)                                       # 'word' | 'line' | 'song'
+    user_id    = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    song_id    = Column(Integer, ForeignKey("songs.id", ondelete="SET NULL"), nullable=True)
+    word       = Column(Text, nullable=True)    # display_form for word reports
+    lemma      = Column(Text, nullable=True)
+    context    = Column(Text, nullable=True)    # original line text for context
+    message    = Column(Text, nullable=True)    # optional user-supplied description
+    status     = Column(String(16), nullable=False, default="open")  # open | resolved | dismissed
+    created_at = Column(Integer, default=lambda: int(time.time()))
+
+
 def create_tables() -> None:
     Base.metadata.create_all(bind=engine)
     _migrate_playlists_pg()
@@ -281,6 +297,12 @@ def _migrate_playlists_pg() -> None:
         "ALTER TABLE playlists ADD COLUMN IF NOT EXISTS target_langs TEXT NOT NULL DEFAULT '[]'",
         "ALTER TABLE songs ADD COLUMN IF NOT EXISTS target_langs TEXT NOT NULL DEFAULT '[]'",
         "CREATE TABLE IF NOT EXISTS localizations (key TEXT PRIMARY KEY, en TEXT NOT NULL DEFAULT '', tr TEXT NOT NULL DEFAULT '', ru TEXT NOT NULL DEFAULT '')",
+        (
+            "CREATE TABLE IF NOT EXISTS reports ("
+            "id SERIAL PRIMARY KEY, kind VARCHAR(32) NOT NULL, user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,"
+            " song_id INTEGER REFERENCES songs(id) ON DELETE SET NULL, word TEXT, lemma TEXT, context TEXT,"
+            " message TEXT, status VARCHAR(16) NOT NULL DEFAULT 'open', created_at INTEGER)"
+        ),
     ]
     for stmt in statements:
         try:
