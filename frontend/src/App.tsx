@@ -1281,6 +1281,8 @@ function SettingsPage({
 }) {
   const [supportForm, setSupportForm] = useState({ subject: '', message: '' })
   const [supportSent, setSupportSent] = useState(false)
+  const [supportSending, setSupportSending] = useState(false)
+  const [supportError, setSupportError] = useState<string | null>(null)
   const t = useT()
 
   const tabs: { key: SettingsTab; label: string; icon: React.ReactNode }[] = [
@@ -1496,12 +1498,27 @@ function SettingsPage({
                     </div>
                     <button
                       type="button"
-                      disabled={!supportForm.subject.trim() || !supportForm.message.trim()}
-                      onClick={() => setSupportSent(true)}
+                      disabled={!supportForm.subject.trim() || !supportForm.message.trim() || supportSending}
+                      onClick={async () => {
+                        setSupportSending(true)
+                        setSupportError(null)
+                        try {
+                          await api.createReport({
+                            kind: 'support',
+                            message: `${supportForm.subject.trim()}\n\n${supportForm.message.trim()}`,
+                          })
+                          setSupportSent(true)
+                        } catch {
+                          setSupportError('Something went wrong, please try again.')
+                        } finally {
+                          setSupportSending(false)
+                        }
+                      }}
                       className="w-full rounded-xl bg-white text-black text-sm font-medium py-2.5 hover:bg-gray-100 disabled:bg-gray-800 disabled:text-gray-500 transition-colors"
                     >
-                      {t('settings.sendMessage')}
+                      {supportSending ? 'Sending…' : t('settings.sendMessage')}
                     </button>
+                    {supportError && <p className="text-red-400 text-xs pt-1">{supportError}</p>}
                   </div>
                 </div>
               )}
