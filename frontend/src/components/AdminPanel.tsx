@@ -1672,17 +1672,20 @@ function LocalizationsTab() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [editKey, setEditKey] = useState<string | null>(null)
-  const [editDraft, setEditDraft] = useState<{ en: string; tr: string; ru: string }>({ en: '', tr: '', ru: '' })
+  const [editDraft, setEditDraft] = useState<{ en: string; tr: string; ru: string; es: string; pt: string; de: string }>({ en: '', tr: '', ru: '', es: '', pt: '', de: '' })
   const [saving, setSaving] = useState(false)
   const [newKey, setNewKey] = useState('')
   const [newEn, setNewEn] = useState('')
   const [newTr, setNewTr] = useState('')
   const [newRu, setNewRu] = useState('')
+  const [newEs, setNewEs] = useState('')
+  const [newPt, setNewPt] = useState('')
+  const [newDe, setNewDe] = useState('')
   const [addError, setAddError] = useState<string | null>(null)
 
   const load = useCallback(() => {
     setLoading(true)
-    api.getLocalizations()
+    api.adminGetLocalizations()
       .then(rows => setItems(rows))
       .catch(() => {})
       .finally(() => setLoading(false))
@@ -1693,12 +1696,12 @@ function LocalizationsTab() {
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase()
     if (!q) return items
-    return items.filter(i => i.key.includes(q) || i.en.toLowerCase().includes(q) || i.tr.toLowerCase().includes(q) || i.ru.toLowerCase().includes(q))
+    return items.filter(i => i.key.includes(q) || i.en.toLowerCase().includes(q) || i.tr.toLowerCase().includes(q) || i.ru.toLowerCase().includes(q) || i.es.toLowerCase().includes(q) || i.pt.toLowerCase().includes(q) || i.de.toLowerCase().includes(q))
   }, [items, search])
 
   function startEdit(item: LocalizationItem) {
     setEditKey(item.key)
-    setEditDraft({ en: item.en, tr: item.tr, ru: item.ru })
+    setEditDraft({ en: item.en, tr: item.tr, ru: item.ru, es: item.es, pt: item.pt, de: item.de })
   }
 
   async function saveEdit() {
@@ -1717,12 +1720,12 @@ function LocalizationsTab() {
     if (!newKey.trim()) { setAddError('Key is required'); return }
     setSaving(true)
     try {
-      const created = await api.upsertLocalization(newKey.trim(), { en: newEn, tr: newTr, ru: newRu })
+      const created = await api.upsertLocalization(newKey.trim(), { en: newEn, tr: newTr, ru: newRu, es: newEs, pt: newPt, de: newDe })
       setItems(prev => {
         const exists = prev.some(i => i.key === created.key)
         return exists ? prev.map(i => i.key === created.key ? created : i) : [...prev, created]
       })
-      setNewKey(''); setNewEn(''); setNewTr(''); setNewRu('')
+      setNewKey(''); setNewEn(''); setNewTr(''); setNewRu(''); setNewEs(''); setNewPt(''); setNewDe('')
     } catch (e: unknown) {
       setAddError(e instanceof Error ? e.message : 'Failed to save')
     }
@@ -1745,7 +1748,7 @@ function LocalizationsTab() {
       <div className="flex items-center justify-between gap-4">
         <div>
           <p className="text-white font-semibold">Localizations</p>
-          <p className="text-xs text-gray-500">{items.length} keys · EN / TR / RU</p>
+          <p className="text-xs text-gray-500">{items.length} keys · EN / TR / RU / ES / PT / DE</p>
         </div>
         <input
           value={search}
@@ -1759,11 +1762,14 @@ function LocalizationsTab() {
       <div className="border border-gray-800 rounded-2xl p-4 space-y-2">
         <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Add / overwrite key</p>
         {addError && <p className="text-xs text-red-400">{addError}</p>}
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-7 gap-2">
           <input value={newKey} onChange={e => setNewKey(e.target.value)} placeholder="key" className={inputCls} />
           <input value={newEn} onChange={e => setNewEn(e.target.value)} placeholder="EN" className={inputCls} />
           <input value={newTr} onChange={e => setNewTr(e.target.value)} placeholder="TR" className={inputCls} />
           <input value={newRu} onChange={e => setNewRu(e.target.value)} placeholder="RU" className={inputCls} />
+          <input value={newEs} onChange={e => setNewEs(e.target.value)} placeholder="ES" className={inputCls} />
+          <input value={newPt} onChange={e => setNewPt(e.target.value)} placeholder="PT" className={inputCls} />
+          <input value={newDe} onChange={e => setNewDe(e.target.value)} placeholder="DE" className={inputCls} />
         </div>
         <button onClick={() => void handleAdd()} disabled={saving} className="rounded-xl bg-indigo-600 px-4 py-1.5 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50">
           {saving ? 'Saving…' : 'Add key'}
@@ -1781,6 +1787,9 @@ function LocalizationsTab() {
                 <th className="px-3 py-2 text-xs font-medium text-gray-500 uppercase">EN</th>
                 <th className="px-3 py-2 text-xs font-medium text-gray-500 uppercase">TR</th>
                 <th className="px-3 py-2 text-xs font-medium text-gray-500 uppercase">RU</th>
+                <th className="px-3 py-2 text-xs font-medium text-gray-500 uppercase">ES</th>
+                <th className="px-3 py-2 text-xs font-medium text-gray-500 uppercase">PT</th>
+                <th className="px-3 py-2 text-xs font-medium text-gray-500 uppercase">DE</th>
                 <th className="px-3 py-2 text-xs font-medium text-gray-500 uppercase w-24"></th>
               </tr>
             </thead>
@@ -1793,6 +1802,9 @@ function LocalizationsTab() {
                       <td className={cellCls}><input value={editDraft.en} onChange={e => setEditDraft(d => ({ ...d, en: e.target.value }))} className={inputCls} /></td>
                       <td className={cellCls}><input value={editDraft.tr} onChange={e => setEditDraft(d => ({ ...d, tr: e.target.value }))} className={inputCls} /></td>
                       <td className={cellCls}><input value={editDraft.ru} onChange={e => setEditDraft(d => ({ ...d, ru: e.target.value }))} className={inputCls} /></td>
+                      <td className={cellCls}><input value={editDraft.es} onChange={e => setEditDraft(d => ({ ...d, es: e.target.value }))} className={inputCls} /></td>
+                      <td className={cellCls}><input value={editDraft.pt} onChange={e => setEditDraft(d => ({ ...d, pt: e.target.value }))} className={inputCls} /></td>
+                      <td className={cellCls}><input value={editDraft.de} onChange={e => setEditDraft(d => ({ ...d, de: e.target.value }))} className={inputCls} /></td>
                       <td className={cellCls}>
                         <button onClick={() => void saveEdit()} disabled={saving} className="text-xs text-indigo-400 hover:text-indigo-300 mr-2 disabled:opacity-50">Save</button>
                         <button onClick={() => setEditKey(null)} className="text-xs text-gray-500 hover:text-gray-300">Cancel</button>
@@ -1803,6 +1815,9 @@ function LocalizationsTab() {
                       <td className={cellCls}>{item.en}</td>
                       <td className={cellCls}>{item.tr}</td>
                       <td className={cellCls}>{item.ru}</td>
+                      <td className={cellCls}>{item.es}</td>
+                      <td className={cellCls}>{item.pt}</td>
+                      <td className={cellCls}>{item.de}</td>
                       <td className={cellCls}>
                         <button onClick={() => startEdit(item)} className="text-xs text-gray-400 hover:text-white mr-2">Edit</button>
                         <button onClick={() => void handleDelete(item.key)} className="text-xs text-red-500 hover:text-red-400">Del</button>

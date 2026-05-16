@@ -99,7 +99,7 @@ interface AppSettings {
   lastPlaylistId: number | null
   lastSongId: number | null
   preferredSource: 'youtube' | 'apple_music'
-  uiLanguage: 'en' | 'tr' | 'ru'
+  uiLanguage: 'en' | 'tr' | 'ru' | 'es' | 'pt' | 'de'
 }
 
 const DEFAULT_SETTINGS: AppSettings = {
@@ -876,13 +876,16 @@ function SongBrowser({
             )}
             <select
               value={language}
-              onChange={e => setLanguage(e.target.value as 'en' | 'tr' | 'ru')}
+              onChange={e => setLanguage(e.target.value as 'en' | 'tr' | 'ru' | 'es' | 'pt' | 'de')}
               className="text-xs rounded-lg border border-gray-700/70 bg-gray-800/70 px-2 py-1 text-gray-300 focus:outline-none focus:border-gray-500 cursor-pointer"
               aria-label="UI language"
             >
               <option value="en">EN</option>
               <option value="tr">TR</option>
               <option value="ru">RU</option>
+              <option value="es">ES</option>
+              <option value="pt">PT</option>
+              <option value="de">DE</option>
             </select>
             <button
               type="button"
@@ -1235,10 +1238,13 @@ function SettingRow({
 function LanguagePicker() {
   const { language, setLanguage } = useLocalization()
   const t = useT()
-  const langs: { code: 'en' | 'tr' | 'ru'; label: string }[] = [
+  const langs: { code: 'en' | 'tr' | 'ru' | 'es' | 'pt' | 'de'; label: string }[] = [
     { code: 'en', label: 'English' },
     { code: 'tr', label: 'Türkçe' },
     { code: 'ru', label: 'Русский' },
+    { code: 'es', label: 'Español' },
+    { code: 'pt', label: 'Português' },
+    { code: 'de', label: 'Deutsch' },
   ]
   return (
     <div className="rounded-2xl border border-gray-800/80 p-4" style={{ background: '#12121f' }}>

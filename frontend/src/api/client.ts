@@ -137,6 +137,9 @@ export interface LocalizationItem {
   en: string
   tr: string
   ru: string
+  es: string
+  pt: string
+  de: string
 }
 
 export interface ReportCreate {
@@ -642,14 +645,17 @@ export const api = {
   getLocalizations: (): Promise<LocalizationItem[]> =>
     apiFetch('/localizations'),
 
-  upsertLocalization: (key: string, body: { en: string; tr: string; ru: string }): Promise<LocalizationItem> =>
+  adminGetLocalizations: (): Promise<LocalizationItem[]> =>
+    apiFetch('/admin/localizations', { headers: getAdminHeaders() }),
+
+  upsertLocalization: (key: string, body: { en: string; tr: string; ru: string; es: string; pt: string; de: string }): Promise<LocalizationItem> =>
     apiFetch(`/admin/localizations?key=${encodeURIComponent(key)}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...getAdminHeaders() },
       body: JSON.stringify(body),
     }),
 
-  updateLocalization: (key: string, body: { en: string; tr: string; ru: string }): Promise<LocalizationItem> =>
+  updateLocalization: (key: string, body: { en: string; tr: string; ru: string; es: string; pt: string; de: string }): Promise<LocalizationItem> =>
     apiFetch(`/admin/localizations/${encodeURIComponent(key)}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', ...getAdminHeaders() },

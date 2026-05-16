@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { api, LocalizationItem } from '../api/client'
 
-export type UILanguage = 'en' | 'tr' | 'ru'
+export type UILanguage = 'en' | 'tr' | 'ru' | 'es' | 'pt' | 'de'
 
 const LANG_STORAGE_KEY = 'flowup.uiLanguage'
 const LOC_CACHE_KEY = 'flowup.localizations'
@@ -10,13 +10,16 @@ function detectBrowserLang(): UILanguage {
   const primary = (navigator.language ?? '').split('-')[0].toLowerCase()
   if (primary === 'tr') return 'tr'
   if (primary === 'ru') return 'ru'
+  if (primary === 'es') return 'es'
+  if (primary === 'pt') return 'pt'
+  if (primary === 'de') return 'de'
   return 'en'
 }
 
 function readStoredLang(): UILanguage {
   try {
     const v = localStorage.getItem(LANG_STORAGE_KEY)
-    if (v === 'en' || v === 'tr' || v === 'ru') return v
+    if (v === 'en' || v === 'tr' || v === 'ru' || v === 'es' || v === 'pt' || v === 'de') return v
   } catch {}
   return detectBrowserLang()
 }

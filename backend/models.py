@@ -435,6 +435,9 @@ class LocalizationItem(BaseModel):
     en: str = ''
     tr: str = ''
     ru: str = ''
+    es: str = ''
+    pt: str = ''
+    de: str = ''
 
     model_config = {"from_attributes": True}
 
@@ -444,6 +447,9 @@ class LocalizationUpsert(BaseModel):
     en: str = ''
     tr: str = ''
     ru: str = ''
+    es: str = ''
+    pt: str = ''
+    de: str = ''
 
 
 # ── Report models ──────────────────────────────────────────────────────────────

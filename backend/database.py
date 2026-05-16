@@ -267,6 +267,9 @@ class Localization(Base):
     en  = Column(Text, nullable=False, default='')
     tr  = Column(Text, nullable=False, default='')
     ru  = Column(Text, nullable=False, default='')
+    es  = Column(Text, nullable=False, default='')
+    pt  = Column(Text, nullable=False, default='')
+    de  = Column(Text, nullable=False, default='')
 
 
 class Report(Base):
