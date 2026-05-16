@@ -220,7 +220,7 @@ _loc_lock = threading.Lock()
 
 def _load_loc_cache(db: Session) -> dict[str, dict]:
     rows = db.query(Localization).all()
-    return {row.key: {"key": row.key, "en": row.en, "tr": row.tr, "ru": row.ru} for row in rows}
+    return {row.key: {"key": row.key, "en": row.en, "tr": row.tr, "ru": row.ru, "es": row.es, "pt": row.pt, "de": row.de} for row in rows}
 
 
 def _invalidate_loc_cache() -> None:
