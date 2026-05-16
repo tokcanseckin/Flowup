@@ -863,7 +863,14 @@ function SongBrowser({
                 </svg>
               </button>
             )}
-            <img src={singolingLogo} className="h-7 object-contain" alt="SingoLing" />
+            <button
+              type="button"
+              onClick={() => onSelectPlaylist(null)}
+              className="hover:opacity-70 transition-opacity"
+              aria-label="Go to browse"
+            >
+              <img src={singolingLogo} className="h-7 object-contain" alt="SingoLing" />
+            </button>
           </div>
           <div className="flex items-center gap-3">
             {isAdmin && (
@@ -1733,7 +1740,7 @@ function useAlbumLyricsTheme(albumArtUrl: string | null): [{ panelGradient: stri
 // ── Player view ────────────────────────────────────────────────────────────────
 
 function PlayerView({
-  song, user, onBack, onLogout, onOpenSettings, onOpenAdmin, onOpenAccount, isAdmin, onPrev, onNext, canPrev, canNext, settings, onUpdate, storedMusicUserToken, onMusicUserToken, favoriteSongIds, toggleFavorite, targetLang, onTargetLangChange,
+  song, user, onBack, onLogout, onOpenSettings, onOpenAdmin, onOpenAccount, isAdmin, onPrev, onNext, canPrev, canNext, settings, onUpdate, storedMusicUserToken, onMusicUserToken, favoriteSongIds, toggleFavorite, targetLang, onTargetLangChange, onGoToBrowse, playlistName, onGoToPlaylist,
 }: {
   song: SongDetail
   user: { display_name: string | null; email: string | null } | null
@@ -1755,6 +1762,9 @@ function PlayerView({
   toggleFavorite: (id: number) => void
   targetLang?: string
   onTargetLangChange?: (lang: string) => void
+  onGoToBrowse: () => void
+  playlistName?: string | null
+  onGoToPlaylist?: () => void
 }) {
   const [infoVisible, setInfoVisible] = useState(false)
   const [playerMenuOpen, setPlayerMenuOpen] = useState(false)
@@ -1997,7 +2007,26 @@ function PlayerView({
               <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
             </svg>
           </button>
-          <img src={singolingLogo} className="h-7 object-contain" alt="SingoLing" />
+          <button
+            type="button"
+            onClick={onGoToBrowse}
+            className="hover:opacity-70 transition-opacity shrink-0"
+            aria-label="Go to browse"
+          >
+            <img src={singolingLogo} className="h-7 object-contain" alt="SingoLing" />
+          </button>
+          {playlistName && (
+            <>
+              <span className="text-zinc-600 text-sm select-none">/</span>
+              <button
+                type="button"
+                onClick={onGoToPlaylist}
+                className="text-sm text-zinc-400 hover:text-white transition-colors truncate max-w-[180px]"
+              >
+                {playlistName}
+              </button>
+            </>
+          )}
         </div>
         <div className="flex items-center gap-3">
           {isAdmin && (
@@ -2390,6 +2419,7 @@ export default function App() {
   }, [])
 
   const appUser = credentialUser ? { display_name: credentialUser.display_name, email: credentialUser.email } : null
+  const tc = useContentT()
 
   const settingsOwnerSpotifyId = credentialUser?.spotify_id ?? null
   const isAuthenticated = !!credentialUser
@@ -2922,6 +2952,9 @@ export default function App() {
           toggleFavorite={toggleFavorite}
           targetLang={effectiveTargetLang}
           onTargetLangChange={(lang) => setOverrideTargetLang(lang)}
+          onGoToBrowse={() => navigateToPath('/browse')}
+          playlistName={activePlaylist ? tc(activePlaylist.name) : null}
+          onGoToPlaylist={activePlaylistId !== null ? () => navigateToPath(playlistPath(activePlaylistId)) : undefined}
         />
         <HelpButton />
       </>
