@@ -101,12 +101,30 @@ db.close()
 
 ## Step 4 — Fill line translations
 
-Uses DeepL. Requires `DEEPL_API_KEY`.
+Uses **Argos Translate** (offline, no API key needed). DeepL is tried first if
+`DEEPL_API_KEY` is set, but Argos is the standard backend for this project.
+
+Ensure the model for the pair is installed before running:
 
 ```bash
-export DEEPL_API_KEY="..."
-python3 pipeline/fill_line_translations.py --src src --tgt tgt --dry-run 2>&1 | head -30
-python3 pipeline/fill_line_translations.py --src src --tgt tgt 2>&1 | tee /tmp/fill_lines_src_tgt.log
+python3 -c "
+import argostranslate.package, argostranslate.translate
+avail = argostranslate.translate.get_installed_languages()
+src_l = next((l for l in avail if l.code == 'src'), None)
+tgt_l = next((l for l in avail if l.code == 'tgt'), None)
+if src_l and tgt_l and src_l.get_translation(tgt_l):
+    print('Model ready.')
+else:
+    print('Model NOT installed — run with ARGOS_AUTO_INSTALL=1')
+"
+```
+
+If the model is missing, the fill script auto-installs it with
+`ARGOS_AUTO_INSTALL=1`:
+
+```bash
+ARGOS_AUTO_INSTALL=1 python3 pipeline/fill_line_translations.py --src src --tgt tgt --dry-run 2>&1 | head -30
+ARGOS_AUTO_INSTALL=1 python3 pipeline/fill_line_translations.py --src src --tgt tgt 2>&1 | tee /tmp/fill_lines_src_tgt.log
 ```
 
 This also updates `song.target_langs` for each song it processes.

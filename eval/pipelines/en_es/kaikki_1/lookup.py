@@ -188,8 +188,8 @@ class Lookup:
     en→es lookup combining spaCy in-context lemmatization with the kaikki DB.
     """
 
-    def __init__(self, src: str, tgt: str) -> None:
-        db_path = _find_db()
+    def __init__(self, src: str, tgt: str, db_path: Path | None = None) -> None:
+        db_path = db_path if db_path is not None else _find_db()
         self._conn = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
         self._conn.row_factory = sqlite3.Row
 

@@ -98,6 +98,16 @@ PAIR_REGISTRY: dict[tuple[str, str], dict[str, Any]] = {
             "eval/pipelines/en_ru/kaikki_1/data/en_ru.db",
         ],
     },
+    # ── English → Spanish (kaikki_1) ──────────────────────────────────────────
+    # Uses the eval pipeline's Lookup directly: overrides (365 entries) +
+    # spaCy lemmatization + contraction expansion + kaikki DB.
+    ("en", "es"): {
+        "backend": "en_es",
+        "db_candidates": [
+            "backend/dictionaries/en_es/en_es.db",
+            "eval/pipelines/en_es/kaikki_1/data/en_es.db",
+        ],
+    },
     # ── Russian → English (kaikki) ── stub: build ru_en.db first ─────────────
     # ("ru", "en"): {
     #     "backend": "kaikki",
@@ -329,10 +339,57 @@ def fill_kaikki(
     )
 
 
+# ── Backend: en_es (spaCy + overrides + kaikki DB) ───────────────────────────
+
+def fill_en_es(
+    session: Session,
+    src_lang: str,
+    tgt_lang: str,
+    config: dict[str, Any],
+    song_id: int | None,
+    overwrite: bool,
+    dry_run: bool,
+    db_path_override: str | None = None,
+    min_id: int | None = None,
+    max_id: int | None = None,
+) -> None:
+    """
+    English → Spanish fill using the eval pipeline's Lookup directly.
+
+    This is intentionally NOT the generic nlp.kaikki.Lookup: the en-es eval
+    Lookup brings 365-entry overrides for function words, spaCy lemmatization,
+    and contraction expansion — all of which improve coverage over a bare DB
+    query on word.lemma.
+    """
+    db_path = _resolve_kaikki_db(config, db_path_override)
+    if db_path is None:
+        candidates = "\n".join(f"  {REPO_ROOT / r}" for r in config.get("db_candidates", []))
+        sys.exit(
+            f"en_es DB not found.\nExpected at:\n{candidates}\n"
+            "Build it first: python -m eval.pipelines.en_es.kaikki_1.build_db"
+        )
+
+    # Import the eval-pipeline Lookup (overrides + spaCy + kaikki DB).
+    from eval.pipelines.en_es.kaikki_1.lookup import Lookup  # type: ignore[import]
+
+    _log(f"Backend: en_es | DB: {db_path}")
+    lookup = Lookup(src_lang, tgt_lang, db_path=db_path)
+    _log("  Lookup ready (spaCy + overrides + kaikki DB).")
+
+    _run_fill_loop(
+        session, src_lang, tgt_lang, song_id, overwrite, dry_run,
+        lookup_fn=lookup.lookup,
+        close_fn=lookup.close,
+        min_id=min_id,
+        max_id=max_id,
+    )
+
+
 # ── Backend dispatch ──────────────────────────────────────────────────────────
 
 _BACKENDS = {
     "kaikki": fill_kaikki,
+    "en_es":  fill_en_es,
     # "wiktionary": fill_wiktionary,  # add here when implemented
 }
 
