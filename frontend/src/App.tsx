@@ -1074,7 +1074,7 @@ function SongBrowser({
               <section className="mb-10">
                 <h2 className="text-xl font-bold text-white mb-1">{t('browse.speakTitle')}</h2>
                 <p className="text-sm text-gray-500 mb-5">{t('browse.speakSubtitle')}</p>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-w-2xl">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   {nativeLangs.map(code => {
                     const selected = nativeLang === code
                     return (
