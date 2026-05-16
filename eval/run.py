@@ -24,11 +24,13 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import csv
 import importlib
 import json
 import random
 import urllib.request
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Optional
 
 
@@ -244,6 +246,28 @@ def print_report(report: EvalReport) -> None:
     print(_SEP)
 
 
+def write_csv(report: EvalReport, path: Path) -> None:
+    """Write per-word lookup results to a CSV file (mirrors song12_lookup.csv format).
+
+    Each (display_form, lemma) pair is written only once; duplicates from
+    repeated chorus lines are skipped.
+    """
+    seen: set[tuple[str, str]] = set()
+    with path.open("w", newline="", encoding="utf-8") as fh:
+        writer = csv.writer(fh)
+        writer.writerow(["display_form", "lemma", "hit", "translations"])
+        for line in report.lines:
+            for w in line.words:
+                key = (w.display_form, w.lemma)
+                if key in seen:
+                    continue
+                seen.add(key)
+                hit = 1 if w.tr_definitions else 0
+                translations = "; ".join(w.tr_definitions) if w.tr_definitions else ""
+                writer.writerow([w.display_form, w.lemma, hit, translations])
+    print(f"CSV written → {path}")
+
+
 # ──────────────────────────────────────────────────────────────────────────────
 # Entry point
 # ──────────────────────────────────────────────────────────────────────────────
@@ -256,10 +280,13 @@ def main() -> None:
     parser.add_argument("--tgt", default="tr", help="Target language code (default: tr)")
     parser.add_argument("--song-id", type=int, default=None, help="Specific song ID (default: random)")
     parser.add_argument("-n", type=int, default=10, help="Number of lines to sample (default: 10)")
+    parser.add_argument("--csv", metavar="PATH", default=None, help="Write per-word CSV to this path")
     args = parser.parse_args()
 
     report = evaluate(args.api, args.src, args.tgt, args.n, args.song_id, args.pipeline)
     print_report(report)
+    if args.csv:
+        write_csv(report, Path(args.csv))
 
 
 if __name__ == "__main__":
