@@ -42,13 +42,14 @@ export default function HelpButton() {
         />
       )}
 
-      {/* Popover — above backdrop */}
-      {open && (
-        <div
-          className="fixed right-6 z-[9991] w-80 rounded-2xl border border-zinc-700/60 bg-zinc-900 shadow-2xl shadow-black/60 p-5 flex flex-col gap-4"
-          style={{ bottom: '4.5rem' }}
-          onClick={e => e.stopPropagation()}
-        >
+      {/* Popover — above backdrop; always in DOM so CSS transition works */}
+      <div
+        className={`fixed right-6 z-[9991] w-80 rounded-2xl border border-zinc-700/60 bg-zinc-900 shadow-2xl shadow-black/60 p-5 flex flex-col gap-4 transition-all duration-200 ease-out origin-bottom-right ${
+          open ? 'opacity-100 scale-100 pointer-events-auto' : 'opacity-0 scale-95 pointer-events-none'
+        }`}
+        style={{ bottom: '5.5rem' }}
+        onClick={e => e.stopPropagation()}
+      >
           {status === 'done' ? (
             <div className="flex flex-col items-center gap-3 py-3 text-center">
               <div className="w-11 h-11 rounded-full bg-green-500/15 flex items-center justify-center">
@@ -117,24 +118,24 @@ export default function HelpButton() {
               </div>
             </>
           )}
-        </div>
-      )}
+      </div>
 
       {/* Trigger button — highest z so it's always clickable */}
       <button
         onClick={open ? handleDismiss : handleOpen}
         aria-label="Help"
-        className="fixed bottom-6 right-6 z-[9992] w-12 h-12 rounded-full bg-white hover:bg-gray-50 shadow-lg shadow-black/30 flex items-center justify-center transition-all duration-200 hover:scale-105"
+        className="fixed bottom-6 right-6 z-[9992] w-14 h-14 rounded-full shadow-lg shadow-black/40 flex items-center justify-center transition-all duration-200 hover:scale-105"
+        style={{ backgroundColor: 'rgb(0, 109, 54)' }}
       >
-        {/* Speech bubble icon in indigo-600 */}
-        <svg viewBox="0 0 24 24" className="w-6 h-6" fill="none">
+        {/* Speech bubble icon in white */}
+        <svg viewBox="0 0 24 24" className="w-8 h-8" fill="none">
           <path
             d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
-            fill="#4f46e5"
+            fill="white"
           />
-          <circle cx="9" cy="10" r="1" fill="white" />
-          <circle cx="12" cy="10" r="1" fill="white" />
-          <circle cx="15" cy="10" r="1" fill="white" />
+          <circle cx="9" cy="10" r="1.2" fill="rgb(0, 109, 54)" />
+          <circle cx="12" cy="10" r="1.2" fill="rgb(0, 109, 54)" />
+          <circle cx="15" cy="10" r="1.2" fill="rgb(0, 109, 54)" />
         </svg>
       </button>
     </>
