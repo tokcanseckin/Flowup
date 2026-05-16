@@ -863,14 +863,7 @@ function SongBrowser({
                 </svg>
               </button>
             )}
-            <button
-              type="button"
-              onClick={() => onSelectPlaylist(null)}
-              className="hover:opacity-70 transition-opacity"
-              aria-label="Go to browse"
-            >
-              <img src={singolingLogo} className="h-7 object-contain" alt="SingoLing" />
-            </button>
+            <img src={singolingLogo} className="h-7 object-contain" alt="SingoLing" />
           </div>
           <div className="flex items-center gap-3">
             {isAdmin && (
@@ -2010,7 +2003,7 @@ function PlayerView({
           <button
             type="button"
             onClick={onGoToBrowse}
-            className="hover:opacity-70 transition-opacity shrink-0"
+            className="hover:opacity-70 shrink-0"
             aria-label="Go to browse"
           >
             <img src={singolingLogo} className="h-7 object-contain" alt="SingoLing" />
