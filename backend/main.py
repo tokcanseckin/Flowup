@@ -462,6 +462,7 @@ _INITIAL_LOCALIZATIONS: list[dict] = [
     {"key": "grammar.Proper_Noun",      "en": "Proper Noun",       "tr": "Özel İsim",         "ru": "Имя собственное"},
     {"key": "grammar.Auxiliary_Verb",   "en": "Auxiliary Verb",    "tr": "Yardımcı Fiil",     "ru": "Вспомогательный глагол"},
     {"key": "grammar.Gerund",           "en": "Gerund",            "tr": "Ulaç",              "ru": "Деепричастие"},
+    {"key": "grammar.Comparative",      "en": "Comparative",       "tr": "Karşılaştırmalı",   "ru": "Сравнительная степень"},
     {"key": "grammar.Adj_short",        "en": "Adj (short)",       "tr": "Kısa sıfat",        "ru": "Краткое прилагательное"},
     {"key": "grammar.Participle_short", "en": "Participle (short)","tr": "Kısa sıfat-fiil",   "ru": "Краткое причастие"},
     {"key": "grammar.Verb_infinitive",  "en": "Infinitive",        "tr": "Mastar",            "ru": "Инфинитив"},
