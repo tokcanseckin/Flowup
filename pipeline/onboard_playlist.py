@@ -304,6 +304,21 @@ def import_songs(
             succeeded += 1
             continue
 
+        # ── Pre-fetch YouTube URL so generate_song_data.py can run stable-ts
+        #    forced alignment when LRCLIB only has plain (unsynced) lyrics.
+        youtube_url = ""
+        if artist:
+            try:
+                from .fill_youtube_urls import search_youtube  # noqa: PLC0415
+                _log("  [YouTube] Pre-fetching URL for stable-ts fallback …")
+                youtube_url, _ = search_youtube(title, artist)
+                if youtube_url:
+                    _log(f"  [YouTube] Found: {youtube_url}")
+                else:
+                    _log("  [YouTube] No match — stable-ts unavailable if LRCLIB has plain lyrics only")
+            except Exception as exc:
+                _log(f"  [YouTube] Pre-fetch failed ({exc}) — skipping")
+
         cmd = [
             sys.executable,
             str(PIPELINE_DIR / "generate_song_data.py"),
@@ -316,6 +331,8 @@ def import_songs(
         ]
         if target_lang:
             cmd += ["--target-lang", target_lang]
+        if youtube_url:
+            cmd += ["--youtube-url", youtube_url]
         t0 = time.perf_counter()
         result = subprocess.run(cmd, cwd=str(PIPELINE_DIR))
         elapsed = time.perf_counter() - t0
