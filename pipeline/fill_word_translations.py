@@ -58,6 +58,7 @@ if str(PIPELINE_DIR) not in sys.path:
 # Import backend models (requires DATABASE_URL env var)
 from backend.database import SessionLocal, Song, Line, Word, WordDefinition  # type: ignore
 from sqlalchemy.orm import Session
+from sqlalchemy.dialects.postgresql import insert as pg_insert
 
 # ── Pair registry ─────────────────────────────────────────────────────────────
 #
@@ -155,6 +156,18 @@ def _get_existing(session: Session, word_id: int, target_lang: str) -> WordDefin
     )
 
 
+def _existing_word_ids_for_song(session: Session, song_id: int, target_lang: str) -> set[int]:
+    """Bulk-fetch all word_ids that already have a definition for target_lang in this song."""
+    rows = (
+        session.query(WordDefinition.word_id)
+        .join(Word, WordDefinition.word_id == Word.id)
+        .join(Line, Word.line_id == Line.id)
+        .filter(Line.song_id == song_id, WordDefinition.target_lang == target_lang)
+        .all()
+    )
+    return {r[0] for r in rows}
+
+
 def _upsert_definition(
     session: Session,
     word_id: int,
@@ -218,24 +231,36 @@ def _run_fill_loop(
         words = _words_for_song(session, song.id)
         hit = miss = skipped = 0
 
+        # One bulk SELECT to find already-filled words for this song
+        existing_ids = _existing_word_ids_for_song(session, song.id, tgt_lang) if not overwrite else set()
+
+        to_insert: list[dict] = []  # rows to batch-insert
+
         for word in words:
-            if not overwrite and _get_existing(session, word.id, tgt_lang):
+            if word.id in existing_ids:
                 skipped += 1
                 continue
 
             results = lookup_fn(word.lemma)
             if not results:
-                if not dry_run:
-                    _upsert_definition(session, word.id, tgt_lang, "", overwrite=True, dry_run=False)
                 miss += 1
+                to_insert.append({"word_id": word.id, "target_lang": tgt_lang, "definition": ""})
                 continue
 
             definition = json.dumps(results, ensure_ascii=False)
-            action = _upsert_definition(session, word.id, tgt_lang, definition, overwrite, dry_run)
-            if action != "skipped":
-                hit += 1
+            hit += 1
+            to_insert.append({"word_id": word.id, "target_lang": tgt_lang, "definition": definition})
+
+        if not dry_run and to_insert:
+            stmt = pg_insert(WordDefinition.__table__).values(to_insert)
+            if overwrite:
+                stmt = stmt.on_conflict_do_update(
+                    index_elements=["word_id", "target_lang"],
+                    set_={"definition": stmt.excluded.definition},
+                )
             else:
-                skipped += 1
+                stmt = stmt.on_conflict_do_nothing()
+            session.execute(stmt)
 
         if not dry_run:
             _sync_song_target_langs(session, song, dry_run)

@@ -53,6 +53,7 @@ sys.path.insert(0, str(REPO_ROOT))
 
 from backend.database import SessionLocal, LineTranslation, PlaylistSong, Song, Line  # type: ignore
 from sqlalchemy.orm import Session
+from sqlalchemy.dialects.postgresql import insert as pg_insert
 
 # ── DeepL / Argos (reuse logic from generate_song_data) ──────────────────────
 
@@ -251,6 +252,17 @@ def _existing_translation(session: Session, line_id: int, tgt_lang: str) -> Opti
     return session.query(LineTranslation).filter_by(line_id=line_id, target_lang=tgt_lang).first()
 
 
+def _existing_line_ids_for_song(session: Session, song_id: int, tgt_lang: str) -> set[int]:
+    """Bulk-fetch all line_ids that already have a translation for tgt_lang in this song."""
+    rows = (
+        session.query(LineTranslation.line_id)
+        .join(Line, LineTranslation.line_id == Line.id)
+        .filter(Line.song_id == song_id, LineTranslation.target_lang == tgt_lang)
+        .all()
+    )
+    return {r[0] for r in rows}
+
+
 def _update_song_target_langs(session: Session, song: Song, tgt_lang: str, dry_run: bool) -> bool:
     """Add tgt_lang to song.target_langs if not already present. Returns True if changed."""
     current: list[str] = json.loads(song.target_langs or "[]")
@@ -292,12 +304,14 @@ def fill_line_translations(
             _log("  No default lines found; skipping.")
             continue
 
+        # One bulk SELECT to find already-translated lines for this song
+        existing_ids = _existing_line_ids_for_song(session, song.id, tgt_lang) if not overwrite else set()
+
         # Determine which lines need translation
         to_translate: list[Line] = []
         skipped = 0
         for line in lines:
-            existing = _existing_translation(session, line.id, tgt_lang)
-            if existing and not overwrite:
+            if line.id in existing_ids:
                 skipped += 1
             else:
                 to_translate.append(line)
@@ -325,18 +339,26 @@ def fill_line_translations(
 
         # Write to DB
         inserted = updated = 0
-        for line, text in zip(to_translate, translated):
-            if dry_run:
-                _log(f"  [DRY] line {line.id}: {line.original_line[:40]!r} → {text[:40]!r}")
-                inserted += 1
-                continue
-            existing = _existing_translation(session, line.id, tgt_lang)
-            if existing:
-                existing.text = text
-                updated += 1
+        if not dry_run and translated:
+            rows = [
+                {"line_id": line.id, "target_lang": tgt_lang, "text": text}
+                for line, text in zip(to_translate, translated)
+            ]
+            stmt = pg_insert(LineTranslation.__table__).values(rows)
+            if overwrite:
+                stmt = stmt.on_conflict_do_update(
+                    index_elements=["line_id", "target_lang"],
+                    set_={"text": stmt.excluded.text},
+                )
+                updated = len(rows)
             else:
-                session.add(LineTranslation(line_id=line.id, target_lang=tgt_lang, text=text))
-                inserted += 1
+                stmt = stmt.on_conflict_do_nothing()
+                inserted = len(rows)
+            session.execute(stmt)
+        elif dry_run:
+            for line, text in zip(to_translate, translated):
+                _log(f"  [DRY] line {line.id}: {line.original_line[:40]!r} → {text[:40]!r}")
+            inserted = len(to_translate)
 
         if not dry_run:
             # Update target_langs on the song
