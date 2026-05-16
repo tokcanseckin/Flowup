@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react'
 import AdminPanel          from './components/AdminPanel'
+import HelpButton          from './components/HelpButton'
 import LyricsPlayer         from './components/LyricsPlayer'
 import ReportModal          from './components/ReportModal'
 import singolingLogo from '../images/singoling_logo@2x.png'
@@ -2899,54 +2900,60 @@ export default function App() {
 
   if (activeSong) {
     return (
-      <PlayerView
-        song={activeSong}
-        user={appUser}
-        onBack={() => navigateToPath(activePlaylistId !== null ? playlistPath(activePlaylistId) : '/browse')}
-        onLogout={handleLogout}
-        onOpenSettings={() => navigateToPath('/settings')}
-        onOpenAccount={() => navigateToPath('/settings/account')}
-        onOpenAdmin={() => navigateToPath(adminPath('songs', activeSong.id))}
-        isAdmin={isAdmin}
-        onPrev={handlePrevSong}
-        onNext={handleNextSong}
-        canPrev={activeSongIndex > 0}
-        canNext={activeSongIndex >= 0 && activeSongIndex < displayedSongs.length - 1}
-        settings={settings}
-        onUpdate={updateSettings}
-        storedMusicUserToken={credentialUser?.apple_music_user_token ?? null}
-        onMusicUserToken={handleMusicUserToken}
-        favoriteSongIds={favoriteSongIds}
-        toggleFavorite={toggleFavorite}
-        targetLang={effectiveTargetLang}
-        onTargetLangChange={(lang) => setOverrideTargetLang(lang)}
-      />
+      <>
+        <PlayerView
+          song={activeSong}
+          user={appUser}
+          onBack={() => navigateToPath(activePlaylistId !== null ? playlistPath(activePlaylistId) : '/browse')}
+          onLogout={handleLogout}
+          onOpenSettings={() => navigateToPath('/settings')}
+          onOpenAccount={() => navigateToPath('/settings/account')}
+          onOpenAdmin={() => navigateToPath(adminPath('songs', activeSong.id))}
+          isAdmin={isAdmin}
+          onPrev={handlePrevSong}
+          onNext={handleNextSong}
+          canPrev={activeSongIndex > 0}
+          canNext={activeSongIndex >= 0 && activeSongIndex < displayedSongs.length - 1}
+          settings={settings}
+          onUpdate={updateSettings}
+          storedMusicUserToken={credentialUser?.apple_music_user_token ?? null}
+          onMusicUserToken={handleMusicUserToken}
+          favoriteSongIds={favoriteSongIds}
+          toggleFavorite={toggleFavorite}
+          targetLang={effectiveTargetLang}
+          onTargetLangChange={(lang) => setOverrideTargetLang(lang)}
+        />
+        <HelpButton />
+      </>
     )
   }
 
   return (
-    <SongBrowser
-      songs={displayedSongs}
-      playlists={playlists}
-      activePlaylistId={activePlaylistId}
-      activePlaylist={activePlaylist}
-      loading={playlistsLoading || playlistDetailLoading}
-      error={songsError}
-      onSelect={handleSelectSong}
-      onPrefetch={handlePrefetchSong}
-      onSelectPlaylist={(id) => navigateToPath(id !== null ? playlistPath(id) : '/browse')}
-      onOpenAdmin={() => navigateToPath(activePlaylistId !== null ? adminPath('playlists', activePlaylistId) : '/admin')}
-      isAdmin={isAdmin}
-      onOpenSettings={() => navigateToPath('/settings')}
-      onOpenAccount={() => navigateToPath('/settings/account')}
-      onLogout={handleLogout}
-      user={appUser}
-      openedSongIds={listenedSongIds}
-      favoriteSongIds={favoriteSongIds}
-      toggleFavorite={toggleFavorite}
-      markAsNotListened={unmarkListened}
-      wordsLookedUpCount={playlistWordCount}
-      onBrowseTargetLang={handleBrowseTargetLang}
-    />
+    <>
+      <SongBrowser
+        songs={displayedSongs}
+        playlists={playlists}
+        activePlaylistId={activePlaylistId}
+        activePlaylist={activePlaylist}
+        loading={playlistsLoading || playlistDetailLoading}
+        error={songsError}
+        onSelect={handleSelectSong}
+        onPrefetch={handlePrefetchSong}
+        onSelectPlaylist={(id) => navigateToPath(id !== null ? playlistPath(id) : '/browse')}
+        onOpenAdmin={() => navigateToPath(activePlaylistId !== null ? adminPath('playlists', activePlaylistId) : '/admin')}
+        isAdmin={isAdmin}
+        onOpenSettings={() => navigateToPath('/settings')}
+        onOpenAccount={() => navigateToPath('/settings/account')}
+        onLogout={handleLogout}
+        user={appUser}
+        openedSongIds={listenedSongIds}
+        favoriteSongIds={favoriteSongIds}
+        toggleFavorite={toggleFavorite}
+        markAsNotListened={unmarkListened}
+        wordsLookedUpCount={playlistWordCount}
+        onBrowseTargetLang={handleBrowseTargetLang}
+      />
+      <HelpButton />
+    </>
   )
 }
