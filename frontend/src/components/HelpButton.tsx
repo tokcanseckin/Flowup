@@ -47,7 +47,7 @@ export default function HelpButton() {
         className={`fixed right-6 z-[9991] w-80 rounded-2xl border border-zinc-700/60 bg-zinc-900 shadow-2xl shadow-black/60 p-5 flex flex-col gap-4 transition-all duration-200 ease-out origin-bottom-right ${
           open ? 'opacity-100 scale-100 pointer-events-auto' : 'opacity-0 scale-95 pointer-events-none'
         }`}
-        style={{ bottom: '5.5rem' }}
+        style={{ bottom: '7rem' }}
         onClick={e => e.stopPropagation()}
       >
           {status === 'done' ? (
