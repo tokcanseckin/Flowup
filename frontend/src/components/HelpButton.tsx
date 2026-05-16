@@ -1,7 +1,9 @@
 import { useRef, useState } from 'react'
 import { api } from '../api/client'
+import { useT } from '../i18n/LocalizationContext'
 
 export default function HelpButton() {
+  const t = useT()
   const [open, setOpen] = useState(false)
   const [message, setMessage] = useState('')
   const [status, setStatus] = useState<'idle' | 'sending' | 'done' | 'error'>('idle')
@@ -58,28 +60,28 @@ export default function HelpButton() {
                 </svg>
               </div>
               <div>
-                <p className="text-white font-semibold text-sm mb-1">Message sent!</p>
-                <p className="text-zinc-400 text-xs leading-relaxed">Thanks for reaching out — we'll get back to you as soon as we can.</p>
+                <p className="text-white font-semibold text-sm mb-1">{t('help.messageSent')}</p>
+                <p className="text-zinc-400 text-xs leading-relaxed">{t('help.messageSentDesc')}</p>
               </div>
               <button
                 onClick={handleDismiss}
                 className="mt-1 px-5 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs transition-colors"
               >
-                Close
+                {t('help.close')}
               </button>
             </div>
           ) : (
             <>
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <p className="text-white font-semibold text-sm leading-snug">Need help?</p>
+                  <p className="text-white font-semibold text-sm leading-snug">{t('help.title')}</p>
                   <p className="text-zinc-400 text-xs leading-relaxed mt-1">
-                    Got a question or running into something? Send us a message and we'll get back to you.
+                    {t('help.description')}
                   </p>
                 </div>
                 <button
                   onClick={handleDismiss}
-                  aria-label="Dismiss"
+                  aria-label={t('help.dismiss')}
                   className="shrink-0 text-zinc-600 hover:text-zinc-400 transition-colors mt-0.5"
                 >
                   <svg viewBox="0 0 24 24" className="w-4 h-4 fill-none stroke-current" strokeWidth="2" strokeLinecap="round">
@@ -93,12 +95,12 @@ export default function HelpButton() {
                 value={message}
                 onChange={e => setMessage(e.target.value)}
                 rows={4}
-                placeholder="Describe your question or issue…"
+                placeholder={t('help.placeholder')}
                 className="w-full rounded-xl border border-zinc-700 bg-zinc-800 px-3 py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-zinc-500 resize-none transition-colors"
               />
 
               {status === 'error' && (
-                <p className="text-red-400 text-xs -mt-2">Something went wrong — please try again.</p>
+                <p className="text-red-400 text-xs -mt-2">{t('help.error')}</p>
               )}
 
               <div className="flex gap-2">
@@ -106,7 +108,7 @@ export default function HelpButton() {
                   onClick={handleDismiss}
                   className="flex-1 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-sm transition-colors"
                 >
-                  Dismiss
+                  {t('help.dismiss')}
                 </button>
                 <button
                   onClick={handleSend}
@@ -114,7 +116,7 @@ export default function HelpButton() {
                   className="flex-1 py-2 rounded-xl text-white text-sm font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                   style={{ backgroundColor: 'rgb(0, 109, 54)' }}
                 >
-                  {status === 'sending' ? 'Sending…' : 'Send'}
+                  {status === 'sending' ? t('help.sending') : t('help.send')}
                 </button>
               </div>
             </>
