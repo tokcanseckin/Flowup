@@ -5,6 +5,8 @@ export type UILanguage = 'en' | 'tr' | 'ru' | 'es' | 'pt' | 'de'
 
 const LANG_STORAGE_KEY = 'flowup.uiLanguage'
 const LOC_CACHE_KEY = 'flowup.localizations'
+const LOC_CACHE_VERSION = 'v2' // bump when LocalizationItem schema changes
+const LOC_CACHE_VERSION_KEY = 'flowup.localizations.version'
 
 function detectBrowserLang(): UILanguage {
   const primary = (navigator.language ?? '').split('-')[0].toLowerCase()
@@ -26,6 +28,8 @@ function readStoredLang(): UILanguage {
 
 function readCachedLocalizations(): Record<string, LocalizationItem> {
   try {
+    const version = localStorage.getItem(LOC_CACHE_VERSION_KEY)
+    if (version !== LOC_CACHE_VERSION) return {}
     const raw = localStorage.getItem(LOC_CACHE_KEY)
     if (raw) return JSON.parse(raw) as Record<string, LocalizationItem>
   } catch {}
@@ -70,7 +74,10 @@ export function LocalizationProvider({ children }: Props) {
         const map: Record<string, LocalizationItem> = {}
         for (const item of items) map[item.key] = item
         setLocalizations(map)
-        try { localStorage.setItem(LOC_CACHE_KEY, JSON.stringify(map)) } catch {}
+        try {
+          localStorage.setItem(LOC_CACHE_VERSION_KEY, LOC_CACHE_VERSION)
+          localStorage.setItem(LOC_CACHE_KEY, JSON.stringify(map))
+        } catch {}
       })
       .catch(err => console.warn('[i18n] Failed to load localizations:', err))
       .finally(() => setIsLoading(false))
