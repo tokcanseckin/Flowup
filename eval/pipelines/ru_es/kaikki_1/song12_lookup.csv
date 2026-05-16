@@ -12,7 +12,7 @@ display_form,lemma,hit,translations
 ста́рый,ста́рый,1,viejo
 оте́ль,оте́ль,1,hotel
 И,и,1,y
-пу́сть,пу́сть,1,no obstante; de todas formas; de todas maneras; pero bueno
+пу́сть,пу́сть,1,a pesar de; aunque
 меня́,я,1,yo
 никто́,никто́,1,nadie; ninguno
 не,не́,1,no; sino
@@ -22,7 +22,7 @@ display_form,lemma,hit,translations
 Вези́,везти́,1,transportar
 "экспре́сс,",экспре́сс,1,expreso; exprés
 вези́,везти́,1,transportar
-скоре́й,ско́рый,1,rápido; firmemente; profundamente; rápidamente
+скоре́й,ско́рый,1,rápido; célere; raudo; pronto
 Го́род,го́род,1,ciudad
 плывёт,плы́ть,1,nadar
 мо́ре,мо́ре,1,mar
@@ -36,7 +36,7 @@ display_form,lemma,hit,translations
 "оте́ль,",оте́ль,1,hotel
 две́ри,две́рь,1,puerta
 свои́,сво́й,1,su
-откро́й,откры́ть,1,abrir; descorrer; encender; prender
+откро́й,откры́ть,1,abrir
 по́лночь,по́лночь,1,medianoche
 укро́й,укры́ть,0,
 Hо,hо,0,

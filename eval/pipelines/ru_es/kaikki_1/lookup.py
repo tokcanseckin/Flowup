@@ -188,17 +188,34 @@ class Lookup:
         return result
 
     def _two_hop(self, key: str, src_pos: str | None = None) -> list[str]:
-        """ru→en→es: look up key in ru_en.db, then each EN word in en_es.db."""
+        """ru→en→es: look up key in ru_en.db, then each EN word in en_es.db.
+
+        When multiple EN intermediates are available, only ES words corroborated
+        by ≥2 of them are kept.  This suppresses polysemy bleed from English
+        words that have unrelated senses (e.g. "fast" → firmemente/profundamente
+        leaking into скорый).  Safe fallback: if corroboration would empty the
+        result, the full union is returned.
+        """
         en_words = self._hop_words("ru_en", key)
         if not en_words:
             return []
-        es_words: list[str] = []
-        seen: set[str] = set()
+
+        # Collect ES words per EN intermediate, preserving first-occurrence order.
+        order: list[str] = []
+        counts: dict[str, int] = {}
         for en in en_words:
             for es in self._hop_words("en_es", en.lower()):
-                if es not in seen:
-                    seen.add(es)
-                    es_words.append(es)
+                if es not in counts:
+                    counts[es] = 0
+                    order.append(es)
+                counts[es] += 1
+
+        if len(en_words) >= 2:
+            corroborated = [es for es in order if counts[es] >= 2]
+            es_words = corroborated if corroborated else order
+        else:
+            es_words = order
+
         return self._es_pos_filter(es_words, src_pos)
 
     def _direct_lookup(self, key: str, pos: str | None) -> list[str]:
