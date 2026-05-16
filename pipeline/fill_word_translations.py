@@ -81,6 +81,14 @@ PAIR_REGISTRY: dict[tuple[str, str], dict[str, Any]] = {
             "eval/pipelines/ru_de/kaikki_1/data/ru_de.db",
         ],
     },
+    # ── Russian → Spanish (kaikki_1) ──────────────────────────────────────────
+    ("ru", "es"): {
+        "backend": "kaikki",
+        "db_candidates": [
+            "backend/dictionaries/ru_es/ru_es.db",
+            "eval/pipelines/ru_es/kaikki_1/data/ru_es.db",
+        ],
+    },
     # ── English → Russian (kaikki) ── stub: build en_ru.db first ─────────────
     # ("en", "ru"): {
     #     "backend": "kaikki",
