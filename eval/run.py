@@ -169,11 +169,15 @@ def evaluate(api: str, src: str, tgt: str, n: int, song_id: Optional[int], pipel
 
     # 4. Translate each line (if translator available) + populate per-word definitions
     print(f"Processing {len(sampled)} lines …\n")
+    has_lookup_line = hasattr(lookup, "lookup_line")
     for line in sampled:
         if translator is not None:
             line.argos_translation = translator.translate(line.text)
-        for word in line.words:
-            word.tr_definitions = lookup.lookup(word.lemma, grammar=word.grammar)
+        if has_lookup_line:
+            lookup.lookup_line(line.text, line.words)
+        else:
+            for word in line.words:
+                word.tr_definitions = lookup.lookup(word.lemma, grammar=word.grammar)
         report.lines.append(line)
 
     lookup.close()

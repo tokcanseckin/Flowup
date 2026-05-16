@@ -553,10 +553,19 @@ def _fetch_lrclib_candidate(artist: str, title: str, lang: str = "") -> dict | N
                 return False
         return True
 
-    def _best_hit(hits: list[dict]) -> dict | None:
+    def _title_matches(hit: dict) -> bool:
+        """Return True if the hit's trackName is a close match for the requested title."""
+        import re as _re
+        def _norm(s: str) -> str:
+            return _re.sub(r"[^a-z0-9]", "", s.lower())
+        return _norm(hit.get("trackName", "")) == _norm(title)
+
+    def _best_hit(hits: list[dict], require_title_match: bool = False) -> dict | None:
         """Return the first synced hit; fall back to the first plain hit."""
         plain_fallback = None
         for hit in hits:
+            if require_title_match and not _title_matches(hit):
+                continue
             if _hit_ok(hit, require_synced=True):
                 return hit
             if plain_fallback is None and _hit_ok(hit):
@@ -577,7 +586,19 @@ def _fetch_lrclib_candidate(artist: str, title: str, lang: str = "") -> dict | N
 
     try:
         variants = _artist_variants(artist)
-        # Try /api/search with each artist variant
+        # Try /api/search with field-specific params (more precise than q=)
+        for variant in variants:
+            r = requests.get(
+                "https://lrclib.net/api/search",
+                params={"track_name": title, "artist_name": variant},
+                timeout=12,
+            )
+            r.raise_for_status()
+            hit = _best_hit(r.json(), require_title_match=True)
+            if hit:
+                return hit
+
+        # Fallback: free-text search with title-match guard
         for variant in variants:
             query = f"{variant} {title}".strip()
             r = requests.get(
@@ -586,7 +607,7 @@ def _fetch_lrclib_candidate(artist: str, title: str, lang: str = "") -> dict | N
                 timeout=12,
             )
             r.raise_for_status()
-            hit = _best_hit(r.json())
+            hit = _best_hit(r.json(), require_title_match=True)
             if hit:
                 return hit
 
@@ -610,7 +631,7 @@ def _fetch_lrclib_candidate(artist: str, title: str, lang: str = "") -> dict | N
                 timeout=12,
             )
             r3.raise_for_status()
-            hit = _best_hit(r3.json())
+            hit = _best_hit(r3.json(), require_title_match=True)
             if hit:
                 return hit
     except requests.RequestException as exc:
@@ -897,19 +918,67 @@ def _is_clean_ru_word(word: str) -> bool:
     return bool(re.match(r"^[\u0400-\u04ff]", word))
 
 
+_kaikki_en_conn: "sqlite3.Connection | None" = None
+
+
+def _get_kaikki_en_conn() -> "sqlite3.Connection | None":
+    """Return a read-only connection to en_ru.db, opening it once per process."""
+    global _kaikki_en_conn
+    if _kaikki_en_conn is not None:
+        return _kaikki_en_conn
+    import sqlite3 as _sqlite3
+    db_path = Path(__file__).parent.parent / "backend" / "dictionaries" / "en_ru" / "en_ru.db"
+    if not db_path.exists():
+        print(f"  [kaikki-en] Local DB not found at {db_path}; falling back to network.")
+        return None
+    _kaikki_en_conn = _sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
+    _kaikki_en_conn.row_factory = _sqlite3.Row
+    return _kaikki_en_conn
+
+
 def _kaikki_en_lookup(lemma: str, pos_hint: str = "") -> tuple[str, str]:
     """Fetch English gloss and Russian translation for an English lemma.
 
-    Uses the kaikki.org per-word JSONL endpoint (no full-file download needed).
+    Queries the local en_ru.db (backend/dictionaries/en_ru/en_ru.db).
+    Falls back to the kaikki.org network endpoint if the DB is unavailable.
     pos_hint: kaikki POS string ("verb", "noun", "adj", "adv") to prefer matching entry.
     Returns (en_gloss, ru_str); either may be an empty string on miss.
     """
-    import urllib.error
-    import urllib.request
-
     w = lemma.lower().strip()
     if not w or len(w) < 2:
         return "", ""
+
+    conn = _get_kaikki_en_conn()
+    if conn is not None:
+        # POS-filtered first, then unfiltered
+        rows = []
+        if pos_hint:
+            rows = conn.execute(
+                "SELECT ru_word, ru_sense FROM definitions WHERE lemma = ? AND pos = ?",
+                (w, pos_hint),
+            ).fetchall()
+        if not rows:
+            rows = conn.execute(
+                "SELECT ru_word, ru_sense FROM definitions WHERE lemma = ?",
+                (w,),
+            ).fetchall()
+        if rows:
+            en_gloss = rows[0]["ru_sense"] or ""
+            ru_words: list[str] = []
+            seen: set[str] = set()
+            for row in rows:
+                rw = row["ru_word"]
+                if rw and rw not in seen:
+                    seen.add(rw)
+                    ru_words.append(rw)
+                if len(ru_words) >= 4:
+                    break
+            return en_gloss, " / ".join(ru_words)
+        return "", ""
+
+    # ── Network fallback (kaikki.org) ─────────────────────────────────────────
+    import urllib.error
+    import urllib.request
 
     url = f"https://kaikki.org/dictionary/English/meaning/{w[0]}/{w[:2]}/{w}.jsonl"
     try:
@@ -930,7 +999,6 @@ def _kaikki_en_lookup(lemma: str, pos_hint: str = "") -> tuple[str, str]:
     content_pos = {"noun", "verb", "adj", "adv"}
 
     def _entry_score(e: dict, hint: str = "") -> tuple[int, int, int]:
-        """Score by: hint-match, clean-RU-count, content-pos bonus."""
         ru_count = sum(
             1 for t in e.get("translations", [])
             if t.get("lang_code") == "ru" and _is_clean_ru_word(t.get("word", ""))
@@ -963,14 +1031,12 @@ def _kaikki_en_lookup(lemma: str, pos_hint: str = "") -> tuple[str, str]:
             if en_gloss:
                 break
 
-    ru_words = [
+    ru_words_net = [
         t["word"]
         for t in best.get("translations", [])
         if t.get("lang_code") == "ru" and _is_clean_ru_word(t.get("word", ""))
     ]
-    ru_str = " / ".join(ru_words[:4])
-
-    return en_gloss, ru_str
+    return en_gloss, " / ".join(ru_words_net[:4])
 
 
 # ── Backend push ──────────────────────────────────────────────────────────────
@@ -1120,14 +1186,23 @@ def main() -> None:
     print(sep)
 
     # ── 1. Lyrics
+    lrc = None
     if args.lrc_file:
         print("\n[1/5] Loading lyrics from local file …")
         lrc = load_local_lrc(args.lrc_file)
     else:
         print("\n[1/5] Fetching lyrics from LRCLIB …")
-        lrc = fetch_synced_lyrics(args.artist, args.title, args.lang)
-        if lrc is None:
-            plain_lyrics = fetch_plain_lyrics(args.artist, args.title, args.lang)
+        print(f"  [LRCLIB] Searching '{args.title}' by '{args.artist}' …")
+        _candidate = _fetch_lrclib_candidate(args.artist, args.title, args.lang)
+        if _candidate and _candidate.get("syncedLyrics"):
+            print(f"  [LRCLIB] Found (id={_candidate.get('id', '?')}, title={_candidate.get('trackName', '?')})")
+            lrc = _candidate["syncedLyrics"]
+        else:
+            if _candidate:
+                print("  [LRCLIB] No synced lyrics found.")
+            plain_lyrics = _candidate.get("plainLyrics") if _candidate else None
+            if plain_lyrics is None:
+                print("  [LRCLIB] No plain lyrics found.")
             if plain_lyrics and args.youtube_url:
                 print("  [stable-ts] Falling back to forced alignment …")
                 lrc = align_with_stable_ts(
@@ -1180,7 +1255,6 @@ def main() -> None:
             lang_code=args.lang,
             target_lang=args.target_lang,
         ))
-        time.sleep(0.02)
 
     # ── 5. Write output JSON
     print(f"\n[5/5] Writing {args.output} …")

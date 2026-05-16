@@ -56,3 +56,7 @@ eval/data/kaikki-ru.jsonl
 
 # Pipeline log files
 pipeline/*.log
+*.log
+
+# Generated pipeline output
+pipeline/song_data.json

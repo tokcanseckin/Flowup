@@ -89,13 +89,14 @@ PAIR_REGISTRY: dict[tuple[str, str], dict[str, Any]] = {
             "eval/pipelines/ru_es/kaikki_1/data/ru_es.db",
         ],
     },
-    # ── English → Russian (kaikki) ── stub: build en_ru.db first ─────────────
-    # ("en", "ru"): {
-    #     "backend": "kaikki",
-    #     "db_candidates": [
-    #         "backend/dictionaries/en_ru/en_ru.db",
-    #     ],
-    # },
+    # ── English → Russian (kaikki_1) ──────────────────────────────────────────
+    ("en", "ru"): {
+        "backend": "kaikki",
+        "db_candidates": [
+            "backend/dictionaries/en_ru/en_ru.db",
+            "eval/pipelines/en_ru/kaikki_1/data/en_ru.db",
+        ],
+    },
     # ── Russian → English (kaikki) ── stub: build ru_en.db first ─────────────
     # ("ru", "en"): {
     #     "backend": "kaikki",
@@ -125,10 +126,14 @@ def _log(msg: str) -> None:
 
 # ── Shared DB helpers ─────────────────────────────────────────────────────────
 
-def _fetch_songs(session: Session, src_lang: str, song_id: int | None) -> list[Song]:
+def _fetch_songs(session: Session, src_lang: str, song_id: int | None, min_id: int | None = None, max_id: int | None = None) -> list[Song]:
     q = session.query(Song).filter(Song.language_code == src_lang)
     if song_id is not None:
         q = q.filter(Song.id == song_id)
+    if min_id is not None:
+        q = q.filter(Song.id >= min_id)
+    if max_id is not None:
+        q = q.filter(Song.id <= max_id)
     return q.order_by(Song.id).all()
 
 
@@ -194,9 +199,11 @@ def _run_fill_loop(
     dry_run: bool,
     lookup_fn,           # callable(lemma: str) -> list[str]
     close_fn=None,       # optional cleanup callable
+    min_id: int | None = None,
+    max_id: int | None = None,
 ) -> None:
     """Generic song→word loop shared by all backends."""
-    songs = _fetch_songs(session, src_lang, song_id)
+    songs = _fetch_songs(session, src_lang, song_id, min_id, max_id)
     if not songs:
         _log(f"No songs found for language '{src_lang}'.")
         if close_fn:
@@ -270,6 +277,8 @@ def fill_kaikki(
     overwrite: bool,
     dry_run: bool,
     db_path_override: str | None = None,
+    min_id: int | None = None,
+    max_id: int | None = None,
 ) -> None:
     db_path = _resolve_kaikki_db(config, db_path_override)
     if db_path is None:
@@ -290,6 +299,8 @@ def fill_kaikki(
         session, src_lang, tgt_lang, song_id, overwrite, dry_run,
         lookup_fn=lookup.lookup,
         close_fn=lookup.close,
+        min_id=min_id,
+        max_id=max_id,
     )
 
 
@@ -321,6 +332,20 @@ def _build_parser() -> argparse.ArgumentParser:
         type=int,
         default=None,
         help="Limit to a single song ID.",
+    )
+    p.add_argument(
+        "--min-id",
+        dest="min_id",
+        type=int,
+        default=None,
+        help="Skip songs with ID below this value.",
+    )
+    p.add_argument(
+        "--max-id",
+        dest="max_id",
+        type=int,
+        default=None,
+        help="Skip songs with ID above this value.",
     )
     p.add_argument(
         "--overwrite",
@@ -375,6 +400,8 @@ def main() -> None:
             session, src_lang, tgt_lang, config,
             args.song_id, args.overwrite, dry_run,
             db_path_override=args.db_path,
+            min_id=args.min_id,
+            max_id=args.max_id,
         )
     finally:
         session.close()

@@ -218,6 +218,8 @@ def _fetch_songs(
     src_lang: str,
     song_id: Optional[int],
     playlist_id: Optional[int] = None,
+    min_id: Optional[int] = None,
+    max_id: Optional[int] = None,
 ) -> list[Song]:
     if playlist_id is not None:
         # Return songs in playlist order
@@ -233,6 +235,10 @@ def _fetch_songs(
     q = session.query(Song).filter(Song.language_code == src_lang)
     if song_id is not None:
         q = q.filter(Song.id == song_id)
+    if min_id is not None:
+        q = q.filter(Song.id >= min_id)
+    if max_id is not None:
+        q = q.filter(Song.id <= max_id)
     return q.order_by(Song.id).all()
 
 
@@ -267,8 +273,10 @@ def fill_line_translations(
     dry_run: bool,
     batch_size: int = 50,
     playlist_id: Optional[int] = None,
+    min_id: Optional[int] = None,
+    max_id: Optional[int] = None,
 ) -> None:
-    songs = _fetch_songs(session, src_lang, song_id, playlist_id)
+    songs = _fetch_songs(session, src_lang, song_id, playlist_id, min_id, max_id)
     if not songs:
         _log(f"No songs found for language '{src_lang}'.")
         return
@@ -360,6 +368,10 @@ def _build_parser() -> argparse.ArgumentParser:
     p.add_argument("--tgt", required=True, help="Target language code (e.g. tr, en, fr).")
     p.add_argument("--song-id", dest="song_id", type=int, default=None,
                    help="Limit to a single song ID.")
+    p.add_argument("--min-id", dest="min_id", type=int, default=None,
+                   help="Skip songs with ID below this value.")
+    p.add_argument("--max-id", dest="max_id", type=int, default=None,
+                   help="Skip songs with ID above this value.")
     p.add_argument("--playlist-id", dest="playlist_id", type=int, default=None,
                    help="Limit to songs in a specific playlist (by playlist ID).")
     p.add_argument("--overwrite", action="store_true",
@@ -392,6 +404,8 @@ def main() -> None:
             dry_run=args.dry_run,
             batch_size=args.batch_size,
             playlist_id=args.playlist_id,
+            min_id=args.min_id,
+            max_id=args.max_id,
         )
     finally:
         session.close()
