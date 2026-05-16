@@ -111,7 +111,8 @@ export default function HelpButton() {
                 <button
                   onClick={handleSend}
                   disabled={!message.trim() || status === 'sending'}
-                  className="flex-1 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="flex-1 py-2 rounded-xl text-white text-sm font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  style={{ backgroundColor: 'rgb(0, 109, 54)' }}
                 >
                   {status === 'sending' ? 'Sending…' : 'Send'}
                 </button>
