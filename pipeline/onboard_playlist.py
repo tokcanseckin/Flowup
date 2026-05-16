@@ -56,6 +56,13 @@ from pathlib import Path
 import requests
 
 PIPELINE_DIR = Path(__file__).parent
+REPO_ROOT = PIPELINE_DIR.parent
+
+# Ensure repo root is on sys.path so `pipeline.*` absolute imports work whether
+# this file is run as a script (python3 pipeline/onboard_playlist.py) or as a
+# module (python3 -m pipeline.onboard_playlist).
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
 # ── Language name → ISO 639-1 code ───────────────────────────────────────────
 LANG_NAME_TO_CODE: dict[str, str] = {
@@ -88,21 +95,22 @@ DIFFICULTY_TO_CEFR: dict[str, str] = {
     "proficient":         "C2",
 }
 
-# Language pairs that have BOTH word definitions + line translations.
-# Mirrors the active (uncommented) keys in fill_word_translations.PAIR_REGISTRY.
-# Update here whenever you add a new pair to that registry.
-FULL_PAIRS: set[tuple[str, str]] = {
-    ("ru", "tr"),
-    ("ru", "de"),
-    ("ru", "es"),
-    ("en", "ru"),
-}
+def _load_pair_registry() -> dict:
+    """
+    Dynamically load PAIR_REGISTRY from fill_word_translations.py so that
+    onboard_playlist automatically covers every graduated language pair without
+    needing a separate hardcoded list.
 
-# Language pairs where we fill LINE translations only — no word dictionary built yet.
-# Key = src_lang, value = list of tgt_langs.
-LINE_ONLY_PAIRS: dict[str, list[str]] = {
-    # ("en", "ru") graduated to FULL_PAIRS — en_ru.db built from enwiktionary.
-}
+    Requires DATABASE_URL to be exported (pulled in transitively by the backend
+    imports inside fill_word_translations.py).
+    """
+    try:
+        from pipeline.fill_word_translations import PAIR_REGISTRY  # noqa: PLC0415
+        return PAIR_REGISTRY
+    except Exception as exc:
+        _log(f"[warn] Could not load PAIR_REGISTRY: {exc}")
+        _log("       Make sure DATABASE_URL is exported before running this script.")
+        return {}
 
 # Artist values too generic for LRCLIB lookup (mirrors import_playlist.py)
 _GENERIC_KEYWORDS = {
@@ -309,7 +317,7 @@ def import_songs(
         youtube_url = ""
         if artist:
             try:
-                from .fill_youtube_urls import search_youtube  # noqa: PLC0415
+                from pipeline.fill_youtube_urls import search_youtube  # noqa: PLC0415
                 _log("  [YouTube] Pre-fetching URL for stable-ts fallback …")
                 youtube_url, _ = search_youtube(title, artist)
                 if youtube_url:
@@ -372,7 +380,7 @@ def fetch_songs_by_ids(api_url: str, ids: set[int]) -> list[dict]:
 
 def fill_youtube_for_songs(api_url: str, songs: list[dict], dry_run: bool) -> None:
     """Search YouTube and patch only the given songs."""
-    from .fill_youtube_urls import search_youtube, patch_youtube_url  # noqa: E402
+    from pipeline.fill_youtube_urls import search_youtube, patch_youtube_url  # noqa: E402
 
     _log(f"\n[{_ts()}] {'='*55}")
     _log(f"[{_ts()}] Filling YouTube URLs for {len(songs)} new song(s) …")
@@ -400,7 +408,7 @@ def fill_youtube_for_songs(api_url: str, songs: list[dict], dry_run: bool) -> No
 
 def fill_apple_music_for_songs(api_url: str, songs: list[dict], dry_run: bool) -> None:
     """Search Apple Music and patch only the given songs."""
-    from .fill_apple_music_urls import search_apple_music, patch_apple_music_url  # noqa: E402
+    from pipeline.fill_apple_music_urls import search_apple_music, patch_apple_music_url  # noqa: E402
 
     _log(f"\n[{_ts()}] {'='*55}")
     _log(f"[{_ts()}] Filling Apple Music URLs for {len(songs)} new song(s) …")
@@ -521,25 +529,15 @@ def main() -> None:
         _log("Mode:       DRY RUN (no writes)")
     _log(f"{'='*60}")
 
-    # ── Discover active pairs for this language ─────────────────────────────────────
-    # Full pairs (word definitions + line translations)
+    # ── Discover active pairs from fill_word_translations.PAIR_REGISTRY ──────
+    registry = _load_pair_registry()
     active_pairs: list[tuple[str, str]] = [
-        (src, tgt) for (src, tgt) in FULL_PAIRS if src == lang_code
+        (src, tgt) for (src, tgt) in registry if src == lang_code
     ]
-    # Line-only pairs (no word definitions — kaikki DB not built yet)
-    line_only_tgt_langs: list[str] = [
-        tgt for tgt in LINE_ONLY_PAIRS.get(lang_code, [])
-        if (lang_code, tgt) not in FULL_PAIRS
-    ]
-
-    all_target_langs = sorted(
-        {tgt for _, tgt in active_pairs} | set(line_only_tgt_langs)
-    )
+    all_target_langs = sorted({tgt for _, tgt in active_pairs})
     primary_target_lang = all_target_langs[0] if all_target_langs else ""
     pair_labels = [f"{s}_{t}" for s, t in active_pairs]
-    _log(f"Full pairs (words+lines) for '{lang_code}': {pair_labels or '(none)'}")
-    if line_only_tgt_langs:
-        _log(f"Line-only pairs for '{lang_code}': {[f'{lang_code}_{t}' for t in line_only_tgt_langs]}")
+    _log(f"Active pairs for '{lang_code}' (from PAIR_REGISTRY): {pair_labels or '(none)'}")
 
     # ── Create or reuse playlist ───────────────────────────────────────────────
     if args.playlist_id is not None:
@@ -624,22 +622,18 @@ def main() -> None:
 
     # ── Fill word definitions + line translations (new songs only) ─────────────
     if not args.skip_translations:
-        if not active_pairs and not line_only_tgt_langs:
+        if not active_pairs:
             _log(f"\n[info] No pairs for src_lang='{lang_code}' — skipping translation fill.")
-            _log(f"       Add to PAIR_REGISTRY (fill_word_translations.py) or LINE_ONLY_PAIRS (onboard_playlist.py).")
+            _log(f"       Add a pair to PAIR_REGISTRY in fill_word_translations.py to enable.")
         elif args.dry_run:
             for src, tgt in active_pairs:
                 _log(f"\n[dry-run] Would fill word definitions + line translations: {src}_{tgt} for new songs")
-            for tgt in line_only_tgt_langs:
-                _log(f"\n[dry-run] Would fill line translations: {lang_code}_{tgt} for new songs")
         elif not new_song_ids:
             _log("\n[info] No new songs to fill translations for")
         else:
             for src, tgt in active_pairs:
                 run_fill_word_translations_for_songs(f"{src}_{tgt}", new_song_ids, args.dry_run)
                 run_fill_line_translations_for_songs(src, tgt, new_song_ids, args.dry_run)
-            for tgt in line_only_tgt_langs:
-                run_fill_line_translations_for_songs(lang_code, tgt, new_song_ids, args.dry_run)
     else:
         _log("\n[skip] Translation fill skipped")
 
