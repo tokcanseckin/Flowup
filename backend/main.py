@@ -241,6 +241,20 @@ def _get_loc_cache(db: Session) -> dict[str, dict]:
         return _loc_cache
 
 
+_SUPPORTED_EMAIL_LANGS = frozenset({'en', 'tr', 'ru', 'es', 'pt', 'de'})
+
+
+def _get_email_t(kind: str, lang: str, db: Session) -> dict:
+    """Return email template strings for kind ('welcome'|'passwordReset') in the given language."""
+    l = lang if lang in _SUPPORTED_EMAIL_LANGS else 'en'
+    cache = _get_loc_cache(db)
+    prefix = f"email.{kind}."
+    return {
+        key[len(prefix):]: (cache[key].get(l) or cache[key].get('en', ''))
+        for key in cache if key.startswith(prefix)
+    }
+
+
 # ── Startup ────────────────────────────────────────────────────────────────────
 
 @asynccontextmanager
@@ -574,6 +588,20 @@ _INITIAL_LOCALIZATIONS: list[dict] = [
     {"key": "help.messageSent",    "en": "Message sent!",                                     "tr": "Mesaj gönderildi!",                                 "ru": "Сообщение отправлено!",                                 "es": "\u00a1Mensaje enviado!",                                   "pt": "Mensagem enviada!",                                       "de": "Nachricht gesendet!"},
     {"key": "help.messageSentDesc","en": "Thanks for reaching out \u2014 we\u2019ll get back to you as soon as we can.", "tr": "Ulaştığınız için teşekkürler \u2014 en kısa sürede geri döneceğiz.", "ru": "Спасибо за обращение \u2014 мы ответим вам как можно скорее.", "es": "Gracias por contactarnos \u2014 te responderemos lo antes posible.", "pt": "Obrigado por entrar em contato \u2014 responderemos em breve.", "de": "Danke für Ihre Nachricht \u2014 wir melden uns so bald wie möglich."},
     {"key": "help.error",          "en": "Something went wrong \u2014 please try again.",          "tr": "Bir şeyler ters gitti \u2014 lütfen tekrar deneyin.",   "ru": "Что-то пошло не так \u2014 пожалуйста, попробуйте снова.", "es": "Algo salió mal \u2014 por favor, inténtalo de nuevo.",    "pt": "Algo deu errado \u2014 por favor, tente novamente.",       "de": "Etwas ist schiefgelaufen \u2014 bitte versuchen Sie es erneut."},
+    # Email — Welcome
+    {"key": "email.welcome.subject",       "en": "Welcome to SingoLing \U0001f3b5",                    "tr": "SingoLing'e hoş geldiniz \U0001f3b5",                                    "ru": "Добро пожаловать в SingoLing \U0001f3b5",                           "es": "Bienvenido a SingoLing \U0001f3b5",                           "pt": "Bem-vindo ao SingoLing \U0001f3b5",                            "de": "Willkommen bei SingoLing \U0001f3b5"},
+    {"key": "email.welcome.greeting",      "en": "Hi",                                                 "tr": "Merhaba",                                                                "ru": "Здравствуйте",                                                      "es": "Hola",                                                        "pt": "Olá",                                                          "de": "Hallo"},
+    {"key": "email.welcome.emoji",         "en": "\U0001f3b5",                                         "tr": "\U0001f3b5",                                                             "ru": "\U0001f3b5",                                                        "es": "\U0001f3b5",                                                  "pt": "\U0001f3b5",                                                   "de": "\U0001f3b5"},
+    {"key": "email.welcome.welcome_title", "en": "Welcome to SingoLing!",                             "tr": "SingoLing'e hoş geldiniz!",                                              "ru": "Добро пожаловать в SingoLing!",                                     "es": "¡Bienvenido a SingoLing!",                                    "pt": "Bem-vindo ao SingoLing!",                                      "de": "Willkommen bei SingoLing!"},
+    {"key": "email.welcome.body",          "en": "You're all set to start learning languages through music. Pick a song, play it, and tap on any word to see its meaning and translation.", "tr": "Müzikle dil öğrenmeye başlamak için hazırsınız. Bir şarkı seçin, çalın ve anlamını görmek için herhangi bir kelimeye dokunun.", "ru": "Вы готовы начать изучать языки через музыку. Выберите песню, включите её и нажмите на любое слово, чтобы увидеть его значение и перевод.", "es": "Estás listo para comenzar a aprender idiomas a través de la música. Elige una canción, reprodúcela y toca cualquier palabra para ver su significado y traducción.", "pt": "Você está pronto para começar a aprender idiomas através da música. Escolha uma música, reproduza-a e toque em qualquer palavra para ver seu significado e tradução.", "de": "Sie sind bereit, Sprachen durch Musik zu lernen. Wählen Sie einen Song aus, spielen Sie ihn ab und tippen Sie auf ein beliebiges Wort, um seine Bedeutung und Übersetzung anzuzeigen."},
+    {"key": "email.welcome.button",        "en": "Browse Songs",                                       "tr": "Şarkılara Göz At",                                                       "ru": "Просмотреть песни",                                                 "es": "Explorar canciones",                                          "pt": "Explorar músicas",                                             "de": "Songs durchsuchen"},
+    {"key": "email.welcome.footer",        "en": "Questions? Reply to this email or visit support@singoling.com", "tr": "Sorularınız mı var? Bu e-postayı yanıtlayın veya support@singoling.com adresini ziyaret edin", "ru": "Вопросы? Ответьте на это письмо или посетите support@singoling.com", "es": "¿Preguntas? Responde a este correo o visita support@singoling.com", "pt": "Dúvidas? Responda este e-mail ou visite support@singoling.com", "de": "Fragen? Antworten Sie auf diese E-Mail oder besuchen Sie support@singoling.com"},
+    # Email — Password Reset
+    {"key": "email.passwordReset.subject", "en": "Reset your SingoLing password",                     "tr": "SingoLing şifrenizi sıfırlayın",                                         "ru": "Сбросить пароль SingoLing",                                         "es": "Restablecer su contraseña de SingoLing",                      "pt": "Redefinir sua senha do SingoLing",                             "de": "SingoLing-Passwort zurücksetzen"},
+    {"key": "email.passwordReset.greeting","en": "Hi",                                                 "tr": "Merhaba",                                                                "ru": "Здравствуйте",                                                      "es": "Hola",                                                        "pt": "Olá",                                                          "de": "Hallo"},
+    {"key": "email.passwordReset.body",    "en": "Click the button below to reset your password. This link expires in 1 hour.", "tr": "Şifrenizi sıfırlamak için aşağıdaki düğmeye tıklayın. Bu bağlantı 1 saat içinde sona erecektir.", "ru": "Нажмите кнопку ниже, чтобы сбросить пароль. Ссылка действительна 1 час.", "es": "Haga clic en el botón de abajo para restablecer su contraseña. Este enlace caduca en 1 hora.", "pt": "Clique no botão abaixo para redefinir sua senha. Este link expira em 1 hora.", "de": "Klicken Sie auf die Schaltfläche unten, um Ihr Passwort zurückzusetzen. Dieser Link läuft in 1 Stunde ab."},
+    {"key": "email.passwordReset.button",  "en": "Reset Password",                                     "tr": "Şifreyi Sıfırla",                                                        "ru": "Сбросить пароль",                                                   "es": "Restablecer contraseña",                                      "pt": "Redefinir senha",                                              "de": "Passwort zurücksetzen"},
+    {"key": "email.passwordReset.footer",  "en": "If you didn't request this, you can safely ignore this email.", "tr": "Bunu siz talep etmediyseniz, bu e-postayı güvenle yok sayabilirsiniz.", "ru": "Если вы не запрашивали сброс пароля, проигнорируйте это письмо.", "es": "Si no solicitó esto, puede ignorar este correo de forma segura.", "pt": "Se você não solicitou isso, pode ignorar este e-mail com segurança.", "de": "Wenn Sie dies nicht angefordert haben, können Sie diese E-Mail einfach ignorieren."},
 ]
 
 
@@ -2379,6 +2407,19 @@ async def register_with_credentials(body: RegisterRequest, db: Session = Depends
     db.commit()
     db.refresh(user)
 
+    if user.email:
+        _t = _get_email_t('welcome', body.lang, db)
+        _email = user.email
+        _name = user.display_name
+
+        def _welcome_reg() -> None:
+            try:
+                _mailgun.send_welcome_email(to=_email, display_name=_name, t=_t)
+            except Exception:
+                pass
+
+        threading.Thread(target=_welcome_reg, daemon=True).start()
+
     return UserResponse(
         id=user.id,
         spotify_id=user.spotify_id,
@@ -2462,10 +2503,11 @@ def forgot_password(body: ForgotPasswordRequest, db: Session = Depends(get_db)):
     reset_url = f"{site_url}/?reset_token={raw_token}"
     _email = user.email
     _name = user.display_name
+    _t = _get_email_t('passwordReset', 'en', db)  # user language not yet stored; defaults to 'en'
 
     def _send() -> None:
         try:
-            _mailgun.send_password_reset(to=_email, display_name=_name, reset_url=reset_url)
+            _mailgun.send_password_reset(to=_email, display_name=_name, reset_url=reset_url, t=_t)
         except Exception:
             pass
 
@@ -2582,6 +2624,7 @@ async def login_with_google(body: GoogleLoginRequest, db: Session = Depends(get_
         # Also try matching by email in case they previously used email/password.
         user = db.query(User).filter(User.email == email).first()
 
+    _is_new = False
     if not user:
         user = User(
             spotify_id=synthetic_id,
@@ -2590,6 +2633,7 @@ async def login_with_google(body: GoogleLoginRequest, db: Session = Depends(get_
             google_user_id=google_sub,
         )
         db.add(user)
+        _is_new = True
     else:
         # Keep google synthetic_id canonical going forward.
         if user.spotify_id != synthetic_id and not user.spotify_id.startswith("spotify:"):
@@ -2602,6 +2646,20 @@ async def login_with_google(body: GoogleLoginRequest, db: Session = Depends(get_
 
     db.commit()
     db.refresh(user)
+
+    if _is_new and user.email:
+        _t = _get_email_t('welcome', body.lang, db)
+        _email = user.email
+        _name = user.display_name
+
+        def _welcome_google() -> None:
+            try:
+                _mailgun.send_welcome_email(to=_email, display_name=_name, t=_t)
+            except Exception:
+                pass
+
+        threading.Thread(target=_welcome_google, daemon=True).start()
+
     return UserResponse(
         id=user.id,
         spotify_id=user.spotify_id,
@@ -2639,6 +2697,7 @@ async def login_with_apple(body: AppleLoginRequest, db: Session = Depends(get_db
     if not user and email:
         user = db.query(User).filter(User.email == email).first()
 
+    _is_new = False
     if not user:
         user = User(
             spotify_id=synthetic_id,
@@ -2647,6 +2706,7 @@ async def login_with_apple(body: AppleLoginRequest, db: Session = Depends(get_db
             apple_user_id=apple_sub,
         )
         db.add(user)
+        _is_new = True
     else:
         if user.spotify_id != synthetic_id and not user.spotify_id.startswith("spotify:"):
             user.spotify_id = synthetic_id
@@ -2657,6 +2717,20 @@ async def login_with_apple(body: AppleLoginRequest, db: Session = Depends(get_db
 
     db.commit()
     db.refresh(user)
+
+    if _is_new and user.email:
+        _t = _get_email_t('welcome', body.lang, db)
+        _email = user.email
+        _name = user.display_name
+
+        def _welcome_apple() -> None:
+            try:
+                _mailgun.send_welcome_email(to=_email, display_name=_name, t=_t)
+            except Exception:
+                pass
+
+        threading.Thread(target=_welcome_apple, daemon=True).start()
+
     return UserResponse(
         id=user.id,
         spotify_id=user.spotify_id,

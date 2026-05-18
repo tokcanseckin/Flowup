@@ -190,14 +190,17 @@ class RegisterRequest(BaseModel):
     display_name: str
     email: str
     password: str
+    lang: str = 'en'
 
 
 class GoogleLoginRequest(BaseModel):
     id_token: str
+    lang: str = 'en'
 
 
 class AppleLoginRequest(BaseModel):
     id_token: str
+    lang: str = 'en'
 
 
 class CompleteOnboardingRequest(BaseModel):
