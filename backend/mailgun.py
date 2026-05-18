@@ -7,6 +7,8 @@ All other config is hardcoded as constants below.
 from __future__ import annotations
 
 import base64
+import hashlib
+import hmac
 import json
 import logging
 import os
@@ -157,3 +159,27 @@ def send_password_reset(*, to: str, display_name: str | None, reset_url: str, t:
         template="password reset email",
         template_variables=variables,
     )
+
+
+# ── Inbound webhook helpers ────────────────────────────────────────────────────
+
+# Personal address to forward non-support inbound emails to.
+# Set ADMIN_PERSONAL_EMAIL in the server environment (e.g. ~/.credentials).
+ADMIN_PERSONAL_EMAIL: str = os.environ.get("ADMIN_PERSONAL_EMAIL", "")
+
+
+def verify_webhook_signature(api_key: str, timestamp: str, token: str, signature: str) -> bool:
+    """Verify a Mailgun inbound-email webhook HMAC-SHA256 signature.
+
+    Mailgun signs each webhook call with:
+        HMAC-SHA256(api_key, timestamp + token)
+    See https://documentation.mailgun.com/docs/mailgun/user-manual/webhooks/
+    """
+    if not (timestamp and token and signature):
+        return False
+    expected = hmac.new(
+        key=api_key.encode("utf-8"),
+        msg=f"{timestamp}{token}".encode("utf-8"),
+        digestmod=hashlib.sha256,
+    ).hexdigest()
+    return hmac.compare_digest(expected, signature)

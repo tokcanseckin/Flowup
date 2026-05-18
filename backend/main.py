@@ -2810,6 +2810,80 @@ async def apple_server_events(request: Request, db: Session = Depends(get_db)):
     return {"ok": True}
 
 
+# ── Mailgun inbound email webhook ──────────────────────────────────────────────
+#
+# Mailgun route (configure once in the Mailgun dashboard):
+#   Expression : match_recipient(".*@singoling.com")
+#   Action     : forward("https://singoling.com/api/mailgun/webhook")
+#   Priority   : 0   (process before any other routes)
+#
+# Routing logic:
+#   support@singoling.com  → creates an open ticket in the reports table (kind='email')
+#   any other @singoling.com address → forwards to ADMIN_PERSONAL_EMAIL env var
+#
+# Signature verification uses HMAC-SHA256(MAILGUN_API_KEY, timestamp + token).
+
+@app.post("/api/mailgun/webhook")
+async def mailgun_inbound_webhook(request: Request, db: Session = Depends(get_db)):
+    """Receive inbound emails routed from Mailgun and process or forward them."""
+    form = await request.form()
+
+    # ── Verify Mailgun webhook signature ──────────────────────────────────────
+    timestamp = str(form.get("timestamp", ""))
+    token     = str(form.get("token", ""))
+    signature = str(form.get("signature", ""))
+    api_key   = os.environ.get("MAILGUN_API_KEY", "")
+
+    if not _mailgun.verify_webhook_signature(api_key, timestamp, token, signature):
+        log.warning("mailgun webhook: rejected request with invalid signature")
+        raise HTTPException(status_code=403, detail="Invalid signature")
+
+    # ── Parse email fields ─────────────────────────────────────────────────────
+    recipient  = str(form.get("recipient", "")).lower().strip()
+    sender     = str(form.get("sender",    "")).strip()
+    subject    = str(form.get("subject",   "")).strip()
+    body_plain = str(form.get("body-plain","")).strip()
+    body_html  = str(form.get("body-html", "")).strip() or None
+
+    log.info("mailgun inbound: from=%r to=%r subject=%r", sender, recipient, subject)
+
+    if recipient == "support@singoling.com":
+        # ── Create support ticket ──────────────────────────────────────────────
+        report = Report(
+            kind    = "email",
+            word    = sender,                               # sender address
+            lemma   = subject,                              # email subject
+            context = f"From: {sender}\nTo: {recipient}",  # routing context
+            message = body_plain or body_html or "(no body)",
+            status  = "open",
+        )
+        db.add(report)
+        db.commit()
+        log.info("mailgun inbound: created ticket id=%s for support email from %r", report.id, sender)
+        return {"status": "processed"}
+    else:
+        # ── Forward to personal inbox ──────────────────────────────────────────
+        personal_email = _mailgun.ADMIN_PERSONAL_EMAIL
+        if not personal_email:
+            log.warning("mailgun inbound: ADMIN_PERSONAL_EMAIL not set, dropping email to %r", recipient)
+            return {"status": "dropped"}
+
+        fwd_subject = f"[Fwd: {recipient}] {subject}"
+        fwd_body = (
+            f"---------- Forwarded message ----------\n"
+            f"From: {sender}\n"
+            f"To: {recipient}\n"
+            f"Subject: {subject}\n"
+            f"---\n\n"
+            f"{body_plain}"
+        )
+        try:
+            _mailgun._send(to=personal_email, subject=fwd_subject, text=fwd_body, html=body_html)
+        except Exception as exc:
+            log.error("mailgun inbound: failed to forward from %r to personal inbox: %s", sender, exc)
+        return {"status": "forwarded"}
+
+
 @app.post("/api/auth/refresh")
 async def refresh_token_endpoint(body: dict):
     """Proxy Spotify token refresh so client_id can be server-side if desired."""
