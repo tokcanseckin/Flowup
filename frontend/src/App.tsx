@@ -14,6 +14,8 @@ import { useListened } from './hooks/useListened'
 import { useWordHistory } from './hooks/useWordHistory'
 import { useLocalization, useT, useContentT } from './i18n/LocalizationContext'
 import { track } from './analytics'
+import PrivacyPolicyPage from './components/PrivacyPolicyPage'
+import TermsOfServicePage from './components/TermsOfServicePage'
 
 // ── Module-level song cache (survives re-renders, cleared on logout) ──────────
 // Key: `{id}:{source}` where source is 'youtube' or 'apple_music'.
@@ -162,6 +164,8 @@ type AppRoute =
   | { page: 'song'; songId: number }
   | { page: 'settings'; tab: SettingsTab }
   | { page: 'admin'; tab: 'songs' | 'playlists' | 'users' | 'tasks' | 'localizations' | 'reports'; id: number | null }
+  | { page: 'privacy' }
+  | { page: 'terms' }
 
 function parseAppRoute(pathname: string): AppRoute {
   const path = pathname || '/browse'
@@ -189,6 +193,9 @@ function parseAppRoute(pathname: string): AppRoute {
   if (songMatch) {
     return { page: 'song', songId: Number(songMatch[1]) }
   }
+
+  if (path === '/privacy') return { page: 'privacy' }
+  if (path === '/terms') return { page: 'terms' }
 
   return { page: 'browse' }
 }
@@ -753,6 +760,21 @@ function SignUpScreen({
               {busy ? t('auth.creatingAccount') : t('auth.createAccount')}
             </button>
           </form>
+
+          <p className="text-center text-xs text-gray-500 leading-relaxed">
+            By signing up, you agree to our{' '}
+            <a
+              href="/terms"
+              onClick={e => { e.preventDefault(); window.history.pushState(null, '', '/terms'); window.dispatchEvent(new PopStateEvent('popstate')) }}
+              className="text-indigo-400 hover:text-indigo-300 transition-colors"
+            >Terms of Service</a>
+            {' '}and{' '}
+            <a
+              href="/privacy"
+              onClick={e => { e.preventDefault(); window.history.pushState(null, '', '/privacy'); window.dispatchEvent(new PopStateEvent('popstate')) }}
+              className="text-indigo-400 hover:text-indigo-300 transition-colors"
+            >Privacy Policy</a>
+          </p>
 
           <p className="text-center text-sm text-gray-500">
             {t('auth.alreadyHaveAccount')}{' '}
@@ -1721,6 +1743,32 @@ function SettingsPage({
                   </div>
                 </div>
               )}
+
+              <div className="space-y-4 pt-2">
+                <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider">Legal</h2>
+                <div className="rounded-2xl border border-gray-800/80 divide-y divide-gray-800/60" style={{ background: '#12121f' }}>
+                  <a
+                    href="/terms"
+                    onClick={e => { e.preventDefault(); window.history.pushState(null, '', '/terms'); window.dispatchEvent(new PopStateEvent('popstate')) }}
+                    className="flex items-center justify-between px-5 py-3.5 hover:bg-white/5 transition-colors group"
+                  >
+                    <span className="text-sm text-gray-300 group-hover:text-white transition-colors">Terms of Service</span>
+                    <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current text-gray-600 group-hover:text-gray-400 transition-colors shrink-0">
+                      <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/>
+                    </svg>
+                  </a>
+                  <a
+                    href="/privacy"
+                    onClick={e => { e.preventDefault(); window.history.pushState(null, '', '/privacy'); window.dispatchEvent(new PopStateEvent('popstate')) }}
+                    className="flex items-center justify-between px-5 py-3.5 hover:bg-white/5 transition-colors group"
+                  >
+                    <span className="text-sm text-gray-300 group-hover:text-white transition-colors">Privacy Policy</span>
+                    <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current text-gray-600 group-hover:text-gray-400 transition-colors shrink-0">
+                      <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/>
+                    </svg>
+                  </a>
+                </div>
+              </div>
             </div>
           )}
         </main>
@@ -2695,7 +2743,7 @@ export default function App() {
   useEffect(() => {
     if (isAuthenticated) return
     const path = window.location.pathname
-    if (path !== '/login' && path !== '/signup') {
+    if (path !== '/login' && path !== '/signup' && path !== '/privacy' && path !== '/terms') {
       const target = showSignUp ? '/signup' : '/login'
       window.history.replaceState(null, '', target)
       setCurrentPath(target)
@@ -3147,6 +3195,10 @@ export default function App() {
     }, 2000)
     return () => window.clearTimeout(timer)
   }, [activeSong, activeSongIndex, displayedSongs, settings.preferredSource])
+
+  // Legal pages are accessible without authentication
+  if (currentPath === '/privacy') return <PrivacyPolicyPage onBack={() => window.history.back()} />
+  if (currentPath === '/terms') return <TermsOfServicePage onBack={() => window.history.back()} />
 
   if (!isAuthenticated) {
     if (resetToken) {
