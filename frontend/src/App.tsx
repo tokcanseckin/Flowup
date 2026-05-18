@@ -351,6 +351,7 @@ function LoginScreen({
   onGoogleLogin,
   onAppleLogin,
   onShowSignUp,
+  onShowForgotPassword,
   error,
   busy,
 }: {
@@ -358,6 +359,7 @@ function LoginScreen({
   onGoogleLogin: (credential: string) => Promise<void>
   onAppleLogin: (idToken: string) => Promise<void>
   onShowSignUp: () => void
+  onShowForgotPassword: () => void
   error: string | null
   busy: boolean
 }) {
@@ -429,6 +431,13 @@ function LoginScreen({
             >
               {busy ? t('auth.signingIn') : t('auth.signIn')}
             </button>
+            <button
+              type="button"
+              onClick={onShowForgotPassword}
+              className="w-full text-center text-xs text-gray-500 hover:text-gray-400 transition-colors"
+            >
+              Forgot password?
+            </button>
           </form>
 
           <p className="text-center text-sm text-gray-500">
@@ -441,6 +450,190 @@ function LoginScreen({
               {t('auth.signUp')}
             </button>
           </p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ── Forgot-password screen ────────────────────────────────────────────────────
+
+function ForgotPasswordScreen({
+  onBack,
+}: {
+  onBack: () => void
+}) {
+  const [email, setEmail] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [sent, setSent] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
+    e.preventDefault()
+    setBusy(true)
+    setError(null)
+    try {
+      await api.forgotPassword(email.trim())
+      setSent(true)
+    } catch {
+      setError('Something went wrong. Please try again.')
+    } finally {
+      setBusy(false)
+    }
+  }, [email])
+
+  return (
+    <div className="min-h-screen flex items-center justify-center p-4"
+         style={{ background: 'radial-gradient(ellipse 120% 80% at 50% 110%, #1a1040 0%, #0d0d14 60%)' }}>
+      <div className="w-full max-w-md">
+        <AppLogo />
+        <div className="rounded-2xl border border-gray-800/80 p-8 shadow-2xl space-y-5"
+             style={{ background: '#12121f' }}>
+          <h2 className="text-white font-semibold text-lg">Reset password</h2>
+
+          {sent ? (
+            <div className="space-y-4">
+              <p className="text-sm text-gray-400">
+                If an account with that email exists, you'll receive a reset link shortly.
+              </p>
+              <button
+                type="button"
+                onClick={onBack}
+                className="w-full py-2.5 rounded-xl font-semibold text-sm bg-gray-800 hover:bg-gray-700 text-white transition-all duration-150"
+              >
+                Back to sign in
+              </button>
+            </div>
+          ) : (
+            <>
+              {error && (
+                <div className="rounded-xl border border-red-900/50 bg-red-950/30 px-4 py-3 text-sm text-red-400">
+                  {error}
+                </div>
+              )}
+              <form onSubmit={handleSubmit} className="space-y-3">
+                <p className="text-sm text-gray-400">
+                  Enter your email and we'll send you a link to reset your password.
+                </p>
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500"
+                />
+                <button
+                  type="submit"
+                  disabled={busy}
+                  className="w-full py-2.5 rounded-xl font-semibold text-sm bg-indigo-600 hover:bg-indigo-500 disabled:bg-gray-800 disabled:text-gray-500 text-white transition-all duration-150"
+                >
+                  {busy ? 'Sending…' : 'Send reset link'}
+                </button>
+              </form>
+              <p className="text-center text-sm text-gray-500">
+                <button
+                  type="button"
+                  onClick={onBack}
+                  className="text-indigo-400 hover:text-indigo-300 font-medium transition-colors"
+                >
+                  Back to sign in
+                </button>
+              </p>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ── Reset-password screen ─────────────────────────────────────────────────────
+
+function ResetPasswordScreen({
+  token,
+  onDone,
+}: {
+  token: string
+  onDone: () => void
+}) {
+  const [password, setPassword] = useState('')
+  const [confirm, setConfirm] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [done, setDone] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (password !== confirm) { setError('Passwords do not match'); return }
+    setBusy(true)
+    setError(null)
+    try {
+      await api.resetPassword(token, password)
+      setDone(true)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong.')
+    } finally {
+      setBusy(false)
+    }
+  }, [token, password, confirm])
+
+  return (
+    <div className="min-h-screen flex items-center justify-center p-4"
+         style={{ background: 'radial-gradient(ellipse 120% 80% at 50% 110%, #1a1040 0%, #0d0d14 60%)' }}>
+      <div className="w-full max-w-md">
+        <AppLogo />
+        <div className="rounded-2xl border border-gray-800/80 p-8 shadow-2xl space-y-5"
+             style={{ background: '#12121f' }}>
+          <h2 className="text-white font-semibold text-lg">Choose a new password</h2>
+
+          {done ? (
+            <div className="space-y-4">
+              <p className="text-sm text-gray-400">Your password has been updated. You can now sign in.</p>
+              <button
+                type="button"
+                onClick={onDone}
+                className="w-full py-2.5 rounded-xl font-semibold text-sm bg-indigo-600 hover:bg-indigo-500 text-white transition-all duration-150"
+              >
+                Sign in
+              </button>
+            </div>
+          ) : (
+            <>
+              {error && (
+                <div className="rounded-xl border border-red-900/50 bg-red-950/30 px-4 py-3 text-sm text-red-400">
+                  {error}
+                </div>
+              )}
+              <form onSubmit={handleSubmit} className="space-y-3">
+                <input
+                  type="password"
+                  required
+                  minLength={8}
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  placeholder="New password (min 8 chars)"
+                  className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500"
+                />
+                <input
+                  type="password"
+                  required
+                  minLength={8}
+                  value={confirm}
+                  onChange={e => setConfirm(e.target.value)}
+                  placeholder="Confirm new password"
+                  className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500"
+                />
+                <button
+                  type="submit"
+                  disabled={busy}
+                  className="w-full py-2.5 rounded-xl font-semibold text-sm bg-indigo-600 hover:bg-indigo-500 disabled:bg-gray-800 disabled:text-gray-500 text-white transition-all duration-150"
+                >
+                  {busy ? 'Updating…' : 'Set new password'}
+                </button>
+              </form>
+            </>
+          )}
         </div>
       </div>
     </div>
@@ -2404,6 +2597,11 @@ export default function App() {
   const [showSignUp, setShowSignUp] = useState(() =>
     typeof window !== 'undefined' && window.location.pathname === '/signup'
   )
+  const [showForgotPassword, setShowForgotPassword] = useState(false)
+  const [resetToken, setResetToken] = useState<string | null>(() => {
+    if (typeof window === 'undefined') return null
+    return new URLSearchParams(window.location.search).get('reset_token')
+  })
 
   const { favoriteSongIds, toggleFavorite } = useFavorites(!!credentialUser)
   const { listenedSongIds, markListened, unmarkListened } = useListened(!!credentialUser)
@@ -2946,6 +3144,24 @@ export default function App() {
   }, [activeSong, activeSongIndex, displayedSongs, settings.preferredSource])
 
   if (!isAuthenticated) {
+    if (resetToken) {
+      return (
+        <ResetPasswordScreen
+          token={resetToken}
+          onDone={() => {
+            setResetToken(null)
+            window.history.replaceState({}, '', window.location.pathname)
+          }}
+        />
+      )
+    }
+    if (showForgotPassword) {
+      return (
+        <ForgotPasswordScreen
+          onBack={() => { setShowForgotPassword(false); setLoginError(null) }}
+        />
+      )
+    }
     if (showSignUp) {
       return (
         <SignUpScreen
@@ -2964,6 +3180,7 @@ export default function App() {
         onGoogleLogin={handleGoogleLogin}
         onAppleLogin={handleAppleLogin}
         onShowSignUp={() => { setShowSignUp(true); setLoginError(null); navigateToPath('/signup') }}
+        onShowForgotPassword={() => { setShowForgotPassword(true); setLoginError(null) }}
         error={loginError}
         busy={loginBusy}
       />

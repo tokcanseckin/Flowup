@@ -43,7 +43,8 @@ from typing import Optional
 import jwt as pyjwt
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv()  # local .env (dev)
+load_dotenv(Path.home() / ".credentials")  # server credentials (won't override already-set vars)
 
 from fastapi import Depends, FastAPI, File, Header, HTTPException, Query, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
@@ -51,7 +52,7 @@ from fastapi.responses import JSONResponse, Response, StreamingResponse
 from sqlalchemy import select as sa_select
 from sqlalchemy.orm import Session, noload
 
-from database import AlignmentTask, Line, LineTranslation, Localization, Playlist, PlaylistSong, Report, Song, User, UserFavorite, UserListenedSong, UserWordLookup, Word, WordDefinition, create_tables, get_db
+from database import AlignmentTask, Line, LineTranslation, Localization, PasswordResetToken, Playlist, PlaylistSong, Report, Song, User, UserFavorite, UserListenedSong, UserWordLookup, Word, WordDefinition, create_tables, get_db
 from models import (
     AdminLyricsUpdate,
     AdminSongDetailResponse,
@@ -99,10 +100,13 @@ from models import (
     ReportCreate,
     AdminReportResponse,
     ReportStatusUpdate,
+    ForgotPasswordRequest,
+    ResetPasswordRequest,
 )
+import mailgun as _mailgun
 from openrussian import ensure_loaded as _load_or, lookup as _or_lookup, lookup_local as _or_lookup_local
 import italian_dict as _italian_dict
-from spotify_auth import fetch_spotify_user, refresh_access_token
+from spotify_auth import fetch_spotify_user, refresh_access_token  # noqa: E402
 from google_auth import verify_google_id_token
 from apple_auth import verify_apple_id_token
 
@@ -2424,6 +2428,81 @@ async def complete_onboarding(body: CompleteOnboardingRequest, db: Session = Dep
     )
 
 
+# ── Password reset ─────────────────────────────────────────────────────────────
+
+@app.post("/api/auth/forgot-password", status_code=204)
+def forgot_password(body: ForgotPasswordRequest, db: Session = Depends(get_db)):
+    """Request a password-reset email. Always returns 204 to prevent email enumeration."""
+    import time as _time
+
+    email = body.email.strip().lower()
+    user = db.query(User).filter(User.email == email).first()
+    if not user or not user.email:
+        return Response(status_code=204)
+
+    raw_token = secrets.token_urlsafe(32)
+    token_hash = sha256(raw_token.encode()).hexdigest()
+    expires_at = int(_time.time()) + 3600  # 1 hour
+
+    # Invalidate any existing unused tokens for this user
+    db.query(PasswordResetToken).filter(
+        PasswordResetToken.user_id == user.id,
+        PasswordResetToken.used == 0,
+    ).update({"used": 1})
+
+    db.add(PasswordResetToken(
+        user_id=user.id,
+        token_hash=token_hash,
+        expires_at=expires_at,
+        used=0,
+    ))
+    db.commit()
+
+    site_url = os.environ.get("SITE_URL", "https://singoling.com").rstrip("/")
+    reset_url = f"{site_url}/?reset_token={raw_token}"
+    _email = user.email
+    _name = user.display_name
+
+    def _send() -> None:
+        try:
+            _mailgun.send_password_reset(to=_email, display_name=_name, reset_url=reset_url)
+        except Exception:
+            pass
+
+    threading.Thread(target=_send, daemon=True).start()
+    return Response(status_code=204)
+
+
+@app.post("/api/auth/reset-password", status_code=204)
+def reset_password(body: ResetPasswordRequest, db: Session = Depends(get_db)):
+    """Consume a reset token and update the user's password."""
+    import time as _time
+
+    if len(body.password) < 8:
+        raise HTTPException(status_code=400, detail="Password must be at least 8 characters")
+
+    token_hash = sha256(body.token.encode()).hexdigest()
+    now = int(_time.time())
+
+    record = db.query(PasswordResetToken).filter(
+        PasswordResetToken.token_hash == token_hash,
+        PasswordResetToken.expires_at > now,
+        PasswordResetToken.used == 0,
+    ).first()
+
+    if not record:
+        raise HTTPException(status_code=400, detail="Invalid or expired reset token")
+
+    user = db.get(User, record.user_id)
+    if not user:
+        raise HTTPException(status_code=400, detail="Invalid or expired reset token")
+
+    user.password_hash = _hash_password(body.password)
+    record.used = 1
+    db.commit()
+    return Response(status_code=204)
+
+
 @app.get("/api/me/settings", response_model=UserSettings)
 async def get_user_settings(current_user: User = Depends(_get_current_user)):
     return _parse_user_settings(current_user.settings_json)
@@ -3128,6 +3207,30 @@ def create_report(
     )
     db.add(report)
     db.commit()
+
+    # Notify admin via email (fire-and-forget)
+    _report_id = report.id
+    _kind = body.kind
+    _user_name = current_user.display_name
+    _user_email = current_user.email
+    _song_title = song.title if song else None
+    _message = body.message
+
+    def _notify() -> None:
+        try:
+            _mailgun.send_support_notification(
+                report_id=_report_id,
+                kind=_kind,
+                user_name=_user_name,
+                user_email=_user_email,
+                song_title=_song_title,
+                message=_message,
+            )
+        except Exception:
+            pass
+
+    threading.Thread(target=_notify, daemon=True).start()
+
     return {"id": report.id}
 
 

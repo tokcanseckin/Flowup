@@ -484,3 +484,16 @@ class ReportStatusUpdate(BaseModel):
     """Body for PATCH /api/admin/reports/{id} — update report status."""
     status: str  # 'open' | 'resolved' | 'dismissed'
 
+
+# ── Password-reset models ───────────────────────────────────────────────────────
+
+class ForgotPasswordRequest(BaseModel):
+    """Body for POST /api/auth/forgot-password."""
+    email: str
+
+
+class ResetPasswordRequest(BaseModel):
+    """Body for POST /api/auth/reset-password."""
+    token: str
+    password: str
+

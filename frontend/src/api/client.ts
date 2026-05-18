@@ -357,6 +357,18 @@ export const api = {
       body: JSON.stringify(body),
     }),
 
+  forgotPassword: (email: string): Promise<void> =>
+    apiFetch('/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    }),
+
+  resetPassword: (token: string, password: string): Promise<void> =>
+    apiFetch('/auth/reset-password', {
+      method: 'POST',
+      body: JSON.stringify({ token, password }),
+    }),
+
   loginWithGoogle: (idToken: string): Promise<BackendUser> =>
     apiFetch('/auth/google', {
       method: 'POST',

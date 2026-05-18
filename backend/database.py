@@ -288,6 +288,17 @@ class Report(Base):
     created_at = Column(Integer, default=lambda: int(time.time()))
 
 
+class PasswordResetToken(Base):
+    """Short-lived tokens for the password-reset flow."""
+    __tablename__ = "password_reset_tokens"
+
+    id         = Column(Integer, primary_key=True)
+    user_id    = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    token_hash = Column(String(64), unique=True, nullable=False)  # SHA-256 hex of the raw token
+    expires_at = Column(Integer, nullable=False)                   # Unix seconds
+    used       = Column(Integer, nullable=False, default=0)
+
+
 def create_tables() -> None:
     Base.metadata.create_all(bind=engine)
     _migrate_playlists_pg()
@@ -305,6 +316,11 @@ def _migrate_playlists_pg() -> None:
             "id SERIAL PRIMARY KEY, kind VARCHAR(32) NOT NULL, user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,"
             " song_id INTEGER REFERENCES songs(id) ON DELETE SET NULL, word TEXT, lemma TEXT, context TEXT,"
             " message TEXT, status VARCHAR(16) NOT NULL DEFAULT 'open', created_at INTEGER)"
+        ),
+        (
+            "CREATE TABLE IF NOT EXISTS password_reset_tokens ("
+            "id SERIAL PRIMARY KEY, user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,"
+            " token_hash VARCHAR(64) NOT NULL UNIQUE, expires_at INTEGER NOT NULL, used INTEGER NOT NULL DEFAULT 0)"
         ),
     ]
     for stmt in statements:
