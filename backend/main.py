@@ -833,7 +833,7 @@ def _maybe_send_rate_limit_alert(
             f"No further alerts will be sent for this IP+endpoint for 24 h."
         )
         try:
-            _mailgun._send(to=_mailgun.ADMIN_EMAIL, subject=subject, text=body)
+            _mailgun._send(to=_mailgun.ADMIN_PERSONAL_EMAIL, subject=subject, text=body)
         except Exception as exc:
             print(f"[rate_limit] failed to send alert email: {exc}")
 
