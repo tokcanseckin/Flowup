@@ -1,4 +1,5 @@
 import React from 'react'
+import { useT } from '../i18n/LocalizationContext'
 
 function Section({ n, title, children }: { n: string; title: string; children: React.ReactNode }) {
   return (
@@ -31,6 +32,7 @@ function UL({ items }: { items: React.ReactNode[] }) {
 }
 
 export default function PrivacyPolicyPage({ onBack }: { onBack: () => void }) {
+  const t = useT()
   return (
     <div className="min-h-screen" style={{ background: '#0d0d14' }}>
       {/* Sticky header */}
@@ -47,10 +49,10 @@ export default function PrivacyPolicyPage({ onBack }: { onBack: () => void }) {
             <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current">
               <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
             </svg>
-            Back
+            {t('nav.back')}
           </button>
           <span className="text-gray-600">|</span>
-          <h1 className="text-white font-semibold text-sm">Privacy Policy</h1>
+          <h1 className="text-white font-semibold text-sm">{t('auth.privacyPolicy')}</h1>
         </div>
       </div>
 
@@ -58,9 +60,9 @@ export default function PrivacyPolicyPage({ onBack }: { onBack: () => void }) {
       <div className="max-w-3xl mx-auto px-6 py-10 space-y-10">
         {/* Header block */}
         <div className="space-y-2">
-          <h1 className="text-2xl font-bold text-white">Privacy Policy</h1>
+          <h1 className="text-2xl font-bold text-white">{t('auth.privacyPolicy')}</h1>
           <p className="text-indigo-400 font-medium">SingoLing</p>
-          <p className="text-gray-500 text-sm">Effective Date: May 18, 2026 &nbsp;|&nbsp; Last Updated: May 18, 2026</p>
+          <p className="text-gray-500 text-sm">{t('legal.effectiveDate')} May 18, 2026 &nbsp;|&nbsp; {t('legal.lastUpdated')} May 18, 2026</p>
         </div>
 
         <P>
@@ -340,9 +342,9 @@ export default function PrivacyPolicyPage({ onBack }: { onBack: () => void }) {
 
         {/* Footer */}
         <div className="border-t border-gray-800/60 pt-6 pb-4 text-center text-xs text-gray-600 space-x-4">
-          <button type="button" onClick={onBack} className="hover:text-gray-400 transition-colors">Back to SingoLing</button>
+          <button type="button" onClick={onBack} className="hover:text-gray-400 transition-colors">{t('legal.backToApp')}</button>
           <span>·</span>
-          <a href="/terms" className="hover:text-gray-400 transition-colors" onClick={e => { e.preventDefault(); window.history.pushState(null,'','/terms'); window.dispatchEvent(new PopStateEvent('popstate')) }}>Terms of Service</a>
+          <a href="/terms" className="hover:text-gray-400 transition-colors" onClick={e => { e.preventDefault(); window.history.pushState(null,'','/terms'); window.dispatchEvent(new PopStateEvent('popstate')) }}>{t('auth.termsOfService')}</a>
         </div>
       </div>
     </div>

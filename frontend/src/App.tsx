@@ -443,7 +443,7 @@ function LoginScreen({
               onClick={onShowForgotPassword}
               className="w-full text-center text-xs text-gray-500 hover:text-gray-400 transition-colors"
             >
-              Forgot password?
+              {t('auth.forgotPassword')}
             </button>
           </form>
 
@@ -474,6 +474,7 @@ function ForgotPasswordScreen({
   const [busy, setBusy] = useState(false)
   const [sent, setSent] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const t = useT()
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault()
@@ -483,11 +484,11 @@ function ForgotPasswordScreen({
       await api.forgotPassword(email.trim())
       setSent(true)
     } catch {
-      setError('Something went wrong. Please try again.')
+      setError(t('auth.somethingWentWrong'))
     } finally {
       setBusy(false)
     }
-  }, [email])
+  }, [email, t])
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4"
@@ -496,19 +497,19 @@ function ForgotPasswordScreen({
         <AppLogo />
         <div className="rounded-2xl border border-gray-800/80 p-8 shadow-2xl space-y-5"
              style={{ background: '#12121f' }}>
-          <h2 className="text-white font-semibold text-lg">Reset password</h2>
+          <h2 className="text-white font-semibold text-lg">{t('auth.resetPassword')}</h2>
 
           {sent ? (
             <div className="space-y-4">
               <p className="text-sm text-gray-400">
-                If an account with that email exists, you'll receive a reset link shortly.
+                {t('auth.resetLinkSent')}
               </p>
               <button
                 type="button"
                 onClick={onBack}
                 className="w-full py-2.5 rounded-xl font-semibold text-sm bg-gray-800 hover:bg-gray-700 text-white transition-all duration-150"
               >
-                Back to sign in
+                {t('auth.backToSignIn')}
               </button>
             </div>
           ) : (
@@ -520,14 +521,14 @@ function ForgotPasswordScreen({
               )}
               <form onSubmit={handleSubmit} className="space-y-3">
                 <p className="text-sm text-gray-400">
-                  Enter your email and we'll send you a link to reset your password.
+                  {t('auth.resetPasswordInstruction')}
                 </p>
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={e => setEmail(e.target.value)}
-                  placeholder="you@example.com"
+                  placeholder={t('auth.emailPlaceholder')}
                   className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500"
                 />
                 <button
@@ -535,7 +536,7 @@ function ForgotPasswordScreen({
                   disabled={busy}
                   className="w-full py-2.5 rounded-xl font-semibold text-sm bg-indigo-600 hover:bg-indigo-500 disabled:bg-gray-800 disabled:text-gray-500 text-white transition-all duration-150"
                 >
-                  {busy ? 'Sending…' : 'Send reset link'}
+                  {busy ? t('auth.sending') : t('auth.sendResetLink')}
                 </button>
               </form>
               <p className="text-center text-sm text-gray-500">
@@ -544,7 +545,7 @@ function ForgotPasswordScreen({
                   onClick={onBack}
                   className="text-indigo-400 hover:text-indigo-300 font-medium transition-colors"
                 >
-                  Back to sign in
+                  {t('auth.backToSignIn')}
                 </button>
               </p>
             </>
@@ -569,21 +570,22 @@ function ResetPasswordScreen({
   const [busy, setBusy] = useState(false)
   const [done, setDone] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const t = useT()
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault()
-    if (password !== confirm) { setError('Passwords do not match'); return }
+    if (password !== confirm) { setError(t('auth.passwordsDoNotMatch')); return }
     setBusy(true)
     setError(null)
     try {
       await api.resetPassword(token, password)
       setDone(true)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong.')
+      setError(err instanceof Error ? err.message : t('auth.somethingWentWrong'))
     } finally {
       setBusy(false)
     }
-  }, [token, password, confirm])
+  }, [token, password, confirm, t])
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4"
@@ -592,17 +594,17 @@ function ResetPasswordScreen({
         <AppLogo />
         <div className="rounded-2xl border border-gray-800/80 p-8 shadow-2xl space-y-5"
              style={{ background: '#12121f' }}>
-          <h2 className="text-white font-semibold text-lg">Choose a new password</h2>
+          <h2 className="text-white font-semibold text-lg">{t('auth.chooseNewPassword')}</h2>
 
           {done ? (
             <div className="space-y-4">
-              <p className="text-sm text-gray-400">Your password has been updated. You can now sign in.</p>
+              <p className="text-sm text-gray-400">{t('auth.passwordUpdated')}</p>
               <button
                 type="button"
                 onClick={onDone}
                 className="w-full py-2.5 rounded-xl font-semibold text-sm bg-indigo-600 hover:bg-indigo-500 text-white transition-all duration-150"
               >
-                Sign in
+                {t('auth.signIn')}
               </button>
             </div>
           ) : (
@@ -619,7 +621,7 @@ function ResetPasswordScreen({
                   minLength={8}
                   value={password}
                   onChange={e => setPassword(e.target.value)}
-                  placeholder="New password (min 8 chars)"
+                  placeholder={t('auth.newPasswordPlaceholder')}
                   className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500"
                 />
                 <input
@@ -628,7 +630,7 @@ function ResetPasswordScreen({
                   minLength={8}
                   value={confirm}
                   onChange={e => setConfirm(e.target.value)}
-                  placeholder="Confirm new password"
+                  placeholder={t('auth.confirmNewPasswordPlaceholder')}
                   className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500"
                 />
                 <button
@@ -636,7 +638,7 @@ function ResetPasswordScreen({
                   disabled={busy}
                   className="w-full py-2.5 rounded-xl font-semibold text-sm bg-indigo-600 hover:bg-indigo-500 disabled:bg-gray-800 disabled:text-gray-500 text-white transition-all duration-150"
                 >
-                  {busy ? 'Updating…' : 'Set new password'}
+                  {busy ? t('auth.updating') : t('auth.setNewPassword')}
                 </button>
               </form>
             </>
@@ -748,6 +750,20 @@ function SignUpScreen({
               placeholder={t('auth.confirmPasswordPlaceholder')}
               className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500"
             />
+            <p className="text-center text-xs text-gray-500 leading-relaxed">
+              {t('auth.signupAgreementPrefix')}{' '}
+              <a
+                href="/terms"
+                onClick={e => { e.preventDefault(); window.history.pushState(null, '', '/terms'); window.dispatchEvent(new PopStateEvent('popstate')) }}
+                className="text-indigo-400 hover:text-indigo-300 transition-colors"
+              >{t('auth.termsOfService')}</a>
+              {' '}{t('auth.and')}{' '}
+              <a
+                href="/privacy"
+                onClick={e => { e.preventDefault(); window.history.pushState(null, '', '/privacy'); window.dispatchEvent(new PopStateEvent('popstate')) }}
+                className="text-indigo-400 hover:text-indigo-300 transition-colors"
+              >{t('auth.privacyPolicy')}</a>
+            </p>
             <button
               type="submit"
               disabled={busy}
@@ -760,21 +776,6 @@ function SignUpScreen({
               {busy ? t('auth.creatingAccount') : t('auth.createAccount')}
             </button>
           </form>
-
-          <p className="text-center text-xs text-gray-500 leading-relaxed">
-            By signing up, you agree to our{' '}
-            <a
-              href="/terms"
-              onClick={e => { e.preventDefault(); window.history.pushState(null, '', '/terms'); window.dispatchEvent(new PopStateEvent('popstate')) }}
-              className="text-indigo-400 hover:text-indigo-300 transition-colors"
-            >Terms of Service</a>
-            {' '}and{' '}
-            <a
-              href="/privacy"
-              onClick={e => { e.preventDefault(); window.history.pushState(null, '', '/privacy'); window.dispatchEvent(new PopStateEvent('popstate')) }}
-              className="text-indigo-400 hover:text-indigo-300 transition-colors"
-            >Privacy Policy</a>
-          </p>
 
           <p className="text-center text-sm text-gray-500">
             {t('auth.alreadyHaveAccount')}{' '}
