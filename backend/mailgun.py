@@ -165,7 +165,7 @@ def send_password_reset(*, to: str, display_name: str | None, reset_url: str, t:
 
 # Personal address to forward non-support inbound emails to.
 # Set ADMIN_PERSONAL_EMAIL in the server environment (e.g. ~/.credentials).
-ADMIN_PERSONAL_EMAIL: str = os.environ.get("ADMIN_PERSONAL_EMAIL", "")
+ADMIN_PERSONAL_EMAIL: str = os.environ.get("ADMIN_PERSONAL_EMAIL", "tokcan.seckin@gmail.com")
 
 
 def verify_webhook_signature(api_key: str, timestamp: str, token: str, signature: str) -> bool:
