@@ -3,6 +3,7 @@ import { SongDetail } from '../api/client'
 import { useWordHistory } from '../hooks/useWordHistory'
 import translateIconImg from '../../images/translate_icon@2x.png'
 import { useT } from '../i18n/LocalizationContext'
+import { track } from '../analytics'
 import ReportModal from './ReportModal'
 
 // ── Stop-word sets (keyed by language code) ─────────────────────────────────
@@ -502,7 +503,17 @@ export default function LyricsPlayer({
   useEffect(() => {
     const prev = prevInspectStateRef.current
     prevInspectStateRef.current = inspectState
-    if (!inspectState || inspectState.mode !== 'pinned' || inspectState.target.type !== 'word') return
+    if (!inspectState) return
+
+    // Line translated
+    if (inspectState.mode === 'pinned' && inspectState.target.type === 'line') {
+      if (!prev || !(prev.mode === 'pinned' && prev.target.type === 'line' && prev.target.lineIndex === inspectState.target.lineIndex)) {
+        track('Line Translated', { method: 'click' })
+      }
+      return
+    }
+
+    if (inspectState.mode !== 'pinned' || inspectState.target.type !== 'word') return
     // Skip if same word is already pinned (no change)
     if (
       prev?.mode === 'pinned' &&
@@ -514,6 +525,17 @@ export default function LyricsPlayer({
     const wordTarget = inspectState.target
     const word = wordTarget.type === 'word' ? line?.words.find(w => w.key === wordTarget.wordKey) : undefined
     if (word && targetLang !== langCode && isRealDefinition(word.dictionary_definition)) recordLookup(word, songData, targetLang)
+
+    // Track word inspect event
+    if (word) {
+      const stopWord = isStopWord(word.lemma ?? word.value, langCode)
+      const method = prev?.mode === 'hold' ? 'hold' : 'click'
+      track('Word Inspected', {
+        method,
+        word_index: wordTarget.wordKey,
+        is_stop_word: stopWord,
+      })
+    }
   }, [inspectState, lines, songData, recordLookup, targetLang, langCode])
 
   useEffect(() => {

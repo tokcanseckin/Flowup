@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { api } from '../api/client'
 import { useT } from '../i18n/LocalizationContext'
+import { track } from '../analytics'
 
 export default function HelpButton() {
   const t = useT()
@@ -13,6 +14,8 @@ export default function HelpButton() {
     setOpen(true)
     setStatus('idle')
     setMessage('')
+    track('Help Button Clicked')
+    track('Support Form Opened')
     setTimeout(() => textareaRef.current?.focus(), 50)
   }
 
@@ -29,6 +32,7 @@ export default function HelpButton() {
     try {
       await api.createReport({ kind: 'support', message: trimmed })
       setStatus('done')
+      track('Support Ticket Submitted', { category: 'help_button' })
     } catch {
       setStatus('error')
     }

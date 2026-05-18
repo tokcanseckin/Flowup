@@ -13,6 +13,7 @@ import { useFavorites } from './hooks/useFavorites'
 import { useListened } from './hooks/useListened'
 import { useWordHistory } from './hooks/useWordHistory'
 import { useLocalization, useT, useContentT } from './i18n/LocalizationContext'
+import { track } from './analytics'
 
 // ── Module-level song cache (survives re-renders, cleared on logout) ──────────
 // Key: `{id}:{source}` where source is 'youtube' or 'apple_music'.
@@ -1512,6 +1513,7 @@ function SettingsPage({
                             message: `${supportForm.subject.trim()}\n\n${supportForm.message.trim()}`,
                           })
                           setSupportSent(true)
+                          track('Support Ticket Submitted', { category: 'settings' })
                         } catch {
                           setSupportError('Something went wrong, please try again.')
                         } finally {
@@ -1766,6 +1768,13 @@ function PlayerView({
   const t = useT()
   const { language, setLanguage } = useLocalization()
 
+  // ── Analytics refs ────────────────────────────────────────────────────────────
+  const songStartedRef = useRef(false)
+  const songCompletedRef = useRef(false)
+  const maxPosRef = useRef(0)
+  const durationMsRef = useRef(0)
+  const prevEffectiveSourceRef = useRef<'youtube' | 'apple_music' | null>(null)
+
   useEffect(() => {
     if (!playerMenuOpen) return
     const close = () => setPlayerMenuOpen(false)
@@ -1915,6 +1924,69 @@ function PlayerView({
     else ytRef.current?.seekTo(ms)
   }, [effectiveSource])
 
+  // ── Analytics effects ─────────────────────────────────────────────────────────
+
+  // Reset per-song analytics state when the song changes
+  useEffect(() => {
+    return () => {
+      // Runs when song.id changes (previous song cleanup) or on unmount
+      const dur = durationMsRef.current
+      const maxPos = maxPosRef.current
+      if (dur > 0 && maxPos > 0 && songStartedRef.current && !songCompletedRef.current) {
+        const pct = maxPos / dur
+        if (pct < 0.25) {
+          track('Song Abandoned', {
+            seconds_played: Math.round(maxPos / 1000),
+            abandonment_pct: Math.round(pct * 100),
+          })
+        }
+      }
+      songStartedRef.current = false
+      songCompletedRef.current = false
+      maxPosRef.current = 0
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [song.id])
+
+  // Keep duration ref in sync
+  useEffect(() => { durationMsRef.current = durationMs }, [durationMs])
+
+  // Track max position reached and fire Song Started / Song Completed
+  useEffect(() => {
+    if (positionMs > maxPosRef.current) maxPosRef.current = positionMs
+  }, [positionMs])
+
+  useEffect(() => {
+    if (!isPlaying || songStartedRef.current) return
+    songStartedRef.current = true
+    track('Song Started', {
+      song_id: song.id,
+      source: effectiveSource,
+      source_lang: song.language.code,
+      target_lang: targetLang ?? '',
+    })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isPlaying])
+
+  useEffect(() => {
+    if (songCompletedRef.current || durationMs <= 0 || positionMs <= 0) return
+    const pct = positionMs / durationMs
+    if (pct < 0.9) return
+    songCompletedRef.current = true
+    track('Song Completed', {
+      duration: Math.round(durationMs / 1000),
+      completion_pct: Math.round(pct * 100),
+    })
+  }, [positionMs, durationMs])
+
+  // Playback Source Switched — fire when effectiveSource changes after first render
+  useEffect(() => {
+    const prev = prevEffectiveSourceRef.current
+    prevEffectiveSourceRef.current = effectiveSource
+    if (prev === null || prev === effectiveSource) return
+    track('Playback Source Switched', { from: prev, to: effectiveSource })
+  }, [effectiveSource])
+
   // Pause-on-inspect
   useEffect(() => {
     if (!settings.pauseOnInspect) {
@@ -1957,6 +2029,7 @@ function PlayerView({
       if (e.key === 'ArrowLeft') {
         e.preventDefault()
         if (e.repeat || !canPrev) return
+        track('Previous Song')
         handlePrev()
         return
       }
@@ -1964,6 +2037,7 @@ function PlayerView({
       if (e.key === 'ArrowRight') {
         e.preventDefault()
         if (e.repeat || !canNext) return
+        track('Next Song', { trigger: 'keyboard' })
         handleNext()
       }
     }
@@ -2070,7 +2144,7 @@ function PlayerView({
                   <button
                     key={opt.value}
                     type="button"
-                    onClick={() => opt.available && onUpdate({ preferredSource: opt.value })}
+                    onClick={() => { if (!opt.available) return; track('Playback Source Switched', { from: effectiveSource, to: opt.value }); onUpdate({ preferredSource: opt.value }) }}
                     disabled={!opt.available}
                     aria-label={opt.label}
                     className={`px-2 py-1 rounded-md transition-all ${
@@ -2196,7 +2270,7 @@ function PlayerView({
           <ProgressBar posMs={positionMs} durMs={durationMs} onSeek={seekTo} />
           <div className="flex items-center justify-center gap-5 mt-6">
             <button
-              onClick={handlePrev}
+              onClick={() => { track('Previous Song'); handlePrev() }}
               disabled={!canPrev}
               aria-label="Previous song"
               className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-black/20 disabled:opacity-40 disabled:cursor-not-allowed text-gray-100 transition-all"
@@ -2228,7 +2302,7 @@ function PlayerView({
               )}
             </button>
             <button
-              onClick={handleNext}
+              onClick={() => { track('Next Song', { trigger: 'button' }); handleNext() }}
               disabled={!canNext}
               aria-label="Next song"
               className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-black/20 disabled:opacity-40 disabled:cursor-not-allowed text-gray-100 transition-all"
@@ -2484,6 +2558,7 @@ export default function App() {
       }
       setCredentialUser(user)
       localStorage.setItem(PASSWORD_SESSION_KEY, JSON.stringify(user))
+      track('Login', { method: 'email' })
     } catch (e) {
       setLoginError(e instanceof Error ? e.message : 'Failed to sign in with email/password')
     } finally {
@@ -2503,6 +2578,7 @@ export default function App() {
       }
       setCredentialUser(user)
       localStorage.setItem(PASSWORD_SESSION_KEY, JSON.stringify(user))
+      track('Login', { method: 'google' })
     } catch (e) {
       setLoginError(e instanceof Error ? e.message : 'Google sign-in failed')
     } finally {
@@ -2522,6 +2598,7 @@ export default function App() {
       }
       setCredentialUser(user)
       localStorage.setItem(PASSWORD_SESSION_KEY, JSON.stringify(user))
+      track('Login', { method: 'apple' })
     } catch (e) {
       setLoginError(e instanceof Error ? e.message : 'Apple sign-in failed')
     } finally {
@@ -2541,6 +2618,7 @@ export default function App() {
       }
       setCredentialUser(user)
       localStorage.setItem(PASSWORD_SESSION_KEY, JSON.stringify(user))
+      track('Sign Up', { method: 'email' })
     } catch (e) {
       setLoginError(e instanceof Error ? e.message : 'Failed to create account')
     } finally {
@@ -2549,6 +2627,7 @@ export default function App() {
   }, [])
 
   const handleLogout = useCallback(() => {
+    track('Logout')
     clearAdminSession()
     setAdminOpen(false)
     setCredentialUser(null)
@@ -2569,6 +2648,8 @@ export default function App() {
     setCredentialUser(updated)
     localStorage.setItem(PASSWORD_SESSION_KEY, JSON.stringify(updated))
     api.saveAppleMusicToken(token).catch(console.error)
+    if (token) track('Apple Music Connected')
+    else track('Apple Music Disconnected')
   }, [credentialUser])
 
   const handleBrowseTargetLang = useCallback((musicLang: string, targetLang: string) => {
@@ -2581,6 +2662,10 @@ export default function App() {
 
   const handleSelectSong = useCallback(async (id: number, options?: { updateRoute?: boolean }) => {
     markListened(id)
+    if (activePlaylist) {
+      const position = activePlaylist.songs.findIndex(s => s.song_id === id)
+      track('Song Selected From Playlist', { song_id: id, position_in_playlist: position + 1 })
+    }
     // Navigate immediately so the UI responds at once; song data loads in background.
     if (options?.updateRoute !== false) {
       navigateToPath(songPath(id))
@@ -2763,6 +2848,29 @@ export default function App() {
   }, [isAuthenticated, isAdmin, activeSong?.id, handleSelectSong, navigateToPath, route])
 
   useEffect(() => {
+    if (!isAuthenticated || route.page !== 'browse') return
+    track('Browse Opened')
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [route.page, isAuthenticated])
+
+  useEffect(() => {
+    if (!isAuthenticated || route.page !== 'admin' || !isAdmin) return
+    track('Admin Panel Opened')
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [route.page])
+
+  const handleSelectPlaylist = useCallback((id: number | null) => {
+    if (id !== null) {
+      const playlist = playlists.find(p => p.id === id)
+      track('Playlist Selected', {
+        playlist_id: id,
+        difficulty: playlist?.difficulty_level ?? '',
+      })
+    }
+    navigateToPath(id !== null ? playlistPath(id) : '/browse')
+  }, [playlists, navigateToPath])
+
+  useEffect(() => {
     if (!settingsHydrated) return
     if (activePlaylistId === settings.lastPlaylistId) return
     updateSettings({ lastPlaylistId: activePlaylistId })
@@ -2812,11 +2920,13 @@ export default function App() {
 
   const handlePrevSong = useCallback(() => {
     if (activeSongIndex <= 0) return
+    track('Previous Song')
     void handleSelectSong(displayedSongs[activeSongIndex - 1].id)
   }, [activeSongIndex, displayedSongs, handleSelectSong])
 
   const handleNextSong = useCallback(() => {
     if (activeSongIndex < 0 || activeSongIndex >= displayedSongs.length - 1) return
+    track('Next Song', { trigger: 'button' })
     void handleSelectSong(displayedSongs[activeSongIndex + 1].id)
   }, [activeSongIndex, displayedSongs, handleSelectSong])
 
@@ -2944,7 +3054,10 @@ export default function App() {
           favoriteSongIds={favoriteSongIds}
           toggleFavorite={toggleFavorite}
           targetLang={effectiveTargetLang}
-          onTargetLangChange={(lang) => setOverrideTargetLang(lang)}
+          onTargetLangChange={(lang) => {
+            track('Target Language Changed', { from: effectiveTargetLang ?? '', to: lang })
+            setOverrideTargetLang(lang)
+          }}
           onGoToBrowse={() => navigateToPath('/browse')}
           playlistName={activePlaylist ? tc(activePlaylist.name) : null}
           onGoToPlaylist={activePlaylistId !== null ? () => navigateToPath(playlistPath(activePlaylistId)) : undefined}
@@ -2965,7 +3078,7 @@ export default function App() {
         error={songsError}
         onSelect={handleSelectSong}
         onPrefetch={handlePrefetchSong}
-        onSelectPlaylist={(id) => navigateToPath(id !== null ? playlistPath(id) : '/browse')}
+        onSelectPlaylist={handleSelectPlaylist}
         onOpenAdmin={() => navigateToPath(activePlaylistId !== null ? adminPath('playlists', activePlaylistId) : '/admin')}
         isAdmin={isAdmin}
         onOpenSettings={() => navigateToPath('/settings')}
