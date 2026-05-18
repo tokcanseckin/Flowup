@@ -42,6 +42,7 @@ class User(Base):
     apple_music_user_token  = Column(Text,        nullable=True)
     google_user_id          = Column(String(128), nullable=True, unique=True)
     apple_user_id           = Column(String(128), nullable=True, unique=True)
+    preferred_lang          = Column(String(8),   nullable=False, server_default='en', default='en')
     created_at              = Column(Integer,     default=lambda: int(time.time()))
 
 
@@ -310,6 +311,7 @@ def _migrate_playlists_pg() -> None:
         "ALTER TABLE playlists ADD COLUMN IF NOT EXISTS is_hidden BOOLEAN NOT NULL DEFAULT FALSE",
         "ALTER TABLE playlists ADD COLUMN IF NOT EXISTS target_langs TEXT NOT NULL DEFAULT '[]'",
         "ALTER TABLE songs ADD COLUMN IF NOT EXISTS target_langs TEXT NOT NULL DEFAULT '[]'",
+        "ALTER TABLE users ADD COLUMN IF NOT EXISTS preferred_lang VARCHAR(8) NOT NULL DEFAULT 'en'",
         "CREATE TABLE IF NOT EXISTS localizations (key TEXT PRIMARY KEY, en TEXT NOT NULL DEFAULT '', tr TEXT NOT NULL DEFAULT '', ru TEXT NOT NULL DEFAULT '')",
         (
             "CREATE TABLE IF NOT EXISTS reports ("

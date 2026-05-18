@@ -96,6 +96,7 @@ export interface BackendUser {
   spotify_enabled: boolean
   apple_music_user_token: string | null
   admin_token: string | null
+  preferred_lang: string
 }
 
 export interface AdminUser {
@@ -354,6 +355,7 @@ export const api = {
     display_name: string
     email: string
     password: string
+    lang?: string
   }): Promise<BackendUser> =>
     apiFetch('/auth/register', {
       method: 'POST',
@@ -372,16 +374,16 @@ export const api = {
       body: JSON.stringify({ token, password }),
     }),
 
-  loginWithGoogle: (idToken: string): Promise<BackendUser> =>
+  loginWithGoogle: (idToken: string, lang?: string): Promise<BackendUser> =>
     apiFetch('/auth/google', {
       method: 'POST',
-      body: JSON.stringify({ id_token: idToken }),
+      body: JSON.stringify({ id_token: idToken, lang }),
     }),
 
-  loginWithApple: (idToken: string): Promise<BackendUser> =>
+  loginWithApple: (idToken: string, lang?: string): Promise<BackendUser> =>
     apiFetch('/auth/apple', {
       method: 'POST',
-      body: JSON.stringify({ id_token: idToken }),
+      body: JSON.stringify({ id_token: idToken, lang }),
     }),
 
   completeOnboarding: (body: {
@@ -410,6 +412,13 @@ export const api = {
     apiFetch('/me/apple-music-token', {
       method: 'PUT',
       body: JSON.stringify({ token }),
+      headers: getUserAuthHeaders(),
+    }),
+
+  updatePreferredLang: (lang: string): Promise<void> =>
+    apiFetch('/me/lang', {
+      method: 'PATCH',
+      body: JSON.stringify({ lang }),
       headers: getUserAuthHeaders(),
     }),
 

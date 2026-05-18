@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
-import { api, LocalizationItem } from '../api/client'
+import { api, getUserAuthHeaders, LocalizationItem } from '../api/client'
 
 export type UILanguage = 'en' | 'tr' | 'ru' | 'es' | 'pt' | 'de'
 
@@ -86,6 +86,15 @@ export function LocalizationProvider({ children }: Props) {
   const setLanguage = useCallback((lang: UILanguage) => {
     try { localStorage.setItem(LANG_STORAGE_KEY, lang) } catch {}
     setLanguageState(lang)
+    // Fire-and-forget: persist to server if user is logged in
+    const headers = getUserAuthHeaders()
+    if (Object.keys(headers).length > 0) {
+      fetch('/api/me/lang', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', ...headers as Record<string, string> },
+        body: JSON.stringify({ lang }),
+      }).catch(() => {})
+    }
   }, [])
 
   const t = useCallback(

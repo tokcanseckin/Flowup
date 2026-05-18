@@ -2574,6 +2574,7 @@ function PlayerView({
 // ── Root App ──────────────────────────────────────────────────────────────────
 
 export default function App() {
+  const { language, setLanguage } = useLocalization()
   const [currentPath, setCurrentPath] = useState(() => (typeof window === 'undefined' ? '/browse' : (window.location.pathname || '/browse')))
   const [adminOpen, setAdminOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
@@ -2756,6 +2757,7 @@ export default function App() {
       }
       setCredentialUser(user)
       localStorage.setItem(PASSWORD_SESSION_KEY, JSON.stringify(user))
+      if (user.preferred_lang) setLanguage(user.preferred_lang as 'en' | 'tr' | 'ru' | 'es' | 'pt' | 'de')
       track('Login', { method: 'email' })
     } catch (e) {
       setLoginError(e instanceof Error ? e.message : 'Failed to sign in with email/password')
@@ -2768,7 +2770,7 @@ export default function App() {
     setLoginBusy(true)
     setLoginError(null)
     try {
-      const user = await api.loginWithGoogle(credential)
+      const user = await api.loginWithGoogle(credential, language)
       if (user.is_admin && user.admin_token) {
         setAdminSession(user.admin_token)
       } else {
@@ -2776,6 +2778,7 @@ export default function App() {
       }
       setCredentialUser(user)
       localStorage.setItem(PASSWORD_SESSION_KEY, JSON.stringify(user))
+      if (user.preferred_lang) setLanguage(user.preferred_lang as 'en' | 'tr' | 'ru' | 'es' | 'pt' | 'de')
       track('Login', { method: 'google' })
     } catch (e) {
       setLoginError(e instanceof Error ? e.message : 'Google sign-in failed')
@@ -2788,7 +2791,7 @@ export default function App() {
     setLoginBusy(true)
     setLoginError(null)
     try {
-      const user = await api.loginWithApple(idToken)
+      const user = await api.loginWithApple(idToken, language)
       if (user.is_admin && user.admin_token) {
         setAdminSession(user.admin_token)
       } else {
@@ -2796,6 +2799,7 @@ export default function App() {
       }
       setCredentialUser(user)
       localStorage.setItem(PASSWORD_SESSION_KEY, JSON.stringify(user))
+      if (user.preferred_lang) setLanguage(user.preferred_lang as 'en' | 'tr' | 'ru' | 'es' | 'pt' | 'de')
       track('Login', { method: 'apple' })
     } catch (e) {
       setLoginError(e instanceof Error ? e.message : 'Apple sign-in failed')
@@ -2808,7 +2812,7 @@ export default function App() {
     setLoginBusy(true)
     setLoginError(null)
     try {
-      const user = await api.register({ display_name: displayName, email, password })
+      const user = await api.register({ display_name: displayName, email, password, lang: language })
       if (user.is_admin && user.admin_token) {
         setAdminSession(user.admin_token)
       } else {
@@ -2816,6 +2820,7 @@ export default function App() {
       }
       setCredentialUser(user)
       localStorage.setItem(PASSWORD_SESSION_KEY, JSON.stringify(user))
+      if (user.preferred_lang) setLanguage(user.preferred_lang as 'en' | 'tr' | 'ru' | 'es' | 'pt' | 'de')
       track('Sign Up', { method: 'email' })
     } catch (e) {
       setLoginError(e instanceof Error ? e.message : 'Failed to create account')

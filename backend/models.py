@@ -149,8 +149,13 @@ class UserResponse(BaseModel):
     spotify_enabled: bool = False
     apple_music_user_token: Optional[str] = None
     admin_token: Optional[str] = None
+    preferred_lang: str = 'en'
 
     model_config = {"from_attributes": True}
+
+
+class UpdateLangRequest(BaseModel):
+    lang: str
 
 
 class AdminUserResponse(BaseModel):

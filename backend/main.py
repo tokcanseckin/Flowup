@@ -102,6 +102,7 @@ from models import (
     ReportStatusUpdate,
     ForgotPasswordRequest,
     ResetPasswordRequest,
+    UpdateLangRequest,
 )
 import mailgun as _mailgun
 from openrussian import ensure_loaded as _load_or, lookup as _or_lookup, lookup_local as _or_lookup_local
@@ -2358,6 +2359,7 @@ async def sync_user(body: UserSyncRequest, db: Session = Depends(get_db)):
         spotify_enabled=bool(user.spotify_enabled),
         apple_music_user_token=user.apple_music_user_token,
         admin_token=_make_admin_token(user),
+        preferred_lang=user.preferred_lang or 'en',
     )
 
 
@@ -2378,6 +2380,7 @@ async def login_with_credentials(body: CredentialLoginRequest, db: Session = Dep
         spotify_enabled=bool(user.spotify_enabled),
         apple_music_user_token=user.apple_music_user_token,
         admin_token=_make_admin_token(user),
+        preferred_lang=user.preferred_lang or 'en',
     )
 
 
@@ -2402,6 +2405,7 @@ async def register_with_credentials(body: RegisterRequest, db: Session = Depends
         display_name=display_name,
         email=email,
         password_hash=_hash_password(body.password),
+        preferred_lang=body.lang or 'en',
     )
     db.add(user)
     db.commit()
@@ -2431,6 +2435,7 @@ async def register_with_credentials(body: RegisterRequest, db: Session = Depends
         spotify_enabled=bool(user.spotify_enabled),
         apple_music_user_token=user.apple_music_user_token,
         admin_token=_make_admin_token(user),
+        preferred_lang=user.preferred_lang or 'en',
     )
 
 
@@ -2466,6 +2471,7 @@ async def complete_onboarding(body: CompleteOnboardingRequest, db: Session = Dep
         spotify_enabled=bool(user.spotify_enabled),
         apple_music_user_token=user.apple_music_user_token,
         admin_token=_make_admin_token(user),
+        preferred_lang=user.preferred_lang or 'en',
     )
 
 
@@ -2503,7 +2509,7 @@ def forgot_password(body: ForgotPasswordRequest, db: Session = Depends(get_db)):
     reset_url = f"{site_url}/?reset_token={raw_token}"
     _email = user.email
     _name = user.display_name
-    _t = _get_email_t('passwordReset', 'en', db)  # user language not yet stored; defaults to 'en'
+    _t = _get_email_t('passwordReset', user.preferred_lang or 'en', db)
 
     def _send() -> None:
         try:
@@ -2587,6 +2593,21 @@ async def update_user_settings(
     return merged
 
 
+_ALLOWED_LANGS = {'en', 'tr', 'ru', 'es', 'pt', 'de'}
+
+@app.patch("/api/me/lang", status_code=204)
+async def update_preferred_lang(
+    body: UpdateLangRequest,
+    current_user: User = Depends(_get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Persist the user's preferred UI/email language."""
+    if body.lang in _ALLOWED_LANGS:
+        current_user.preferred_lang = body.lang
+        db.commit()
+    return Response(status_code=204)
+
+
 # ── Apple Music user token persistence ────────────────────────────────────────
 
 
@@ -2631,6 +2652,7 @@ async def login_with_google(body: GoogleLoginRequest, db: Session = Depends(get_
             display_name=display_name,
             email=email,
             google_user_id=google_sub,
+            preferred_lang=body.lang or 'en',
         )
         db.add(user)
         _is_new = True
@@ -2671,6 +2693,7 @@ async def login_with_google(body: GoogleLoginRequest, db: Session = Depends(get_
         spotify_enabled=bool(user.spotify_enabled),
         apple_music_user_token=user.apple_music_user_token,
         admin_token=_make_admin_token(user),
+        preferred_lang=user.preferred_lang or 'en',
     )
 
 
@@ -2704,6 +2727,7 @@ async def login_with_apple(body: AppleLoginRequest, db: Session = Depends(get_db
             display_name=display_name or email or "Apple User",
             email=email,
             apple_user_id=apple_sub,
+            preferred_lang=body.lang or 'en',
         )
         db.add(user)
         _is_new = True
@@ -2742,6 +2766,7 @@ async def login_with_apple(body: AppleLoginRequest, db: Session = Depends(get_db
         spotify_enabled=bool(user.spotify_enabled),
         apple_music_user_token=user.apple_music_user_token,
         admin_token=_make_admin_token(user),
+        preferred_lang=user.preferred_lang or 'en',
     )
 
 
