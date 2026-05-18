@@ -7,13 +7,16 @@ All other config is hardcoded as constants below.
 from __future__ import annotations
 
 import base64
+import logging
 import os
 import urllib.parse
 import urllib.request
 
+log = logging.getLogger(__name__)
+
 # ── Constants ──────────────────────────────────────────────────────────────────
 
-DOMAIN              = "mg.singoling.com"
+DOMAIN              = "singoling.com"
 FROM_EMAIL          = f"SingoLing <noreply@{DOMAIN}>"
 FROM_EMAIL_INFO     = "SingoLing <info@singoling.com>"
 API_BASE            = "https://api.mailgun.net"
@@ -44,9 +47,13 @@ def _send(to: str, subject: str, text: str, html: str | None = None, from_overri
         headers={"Authorization": f"Basic {credentials}"},
         method="POST",
     )
-    with urllib.request.urlopen(req, timeout=10) as resp:
-        if resp.status not in (200, 202):
-            raise RuntimeError(f"Mailgun returned status {resp.status}")
+    try:
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            if resp.status not in (200, 202):
+                raise RuntimeError(f"Mailgun returned status {resp.status}")
+    except Exception as exc:
+        log.error("mailgun: failed to send to %s (subject=%r): %s", to, subject, exc)
+        raise
 
 
 def send_support_notification(
