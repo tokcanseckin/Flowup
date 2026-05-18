@@ -684,6 +684,94 @@ app.add_middleware(
 )
 
 
+# ── Rate limiting ──────────────────────────────────────────────────────────────
+
+class _RateLimiter:
+    """Fixed-window in-memory rate limiter. Thread-safe, no external deps."""
+
+    def __init__(self) -> None:
+        # key → (window_start, count)
+        self._windows: dict[str, tuple[float, int]] = {}
+        self._lock = threading.Lock()
+        # Periodic cleanup every 5 minutes
+        self._start_cleanup()
+
+    def is_allowed(self, key: str, limit: int, window_seconds: int) -> tuple[bool, int]:
+        """Return (allowed, retry_after_seconds). retry_after is 0 when allowed."""
+        now = time.time()
+        with self._lock:
+            start, count = self._windows.get(key, (now, 0))
+            if now - start >= window_seconds:
+                # New window
+                self._windows[key] = (now, 1)
+                return True, 0
+            if count < limit:
+                self._windows[key] = (start, count + 1)
+                return True, 0
+            retry_after = int(window_seconds - (now - start)) + 1
+            return False, retry_after
+
+    def _cleanup(self) -> None:
+        now = time.time()
+        with self._lock:
+            expired = [k for k, (start, _) in self._windows.items() if now - start >= 3600]
+            for k in expired:
+                del self._windows[k]
+
+    def _start_cleanup(self) -> None:
+        def _run() -> None:
+            while True:
+                time.sleep(300)
+                self._cleanup()
+        t = threading.Thread(target=_run, daemon=True)
+        t.start()
+
+
+_rate_limiter = _RateLimiter()
+
+
+def _get_client_ip(request: Request) -> str:
+    """Extract real client IP, honouring X-Forwarded-For from trusted proxies."""
+    forwarded_for = request.headers.get("X-Forwarded-For")
+    if forwarded_for:
+        # Take leftmost (original client) IP
+        ip = forwarded_for.split(",")[0].strip()
+        try:
+            ipaddress.ip_address(ip)
+            return ip
+        except ValueError:
+            pass
+    return request.client.host if request.client else "unknown"
+
+
+def rate_limit(limit: int, window_seconds: int, key_prefix: str = ""):
+    """FastAPI dependency factory for rate limiting by IP."""
+    def dependency(request: Request):
+        ip = _get_client_ip(request)
+        key = f"{key_prefix}:{ip}"
+        allowed, retry_after = _rate_limiter.is_allowed(key, limit, window_seconds)
+        if not allowed:
+            raise HTTPException(
+                status_code=429,
+                detail="Too many requests. Please try again later.",
+                headers={"Retry-After": str(retry_after)},
+            )
+    return Depends(dependency)
+
+
+# Tier 1 — Auth (strict, IP-based)
+_rl_login           = rate_limit(5,   15 * 60, "login")
+_rl_register        = rate_limit(3,   15 * 60, "register")
+_rl_forgot_password = rate_limit(3,   15 * 60, "forgot_password")
+_rl_reset_password  = rate_limit(5,   15 * 60, "reset_password")
+# Tier 2 — OAuth (relaxed, IP-based)
+_rl_oauth           = rate_limit(10,  15 * 60, "oauth")
+# Tier 3 — Webhooks (IP-based)
+_rl_webhook         = rate_limit(100, 60,       "webhook")
+# Tier 4 — Admin: rate limiting is embedded in _require_admin (30 req/min per user ID)
+# Tier 4 — User actions (_rl_user_action): defined below after _get_current_user
+
+
 # ── Worker API key auth ────────────────────────────────────────────────────────
 
 _WORKER_API_KEY = os.environ.get("WORKER_API_KEY", "").strip()
@@ -1177,6 +1265,7 @@ def _verify_admin_token(token: str, user: User) -> bool:
 
 
 def _require_admin(
+    request: Request,
     authorization: str | None = Header(default=None),
     db: Session = Depends(get_db),
 ) -> User:
@@ -1202,6 +1291,15 @@ def _require_admin(
             raise HTTPException(status_code=401, detail="Invalid admin token")
         if not user.is_admin:
             raise HTTPException(status_code=403, detail="Admin access required")
+        # Rate-limit by user ID for accuracy
+        key = f"admin:user:{user.id}"
+        allowed, retry_after = _rate_limiter.is_allowed(key, 30, 60)
+        if not allowed:
+            raise HTTPException(
+                status_code=429,
+                detail="Too many requests. Please try again later.",
+                headers={"Retry-After": str(retry_after)},
+            )
         return user
 
     # ── Basic (email:password) — legacy, kept for compatibility ───────────────
@@ -1216,6 +1314,15 @@ def _require_admin(
             raise HTTPException(status_code=401, detail="Invalid admin credentials")
         if not user.is_admin:
             raise HTTPException(status_code=403, detail="Admin access required")
+        # Rate-limit by user ID for accuracy
+        key = f"admin:user:{user.id}"
+        allowed, retry_after = _rate_limiter.is_allowed(key, 30, 60)
+        if not allowed:
+            raise HTTPException(
+                status_code=429,
+                detail="Too many requests. Please try again later.",
+                headers={"Retry-After": str(retry_after)},
+            )
         return user
 
     raise HTTPException(status_code=401, detail="Unsupported authentication scheme")
@@ -1259,6 +1366,24 @@ def _get_current_user(
         return user
 
     raise HTTPException(status_code=401, detail="Unsupported authentication scheme")
+
+
+def rate_limit_user(limit: int, window_seconds: int, key_prefix: str = ""):
+    """FastAPI dependency factory for rate limiting by authenticated user ID."""
+    def dependency(request: Request, current_user: User = Depends(_get_current_user)):
+        key = f"{key_prefix}:user:{current_user.id}"
+        allowed, retry_after = _rate_limiter.is_allowed(key, limit, window_seconds)
+        if not allowed:
+            raise HTTPException(
+                status_code=429,
+                detail="Too many requests. Please try again later.",
+                headers={"Retry-After": str(retry_after)},
+            )
+    return Depends(dependency)
+
+
+# Tier 4 — User actions (user-ID-based, defined here after _get_current_user)
+_rl_user_action = rate_limit_user(100, 60, "user_action")
 
 
 # ── Health ─────────────────────────────────────────────────────────────────────
@@ -2299,6 +2424,7 @@ def record_word_lookup(
     body: WordLookupCreate,
     current_user: User = Depends(_get_current_user),
     db: Session = Depends(get_db),
+    _rl: None = _rl_user_action,
 ):
     """Upsert a word lookup — updates timestamp and details if the (lemma, language) pair already exists."""
     existing = db.query(UserWordLookup).filter(
@@ -2364,7 +2490,7 @@ async def sync_user(body: UserSyncRequest, db: Session = Depends(get_db)):
 
 
 @app.post("/api/auth/login", response_model=UserResponse)
-async def login_with_credentials(body: CredentialLoginRequest, db: Session = Depends(get_db)):
+async def login_with_credentials(body: CredentialLoginRequest, db: Session = Depends(get_db), _rl: None = _rl_login):
     user = db.query(User).filter(User.email == body.email.strip().lower()).first()
     if not user or not _verify_password(body.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Invalid email or password")
@@ -2385,7 +2511,7 @@ async def login_with_credentials(body: CredentialLoginRequest, db: Session = Dep
 
 
 @app.post("/api/auth/register", response_model=UserResponse)
-async def register_with_credentials(body: RegisterRequest, db: Session = Depends(get_db)):
+async def register_with_credentials(body: RegisterRequest, db: Session = Depends(get_db), _rl: None = _rl_register):
     email = body.email.strip().lower()
     display_name = body.display_name.strip()
     if not email:
@@ -2478,7 +2604,7 @@ async def complete_onboarding(body: CompleteOnboardingRequest, db: Session = Dep
 # ── Password reset ─────────────────────────────────────────────────────────────
 
 @app.post("/api/auth/forgot-password", status_code=204)
-def forgot_password(body: ForgotPasswordRequest, db: Session = Depends(get_db)):
+def forgot_password(body: ForgotPasswordRequest, db: Session = Depends(get_db), _rl: None = _rl_forgot_password):
     """Request a password-reset email. Always returns 204 to prevent email enumeration."""
     import time as _time
 
@@ -2522,7 +2648,7 @@ def forgot_password(body: ForgotPasswordRequest, db: Session = Depends(get_db)):
 
 
 @app.post("/api/auth/reset-password", status_code=204)
-def reset_password(body: ResetPasswordRequest, db: Session = Depends(get_db)):
+def reset_password(body: ResetPasswordRequest, db: Session = Depends(get_db), _rl: None = _rl_reset_password):
     """Consume a reset token and update the user's password."""
     import time as _time
 
@@ -2626,7 +2752,7 @@ async def save_apple_music_token(
 # ── Auth ───────────────────────────────────────────────────────────────────────
 
 @app.post("/api/auth/google", response_model=UserResponse)
-async def login_with_google(body: GoogleLoginRequest, db: Session = Depends(get_db)):
+async def login_with_google(body: GoogleLoginRequest, db: Session = Depends(get_db), _rl: None = _rl_oauth):
     """Verify a Google ID token and create/return the matching user."""
     try:
         claims = await verify_google_id_token(body.id_token)
@@ -2698,7 +2824,7 @@ async def login_with_google(body: GoogleLoginRequest, db: Session = Depends(get_
 
 
 @app.post("/api/auth/apple", response_model=UserResponse)
-async def login_with_apple(body: AppleLoginRequest, db: Session = Depends(get_db)):
+async def login_with_apple(body: AppleLoginRequest, db: Session = Depends(get_db), _rl: None = _rl_oauth):
     """Verify a Sign In with Apple identity token and create/return the matching user."""
     try:
         claims = await verify_apple_id_token(body.id_token)
@@ -2824,7 +2950,7 @@ async def apple_server_events(request: Request, db: Session = Depends(get_db)):
 # Signature verification uses HMAC-SHA256(MAILGUN_API_KEY, timestamp + token).
 
 @app.post("/api/mailgun/webhook")
-async def mailgun_inbound_webhook(request: Request, db: Session = Depends(get_db)):
+async def mailgun_inbound_webhook(request: Request, db: Session = Depends(get_db), _rl: None = _rl_webhook):
     """Receive inbound emails routed from Mailgun and process or forward them."""
     form = await request.form()
 
