@@ -64,217 +64,405 @@ export default function TermsOfServicePage({ onBack }: { onBack: () => void }) {
         </div>
 
         <P>
-          Welcome to SingoLing ("SingoLing," "we," "us," or "our"). These Terms of Service (the "Terms") are a legally
-          binding agreement between you and SingoLing. They govern your access to and use of the SingoLing website and
-          service available at singoling.com (the "Service"). Please read them carefully.
-        </P>
-        <P>
-          By creating an account or by accessing or using the Service, you agree to be bound by these Terms and our
-          Privacy Policy. If you do not agree, do not use the Service.
+          Welcome to SingoLing. These Terms of Service (the "Terms") form a binding agreement between you (the "User,"
+          "you," or "your") and the operator of SingoLing (the "Service," "we," "us," or "our"), accessible at
+          singoling.com. By creating an account, accessing, or using the Service, you agree to be bound by these Terms.
+          If you do not agree, do not use the Service.
         </P>
 
-        <Section n="1" title="Scope of the Service">
+        <Section n="1" title="Scope of Service">
           <P>
-            SingoLing is a language-learning platform that helps you learn languages through music. It provides an
-            interactive lyrics player with synchronized word-by-word translations, phonetic stress marks, and grammatical
-            information. It is designed for personal, non-commercial, educational use only.
+            SingoLing is a web-based language learning application that teaches foreign languages through music. The
+            Service currently focuses on Russian-language instruction and provides synchronized lyric display, phonetic
+            stress marks, real-time word lookup (morphology, grammar, definitions, and translations), curated playlists,
+            and personal progress tracking.
           </P>
           <P>
-            The Service integrates with third-party audio platforms (currently YouTube and Apple Music) solely to
-            enable audio playback in your browser. We do not host, store, or distribute the audio files of any songs.
-            Audio playback is governed by the terms of the respective platforms.
+            Audio playback is provided exclusively through integrations with third-party platforms, currently YouTube
+            and Apple Music. SingoLing does not host, store, or distribute audio recordings. Your ability to play any
+            given song depends on your access to and subscription status with those third-party platforms.
+          </P>
+          <P>
+            The Service is provided primarily for educational and personal, non-commercial use. The Service is under
+            active development. Features described in these Terms or on the website may be added, modified, suspended,
+            or removed at any time, with or without notice.
           </P>
         </Section>
 
-        <Section n="2" title="Eligibility">
+        <Section n="2" title="Eligibility and Account Requirements">
           <Sub n="2.1" title="Age Requirements">
-            <P>You must be at least 13 years old to use the Service. If you reside in a country in the European Economic Area, you must be at least 16, or the minimum age required by your country's national law for digital consent, whichever is higher. By creating an account, you represent that you meet this requirement.</P>
-            <P>If you are under 18, your parent or legal guardian must review these Terms and consent on your behalf.</P>
+            <P>
+              You must be at least 13 years old to create an account. If you reside in the European Economic Area, the
+              United Kingdom, or any other jurisdiction that sets a higher minimum age for digital consent, you must be
+              at least 16 years old, or the minimum age required by your local law, whichever is higher. By creating an
+              account, you represent that you meet these requirements.
+            </P>
+            <P>
+              If you are under the age of majority in your jurisdiction, you may only use the Service with the consent
+              and supervision of a parent or legal guardian who agrees to be bound by these Terms on your behalf.
+            </P>
           </Sub>
-          <Sub n="2.2" title="Registration">
-            <P>You must create an account to use most features of the Service. You agree to provide accurate, current, and complete information during registration and to keep your account information up to date. You are responsible for keeping your password confidential and for all activity that occurs under your account.</P>
+          <Sub n="2.2" title="Account Registration">
+            <P>
+              To access most features of the Service, you must register for an account. You may register directly with
+              an email address and password, or through a supported third-party authentication provider (currently
+              Google and Apple). When registering, you agree to:
+            </P>
+            <UL items={[
+              'Provide accurate, current, and complete information, including a valid email address and a display name;',
+              'Keep your account information up to date;',
+              'Maintain the security and confidentiality of your password and authentication credentials;',
+              'Be responsible for all activity that occurs under your account, whether or not authorized by you;',
+              <>Promptly notify us at <a href="mailto:support@singoling.com" className="text-indigo-400 hover:text-indigo-300">support@singoling.com</a> of any unauthorized access to your account or any other suspected breach of security.</>,
+            ]} />
+            <P>We are not liable for any loss or damage arising from your failure to safeguard your credentials.</P>
           </Sub>
-          <Sub n="2.3" title="One Account Per Person">
-            <P>You may maintain only one account per person. You may not create accounts on behalf of others without authorization, and you may not allow others to use your account.</P>
+          <Sub n="2.3" title="One Account Per User">
+            <P>
+              You may not create or maintain more than one personal account, share your account with others, or transfer
+              your account to any other person without our prior written consent.
+            </P>
           </Sub>
         </Section>
 
-        <Section n="3" title="Third-Party Services and Audio Playback">
-          <Sub n="3.1" title="YouTube and Apple Music">
-            <P>The Service relies on YouTube (via the YouTube IFrame Player API) and Apple Music (via MusicKit JS) for audio playback. By using these features, you agree to the terms and policies of those services:</P>
+        <Section n="3" title="Third-Party Services">
+          <Sub n="3.1" title="Audio Playback Providers">
+            <P>
+              Music playback on SingoLing is performed by third-party services, including YouTube (via the YouTube
+              IFrame Player API) and Apple Music (via MusicKit JS). Your use of these features is subject to:
+            </P>
             <UL items={[
-              <>YouTube: <a href="https://www.youtube.com/t/terms" className="text-indigo-400 hover:text-indigo-300">YouTube Terms of Service</a> and <a href="https://policies.google.com/privacy" className="text-indigo-400 hover:text-indigo-300">Google Privacy Policy</a>.</>,
-              <>Apple Music: <a href="https://www.apple.com/legal/internet-services/itunes/" className="text-indigo-400 hover:text-indigo-300">Apple Media Services Terms and Conditions</a> and <a href="https://www.apple.com/legal/privacy/" className="text-indigo-400 hover:text-indigo-300">Apple Privacy Policy</a>.</>,
+              <>YouTube's <a href="https://www.youtube.com/t/terms" className="text-indigo-400 hover:text-indigo-300">Terms of Service</a> and <a href="https://policies.google.com/privacy" className="text-indigo-400 hover:text-indigo-300">Privacy Policy</a>; and</>,
+              <>Apple Media Services Terms and Conditions and Apple's Privacy Policy, including any requirement to maintain an active Apple Music subscription.</>,
             ]} />
-            <P>Apple Music playback requires an active Apple Music subscription, which must be purchased separately from Apple. We do not provide or sell music access, and we have no control over Apple's pricing, availability, or licensing.</P>
-            <P>We are not affiliated with, endorsed by, or sponsored by YouTube, Google, or Apple.</P>
+            <P>
+              SingoLing does not control these third-party services and is not responsible for their availability,
+              content catalog, pricing, geographic restrictions, advertisements, or any modifications they make to their
+              platforms. If a song becomes unavailable on a third-party platform, it may no longer be playable through
+              the Service, even though its lyrics and learning content may remain visible.
+            </P>
           </Sub>
           <Sub n="3.2" title="Authentication Providers">
-            <P>If you sign in with Google or Apple, your use of those sign-in methods is also subject to those providers' terms. We receive only the information described in our Privacy Policy.</P>
+            <P>
+              If you choose to sign in using Google or Apple, you authorize us to receive and store certain identifiers
+              and profile information from those providers as necessary to create and maintain your account. Your use of
+              these providers is also subject to their respective terms.
+            </P>
           </Sub>
-          <Sub n="3.3" title="Other Third Parties">
-            <P>We source song lyrics from LRCLIB and translations from DeepL. We have no control over the content or availability of those services. The accuracy of lyrics and translations is not guaranteed; see Section 7.</P>
+          <Sub n="3.3" title="Other Third-Party Services">
+            <P>
+              To deliver the Service, we use additional third parties for analytics (Plausible Analytics), transactional
+              email (Mailgun), lyrics retrieval (LRCLIB), and machine translation (DeepL). These services receive only
+              the data necessary for their function, as described in our Privacy Policy. We are not responsible for the
+              practices of any third-party service.
+            </P>
           </Sub>
         </Section>
 
         <Section n="4" title="User Content and Conduct">
-          <Sub n="4.1" title="Content You Submit">
-            <P>You may submit content through the Service such as problem reports about lyrics, translations, or annotations. By submitting content, you grant us a worldwide, non-exclusive, royalty-free, perpetual, and irrevocable license to use, reproduce, display, and distribute that content solely to improve the Service. You represent that any content you submit does not violate any law or the rights of any third party.</P>
+          <Sub n="4.1" title="User Content">
+            <P>
+              "User Content" means any information or material you submit to the Service, including problem reports,
+              favorites, listening history, display name, and any feedback or messages you send to us. You retain
+              ownership of your User Content. By submitting User Content, you grant SingoLing a worldwide,
+              non-exclusive, royalty-free, sublicensable license to host, store, reproduce, modify, and use that content
+              for the limited purposes of operating, improving, and securing the Service.
+            </P>
+            <P>
+              You represent and warrant that you have all rights necessary to submit your User Content and that it does
+              not violate any law or third-party right.
+            </P>
           </Sub>
           <Sub n="4.2" title="Prohibited Conduct">
-            <P>You agree not to:</P>
+            <P>You agree not to, and not to attempt to:</P>
             <UL items={[
-              'Use the Service for any purpose other than personal, non-commercial, educational use.',
-              'Reproduce, publicly perform, distribute, or make available any songs, lyrics, or translations obtained through the Service in a manner that infringes copyright.',
-              'Attempt to circumvent any technical limitations, access controls, rate limits, or security measures of the Service.',
-              'Scrape, crawl, or systematically extract data from the Service through automated means.',
-              'Use the Service to transmit spam, malware, phishing content, or other harmful or disruptive material.',
-              'Impersonate any person or entity, or falsely represent your affiliation with any person or entity.',
-              'Use the Service for any unlawful purpose or in violation of any applicable laws.',
-              'Interfere with or disrupt the integrity or performance of the Service, its servers, or its networks.',
+              'Use the Service for any unlawful purpose or in violation of these Terms or any applicable law;',
+              'Use the Service to harass, defame, threaten, or otherwise harm any person;',
+              'Upload or submit content that is unlawful, infringing, defamatory, obscene, or otherwise objectionable;',
+              'Reverse engineer, decompile, disassemble, or otherwise attempt to derive the source code of the Service, except to the extent expressly permitted by applicable law;',
+              'Scrape, crawl, harvest, or otherwise extract data from the Service by automated means without our prior written consent;',
+              'Use the Service to train, fine-tune, or evaluate machine learning models without our prior written consent;',
+              'Interfere with, disrupt, or place an undue load on the Service or its infrastructure, including by overwhelming any endpoint with requests or attempting to bypass rate limits or other technical safeguards;',
+              'Probe, scan, or test the vulnerability of the Service or breach any security or authentication measures;',
+              'Impersonate any person or entity, or misrepresent your affiliation with any person or entity;',
+              'Resell, sublicense, rent, lease, or otherwise commercially exploit the Service without our prior written consent;',
+              'Circumvent any geographic or platform restriction imposed by us or by a third-party audio provider;',
+              'Use the Service to infringe the intellectual property rights, privacy rights, or other rights of any third party.',
             ]} />
+            <P>
+              We may investigate and respond to any suspected violation of this section, including by suspending or
+              terminating your account.
+            </P>
           </Sub>
           <Sub n="4.3" title="Responsible Reporting">
-            <P>If you become aware of a security vulnerability or other serious issue with the Service, please report it to <a href="mailto:support@singoling.com" className="text-indigo-400 hover:text-indigo-300">support@singoling.com</a>. Do not exploit vulnerabilities, attempt unauthorized access, or publicly disclose vulnerabilities before we have had a reasonable opportunity to address them.</P>
+            <P>
+              If you discover a security vulnerability or a serious content problem, please report it to{' '}
+              <a href="mailto:support@singoling.com" className="text-indigo-400 hover:text-indigo-300">support@singoling.com</a>{' '}
+              rather than disclosing it publicly. Do not exploit the issue beyond the minimum necessary to demonstrate it.
+            </P>
           </Sub>
         </Section>
 
         <Section n="5" title="Intellectual Property">
           <Sub n="5.1" title="SingoLing Materials">
-            <P>All software, design, text, graphics, interfaces, trademarks, and other content that we create (the "SingoLing Materials") are owned by or licensed to SingoLing and protected by copyright, trademark, and other intellectual property laws. You may not copy, reproduce, modify, distribute, or create derivative works from the SingoLing Materials except as expressly permitted in these Terms.</P>
+            <P>
+              Except for User Content and third-party content described below, all materials made available through the
+              Service, including the user interface, software, design, graphics, logos, curated playlist selections, and
+              original written content, are owned by us or our licensors and are protected by copyright, trademark, and
+              other intellectual property laws. We grant you a limited, personal, non-exclusive, non-transferable,
+              revocable license to access and use the Service for your personal, non-commercial educational use, subject
+              to these Terms.
+            </P>
           </Sub>
-          <Sub n="5.2" title="Lyrics and Translations">
-            <P>Song lyrics are owned by their respective rights holders. Translations provided by the Service are for personal educational use only. You may not copy, reproduce, or redistribute lyrics or translations obtained through the Service beyond what is permitted by applicable copyright law, including fair use or quotation rights.</P>
+          <Sub n="5.2" title="Song Lyrics and Translations">
+            <P>
+              Song lyrics displayed on the Service are sourced from publicly available lyric databases (including
+              LRCLIB) and are presented for educational, language-learning purposes. We do not claim ownership of the
+              underlying lyrics, which remain the property of their respective rights holders. Translations and phonetic,
+              morphological, and grammatical annotations generated by the Service are derived works provided for study
+              purposes and may contain errors or imperfections.
+            </P>
           </Sub>
           <Sub n="5.3" title="Audio Content">
-            <P>Audio content streamed through YouTube or Apple Music is owned by its respective rights holders. Your access to audio is governed exclusively by your agreement with YouTube and/or Apple. We claim no ownership of, and grant no rights to, any audio content.</P>
+            <P>
+              We do not host or distribute audio recordings. All audio is streamed by third-party services directly to
+              your device under your own account and license with those services. We make no representation that any
+              particular song will remain available.
+            </P>
           </Sub>
           <Sub n="5.4" title="Copyright Complaints">
-            <P>If you believe that any content available through the Service infringes your copyright, please contact us at <a href="mailto:support@singoling.com" className="text-indigo-400 hover:text-indigo-300">support@singoling.com</a> with a description of the work, the URL where the allegedly infringing content appears, and your contact information. We will investigate and take appropriate action.</P>
+            <P>
+              We respect the intellectual property rights of others. If you believe that content available through the
+              Service infringes your copyright, please send a written notice to{' '}
+              <a href="mailto:support@singoling.com" className="text-indigo-400 hover:text-indigo-300">support@singoling.com</a>{' '}
+              that includes:
+            </P>
+            <UL items={[
+              'Your contact information;',
+              'A description of the copyrighted work you claim has been infringed;',
+              'The specific URL or location of the allegedly infringing material on the Service;',
+              'A statement, under penalty of perjury, that you are the rights holder or are authorized to act on the rights holder\'s behalf, and that you have a good-faith belief that the use is not authorized; and',
+              'Your physical or electronic signature.',
+            ]} />
+            <P>
+              We will review valid notices and may remove or disable access to the material in question. We may also
+              terminate the accounts of users who are determined to be repeat infringers.
+            </P>
           </Sub>
         </Section>
 
-        <Section n="6" title="Privacy">
-          <P>Your use of the Service is also governed by our <a href="/privacy" className="text-indigo-400 hover:text-indigo-300" onClick={e => { e.preventDefault(); window.history.pushState(null,'','/privacy'); window.dispatchEvent(new PopStateEvent('popstate')) }}>Privacy Policy</a>, which is incorporated into and forms part of these Terms. Please review it carefully to understand how we collect, use, and protect your information.</P>
+        <Section n="6" title="Privacy and Data Protection">
+          <P>
+            Your privacy is important to us. Our collection, use, storage, and disclosure of personal information is
+            governed by our{' '}
+            <a href="/privacy" className="text-indigo-400 hover:text-indigo-300" onClick={e => { e.preventDefault(); window.history.pushState(null, '', '/privacy'); window.dispatchEvent(new PopStateEvent('popstate')) }}>Privacy Policy</a>,
+            which is incorporated into these Terms by reference. By using the Service, you acknowledge that you have
+            read and understood the Privacy Policy.
+          </P>
+          <P>
+            In summary, we collect account information (such as your email address, display name, hashed password, and
+            authentication provider identifiers), authentication and session tokens, learning activity (songs listened
+            to, words looked up, favorites, and problem reports), and limited security event data (such as rate-limit
+            breach notifications). We do not collect payment information, device fingerprints, precise location data,
+            or general IP-address access logs. Data is stored on infrastructure located in the European Economic Area.
+          </P>
+          <P>
+            For information about your rights to access, correct, delete, or export your personal data, and about
+            retention, please refer to the Privacy Policy.
+          </P>
         </Section>
 
         <Section n="7" title="Educational Disclaimer">
           <P>
-            SingoLing is an independent educational tool. All linguistic content — including translations, definitions,
-            phonetic transcriptions, grammatical labels, and stress marks — is generated automatically and has not been
-            reviewed by professional linguists or certified translators. This content is provided for personal
-            educational purposes only and may contain errors. SingoLing makes no representation that the linguistic
-            content is accurate, complete, current, or suitable for any purpose other than casual language learning.
+            SingoLing is a language-learning tool. Translations, definitions, phonetic stress marks, and grammatical
+            analyses are generated by automated systems and curated content sources and may contain inaccuracies,
+            omissions, or errors. The Service is not a substitute for a qualified language teacher, professional
+            translator, or authoritative dictionary. You should not rely on the Service for legal, medical,
+            professional, official, or safety-critical translations.
           </P>
-          <P>You should not rely on SingoLing for certified translation, professional language instruction, or official examination preparation.</P>
         </Section>
 
-        <Section n="8" title="Service Availability">
+        <Section n="8" title="Service Availability and Changes">
           <P>
-            We make no guarantee that the Service will be available at any particular time or location, uninterrupted,
-            error-free, or free of viruses or other harmful components. We may modify, suspend, or discontinue any part
-            of the Service at any time without notice and without liability. We are also dependent on third-party
-            services (YouTube, Apple Music, DeepL, LRCLIB) whose availability we do not control.
+            We strive to keep the Service available, but we do not guarantee uninterrupted, error-free, or secure
+            access. The Service may be unavailable from time to time for maintenance, upgrades, technical failures, or
+            reasons beyond our control, including outages of third-party services on which the Service depends.
+          </P>
+          <P>
+            We may add, modify, suspend, or discontinue any feature of the Service at any time, including songs,
+            playlists, supported languages, and third-party integrations. We are not liable for any loss arising from
+            such changes.
           </P>
         </Section>
 
         <Section n="9" title="Suspension and Termination">
           <Sub n="9.1" title="By You">
-            <P>You may stop using the Service and request deletion of your account at any time by contacting us at <a href="mailto:support@singoling.com" className="text-indigo-400 hover:text-indigo-300">support@singoling.com</a> from the email address associated with your account.</P>
+            <P>
+              You may stop using the Service at any time. Once account deletion is available in the Service, you may
+              request deletion of your account through the in-product controls. Until then, you may request deletion by
+              emailing <a href="mailto:support@singoling.com" className="text-indigo-400 hover:text-indigo-300">support@singoling.com</a> from
+              the address associated with your account.
+            </P>
           </Sub>
           <Sub n="9.2" title="By Us">
-            <P>We may suspend or terminate your account or your access to the Service at any time and without notice if we reasonably believe you have violated these Terms, if required by law, or if we determine in our sole discretion that such action is necessary to protect the Service or other users. We will attempt to notify you where reasonably practical.</P>
+            <P>
+              We may suspend or terminate your access to the Service, in whole or in part, at any time and without prior
+              notice if we reasonably believe that:
+            </P>
+            <UL items={[
+              'You have violated these Terms or any applicable law;',
+              'Your conduct poses a risk to other users, to third parties, or to the Service;',
+              'We are required to do so by law or by a competent authority; or',
+              'Continued provision of the Service to you is no longer commercially or technically feasible.',
+            ]} />
+            <P>
+              We will use reasonable efforts to notify you of any termination, except where doing so would be unlawful
+              or would compromise security.
+            </P>
           </Sub>
           <Sub n="9.3" title="Effect of Termination">
-            <P>Upon termination, your right to use the Service ceases immediately. Sections 4, 5, 7, 10, 11, 12, and 13 survive termination. If your account is terminated because you violated these Terms, you may not create a new account without our prior written consent.</P>
+            <P>
+              Upon termination, your right to use the Service ends immediately. Provisions of these Terms that by their
+              nature should survive termination, including those relating to intellectual property, disclaimers,
+              limitation of liability, indemnification, and dispute resolution, will survive.
+            </P>
           </Sub>
         </Section>
 
         <Section n="10" title="Disclaimers">
           <P>
-            THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE," WITHOUT WARRANTY OF ANY KIND. TO THE FULLEST EXTENT
-            PERMITTED BY APPLICABLE LAW, SINGOLING DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT
-            LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, NON-INFRINGEMENT,
-            AND ACCURACY.
+            TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE,"
+            WITHOUT WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+            PARTICULAR PURPOSE, NON-INFRINGEMENT, ACCURACY, OR UNINTERRUPTED OPERATION.
           </P>
           <P>
-            WE DO NOT WARRANT THAT THE SERVICE WILL BE UNINTERRUPTED, SECURE, OR FREE OF ERRORS; THAT DEFECTS WILL BE
-            CORRECTED; OR THAT THE LINGUISTIC CONTENT PROVIDED BY THE SERVICE IS ACCURATE OR COMPLETE. YOUR USE OF
-            THE SERVICE IS AT YOUR OWN RISK.
+            Without limiting the foregoing, we do not warrant that translations, definitions, lyrics, phonetic
+            annotations, or other educational content provided through the Service are accurate, complete, or up to
+            date. We do not warrant that third-party services on which the Service depends will remain available or
+            compatible.
+          </P>
+          <P>
+            Some jurisdictions do not allow the exclusion of certain warranties. In those jurisdictions, the above
+            exclusions apply to the maximum extent permitted by law, and you may have additional statutory rights that
+            these Terms do not modify.
           </P>
         </Section>
 
         <Section n="11" title="Limitation of Liability">
           <P>
-            TO THE FULLEST EXTENT PERMITTED BY APPLICABLE LAW, SINGOLING AND ITS OPERATORS, EMPLOYEES, AGENTS, AND
-            LICENSORS WILL NOT BE LIABLE TO YOU FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, EXEMPLARY, OR
-            PUNITIVE DAMAGES — INCLUDING BUT NOT LIMITED TO LOSS OF DATA, LOSS OF REVENUE, LOSS OF PROFITS, OR LOSS
-            OF GOODWILL — ARISING OUT OF OR IN CONNECTION WITH THESE TERMS OR YOUR USE OF OR INABILITY TO USE THE
-            SERVICE, EVEN IF WE HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+            TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT WILL SINGOLING, ITS OPERATORS, OR ITS
+            LICENSORS BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, EXEMPLARY, OR PUNITIVE DAMAGES,
+            OR FOR ANY LOSS OF PROFITS, REVENUE, DATA, GOODWILL, OR LEARNING PROGRESS, ARISING OUT OF OR RELATING TO
+            THESE TERMS OR THE SERVICE, WHETHER BASED ON CONTRACT, TORT, STATUTE, OR ANY OTHER LEGAL THEORY, AND
+            WHETHER OR NOT WE HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
           </P>
           <P>
-            TO THE FULLEST EXTENT PERMITTED BY APPLICABLE LAW, OUR TOTAL CUMULATIVE LIABILITY TO YOU FOR ALL CLAIMS
-            ARISING OUT OF OR RELATING TO THESE TERMS OR THE SERVICE, WHETHER IN CONTRACT, TORT, STATUTE, OR OTHERWISE,
-            WILL NOT EXCEED THE GREATER OF: (A) FIFTY EUROS (€50); OR (B) THE TOTAL AMOUNT YOU HAVE PAID US FOR THE
-            SERVICE IN THE TWELVE MONTHS IMMEDIATELY PRECEDING THE EVENT GIVING RISE TO THE CLAIM.
+            TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, OUR TOTAL CUMULATIVE LIABILITY ARISING OUT OF OR
+            RELATING TO THESE TERMS OR THE SERVICE WILL NOT EXCEED THE GREATER OF (A) THE AMOUNT YOU HAVE PAID TO US
+            FOR THE SERVICE IN THE TWELVE (12) MONTHS PRECEDING THE EVENT GIVING RISE TO THE CLAIM AND (B) FIFTY EURO
+            (€50).
           </P>
-          <P>Nothing in these Terms limits liability that cannot be limited under applicable mandatory law, including liability for death or personal injury caused by negligence, fraud, or fraudulent misrepresentation.</P>
+          <P>
+            Nothing in these Terms limits or excludes liability that cannot be limited or excluded under applicable law,
+            including liability for gross negligence, willful misconduct, fraud, or, where applicable, death or personal
+            injury caused by negligence.
+          </P>
         </Section>
 
         <Section n="12" title="Indemnification">
           <P>
-            You agree to indemnify, defend, and hold harmless SingoLing and its operators, employees, agents, licensors,
-            and service providers from and against any and all claims, liabilities, damages, losses, costs, and expenses
-            (including reasonable legal fees) arising out of or in connection with: (a) your use of the Service in
-            violation of these Terms; (b) any content you submit through the Service; (c) your infringement of any
-            intellectual property or other rights of any third party; or (d) your violation of any applicable law.
+            To the extent permitted by applicable law, you agree to indemnify, defend, and hold harmless SingoLing and
+            its operators from and against any claims, liabilities, damages, losses, and expenses, including reasonable
+            legal fees, arising out of or in any way connected with (a) your use of or access to the Service, (b) your
+            violation of these Terms, (c) your User Content, or (d) your violation of any law or third-party right.
           </P>
         </Section>
 
         <Section n="13" title="Governing Law and Dispute Resolution">
           <P>
-            These Terms are governed by and construed in accordance with the laws of the Republic of Türkiye, without
-            regard to its conflict of laws principles, except to the extent that mandatory consumer protection laws of
-            your country of residence apply. Any dispute arising out of or in connection with these Terms or the Service
-            will be submitted to the exclusive jurisdiction of the courts of Istanbul, Türkiye, except that if you are
-            a consumer resident in the European Union, you may also bring proceedings in the courts of your country
-            of residence.
+            These Terms and any dispute or claim arising out of or in connection with them or their subject matter or
+            formation (including non-contractual disputes or claims) are governed by and construed in accordance with
+            the laws of the Republic of Türkiye, without regard to its conflict-of-laws principles.
           </P>
           <P>
-            If you are an EU consumer, you may also use the European Commission's Online Dispute Resolution (ODR)
-            platform: <a href="https://ec.europa.eu/consumers/odr" className="text-indigo-400 hover:text-indigo-300" target="_blank" rel="noopener noreferrer">https://ec.europa.eu/consumers/odr</a>. Our contact email for ODR purposes is <a href="mailto:support@singoling.com" className="text-indigo-400 hover:text-indigo-300">support@singoling.com</a>.
+            If you are a consumer resident in the European Union, you may also have the right to bring proceedings in
+            the courts of your country of residence and may have access to the European Commission's online dispute
+            resolution platform at{' '}
+            <a href="https://ec.europa.eu/consumers/odr" className="text-indigo-400 hover:text-indigo-300" target="_blank" rel="noopener noreferrer">https://ec.europa.eu/consumers/odr</a>.
+          </P>
+          <P>
+            Nothing in this section prevents either party from seeking injunctive or other equitable relief in any
+            court of competent jurisdiction to protect its intellectual property or confidential information.
           </P>
         </Section>
 
         <Section n="14" title="Changes to These Terms">
           <P>
-            We may update these Terms from time to time. If we make material changes, we will give you at least fourteen
-            (14) days' advance notice before the updated Terms take effect, either by email or by a prominent notice
-            within the Service, unless a shorter period is required by law or urgent legal or security circumstances.
-            Immaterial changes (such as grammar corrections or clarifications) take effect when posted.
+            We may update these Terms from time to time. If we make a material change, we will provide reasonable
+            advance notice, for example by email to the address associated with your account or by a prominent notice
+            within the Service, at least fourteen (14) days before the change takes effect, unless a shorter period is
+            required by law or by urgent security or legal considerations. Non-material changes (such as clarifications
+            or formatting changes) take effect when posted.
           </P>
-          <P>Your continued use of the Service after updated Terms take effect means you accept them. If you do not accept the updated Terms, please stop using the Service and request account deletion.</P>
+          <P>
+            Your continued use of the Service after the effective date of an updated version of the Terms constitutes
+            acceptance of the updated Terms. If you do not accept the updated Terms, you must stop using the Service
+            and may close your account.
+          </P>
         </Section>
 
         <Section n="15" title="Miscellaneous">
           <Sub n="15.1" title="Entire Agreement">
-            <P>These Terms, together with the Privacy Policy and any other policies incorporated by reference, constitute the entire agreement between you and SingoLing with respect to the Service and supersede all prior agreements, representations, and understandings.</P>
+            <P>
+              These Terms, together with the Privacy Policy and any additional terms expressly incorporated by
+              reference, constitute the entire agreement between you and us regarding the Service and supersede any
+              prior agreements on the same subject matter.
+            </P>
           </Sub>
           <Sub n="15.2" title="Severability">
-            <P>If any provision of these Terms is found by a court of competent jurisdiction to be invalid, illegal, or unenforceable, that provision will be limited or eliminated to the minimum extent necessary, and the remaining provisions will continue in full force and effect.</P>
+            <P>
+              If any provision of these Terms is held to be invalid or unenforceable, that provision will be enforced
+              to the maximum extent permissible, and the remaining provisions will remain in full force and effect.
+            </P>
           </Sub>
           <Sub n="15.3" title="No Waiver">
-            <P>Our failure to enforce any provision of these Terms on one occasion will not be deemed a waiver of our right to enforce it on any future occasion.</P>
+            <P>Our failure to enforce any provision of these Terms is not a waiver of our right to do so later.</P>
           </Sub>
           <Sub n="15.4" title="Assignment">
-            <P>You may not assign or transfer these Terms or any rights or obligations under them without our prior written consent. We may assign these Terms in connection with a merger, acquisition, reorganization, or sale of all or substantially all of our assets.</P>
+            <P>
+              You may not assign or transfer these Terms or any rights or obligations under them without our prior
+              written consent. We may assign these Terms in connection with a merger, acquisition, reorganization, or
+              sale of assets, or by operation of law, without your consent.
+            </P>
           </Sub>
-          <Sub n="15.5" title="Force Majeure">
-            <P>We will not be liable for any failure or delay in performance caused by circumstances beyond our reasonable control, including natural disasters, acts of government, internet outages, or failures of third-party services.</P>
+          <Sub n="15.5" title="No Agency">
+            <P>
+              Nothing in these Terms creates any agency, partnership, joint venture, or employment relationship between
+              you and us.
+            </P>
           </Sub>
-          <Sub n="15.6" title="Contact">
-            <P>If you have any questions about these Terms, please contact us at <a href="mailto:support@singoling.com" className="text-indigo-400 hover:text-indigo-300">support@singoling.com</a>.</P>
+          <Sub n="15.6" title="Force Majeure">
+            <P>
+              We are not liable for any failure or delay in performance caused by events beyond our reasonable control,
+              including acts of God, war, terrorism, civil unrest, labor disputes, governmental action, internet or
+              telecommunications failures, or failures of third-party services.
+            </P>
           </Sub>
+          <Sub n="15.7" title="Language">
+            <P>
+              These Terms are written in English. If we provide a translation, the English version will control in the
+              event of any conflict, except where mandatory local law requires otherwise.
+            </P>
+          </Sub>
+        </Section>
+
+        <Section n="16" title="Contact Us">
+          <P>If you have any questions, complaints, or notices regarding these Terms or the Service, please contact us at:</P>
+          <UL items={[
+            <>Email: <a href="mailto:support@singoling.com" className="text-indigo-400 hover:text-indigo-300">support@singoling.com</a></>,
+            <>Website: <a href="https://singoling.com" className="text-indigo-400 hover:text-indigo-300">https://singoling.com</a></>,
+          ]} />
+          <P>By creating an account or using SingoLing, you acknowledge that you have read, understood, and agree to be bound by these Terms of Service.</P>
         </Section>
 
         {/* Footer */}
@@ -287,3 +475,4 @@ export default function TermsOfServicePage({ onBack }: { onBack: () => void }) {
     </div>
   )
 }
+

@@ -325,7 +325,7 @@ export default function PrivacyPolicyPage({ onBack }: { onBack: () => void }) {
         </Section>
 
         <Section n="15" title="Changes to This Privacy Policy">
-          <P>We may update this Privacy Policy from time to time. If we make material changes, we will give you reasonable advance notice, for example by email to the address associated with your account or by a prominent notice within the Service, at least fourteen (14) days before the change takes effect, unless a shorter period is required by law or by urgent security or legal considerations. Non-material changes (such as clarifications or formatting changes) take effect when posted.</P>
+          <P>We may update this Privacy Policy from time to time. If we make material changes, we will give you reasonable advance notice, for example by email to the address associated with your account or by a prominent notice within the Service, at least fourteen (14) days before the change takes effect, unless a shorter period is required by law or by urgent security or legal considerations. Non-material changes (such as clarifications or formatting changes) take effect when posted. The "Last Updated" date at the top of this Policy will always reflect the current version.</P>
           <P>Your continued use of the Service after a change takes effect means you accept the updated Privacy Policy. If you do not accept the changes, please stop using the Service and, if you wish, request deletion of your account.</P>
         </Section>
 
