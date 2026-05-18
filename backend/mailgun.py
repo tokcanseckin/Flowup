@@ -13,21 +13,22 @@ import urllib.request
 
 # ── Constants ──────────────────────────────────────────────────────────────────
 
-DOMAIN     = "mg.singoling.com"
-FROM_EMAIL = f"SingoLing <noreply@{DOMAIN}>"
-API_BASE   = "https://api.mailgun.net"
-ADMIN_EMAIL = "seckin@singoling.com"
-SITE_URL   = "https://singoling.com"
+DOMAIN              = "mg.singoling.com"
+FROM_EMAIL          = f"SingoLing <noreply@{DOMAIN}>"
+FROM_EMAIL_INFO     = "SingoLing <info@singoling.com>"
+API_BASE            = "https://api.mailgun.net"
+ADMIN_EMAIL         = "support@singoling.com"
+SITE_URL            = "https://singoling.com"
 
 
-def _send(to: str, subject: str, text: str, html: str | None = None) -> None:
+def _send(to: str, subject: str, text: str, html: str | None = None, from_override: str | None = None) -> None:
     """POST to the Mailgun messages API. Silently skips if MAILGUN_API_KEY is not set."""
     api_key = os.environ.get("MAILGUN_API_KEY", "")
     if not api_key:
         return
 
     data: dict[str, str] = {
-        "from": FROM_EMAIL,
+        "from": from_override or FROM_EMAIL,
         "to": to,
         "subject": subject,
         "text": text,
@@ -98,4 +99,4 @@ def send_password_reset(*, to: str, display_name: str | None, reset_url: str) ->
         "you can safely ignore this email.</p>"
         "<p>— The SingoLing team</p>"
     )
-    _send(to=to, subject="Reset your SingoLing password", text=text, html=html)
+    _send(to=to, subject="Reset your SingoLing password", text=text, html=html, from_override=FROM_EMAIL_INFO)
