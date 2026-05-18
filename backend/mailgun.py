@@ -141,11 +141,12 @@ def send_password_reset(*, to: str, display_name: str | None, reset_url: str, t:
         "\u2014 The SingoLing team"
     )
     variables = {
+        "welcome_title": subject,
         "name": name,
         "greeting": greeting,
         "body_text": body_text,
-        "button": button,
-        "button_url": reset_url,
+        "button_title": button,
+        "action_url": reset_url,
         "footer_text": footer_text,
     }
     _send(
