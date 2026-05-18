@@ -528,7 +528,7 @@ export default function LyricsPlayer({
 
     // Track word inspect event
     if (word) {
-      const stopWord = isStopWord(word.lemma ?? word.value, langCode)
+      const stopWord = isStopWord(word.lemma ?? word.display_form, langCode)
       const method = prev?.mode === 'hold' ? 'hold' : 'click'
       track('Word Inspected', {
         method,
