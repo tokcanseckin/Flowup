@@ -235,6 +235,9 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
     const body = await r.json().catch(() => ({ detail: r.statusText })) as { detail?: string }
     throw new Error(body.detail ?? `API error ${r.status}`)
   }
+  if (r.status === 204 || r.headers.get('content-length') === '0') {
+    return undefined as unknown as T
+  }
   return r.json() as Promise<T>
 }
 
