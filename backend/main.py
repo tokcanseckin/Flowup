@@ -2835,7 +2835,7 @@ async def mailgun_inbound_webhook(request: Request, db: Session = Depends(get_db
     api_key   = os.environ.get("MAILGUN_API_KEY", "")
 
     if not _mailgun.verify_webhook_signature(api_key, timestamp, token, signature):
-        log.warning("mailgun webhook: rejected request with invalid signature")
+        print("[Mailgun] webhook: rejected request with invalid signature")
         raise HTTPException(status_code=403, detail="Invalid signature")
 
     # ── Parse email fields ─────────────────────────────────────────────────────
@@ -2845,7 +2845,7 @@ async def mailgun_inbound_webhook(request: Request, db: Session = Depends(get_db
     body_plain = str(form.get("body-plain","")).strip()
     body_html  = str(form.get("body-html", "")).strip() or None
 
-    log.info("mailgun inbound: from=%r to=%r subject=%r", sender, recipient, subject)
+    print(f"[Mailgun] inbound: from={sender!r} to={recipient!r} subject={subject!r}")
 
     if recipient == "support@singoling.com":
         # ── Create support ticket ──────────────────────────────────────────────
@@ -2859,13 +2859,13 @@ async def mailgun_inbound_webhook(request: Request, db: Session = Depends(get_db
         )
         db.add(report)
         db.commit()
-        log.info("mailgun inbound: created ticket id=%s for support email from %r", report.id, sender)
+        print(f"[Mailgun] inbound: created ticket id={report.id} for support email from {sender!r}")
         return {"status": "processed"}
     else:
         # ── Forward to personal inbox ──────────────────────────────────────────
         personal_email = _mailgun.ADMIN_PERSONAL_EMAIL
         if not personal_email:
-            log.warning("mailgun inbound: ADMIN_PERSONAL_EMAIL not set, dropping email to %r", recipient)
+            print(f"[Mailgun] inbound: ADMIN_PERSONAL_EMAIL not set, dropping email to {recipient!r}")
             return {"status": "dropped"}
 
         fwd_subject = f"[Fwd: {recipient}] {subject}"
@@ -2880,7 +2880,7 @@ async def mailgun_inbound_webhook(request: Request, db: Session = Depends(get_db
         try:
             _mailgun._send(to=personal_email, subject=fwd_subject, text=fwd_body, html=body_html)
         except Exception as exc:
-            log.error("mailgun inbound: failed to forward from %r to personal inbox: %s", sender, exc)
+            print(f"[Mailgun] inbound: failed to forward from {sender!r} to personal inbox: {exc}")
         return {"status": "forwarded"}
 
 
