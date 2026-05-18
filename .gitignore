@@ -46,7 +46,10 @@ content_to_add
 pipeline/*_output.json
 backend/flowup.db-shm
 backend/flowup.db-wal
-migrate_sqlite_to_postgres.py
+util/migrate_sqlite_to_postgres.py
+util/*.log
+util/flowup.db
+util/.test_cache/
 
 # Large eval source files (>100MB, not suitable for GitHub)
 # All raw source dumps live in eval/sources/ — never in individual pipeline folders
