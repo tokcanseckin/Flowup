@@ -2829,15 +2829,12 @@ async def mailgun_inbound_webhook(request: Request, db: Session = Depends(get_db
     form = await request.form()
 
     # ── Verify Mailgun webhook signature ──────────────────────────────────────
-    timestamp = str(form.get("timestamp", ""))
-    token     = str(form.get("token", ""))
-    signature = str(form.get("signature", ""))
-    api_key   = os.environ.get("MAILGUN_API_KEY", "")
+    timestamp    = str(form.get("timestamp", ""))
+    token        = str(form.get("token", ""))
+    signature    = str(form.get("signature", ""))
+    signing_key  = os.environ.get("MAILGUN_WEB_HOOK_KEY", "")
 
-    import hashlib as _hashlib, hmac as _hmac_mod
-    _expected = _hmac_mod.new(key=api_key.encode(), msg=f"{timestamp}{token}".encode(), digestmod=_hashlib.sha256).hexdigest()
-    print(f"[Mailgun] sig debug: key_len={len(api_key)} key_prefix={api_key[:6]!r} expected={_expected[:12]!r} received={signature[:12]!r}")
-    if not _mailgun.verify_webhook_signature(api_key, timestamp, token, signature):
+    if not _mailgun.verify_webhook_signature(signing_key, timestamp, token, signature):
         print("[Mailgun] webhook: rejected request with invalid signature")
         raise HTTPException(status_code=403, detail="Invalid signature")
 
