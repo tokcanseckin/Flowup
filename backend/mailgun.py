@@ -125,29 +125,34 @@ def send_support_notification(
 
 
 def send_password_reset(*, to: str, display_name: str | None, reset_url: str, t: dict | None = None) -> None:
-    """Send a password-reset email to a user."""
+    """Send a password-reset email using the 'password reset email' Mailgun stored template."""
     t = t or {}
     greeting = t.get("greeting", "Hi")
-    body_text = t.get("body", "Click the link below to reset your password. This link expires in 1 hour.")
+    body_text = t.get("body", "Click the button below to reset your password. This link expires in 1 hour.")
     button = t.get("button", "Reset Password")
-    footer = t.get("footer", "If you did not request this, you can safely ignore this email.")
+    footer_text = t.get("footer", "If you didn't request this, you can safely ignore this email.")
     subject = t.get("subject", "Reset your SingoLing password")
     name = display_name or "there"
     text = (
         f"{greeting} {name},\n\n"
         f"{body_text}\n\n"
         f"{reset_url}\n\n"
-        f"{footer}\n\n"
-        "— The SingoLing team"
+        f"{footer_text}\n\n"
+        "\u2014 The SingoLing team"
     )
-    html = (
-        f"<p>{greeting} {name},</p>"
-        f"<p>{body_text}</p>"
-        f'<p><a href="{reset_url}" '
-        'style="display:inline-block;background:#6366f1;color:#fff;'
-        'padding:10px 24px;border-radius:8px;text-decoration:none;font-weight:600;">'
-        f"{button}</a></p>"
-        f'<p style="color:#6b7280;font-size:13px;">{footer}</p>'
-        "<p>— The SingoLing team</p>"
+    variables = {
+        "name": name,
+        "greeting": greeting,
+        "body_text": body_text,
+        "button": button,
+        "button_url": reset_url,
+        "footer_text": footer_text,
+    }
+    _send(
+        to=to,
+        subject=subject,
+        text=text,
+        from_override=FROM_EMAIL_INFO,
+        template="password reset email",
+        template_variables=variables,
     )
-    _send(to=to, subject=subject, text=text, html=html, from_override=FROM_EMAIL_INFO)
