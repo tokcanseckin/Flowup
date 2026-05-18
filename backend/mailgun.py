@@ -1,13 +1,7 @@
 """Mailgun email sending helper.
 
-Required environment variables:
-    MAILGUN_API_KEY    — Mailgun API key (starts with "key-…")
-    MAILGUN_DOMAIN     — Sending domain configured in Mailgun (e.g. mg.singoling.com)
-
-Optional:
-    MAILGUN_FROM_EMAIL — Defaults to "noreply@{MAILGUN_DOMAIN}"
-    MAILGUN_API_BASE   — Defaults to "https://api.mailgun.net" (EU: "https://api.eu.mailgun.net")
-    MAILGUN_ADMIN_EMAIL — Where to deliver admin notifications (support tickets etc.)
+Only MAILGUN_API_KEY is read from the environment (set in ~/.credentials on the server).
+All other config is hardcoded as constants below.
 """
 
 from __future__ import annotations
@@ -17,19 +11,23 @@ import os
 import urllib.parse
 import urllib.request
 
+# ── Constants ──────────────────────────────────────────────────────────────────
+
+DOMAIN     = "mg.singoling.com"
+FROM_EMAIL = f"SingoLing <noreply@{DOMAIN}>"
+API_BASE   = "https://api.mailgun.net"
+ADMIN_EMAIL = "seckin@singoling.com"
+SITE_URL   = "https://singoling.com"
+
 
 def _send(to: str, subject: str, text: str, html: str | None = None) -> None:
-    """POST to the Mailgun messages API. Silently skips if Mailgun is not configured."""
+    """POST to the Mailgun messages API. Silently skips if MAILGUN_API_KEY is not set."""
     api_key = os.environ.get("MAILGUN_API_KEY", "")
-    domain = os.environ.get("MAILGUN_DOMAIN", "")
-    if not api_key or not domain:
+    if not api_key:
         return
 
-    from_email = os.environ.get("MAILGUN_FROM_EMAIL", f"SingoLing <noreply@{domain}>")
-    api_base = os.environ.get("MAILGUN_API_BASE", "https://api.mailgun.net")
-
     data: dict[str, str] = {
-        "from": from_email,
+        "from": FROM_EMAIL,
         "to": to,
         "subject": subject,
         "text": text,
@@ -40,7 +38,7 @@ def _send(to: str, subject: str, text: str, html: str | None = None) -> None:
     encoded = urllib.parse.urlencode(data).encode()
     credentials = base64.b64encode(f"api:{api_key}".encode()).decode()
     req = urllib.request.Request(
-        f"{api_base}/v3/{domain}/messages",
+        f"{API_BASE}/v3/{DOMAIN}/messages",
         data=encoded,
         headers={"Authorization": f"Basic {credentials}"},
         method="POST",
@@ -59,11 +57,7 @@ def send_support_notification(
     song_title: str | None,
     message: str | None,
 ) -> None:
-    """Email the admin when a new support ticket is submitted. No-ops if MAILGUN_ADMIN_EMAIL is not set."""
-    admin_email = os.environ.get("MAILGUN_ADMIN_EMAIL", "")
-    if not admin_email:
-        return
-
+    """Email the admin when a new support ticket is submitted."""
     lines = [
         f"New support ticket #{report_id}",
         f"Kind:  {kind}",
@@ -75,7 +69,7 @@ def send_support_notification(
         lines.append(f"\nMessage:\n{message}")
 
     _send(
-        to=admin_email,
+        to=ADMIN_EMAIL,
         subject=f"[SingoLing] Support ticket #{report_id} — {kind}",
         text="\n".join(lines),
     )

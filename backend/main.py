@@ -2458,7 +2458,7 @@ def forgot_password(body: ForgotPasswordRequest, db: Session = Depends(get_db)):
     ))
     db.commit()
 
-    site_url = os.environ.get("SITE_URL", "https://singoling.com").rstrip("/")
+    site_url = _mailgun.SITE_URL
     reset_url = f"{site_url}/?reset_token={raw_token}"
     _email = user.email
     _name = user.display_name
