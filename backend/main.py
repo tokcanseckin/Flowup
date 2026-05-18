@@ -689,34 +689,53 @@ app.add_middleware(
 class _RateLimiter:
     """Fixed-window in-memory rate limiter. Thread-safe, no external deps."""
 
+    _ALERT_WINDOW = 86_400  # seconds between repeated alerts for same IP+endpoint
+
     def __init__(self) -> None:
         # key → (window_start, count)
         self._windows: dict[str, tuple[float, int]] = {}
+        # alert_key → last_alert_timestamp  (deduplicate within 24 h)
+        self._alerts: dict[str, float] = {}
         self._lock = threading.Lock()
         # Periodic cleanup every 5 minutes
         self._start_cleanup()
 
-    def is_allowed(self, key: str, limit: int, window_seconds: int) -> tuple[bool, int]:
-        """Return (allowed, retry_after_seconds). retry_after is 0 when allowed."""
+    def is_allowed(self, key: str, limit: int, window_seconds: int) -> tuple[bool, int, int]:
+        """Return (allowed, retry_after_seconds, attempt_count). retry_after is 0 when allowed."""
         now = time.time()
         with self._lock:
             start, count = self._windows.get(key, (now, 0))
             if now - start >= window_seconds:
                 # New window
                 self._windows[key] = (now, 1)
-                return True, 0
+                return True, 0, 1
             if count < limit:
                 self._windows[key] = (start, count + 1)
-                return True, 0
+                return True, 0, count + 1
             retry_after = int(window_seconds - (now - start)) + 1
-            return False, retry_after
+            return False, retry_after, count
+
+    def should_alert(self, alert_key: str) -> bool:
+        """True if no alert has been sent for this key within the last 24 h."""
+        now = time.time()
+        with self._lock:
+            last = self._alerts.get(alert_key, 0.0)
+            return now - last >= self._ALERT_WINDOW
+
+    def mark_alerted(self, alert_key: str) -> None:
+        """Record that an alert was just sent for this key."""
+        with self._lock:
+            self._alerts[alert_key] = time.time()
 
     def _cleanup(self) -> None:
         now = time.time()
         with self._lock:
-            expired = [k for k, (start, _) in self._windows.items() if now - start >= 3600]
-            for k in expired:
+            expired_w = [k for k, (start, _) in self._windows.items() if now - start >= 3600]
+            for k in expired_w:
                 del self._windows[k]
+            expired_a = [k for k, ts in self._alerts.items() if now - ts >= self._ALERT_WINDOW]
+            for k in expired_a:
+                del self._alerts[k]
 
     def _start_cleanup(self) -> None:
         def _run() -> None:
@@ -744,13 +763,20 @@ def _get_client_ip(request: Request) -> str:
     return request.client.host if request.client else "unknown"
 
 
-def rate_limit(limit: int, window_seconds: int, key_prefix: str = ""):
-    """FastAPI dependency factory for rate limiting by IP."""
-    def dependency(request: Request):
+def rate_limit(limit: int, window_seconds: int, key_prefix: str = "", endpoint_name: str = ""):
+    """FastAPI dependency factory for rate limiting by IP, with first-breach alerting."""
+    def dependency(request: Request, db: Session = Depends(get_db)):
         ip = _get_client_ip(request)
         key = f"{key_prefix}:{ip}"
-        allowed, retry_after = _rate_limiter.is_allowed(key, limit, window_seconds)
+        allowed, retry_after, attempt_count = _rate_limiter.is_allowed(key, limit, window_seconds)
         if not allowed:
+            _maybe_send_rate_limit_alert(
+                db=db,
+                request=request,
+                ip=ip,
+                endpoint_name=endpoint_name or key_prefix,
+                attempt_count=attempt_count,
+            )
             raise HTTPException(
                 status_code=429,
                 detail="Too many requests. Please try again later.",
@@ -759,15 +785,70 @@ def rate_limit(limit: int, window_seconds: int, key_prefix: str = ""):
     return Depends(dependency)
 
 
+def _maybe_send_rate_limit_alert(
+    *,
+    db: Session,
+    request: Request,
+    ip: str,
+    endpoint_name: str,
+    attempt_count: int,
+) -> None:
+    """Create a Report and fire an admin email on the first breach per IP+endpoint within 24 h."""
+    alert_key = f"{ip}:{endpoint_name}"
+    if not _rate_limiter.should_alert(alert_key):
+        return
+
+    _rate_limiter.mark_alerted(alert_key)
+
+    user_agent = request.headers.get("User-Agent", "")
+    now_ts = int(time.time())
+    body_data = {
+        "ip": ip,
+        "endpoint": endpoint_name,
+        "timestamp": now_ts,
+        "attempt_count": attempt_count,
+        "user_agent": user_agent,
+    }
+
+    try:
+        report = Report(
+            kind    = "rate_limit",
+            context = endpoint_name,
+            message = json.dumps(body_data),
+            status  = "open",
+        )
+        db.add(report)
+        db.commit()
+    except Exception as exc:
+        print(f"[rate_limit] failed to create Report: {exc}")
+
+    def _send_alert() -> None:
+        subject = f"[Security Alert] Rate limit exceeded: {endpoint_name}"
+        body = (
+            f"Rate limit breached on /{endpoint_name}\n\n"
+            f"IP:            {ip}\n"
+            f"User-Agent:    {user_agent}\n"
+            f"Attempt count: {attempt_count}\n"
+            f"Timestamp:     {now_ts}\n\n"
+            f"No further alerts will be sent for this IP+endpoint for 24 h."
+        )
+        try:
+            _mailgun._send(to=_mailgun.ADMIN_EMAIL, subject=subject, text=body)
+        except Exception as exc:
+            print(f"[rate_limit] failed to send alert email: {exc}")
+
+    threading.Thread(target=_send_alert, daemon=True).start()
+
+
 # Tier 1 — Auth (strict, IP-based)
-_rl_login           = rate_limit(5,   15 * 60, "login")
-_rl_register        = rate_limit(3,   15 * 60, "register")
-_rl_forgot_password = rate_limit(3,   15 * 60, "forgot_password")
-_rl_reset_password  = rate_limit(5,   15 * 60, "reset_password")
+_rl_login           = rate_limit(5,   15 * 60, "login",           endpoint_name="login")
+_rl_register        = rate_limit(3,   15 * 60, "register",        endpoint_name="register")
+_rl_forgot_password = rate_limit(3,   15 * 60, "forgot_password", endpoint_name="forgot_password")
+_rl_reset_password  = rate_limit(5,   15 * 60, "reset_password",  endpoint_name="reset_password")
 # Tier 2 — OAuth (relaxed, IP-based)
-_rl_oauth           = rate_limit(10,  15 * 60, "oauth")
+_rl_oauth           = rate_limit(10,  15 * 60, "oauth",           endpoint_name="oauth")
 # Tier 3 — Webhooks (IP-based)
-_rl_webhook         = rate_limit(100, 60,       "webhook")
+_rl_webhook         = rate_limit(100, 60,       "webhook",         endpoint_name="webhook")
 # Tier 4 — Admin: rate limiting is embedded in _require_admin (30 req/min per user ID)
 # Tier 4 — User actions (_rl_user_action): defined below after _get_current_user
 
@@ -1293,7 +1374,7 @@ def _require_admin(
             raise HTTPException(status_code=403, detail="Admin access required")
         # Rate-limit by user ID for accuracy
         key = f"admin:user:{user.id}"
-        allowed, retry_after = _rate_limiter.is_allowed(key, 30, 60)
+        allowed, retry_after, _ = _rate_limiter.is_allowed(key, 30, 60)
         if not allowed:
             raise HTTPException(
                 status_code=429,
@@ -1316,7 +1397,7 @@ def _require_admin(
             raise HTTPException(status_code=403, detail="Admin access required")
         # Rate-limit by user ID for accuracy
         key = f"admin:user:{user.id}"
-        allowed, retry_after = _rate_limiter.is_allowed(key, 30, 60)
+        allowed, retry_after, _ = _rate_limiter.is_allowed(key, 30, 60)
         if not allowed:
             raise HTTPException(
                 status_code=429,
@@ -1372,7 +1453,7 @@ def rate_limit_user(limit: int, window_seconds: int, key_prefix: str = ""):
     """FastAPI dependency factory for rate limiting by authenticated user ID."""
     def dependency(request: Request, current_user: User = Depends(_get_current_user)):
         key = f"{key_prefix}:user:{current_user.id}"
-        allowed, retry_after = _rate_limiter.is_allowed(key, limit, window_seconds)
+        allowed, retry_after, _ = _rate_limiter.is_allowed(key, limit, window_seconds)
         if not allowed:
             raise HTTPException(
                 status_code=429,
