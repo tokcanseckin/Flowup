@@ -81,14 +81,11 @@ def send_welcome_email(*, to: str, display_name: str | None, t: dict) -> None:
         f"{t.get('footer', '')}"
     )
     variables = {
-        "display_name": name,
+        "name": name,
         "greeting": t.get("greeting", "Hi"),
-        "emoji": t.get("emoji", "\U0001f3b5"),
         "welcome_title": t.get("welcome_title", "Welcome to SingoLing!"),
-        "body": t.get("body", ""),
-        "button": t.get("button", "Browse Songs"),
-        "button_url": SITE_URL,
-        "footer": t.get("footer", ""),
+        "body_text": t.get("body", ""),
+        "footer_text": t.get("footer", ""),
     }
     _send(
         to=to,
