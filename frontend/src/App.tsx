@@ -3599,6 +3599,7 @@ export default function App() {
         <PricingPage
           user={credentialUser}
           onClose={() => setShowPricingPage(false)}
+          onUserUpdate={(user) => setCredentialUser(user)}
         />
       )}
     </>

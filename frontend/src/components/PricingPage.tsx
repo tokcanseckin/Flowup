@@ -5,6 +5,7 @@ import { BackendUser, PricingData, api } from '../api/client'
 interface PricingPageProps {
   user: BackendUser | null
   onClose: () => void
+  onUserUpdate?: (user: BackendUser) => void
 }
 
 // Paddle.js types (Paddle Billing v2)
@@ -32,7 +33,7 @@ declare global {
   }
 }
 
-const PricingPage: React.FC<PricingPageProps> = ({ user, onClose }) => {
+const PricingPage: React.FC<PricingPageProps> = ({ user, onClose, onUserUpdate }) => {
   const [isAnnual, setIsAnnual] = useState(false)
   const [paddleLoaded, setPaddleLoaded] = useState(false)
   const [pricing, setPricing] = useState<PricingData | null>(null)
@@ -68,12 +69,22 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose }) => {
         }
         window.Paddle.Initialize({ 
           token: clientToken,
-          eventCallback: (data) => {
+          eventCallback: async (data) => {
             console.log('[Paddle Event]', data)
             if (data.name === 'checkout.completed') {
               track('Checkout Completed', { 
                 transaction_id: data.data?.transaction_id 
               })
+              // Auto-sync subscription after successful checkout
+              try {
+                const updatedUser = await api.syncSubscription()
+                if (onUserUpdate) {
+                  onUserUpdate(updatedUser)
+                }
+                onClose() // Close pricing page on success
+              } catch (err) {
+                console.error('Failed to sync subscription after checkout:', err)
+              }
             }
           }
         })
