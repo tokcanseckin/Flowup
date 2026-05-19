@@ -247,10 +247,6 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose, onUserUpdate: 
               >
                 {!paddleLoaded ? 'Loading...' : !pricing ? 'Pricing unavailable' : 'Start Learning Now'}
               </button>
-
-              <p className={`text-center text-sm ${isPage ? 'text-gray-400' : 'text-gray-500'}`}>
-                Cancel anytime • No questions asked
-              </p>
             </div>
           </div>
 
