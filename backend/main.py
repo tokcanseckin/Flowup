@@ -3802,8 +3802,15 @@ async def paddle_webhook(request: Request, db: Session = Depends(get_db)):
     # Log webhook receipt for debugging
     print(f"[Paddle Webhook] Received webhook")
     print(f"[Paddle Webhook] Signature header: {signature_header}")
-    print(f"[Paddle Webhook] Body length: {len(body_str)} bytes")
+    print(f"[Paddle Webhook] Body preview: {body_str[:200]}...")
     print(f"[Paddle Webhook] Webhook secret configured: {bool(PADDLE_WEBHOOK_SECRET)}")
+    print(f"[Paddle Webhook] Secret length: {len(PADDLE_WEBHOOK_SECRET) if PADDLE_WEBHOOK_SECRET else 0}")
+    
+    # TEMPORARY: Log all headers for debugging
+    print("[Paddle Webhook] All headers:")
+    for header_name, header_value in request.headers.items():
+        if 'paddle' in header_name.lower() or 'signature' in header_name.lower():
+            print(f"  {header_name}: {header_value}")
     
     if not signature_header:
         print("[Paddle Webhook] ERROR: Missing Paddle-Signature header")
@@ -3837,8 +3844,11 @@ async def paddle_webhook(request: Request, db: Session = Depends(get_db)):
         ).hexdigest()
         
         print(f"[Paddle Webhook] Timestamp: {timestamp}")
-        print(f"[Paddle Webhook] Received signature: {signature[:20]}...")
-        print(f"[Paddle Webhook] Expected signature: {expected_signature[:20]}...")
+        print(f"[Paddle Webhook] Signed payload length: {len(signed_payload)} bytes")
+        print(f"[Paddle Webhook] Signed payload preview: {signed_payload[:100]}...")
+        print(f"[Paddle Webhook] Received signature: {signature}")
+        print(f"[Paddle Webhook] Expected signature: {expected_signature}")
+        print(f"[Paddle Webhook] Signatures match: {signature == expected_signature}")
         
         if not secrets.compare_digest(signature, expected_signature):
             print("[Paddle Webhook] ERROR: Signature mismatch")
