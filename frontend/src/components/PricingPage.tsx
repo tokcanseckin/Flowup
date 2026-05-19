@@ -85,7 +85,9 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose, onUserUpdate }
               // Auto-sync subscription after successful checkout with retry
               console.log('[Paddle] Checkout completed, waiting for Paddle to process...')
               
-              const attemptSync = async (attemptNumber: number, delayMs: number) => {
+              console.log('[Paddle] About to define attemptSync...')
+              const attemptSync = (attemptNumber: number, delayMs: number) => {
+                console.log(`[Paddle] attemptSync called with attempt=${attemptNumber}, delay=${delayMs}`)
                 setTimeout(async () => {
                   try {
                     console.log(`[Paddle] Syncing subscription (attempt ${attemptNumber})...`)
@@ -110,7 +112,9 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose, onUserUpdate }
                 }, delayMs)
               }
               
+              console.log('[Paddle] Calling attemptSync(1, 2000)...')
               attemptSync(1, 2000)
+              console.log('[Paddle] attemptSync has been called')
             }
           }
         })
