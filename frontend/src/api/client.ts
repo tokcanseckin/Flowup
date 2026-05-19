@@ -289,7 +289,7 @@ export const api = {
     apiFetch('/pricing'),
 
   syncSubscription: (): Promise<BackendUser> =>
-    apiFetch('/sync-subscription', { method: 'POST' }),
+    apiFetch('/sync-subscription', { method: 'POST', headers: getUserAuthHeaders() }),
 
   listSongs: (): Promise<SongSummary[]> =>
     apiFetch('/songs'),
