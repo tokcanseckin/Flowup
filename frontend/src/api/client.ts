@@ -55,6 +55,15 @@ export interface SongDetail {
   youtube_url: string | null
   apple_music_url: string | null
   target_langs: string[]
+  lyrics_unlocked?: boolean  // Subscription access control
+  upgrade_cta?: {
+    title: string
+    message: string
+    cta: string
+    url: string
+    back_to_trial_url: string
+    highlight_features: string[]
+  }
 }
 
 export interface PlaylistSongEntry {
@@ -97,6 +106,15 @@ export interface BackendUser {
   apple_music_user_token: string | null
   admin_token: string | null
   preferred_lang: string
+  // Subscription fields
+  subscription_tier: string
+  subscription_status: string | null
+  subscription_platform: string | null
+  subscription_external_id: string | null
+  subscription_started_at: string | null
+  subscription_expires_at: string | null
+  subscription_cancel_at_period_end: boolean
+  original_platform: string | null
 }
 
 export interface AdminUser {

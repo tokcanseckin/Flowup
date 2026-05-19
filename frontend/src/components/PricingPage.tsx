@@ -1,0 +1,216 @@
+import React, { useState, useEffect } from 'react'
+import { track } from '../analytics'
+import { BackendUser } from '../api/client'
+
+interface PricingPageProps {
+  user: BackendUser | null
+  onClose: () => void
+}
+
+// Paddle.js types
+declare global {
+  interface Window {
+    Paddle?: {
+      Environment: {
+        set: (env: 'sandbox' | 'production') => void
+      }
+      Setup: (options: { vendor: number; eventCallback?: (data: any) => void }) => void
+      Checkout: {
+        open: (options: {
+          product?: number
+          email?: string
+          passthrough?: string
+          success?: string
+          closeCallback?: () => void
+        }) => void
+      }
+    }
+  }
+}
+
+const PricingPage: React.FC<PricingPageProps> = ({ user, onClose }) => {
+  const [isAnnual, setIsAnnual] = useState(false)
+  const [paddleLoaded, setPaddleLoaded] = useState(false)
+
+  useEffect(() => {
+    // Load Paddle.js
+    const script = document.createElement('script')
+    script.src = 'https://cdn.paddle.com/paddle/paddle.js'
+    script.async = true
+    script.onload = () => {
+      if (window.Paddle) {
+        // Use sandbox for testing, production for live
+        window.Paddle.Environment.set('sandbox')
+        // TODO: Replace with actual vendor ID from Paddle dashboard
+        window.Paddle.Setup({ vendor: 12345 })
+        setPaddleLoaded(true)
+      }
+    }
+    document.body.appendChild(script)
+
+    return () => {
+      document.body.removeChild(script)
+    }
+  }, [])
+
+  const handleUpgrade = (tier: 'monthly' | 'annual') => {
+    if (!paddleLoaded || !window.Paddle) {
+      alert('Payment system is loading. Please try again in a moment.')
+      return
+    }
+
+    track('Checkout Initiated', {
+      tier,
+      source: 'pricing_page',
+      user_id: user?.id ?? 0,
+    })
+
+    // TODO: Replace with actual product IDs from Paddle dashboard
+    const productId = tier === 'monthly' ? 54321 : 54322
+
+    window.Paddle.Checkout.open({
+      product: productId,
+      email: user?.email || undefined,
+      passthrough: user ? JSON.stringify({ user_id: user.id }) : undefined,
+      success: '/welcome?subscribed=true',
+      closeCallback: () => {
+        track('Checkout Closed', { tier })
+      },
+    })
+  }
+
+  const features = [
+    'Interactive word-by-word translations',
+    'Instant definitions with keyboard shortcuts (D key)',
+    'Full-line translations in your language',
+    'Unlimited songs in all languages',
+    'Ad-free experience',
+    'Priority support',
+  ]
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+      <div className="relative w-full max-w-5xl mx-4 bg-white rounded-2xl shadow-2xl overflow-hidden">
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 z-10 text-gray-400 hover:text-gray-600 transition-colors"
+          aria-label="Close"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+
+        <div className="p-8 md:p-12">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              Upgrade to Premium
+            </h1>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Unlock unlimited interactive lyrics, translations, and word definitions across all songs
+            </p>
+          </div>
+
+          {/* Annual/Monthly toggle */}
+          <div className="flex items-center justify-center gap-4 mb-8">
+            <button
+              onClick={() => setIsAnnual(false)}
+              className={`px-6 py-2 rounded-full font-medium transition-all ${
+                !isAnnual
+                  ? 'bg-purple-600 text-white shadow-lg'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              Monthly
+            </button>
+            <button
+              onClick={() => setIsAnnual(true)}
+              className={`px-6 py-2 rounded-full font-medium transition-all ${
+                isAnnual
+                  ? 'bg-purple-600 text-white shadow-lg'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              Annual <span className="ml-2 text-sm">(Save 17%)</span>
+            </button>
+          </div>
+
+          {/* Pricing card */}
+          <div className="max-w-md mx-auto mb-8">
+            <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl p-8 border-2 border-purple-200">
+              <div className="text-center mb-6">
+                <div className="text-5xl font-bold text-gray-900 mb-2">
+                  ${isAnnual ? '99.99' : '9.99'}
+                  <span className="text-2xl text-gray-600 font-normal">
+                    /{isAnnual ? 'year' : 'month'}
+                  </span>
+                </div>
+                {isAnnual && (
+                  <p className="text-sm text-purple-600 font-medium">
+                    Just $8.33/month — Save $20/year
+                  </p>
+                )}
+              </div>
+
+              <button
+                onClick={() => handleUpgrade(isAnnual ? 'annual' : 'monthly')}
+                disabled={!paddleLoaded}
+                className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-4 px-8 rounded-lg shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed mb-4"
+              >
+                {paddleLoaded ? 'Start Learning Now' : 'Loading...'}
+              </button>
+
+              <p className="text-center text-sm text-gray-500">
+                Cancel anytime • No questions asked
+              </p>
+            </div>
+          </div>
+
+          {/* Features list */}
+          <div className="max-w-2xl mx-auto">
+            <h3 className="text-xl font-semibold text-gray-900 mb-4 text-center">
+              Everything you need to master a new language
+            </h3>
+            <div className="grid md:grid-cols-2 gap-4">
+              {features.map((feature, i) => (
+                <div key={i} className="flex items-start gap-3">
+                  <svg
+                    className="w-6 h-6 text-purple-600 flex-shrink-0 mt-0.5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                  <span className="text-gray-700">{feature}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Free trial info */}
+          <div className="mt-8 text-center text-sm text-gray-500">
+            <p>
+              Already subscribed?{' '}
+              <button
+                onClick={onClose}
+                className="text-purple-600 hover:text-purple-700 font-medium underline"
+              >
+                Continue learning
+              </button>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default PricingPage

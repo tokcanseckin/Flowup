@@ -17,6 +17,7 @@ import { track } from './analytics'
 import PrivacyPolicyPage from './components/PrivacyPolicyPage'
 import TermsOfServicePage from './components/TermsOfServicePage'
 import { TutorialOverlay, TutorialHandle, TutorialStep } from './components/TutorialOverlay'
+import PricingPage from './components/PricingPage'
 
 // ── Module-level song cache (survives re-renders, cleared on logout) ──────────
 // Key: `{id}:{source}` where source is 'youtube' or 'apple_music'.
@@ -1978,7 +1979,7 @@ function useAlbumLyricsTheme(albumArtUrl: string | null): [{ panelGradient: stri
 // ── Player view ────────────────────────────────────────────────────────────────
 
 function PlayerView({
-  song, user, onBack, onLogout, onOpenSettings, onOpenAdmin, onOpenAccount, isAdmin, onPrev, onNext, canPrev, canNext, settings, onUpdate, storedMusicUserToken, onMusicUserToken, favoriteSongIds, toggleFavorite, targetLang, onTargetLangChange, onGoToBrowse, playlistName, onGoToPlaylist,
+  song, user, onBack, onLogout, onOpenSettings, onOpenAdmin, onOpenAccount, isAdmin, onPrev, onNext, canPrev, canNext, settings, onUpdate, storedMusicUserToken, onMusicUserToken, favoriteSongIds, toggleFavorite, targetLang, onTargetLangChange, onGoToBrowse, playlistName, onGoToPlaylist, onShowPricing, onBackToTrial,
 }: {
   song: SongDetail
   user: { display_name: string | null; email: string | null } | null
@@ -2003,6 +2004,8 @@ function PlayerView({
   onGoToBrowse: () => void
   playlistName?: string | null
   onGoToPlaylist?: () => void
+  onShowPricing?: () => void
+  onBackToTrial?: () => void
 }) {
   const [infoVisible, setInfoVisible] = useState(false)
   const [playerMenuOpen, setPlayerMenuOpen] = useState(false)
@@ -2660,6 +2663,8 @@ function PlayerView({
             onLineTranslateClosed={() => { if (showPlayerTutorial && tutorialStepRef.current === 2) tutorialRef.current?.advance() }}
             onSeek={seekTo}
             onTogglePlayback={togglePlay}
+            onShowPricing={onShowPricing}
+            onBackToTrial={onBackToTrial}
           />
         </section>
       </main>
@@ -2713,6 +2718,7 @@ export default function App() {
     if (typeof window === 'undefined') return null
     return new URLSearchParams(window.location.search).get('reset_token')
   })
+  const [showPricingPage, setShowPricingPage] = useState(false)
 
   const { favoriteSongIds, toggleFavorite } = useFavorites(!!credentialUser)
   const { listenedSongIds, markListened, unmarkListened } = useListened(!!credentialUser)
@@ -3390,6 +3396,14 @@ export default function App() {
           onGoToBrowse={() => navigateToPath('/browse')}
           playlistName={activePlaylist ? tc(activePlaylist.name) : null}
           onGoToPlaylist={activePlaylistId !== null ? () => navigateToPath(playlistPath(activePlaylistId)) : undefined}
+          onShowPricing={() => setShowPricingPage(true)}
+          onBackToTrial={() => {
+            // Navigate to first song in current playlist
+            if (activePlaylist && activePlaylist.songs.length > 0) {
+              const firstSongId = activePlaylist.songs[0].song_id
+              navigateToPath(songPath(firstSongId), true)
+            }
+          }}
         />
         <HelpButton />
       </>
@@ -3422,6 +3436,14 @@ export default function App() {
         onBrowseTargetLang={handleBrowseTargetLang}
       />
       <HelpButton />
+      
+      {/* Pricing page overlay */}
+      {showPricingPage && (
+        <PricingPage
+          user={credentialUser}
+          onClose={() => setShowPricingPage(false)}
+        />
+      )}
     </>
   )
 }

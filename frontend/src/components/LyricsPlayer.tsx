@@ -5,6 +5,7 @@ import translateIconImg from '../../images/translate_icon@2x.png'
 import { useT } from '../i18n/LocalizationContext'
 import { track } from '../analytics'
 import ReportModal from './ReportModal'
+import LyricsLockScreen from './LyricsLockScreen'
 
 // ── Stop-word sets (keyed by language code) ─────────────────────────────────
 // These words are still clickable, but don't consume a keyboard index (1-9).
@@ -329,6 +330,9 @@ interface Props {
   onLineTranslateClosed?: () => void
   onSeek?: (ms: number) => void
   onTogglePlayback?: () => void
+  /** Subscription callbacks */
+  onShowPricing?: () => void
+  onBackToTrial?: () => void
 }
 
 export default function LyricsPlayer({
@@ -349,6 +353,8 @@ export default function LyricsPlayer({
   onLineTranslateClosed,
   onSeek,
   onTogglePlayback,
+  onShowPricing,
+  onBackToTrial,
 }: Props) {
   const t = useT()
   const { lines, language } = songData
@@ -966,6 +972,32 @@ export default function LyricsPlayer({
             )}
           </div>
         </aside>
+      )}
+
+      {/* Lyrics Lock Screen - shown when subscription required */}
+      {songData.lyrics_unlocked === false && songData.upgrade_cta && (
+        <LyricsLockScreen
+          lyrics={lines}
+          currentTime={currentPositionMs}
+          title={songData.upgrade_cta.title}
+          message={songData.upgrade_cta.message}
+          features={songData.upgrade_cta.highlight_features}
+          upgradeButtonText={songData.upgrade_cta.cta}
+          onUpgrade={() => {
+            track('Paywall Hit', {
+              song_id: songData.id,
+              source: 'lyrics_lock_screen',
+            })
+            onShowPricing?.()
+          }}
+          onBackToTrial={onBackToTrial ? () => {
+            track('Back to Trial', {
+              song_id: songData.id,
+              source: 'lyrics_lock_screen',
+            })
+            onBackToTrial()
+          } : undefined}
+        />
       )}
     </div>
   )
