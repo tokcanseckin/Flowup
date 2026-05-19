@@ -17,6 +17,10 @@ declare global {
       Setup: (options: { vendor: number; eventCallback?: (data: any) => void }) => void
       Checkout: {
         open: (options: {
+          items?: Array<{ priceId: string; quantity: number }>
+          customData?: Record<string, any>
+          customer?: { email?: string }
+          successUrl?: string
           product?: number
           email?: string
           passthrough?: string
@@ -65,14 +69,17 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose }) => {
       user_id: user?.id ?? 0,
     })
 
-    // TODO: Replace with actual product IDs from Paddle dashboard
-    const productId = tier === 'monthly' ? 54321 : 54322
+    // Real Paddle price IDs from sandbox
+    const priceIds = {
+      monthly: 'pri_01ks0ddf0xdr1tskvcfr7n0dxq',  // 8.00 EUR/month
+      annual: 'pri_01ks0dfv5dxxeehzn75fs8nwa6',   // 80.00 EUR/year
+    }
 
     window.Paddle.Checkout.open({
-      product: productId,
-      email: user?.email || undefined,
-      passthrough: user ? JSON.stringify({ user_id: user.id }) : undefined,
-      success: '/welcome?subscribed=true',
+      items: [{ priceId: priceIds[tier], quantity: 1 }],
+      customData: { user_id: user?.id ?? 0 },
+      customer: { email: user?.email || undefined },
+      successUrl: window.location.origin + '/welcome?subscribed=true',
       closeCallback: () => {
         track('Checkout Closed', { tier })
       },
@@ -142,14 +149,14 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose }) => {
             <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl p-8 border-2 border-purple-200">
               <div className="text-center mb-6">
                 <div className="text-5xl font-bold text-gray-900 mb-2">
-                  ${isAnnual ? '99.99' : '9.99'}
+                  €{isAnnual ? '80.00' : '8.00'}
                   <span className="text-2xl text-gray-600 font-normal">
                     /{isAnnual ? 'year' : 'month'}
                   </span>
                 </div>
                 {isAnnual && (
                   <p className="text-sm text-purple-600 font-medium">
-                    Just $8.33/month — Save $20/year
+                    Just €6.67/month — Save €16/year
                   </p>
                 )}
               </div>

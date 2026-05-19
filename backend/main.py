@@ -53,6 +53,7 @@ from sqlalchemy import select as sa_select
 from sqlalchemy.orm import Session, noload
 
 from database import AlignmentTask, Line, LineTranslation, Localization, PasswordResetToken, Playlist, PlaylistSong, Report, Song, User, UserFavorite, UserListenedSong, UserWordLookup, Word, WordDefinition, create_tables, get_db
+import paddle_config
 from models import (
     AdminLyricsUpdate,
     AdminSongDetailResponse,
@@ -3845,7 +3846,12 @@ async def paddle_webhook(request: Request, db: Session = Depends(get_db)):
         next_billed_at = data.get('next_billed_at')
         started_at = data.get('started_at') or data.get('created_at')
         
-        user.subscription_tier = 'premium'
+        # Extract price_id from items to determine tier
+        items = data.get('items', [])
+        price_id = items[0]['price']['id'] if items and len(items) > 0 else None
+        tier = paddle_config.get_tier_for_price(price_id) if price_id else 'premium'
+        
+        user.subscription_tier = tier
         user.subscription_status = 'active'
         user.subscription_platform = 'paddle'
         user.subscription_external_id = subscription_id
