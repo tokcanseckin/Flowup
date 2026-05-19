@@ -66,14 +66,14 @@ const LyricsLockScreen: React.FC<LyricsLockScreenProps> = ({
   }, [currentTime, lyrics])
 
   return (
-    <div className="absolute inset-0 z-40 overflow-hidden">
+    <div className="absolute inset-0 z-40 overflow-hidden backdrop-blur-sm">
       {/* Blurred lyrics background with auto-scroll */}
       <div
         ref={scrollContainerRef}
         className="absolute inset-0 overflow-y-auto overflow-x-hidden scrollbar-hide"
         style={{
-          filter: 'blur(8px)',
-          opacity: 0.3,
+          filter: 'blur(12px)',
+          opacity: 0.4,
         }}
       >
         <div className="px-8 py-24 space-y-6">
@@ -96,8 +96,8 @@ const LyricsLockScreen: React.FC<LyricsLockScreenProps> = ({
         </div>
       </div>
 
-      {/* Dark gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/85 to-black/90" />
+      {/* Dark gradient overlay with backdrop blur */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/85 to-black/90 backdrop-blur-md" />
 
       {/* Lock screen content */}
       <div className="absolute inset-0 flex items-center justify-center p-4">
