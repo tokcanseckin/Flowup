@@ -120,6 +120,7 @@ export interface BackendUser {
 export interface PricingData {
   product_id: string
   product_name: string
+  client_token: string
   monthly: {
     id: string
     amount: number

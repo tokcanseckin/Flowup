@@ -44,6 +44,10 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose }) => {
       .then(data => {
         setPricing(data)
         setLoading(false)
+        // Load Paddle.js once we have the client token
+        if (data.client_token && !paddleLoaded) {
+          initializePaddle(data.client_token)
+        }
       })
       .catch(err => {
         console.error('Failed to fetch pricing:', err)
@@ -51,7 +55,7 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose }) => {
       })
   }, [])
 
-  useEffect(() => {
+  const initializePaddle = (clientToken: string) => {
     // Load Paddle.js v2 for Paddle Billing
     const script = document.createElement('script')
     script.src = 'https://cdn.paddle.com/paddle/v2/paddle.js'
@@ -59,9 +63,8 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose }) => {
     script.onload = () => {
       if (window.Paddle) {
         window.Paddle.Environment.set('sandbox')
-        // For sandbox, use the seller/vendor ID directly
         window.Paddle.Initialize({ 
-          token: '12345',  // Sandbox seller ID
+          token: clientToken,
           eventCallback: (data) => {
             console.log('[Paddle Event]', data)
             if (data.name === 'checkout.completed') {
@@ -75,11 +78,7 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose }) => {
       }
     }
     document.body.appendChild(script)
-
-    return () => {
-      document.body.removeChild(script)
-    }
-  }, [])
+  }
 
   const handleUpgrade = (tier: 'monthly' | 'annual') => {
     if (!paddleLoaded || !window.Paddle) {

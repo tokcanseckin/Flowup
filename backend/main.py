@@ -1592,7 +1592,9 @@ def health():
 @app.get("/api/pricing")
 def get_pricing():
     """Get current pricing from Paddle (cached)."""
-    return paddle_config.get_current_pricing()
+    pricing_data = paddle_config.get_current_pricing()
+    pricing_data['client_token'] = PADDLE_CLIENT_TOKEN
+    return pricing_data
 
 
 @app.post("/api/sync-subscription", response_model=UserResponse)
