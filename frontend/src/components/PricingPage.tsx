@@ -96,18 +96,16 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose }) => {
       tier,
       source: 'pricing_page',
       user_id: user?.id ?? 0,
-    })ettings: {
-        successUrl: window.location.origin + '/browse?subscribed=true',
-      },
-   ? pricing.monthly.id : pricing.annual.id
+    })
+
+    const priceId = tier === 'monthly' ? pricing.monthly.id : pricing.annual.id
 
     window.Paddle.Checkout.open({
       items: [{ priceId, quantity: 1 }],
       customData: { user_id: user?.id ?? 0 },
       customer: { email: user?.email || undefined },
-      successUrl: window.location.origin + '/welcome?subscribed=true',
-      closeCallback: () => {
-        track('Checkout Closed', { tier })
+      settings: {
+        successUrl: window.location.origin + '/browse?subscribed=true',
       },
     })
   }
