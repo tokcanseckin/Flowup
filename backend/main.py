@@ -1136,6 +1136,7 @@ def _admin_user_response(user: User) -> AdminUserResponse:
         email=user.email,
         has_password=bool(user.password_hash),
         is_admin=bool(user.is_admin),
+        access_status=user.access_status or 'approved',
         created_at=user.created_at,
     )
 
@@ -1369,6 +1370,9 @@ def _is_onboarding_required(user: User) -> bool:
 
 # ── Admin token (HMAC-based, works for Google users who have no password) ─────
 _ADMIN_TOKEN_SECRET = os.environ.get("FLOWUP_ADMIN_SECRET", "flowup-dev-admin-secret-change-in-prod").encode()
+
+# ── Closed access mode (when True, new users default to pending-approval) ─────
+CLOSED_ACCESS = os.environ.get("CLOSED_ACCESS", "false").lower() in ("true", "1", "yes")
 
 
 def _make_admin_token(user: User) -> str:
@@ -2162,6 +2166,11 @@ def update_admin_user(user_id: int, body: AdminUserUpdate, db: Session = Depends
     if "is_admin" in body.model_fields_set and body.is_admin is not None:
         user.is_admin = 1 if body.is_admin else 0
 
+    if "access_status" in body.model_fields_set and body.access_status is not None:
+        if body.access_status not in ('approved', 'pending-approval'):
+            raise HTTPException(status_code=400, detail="access_status must be 'approved' or 'pending-approval'")
+        user.access_status = body.access_status
+
     if body.password is not None:
         if len(body.password) < 8:
             raise HTTPException(status_code=400, detail="Password must be at least 8 characters")
@@ -2651,6 +2660,7 @@ async def register_with_credentials(body: RegisterRequest, db: Session = Depends
         email=email,
         password_hash=_hash_password(body.password),
         preferred_lang=body.lang or 'en',
+        access_status='pending-approval' if CLOSED_ACCESS else 'approved',
     )
     db.add(user)
     db.commit()
@@ -2898,6 +2908,7 @@ async def login_with_google(body: GoogleLoginRequest, db: Session = Depends(get_
             email=email,
             google_user_id=google_sub,
             preferred_lang=body.lang or 'en',
+            access_status='pending-approval' if CLOSED_ACCESS else 'approved',
         )
         db.add(user)
         _is_new = True
@@ -2973,6 +2984,7 @@ async def login_with_apple(body: AppleLoginRequest, db: Session = Depends(get_db
             email=email,
             apple_user_id=apple_sub,
             preferred_lang=body.lang or 'en',
+            access_status='pending-approval' if CLOSED_ACCESS else 'approved',
         )
         db.add(user)
         _is_new = True

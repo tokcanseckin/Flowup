@@ -106,6 +106,7 @@ export interface AdminUser {
   email: string | null
   has_password: boolean
   is_admin: boolean
+  access_status: string
   created_at: number
 }
 
@@ -566,6 +567,7 @@ export const api = {
     display_name?: string | null
     email?: string | null
     is_admin?: boolean
+    access_status?: string
     password?: string | null
   }): Promise<AdminUser> =>
     apiFetch(`/admin/users/${userId}`, {

@@ -165,6 +165,7 @@ class AdminUserResponse(BaseModel):
     email: Optional[str]
     has_password: bool
     is_admin: bool
+    access_status: str
     created_at: int
 
 
@@ -172,6 +173,7 @@ class AdminUserUpdate(BaseModel):
     display_name: Optional[str] = None
     email: Optional[str] = None
     is_admin: Optional[bool] = None
+    access_status: Optional[str] = None
     password: Optional[str] = None
 
 

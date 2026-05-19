@@ -52,6 +52,7 @@ type UserDraft = {
   display_name: string
   email: string
   is_admin: boolean
+  access_status: string
   password: string
 }
 
@@ -247,8 +248,16 @@ export default function AdminPanel({
 
   const filteredUsers = useMemo(() => {
     const needle = searchQuery.trim().toLowerCase()
-    if (tab !== 'users' || !needle) return users
-    return users.filter(item => `${item.display_name ?? ''} ${item.email ?? ''} ${item.spotify_id}`.toLowerCase().includes(needle))
+    let result = tab !== 'users' || !needle 
+      ? users 
+      : users.filter(item => `${item.display_name ?? ''} ${item.email ?? ''} ${item.spotify_id}`.toLowerCase().includes(needle))
+    
+    // Sort pending-approval users to the top
+    return result.sort((a, b) => {
+      if (a.access_status === 'pending-approval' && b.access_status !== 'pending-approval') return -1
+      if (a.access_status !== 'pending-approval' && b.access_status === 'pending-approval') return 1
+      return 0
+    })
   }, [searchQuery, tab, users])
 
   const filteredTasks = useMemo(() => {
@@ -472,6 +481,7 @@ export default function AdminPanel({
           display_name: detail.display_name ?? '',
           email: detail.email ?? '',
           is_admin: detail.is_admin,
+          access_status: detail.access_status || 'approved',
           password: '',
         })
       })
@@ -930,6 +940,7 @@ export default function AdminPanel({
         display_name: userDraft.display_name.trim() || null,
         email: userDraft.email.trim().toLowerCase() || null,
         is_admin: userDraft.is_admin,
+        access_status: userDraft.access_status,
         password: userDraft.password.trim() || null,
       })
       setSelectedUser(updated)
@@ -937,6 +948,7 @@ export default function AdminPanel({
         display_name: updated.display_name ?? '',
         email: updated.email ?? '',
         is_admin: updated.is_admin,
+        access_status: updated.access_status || 'approved',
         password: '',
       })
       setUsers(prev => prev.map(item => item.id === updated.id ? updated : item))
@@ -1116,7 +1128,10 @@ export default function AdminPanel({
                   >
                     <div className="flex items-center justify-between gap-2">
                       <p className="text-sm font-medium text-white truncate">{item.display_name ?? item.email ?? item.spotify_id}</p>
-                      {item.is_admin && <span className="rounded-md border border-amber-700/50 bg-amber-950/30 px-1.5 py-0.5 text-[10px] font-semibold text-amber-300">ADMIN</span>}
+                      <div className="flex items-center gap-1.5">
+                        {item.access_status === 'pending-approval' && <span className="rounded-md border border-orange-700/50 bg-orange-950/30 px-1.5 py-0.5 text-[10px] font-semibold text-orange-300">PENDING</span>}
+                        {item.is_admin && <span className="rounded-md border border-amber-700/50 bg-amber-950/30 px-1.5 py-0.5 text-[10px] font-semibold text-amber-300">ADMIN</span>}
+                      </div>
                     </div>
                     <p className="text-xs text-gray-500 truncate">{item.email ?? item.spotify_id}</p>
                   </button>
@@ -1504,6 +1519,20 @@ export default function AdminPanel({
                       <input type="checkbox" checked={userDraft.is_admin} onChange={e => setUserDraft(prev => prev ? { ...prev, is_admin: e.target.checked } : prev)} className="rounded border-gray-600 bg-gray-900 text-indigo-500 focus:ring-indigo-500" />
                       <span>Administrator access</span>
                     </label>
+                    <div className="space-y-2">
+                      <p className="text-xs text-gray-500">Access Status</p>
+                      <div className="flex items-center gap-3">
+                        <select value={userDraft.access_status} onChange={e => setUserDraft(prev => prev ? { ...prev, access_status: e.target.value } : prev)} className="flex-1 rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
+                          <option value="approved">Approved</option>
+                          <option value="pending-approval">Pending Approval</option>
+                        </select>
+                        {userDraft.access_status === 'pending-approval' && (
+                          <button type="button" onClick={() => setUserDraft(prev => prev ? { ...prev, access_status: 'approved' } : prev)} className="rounded-xl bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-500">
+                            Approve Access
+                          </button>
+                        )}
+                      </div>
+                    </div>
                     <div className="text-xs text-gray-500">Current password status: {selectedUser.has_password ? 'Password set' : 'No password set'}</div>
                   </div>
                 )}

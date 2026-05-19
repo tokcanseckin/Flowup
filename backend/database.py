@@ -43,6 +43,7 @@ class User(Base):
     google_user_id          = Column(String(128), nullable=True, unique=True)
     apple_user_id           = Column(String(128), nullable=True, unique=True)
     preferred_lang          = Column(String(8),   nullable=False, server_default='en', default='en')
+    access_status           = Column(String(32),  nullable=False, server_default='approved', default='approved')
     created_at              = Column(Integer,     default=lambda: int(time.time()))
 
 
