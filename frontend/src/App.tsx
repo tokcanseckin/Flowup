@@ -1189,7 +1189,7 @@ function SongBrowser({
               {songs.length > 0 && (
                 <button
                   type="button"
-                  onClick={() => onSelect(songs[0].id)}
+                  onClick={() => { track('Playlist Play Button Clicked', { playlist_id: activePlaylistId }); onSelect(songs[0].id) }}
                   className="w-full flex items-center justify-center gap-2 rounded-xl active:scale-[0.98] transition-all text-white font-medium text-sm py-3 mb-6"
                   style={{ background: '#006D36' }}
                   onMouseEnter={e => (e.currentTarget.style.background = '#008a44')}
@@ -1249,7 +1249,7 @@ function SongBrowser({
                     <button
                       key={code}
                       type="button"
-                      onClick={() => { setLearnLang(code); setNativeLang(null) }}
+                      onClick={() => { track('Learn Language Selected', { language: code }); setLearnLang(code); setNativeLang(null) }}
                       className={`rounded-2xl border p-5 flex items-center gap-4 transition-all cursor-pointer text-left ${selected ? 'border-transparent' : 'border-zinc-700/70 hover:border-white/15'}`}
                       style={{ background: selected ? '#488DC7' : '#18191f' }}
                       onMouseEnter={e => { if (!selected) (e.currentTarget as HTMLElement).style.background = '#22232a' }}
@@ -1302,7 +1302,7 @@ function SongBrowser({
                       <button
                         key={code}
                         type="button"
-                        onClick={() => { setNativeLang(code); if (learnLang) onBrowseTargetLang(learnLang, code) }}
+                        onClick={() => { track('Native Language Selected', { language: code }); setNativeLang(code); if (learnLang) onBrowseTargetLang(learnLang, code) }}
                         className={`rounded-2xl border p-5 flex items-center gap-4 transition-all cursor-pointer text-left ${selected ? 'border-transparent' : 'border-zinc-700/70 hover:border-white/15'}`}
                         style={{ background: selected ? '#488DC7' : '#18191f' }}
                         onMouseEnter={e => { if (!selected) (e.currentTarget as HTMLElement).style.background = '#22232a' }}
@@ -1359,7 +1359,7 @@ function SongBrowser({
                     <button
                       key={pl.id}
                       type="button"
-                      onClick={() => onSelectPlaylist(pl.id)}
+                      onClick={() => { track('Playlist Selected', { playlist_id: pl.id, learn_lang: learnLang ?? '', native_lang: nativeLang ?? '' }); onSelectPlaylist(pl.id) }}
                       className="text-left rounded-2xl border border-zinc-700/70 overflow-hidden transition-all hover:border-zinc-500/60 shrink-0"
                       style={{ width: 300, background: '#18191f' }}
                       onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#22232a' }}
@@ -3112,15 +3112,8 @@ export default function App() {
   }, [route.page])
 
   const handleSelectPlaylist = useCallback((id: number | null) => {
-    if (id !== null) {
-      const playlist = playlists.find(p => p.id === id)
-      track('Playlist Selected', {
-        playlist_id: id,
-        difficulty: playlist?.difficulty_level ?? '',
-      })
-    }
     navigateToPath(id !== null ? playlistPath(id) : '/browse')
-  }, [playlists, navigateToPath])
+  }, [navigateToPath])
 
   useEffect(() => {
     if (!settingsHydrated) return
