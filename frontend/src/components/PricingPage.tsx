@@ -70,20 +70,25 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose, onUserUpdate }
         window.Paddle.Initialize({ 
           token: clientToken,
           eventCallback: async (data) => {
-            console.log('[Paddle Event]', data)
-            if (data.name === 'checkout.completed') {
+            console.log('[Paddle Event]', data.name, data)
+            // Handle checkout completion (event name varies by Paddle version)
+            if (data.name === 'checkout.completed' || 
+                data.name === 'checkout.complete' ||
+                data.name === 'checkout.success') {
               track('Checkout Completed', { 
                 transaction_id: data.data?.transaction_id 
               })
               // Auto-sync subscription after successful checkout
+              console.log('[Paddle] Checkout completed, syncing subscription...')
               try {
                 const updatedUser = await api.syncSubscription()
+                console.log('[Paddle] Subscription synced:', updatedUser.subscription_tier)
                 if (onUserUpdate) {
                   onUserUpdate(updatedUser)
                 }
                 onClose() // Close pricing page on success
               } catch (err) {
-                console.error('Failed to sync subscription after checkout:', err)
+                console.error('[Paddle] Failed to sync subscription after checkout:', err)
               }
             }
           }
