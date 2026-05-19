@@ -1595,6 +1595,103 @@ def get_pricing():
     return paddle_config.get_current_pricing()
 
 
+@app.post("/api/sync-subscription")
+def sync_subscription(current_user: User = Depends(require_user), db: Session = Depends(get_db)):
+    """Sync subscription status from Paddle API by email.
+    
+    Similar to iOS 'restore purchase' - queries Paddle for active subscriptions
+    and updates the user's subscription status in the database.
+    """
+    import requests
+    
+    if not PADDLE_API_KEY:
+        raise HTTPException(status_code=500, detail="Paddle API key not configured")
+    
+    try:
+        # Query Paddle Subscriptions API by customer email
+        response = requests.get(
+            'https://sandbox-api.paddle.com/subscriptions',
+            headers={'Authorization': f'Bearer {PADDLE_API_KEY}'},
+            params={'customer_email': current_user.email},
+            timeout=10
+        )
+        response.raise_for_status()
+        data = response.json()
+        
+        subscriptions = data.get('data', [])
+        
+        if not subscriptions:
+            # No active subscription found - set to free
+            if current_user.subscription_tier != 'free':
+                current_user.subscription_tier = 'free'
+                current_user.subscription_status = None
+                current_user.subscription_external_id = None
+                current_user.subscription_expires_at = None
+                db.commit()
+            return {
+                "status": "success",
+                "message": "No active subscription found",
+                "subscription_tier": "free"
+            }
+        
+        # Get the most recent active subscription
+        active_sub = None
+        for sub in subscriptions:
+            if sub.get('status') == 'active':
+                active_sub = sub
+                break
+        
+        # If no active, check for other statuses (past_due, etc.)
+        if not active_sub and subscriptions:
+            active_sub = subscriptions[0]
+        
+        if active_sub:
+            # Extract subscription details
+            subscription_id = active_sub.get('id')
+            status = active_sub.get('status', 'active')
+            next_billed_at = active_sub.get('next_billed_at')
+            started_at = active_sub.get('started_at') or active_sub.get('created_at')
+            scheduled_change = active_sub.get('scheduled_change')
+            
+            # Extract price_id from items to determine tier
+            items = active_sub.get('items', [])
+            price_id = items[0]['price']['id'] if items and len(items) > 0 else None
+            tier = paddle_config.get_tier_for_price(price_id) if price_id else 'premium'
+            
+            # Update user subscription
+            current_user.subscription_tier = tier
+            current_user.subscription_status = status
+            current_user.subscription_platform = 'paddle'
+            current_user.subscription_external_id = subscription_id
+            current_user.subscription_started_at = datetime.fromisoformat(started_at.replace('Z', '+00:00')) if started_at else None
+            current_user.subscription_expires_at = datetime.fromisoformat(next_billed_at.replace('Z', '+00:00')) if next_billed_at else None
+            current_user.subscription_cancel_at_period_end = scheduled_change is not None and scheduled_change.get('action') == 'cancel'
+            
+            if not current_user.original_platform:
+                current_user.original_platform = 'paddle'
+            
+            db.commit()
+            
+            return {
+                "status": "success",
+                "message": "Subscription synced successfully",
+                "subscription_tier": tier,
+                "subscription_status": status
+            }
+        
+        return {
+            "status": "error",
+            "message": "No valid subscription found"
+        }
+        
+    except requests.exceptions.RequestException as e:
+        print(f"Error syncing subscription from Paddle: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to sync with Paddle: {str(e)}")
+    except Exception as e:
+        print(f"Unexpected error syncing subscription: {e}")
+        raise HTTPException(status_code=500, detail="Failed to sync subscription")
+
+
 @app.get("/api/image-proxy")
 def image_proxy(url: str = Query(..., min_length=8, max_length=2048)):
     """Fetch a remote image and serve it from same-origin for safe canvas sampling."""

@@ -288,6 +288,9 @@ export const api = {
   getPricing: (): Promise<PricingData> =>
     apiFetch('/pricing'),
 
+  syncSubscription: (): Promise<{ status: string; message: string; subscription_tier?: string; subscription_status?: string }> =>
+    apiFetch('/sync-subscription', { method: 'POST' }),
+
   listSongs: (): Promise<SongSummary[]> =>
     apiFetch('/songs'),
 

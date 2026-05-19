@@ -1494,6 +1494,7 @@ function SettingsPage({
   activeTab,
   onTabChange,
   onShowPricing,
+  onUserUpdate,
 }: {
   settings: AppSettings
   onUpdate: (patch: Partial<AppSettings>) => void
@@ -1503,6 +1504,7 @@ function SettingsPage({
   activeTab: SettingsTab
   onTabChange: (tab: SettingsTab) => void
   onShowPricing: () => void
+  onUserUpdate?: (user: BackendUser) => void
 }) {
   const [supportForm, setSupportForm] = useState({ subject: '', message: '' })
   const [supportSent, setSupportSent] = useState(false)
@@ -1737,6 +1739,47 @@ function SettingsPage({
                     )}
                   </div>
                 )}
+
+                {/* Sync Subscription Button */}
+                <div className="pt-4 border-t border-gray-800">
+                  <button
+                    onClick={async () => {
+                      const btn = document.querySelector('[data-sync-btn]') as HTMLButtonElement
+                      if (!btn || btn.disabled) return
+                      
+                      btn.disabled = true
+                      const originalText = btn.textContent
+                      btn.textContent = 'Syncing...'
+                      
+                      try {
+                        const result = await api.syncSubscription()
+                        btn.textContent = '✓ Synced'
+                        setTimeout(() => {
+                          btn.textContent = originalText
+                          btn.disabled = false
+                        }, 2000)
+                        
+                        // Refresh user data
+                        const freshUser = await api.getCurrentUser()
+                        onUserUpdate?.(freshUser)
+                      } catch (error) {
+                        console.error('Failed to sync subscription:', error)
+                        btn.textContent = '✗ Failed'
+                        setTimeout(() => {
+                          btn.textContent = originalText
+                          btn.disabled = false
+                        }, 2000)
+                      }
+                    }}
+                    data-sync-btn
+                    className="w-full px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Sync Subscription
+                  </button>
+                  <p className="text-xs text-gray-500 mt-2 text-center">
+                    Refresh subscription status from Paddle
+                  </p>
+                </div>
 
                 {/* Free Plan Features */}
                 {user?.subscription_tier === 'free' && (
@@ -3429,6 +3472,7 @@ export default function App() {
         activeTab={route.page === 'settings' ? route.tab : 'preferences'}
         onTabChange={(t) => navigateToPath(settingsPath(t))}
         onShowPricing={() => setShowPricingPage(true)}
+        onUserUpdate={(user) => setCredentialUser(user)}
       />
     )
   }
