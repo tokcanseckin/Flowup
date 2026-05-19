@@ -94,7 +94,8 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose, onUserUpdate }
                     if (onUserUpdate) {
                       onUserUpdate(updatedUser)
                     }
-                    onClose() // Close pricing page on success
+                    // Don't auto-close so user can see console logs
+                    console.log('[Paddle] ✅ Sync successful! You can close this page.')
                   } catch (err) {
                     console.error(`[Paddle] Sync attempt ${attemptNumber} failed:`, err)
                     if (attemptNumber === 1) {
@@ -102,9 +103,8 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose, onUserUpdate }
                       console.log('[Paddle] Retrying sync in 3 seconds...')
                       attemptSync(2, 3000)
                     } else {
-                      // Give up after second attempt, close anyway
-                      console.error('[Paddle] Sync failed after 2 attempts. User can manually sync.')
-                      onClose()
+                      // Give up after second attempt
+                      console.error('[Paddle] ❌ Sync failed after 2 attempts. Please manually sync in Settings.')
                     }
                   }
                 }, delayMs)
