@@ -2038,12 +2038,14 @@ function PlayerView({
     track('Tutorial Skipped')
     localStorage.setItem('tutorial_player_seen', '1')
     setShowPlayerTutorial(false)
+    if (!isPlaying) togglePlay()
   }
 
   const handleTutorialComplete = () => {
     track('Tutorial Completed')
     localStorage.setItem('tutorial_player_seen', '1')
     setShowPlayerTutorial(false)
+    if (!isPlaying) togglePlay()
   }
 
   // ── Analytics refs ────────────────────────────────────────────────────────────
