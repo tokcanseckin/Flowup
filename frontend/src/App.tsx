@@ -1493,14 +1493,16 @@ function SettingsPage({
   user,
   activeTab,
   onTabChange,
+  onShowPricing,
 }: {
   settings: AppSettings
   onUpdate: (patch: Partial<AppSettings>) => void
   onBack: () => void
   onLogout: () => void
-  user: { display_name: string | null; email: string | null } | null
+  user: BackendUser | null
   activeTab: SettingsTab
   onTabChange: (tab: SettingsTab) => void
+  onShowPricing: () => void
 }) {
   const [supportForm, setSupportForm] = useState({ subject: '', message: '' })
   const [supportSent, setSupportSent] = useState(false)
@@ -1662,15 +1664,126 @@ function SettingsPage({
           {activeTab === 'subscription' && (
             <div className="max-w-xl w-full space-y-3">
               <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-4">{t('settings.subscription')}</h2>
-              <div className="rounded-2xl border border-gray-800/80 p-8 flex flex-col items-center text-center" style={{ background: '#12121f' }}>
-                <div className="w-14 h-14 rounded-2xl bg-gray-800 flex items-center justify-center mb-4">
-                  <svg viewBox="0 0 24 24" className="w-7 h-7 fill-gray-500">
-                    <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/>
-                  </svg>
+              
+              {/* Current Plan Status */}
+              <div className="rounded-2xl border border-gray-800/80 p-6" style={{ background: '#12121f' }}>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
+                      <svg viewBox="0 0 24 24" className="w-5 h-5 fill-white">
+                        <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-white font-semibold capitalize">{user?.subscription_tier || 'free'} Plan</p>
+                      <p className="text-xs text-gray-500">
+                        {user?.subscription_status === 'active' ? 'Active' : 
+                         user?.subscription_status === 'past_due' ? 'Past Due' : 
+                         user?.subscription_status === 'canceled' ? 'Canceled' : 
+                         user?.subscription_tier === 'free' ? 'Free Trial' : 'Inactive'}
+                      </p>
+                    </div>
+                  </div>
+                  {user?.subscription_tier === 'free' && (
+                    <button
+                      onClick={onShowPricing}
+                      className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors"
+                    >
+                      Upgrade
+                    </button>
+                  )}
                 </div>
-                <p className="text-white font-semibold mb-1">{t('settings.subscriptionManagement')}</p>
-                <p className="text-gray-500 text-sm leading-relaxed">{t('settings.subscriptionDesc')}</p>
+
+                {/* Subscription Details */}
+                {user && user.subscription_tier !== 'free' && (
+                  <div className="space-y-2 pt-4 border-t border-gray-800">
+                    {user.subscription_platform && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-500">Platform</span>
+                        <span className="text-white capitalize">{user.subscription_platform}</span>
+                      </div>
+                    )}
+                    {user.subscription_started_at && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-500">Started</span>
+                        <span className="text-white">
+                          {new Date(user.subscription_started_at).toLocaleDateString('en-US', { 
+                            year: 'numeric', 
+                            month: 'short', 
+                            day: 'numeric' 
+                          })}
+                        </span>
+                      </div>
+                    )}
+                    {user.subscription_expires_at && user.subscription_tier !== 'lifetime' && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-500">
+                          {user.subscription_cancel_at_period_end ? 'Expires' : 'Renews'}
+                        </span>
+                        <span className="text-white">
+                          {new Date(user.subscription_expires_at).toLocaleDateString('en-US', { 
+                            year: 'numeric', 
+                            month: 'short', 
+                            day: 'numeric' 
+                          })}
+                        </span>
+                      </div>
+                    )}
+                    {user.subscription_tier === 'lifetime' && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-500">Access</span>
+                        <span className="text-green-400 font-medium">Lifetime</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Free Plan Features */}
+                {user?.subscription_tier === 'free' && (
+                  <div className="pt-4 border-t border-gray-800">
+                    <p className="text-xs text-gray-500 mb-2">With Premium you get:</p>
+                    <ul className="space-y-1.5">
+                      <li className="text-sm text-gray-400 flex items-center gap-2">
+                        <svg viewBox="0 0 20 20" className="w-4 h-4 fill-green-500 flex-shrink-0">
+                          <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
+                        </svg>
+                        <span>Unlimited word translations</span>
+                      </li>
+                      <li className="text-sm text-gray-400 flex items-center gap-2">
+                        <svg viewBox="0 0 20 20" className="w-4 h-4 fill-green-500 flex-shrink-0">
+                          <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
+                        </svg>
+                        <span>Full lyrics access</span>
+                      </li>
+                      <li className="text-sm text-gray-400 flex items-center gap-2">
+                        <svg viewBox="0 0 20 20" className="w-4 h-4 fill-green-500 flex-shrink-0">
+                          <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
+                        </svg>
+                        <span>All languages supported</span>
+                      </li>
+                    </ul>
+                  </div>
+                )}
               </div>
+
+              {/* Manage Subscription (for active subscriptions) */}
+              {user && user.subscription_tier !== 'free' && user.subscription_platform === 'paddle' && (
+                <div className="rounded-2xl border border-gray-800/80 p-6" style={{ background: '#12121f' }}>
+                  <p className="text-white font-medium mb-2">Manage Subscription</p>
+                  <p className="text-sm text-gray-500 mb-4">
+                    To update your payment method, billing information, or cancel your subscription, 
+                    visit the Paddle billing portal.
+                  </p>
+                  <a
+                    href="https://www.paddle.com/support/manage-subscription"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white text-sm font-medium rounded-lg transition-colors"
+                  >
+                    Open Billing Portal →
+                  </a>
+                </div>
+              )}
             </div>
           )}
 
@@ -3312,9 +3425,10 @@ export default function App() {
         onUpdate={updateSettings}
         onBack={() => navigateToPath(activeSong ? songPath(activeSong.id) : activePlaylistId !== null ? playlistPath(activePlaylistId) : '/browse')}
         onLogout={handleLogout}
-        user={appUser}
+        user={credentialUser}
         activeTab={route.page === 'settings' ? route.tab : 'preferences'}
         onTabChange={(t) => navigateToPath(settingsPath(t))}
+        onShowPricing={() => setShowPricingPage(true)}
       />
     )
   }
