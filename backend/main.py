@@ -1595,12 +1595,13 @@ def get_pricing():
     return paddle_config.get_current_pricing()
 
 
-@app.post("/api/sync-subscription")
+@app.post("/api/sync-subscription", response_model=UserResponse)
 def sync_subscription(current_user: User = Depends(require_user), db: Session = Depends(get_db)):
     """Sync subscription status from Paddle API by email.
     
     Similar to iOS 'restore purchase' - queries Paddle for active subscriptions
     and updates the user's subscription status in the database.
+    Returns the updated user object.
     """
     import requests
     
@@ -1628,11 +1629,7 @@ def sync_subscription(current_user: User = Depends(require_user), db: Session = 
                 current_user.subscription_external_id = None
                 current_user.subscription_expires_at = None
                 db.commit()
-            return {
-                "status": "success",
-                "message": "No active subscription found",
-                "subscription_tier": "free"
-            }
+            return _user_to_response(current_user)
         
         # Get the most recent active subscription
         active_sub = None
@@ -1671,18 +1668,14 @@ def sync_subscription(current_user: User = Depends(require_user), db: Session = 
                 current_user.original_platform = 'paddle'
             
             db.commit()
-            
-            return {
-                "status": "success",
-                "message": "Subscription synced successfully",
-                "subscription_tier": tier,
-                "subscription_status": status
-            }
+            return _user_to_response(current_user)
         
-        return {
-            "status": "error",
-            "message": "No valid subscription found"
-        }
+        # No valid subscription found
+        if current_user.subscription_tier != 'free':
+            current_user.subscription_tier = 'free'
+            current_user.subscription_status = None
+            db.commit()
+        return _user_to_response(current_user)
         
     except requests.exceptions.RequestException as e:
         print(f"Error syncing subscription from Paddle: {e}")

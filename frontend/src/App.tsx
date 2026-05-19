@@ -1752,15 +1752,14 @@ function SettingsPage({
                       btn.textContent = 'Syncing...'
                       
                       try {
-                        const result = await api.syncSubscription()
+                        const freshUser = await api.syncSubscription()
                         btn.textContent = '✓ Synced'
                         setTimeout(() => {
                           btn.textContent = originalText
                           btn.disabled = false
                         }, 2000)
                         
-                        // Refresh user data
-                        const freshUser = await api.getCurrentUser()
+                        // Update user data
                         onUserUpdate?.(freshUser)
                       } catch (error) {
                         console.error('Failed to sync subscription:', error)
