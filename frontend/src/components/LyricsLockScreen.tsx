@@ -101,7 +101,7 @@ const LyricsLockScreen: React.FC<LyricsLockScreenProps> = ({
 
       {/* Lock screen content */}
       <div className="absolute inset-0 flex items-center justify-center p-4">
-        <div className="max-w-xl w-full text-center space-y-4">
+        <div className="max-w-none w-auto text-center space-y-4 px-8">
           {/* Lock icon */}
           <div className="flex justify-center mb-2">
             <div className="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center backdrop-blur-sm">
@@ -133,7 +133,7 @@ const LyricsLockScreen: React.FC<LyricsLockScreenProps> = ({
 
           {/* Features list (if provided) */}
           {features && features.length > 0 && (
-            <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 max-w-5xl mx-auto">
+            <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 w-auto inline-block mx-auto">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2">
                 {features.map((feature, i) => (
                   <div key={i} className="flex items-start gap-2 text-left">
