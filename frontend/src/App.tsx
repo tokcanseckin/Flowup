@@ -1189,7 +1189,7 @@ function SongBrowser({
               {songs.length > 0 && (
                 <button
                   type="button"
-                  onClick={() => { track('Playlist Play Button Clicked', { playlist_id: activePlaylistId }); onSelect(songs[0].id) }}
+                  onClick={() => { track('Playlist Play Button Clicked', { playlist_id: activePlaylistId ?? '' }); onSelect(songs[0].id) }}
                   className="w-full flex items-center justify-center gap-2 rounded-xl active:scale-[0.98] transition-all text-white font-medium text-sm py-3 mb-6"
                   style={{ background: '#006D36' }}
                   onMouseEnter={e => (e.currentTarget.style.background = '#008a44')}
