@@ -82,24 +82,35 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose, onUserUpdate }
               track('Checkout Completed', { 
                 transaction_id: data.data?.transaction_id 
               })
-              // Auto-sync subscription after successful checkout
-              // Wait 2 seconds for Paddle to process the subscription
+              // Auto-sync subscription after successful checkout with retry
               console.log('[Paddle] Checkout completed, waiting for Paddle to process...')
-              setTimeout(async () => {
-                try {
-                  console.log('[Paddle] Syncing subscription...')
-                  const updatedUser = await api.syncSubscription()
-                  console.log('[Paddle] Subscription synced:', updatedUser.subscription_tier)
-                  if (onUserUpdate) {
-                    onUserUpdate(updatedUser)
+              
+              const attemptSync = async (attemptNumber: number, delayMs: number) => {
+                setTimeout(async () => {
+                  try {
+                    console.log(`[Paddle] Syncing subscription (attempt ${attemptNumber})...`)
+                    const updatedUser = await api.syncSubscription()
+                    console.log('[Paddle] Subscription synced:', updatedUser.subscription_tier)
+                    if (onUserUpdate) {
+                      onUserUpdate(updatedUser)
+                    }
+                    onClose() // Close pricing page on success
+                  } catch (err) {
+                    console.error(`[Paddle] Sync attempt ${attemptNumber} failed:`, err)
+                    if (attemptNumber === 1) {
+                      // Retry after 3 more seconds (5 seconds total)
+                      console.log('[Paddle] Retrying sync in 3 seconds...')
+                      attemptSync(2, 3000)
+                    } else {
+                      // Give up after second attempt, close anyway
+                      console.error('[Paddle] Sync failed after 2 attempts. User can manually sync.')
+                      onClose()
+                    }
                   }
-                  onClose() // Close pricing page on success
-                } catch (err) {
-                  console.error('[Paddle] Failed to sync subscription after checkout:', err)
-                  // Close anyway and let user manually sync if needed
-                  onClose()
-                }
-              }, 2000)
+                }, delayMs)
+              }
+              
+              attemptSync(1, 2000)
             }
           }
         })
