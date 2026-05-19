@@ -62,7 +62,7 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose }) => {
     script.async = true
     script.onload = () => {
       if (window.Paddle) {
-        window.Paddle.Environment.set('sandbox')
+        // Token determines environment (test_ = sandbox, live_ = production)
         window.Paddle.Initialize({ 
           token: clientToken,
           eventCallback: (data) => {
