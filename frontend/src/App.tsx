@@ -2876,24 +2876,6 @@ export default function App() {
     return new URLSearchParams(window.location.search).get('reset_token')
   })
 
-  // Auto-sync subscription after successful Paddle checkout
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    if (params.get('subscribed') === 'true' && credentialUser) {
-      console.log('[Paddle] Detected successful checkout, syncing subscription...')
-      api.syncSubscription()
-        .then((updatedUser) => {
-          console.log('[Paddle] Subscription synced:', updatedUser.subscription_tier)
-          setCredentialUser(updatedUser)
-          // Remove the parameter and navigate to browse
-          navigateToPath('/browse')
-        })
-        .catch((err) => {
-          console.error('[Paddle] Failed to sync subscription:', err)
-        })
-    }
-  }, [credentialUser, navigateToPath]) // Run when user changes
-
   const { favoriteSongIds, toggleFavorite } = useFavorites(!!credentialUser)
   const { listenedSongIds, markListened, unmarkListened } = useListened(!!credentialUser)
   const { entries: wordLookupEntries } = useWordHistory(!!credentialUser)
@@ -2963,6 +2945,24 @@ export default function App() {
     window.history.pushState(null, '', path)
     setCurrentPath(path)
   }, [])
+
+  // Auto-sync subscription after successful Paddle checkout
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('subscribed') === 'true' && credentialUser) {
+      console.log('[Paddle] Detected successful checkout, syncing subscription...')
+      api.syncSubscription()
+        .then((updatedUser) => {
+          console.log('[Paddle] Subscription synced:', updatedUser.subscription_tier)
+          setCredentialUser(updatedUser)
+          // Remove the parameter and navigate to browse
+          navigateToPath('/browse')
+        })
+        .catch((err) => {
+          console.error('[Paddle] Failed to sync subscription:', err)
+        })
+    }
+  }, [credentialUser, navigateToPath])
 
   useEffect(() => {
     const onPopState = () => {

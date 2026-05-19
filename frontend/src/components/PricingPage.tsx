@@ -34,7 +34,7 @@ declare global {
   }
 }
 
-const PricingPage: React.FC<PricingPageProps> = ({ user, onClose, onUserUpdate, isPage = false }) => {
+const PricingPage: React.FC<PricingPageProps> = ({ user, onClose, onUserUpdate: _onUserUpdate, isPage = false }) => {
   const [isAnnual, setIsAnnual] = useState(false)
   const [paddleLoaded, setPaddleLoaded] = useState(false)
   const [pricing, setPricing] = useState<PricingData | null>(null)
