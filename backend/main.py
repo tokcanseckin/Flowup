@@ -1850,7 +1850,7 @@ def get_song(
     else:
         # Free user (not authenticated) - check position-based trial
         if playlist and position_in_playlist is not None:
-            lyrics_unlocked = position_in_playlist <= 2
+            lyrics_unlocked = position_in_playlist < 2
         else:
             lyrics_unlocked = False
         

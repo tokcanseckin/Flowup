@@ -53,9 +53,9 @@ def can_access_lyrics(user: User, song: Song, playlist: Playlist | None, positio
         if is_subscription_active(user):
             return True
     
-    # Free tier: first 2 songs per playlist
+    # Free tier: first 2 songs per playlist (positions 0 and 1)
     if playlist and position_in_playlist is not None:
-        return position_in_playlist <= 2
+        return position_in_playlist < 2
     
     # If no playlist context, deny access for free users
     return False
