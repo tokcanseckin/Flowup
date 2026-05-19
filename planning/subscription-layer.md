@@ -103,7 +103,7 @@ async def get_song_data(song_id: int, current_user: User = Depends(auth)):
         # Gate NLP layer behind paywall
         'line_translations': song.line_translations if lyrics_unlocked else None,
         'word_data': song.word_data if lyrics_unlocked else None,
-        'upgrade_cta': None if lyrics_unlocked else get_upgrade_cta(current_user, song)
+        'upgrade_cta': None if lyrics_unlocked else get_upgrade_cta(current_user, song, playlist)
     }
 ```
 
@@ -114,15 +114,23 @@ async def get_song_data(song_id: int, current_user: User = Depends(auth)):
 ) : (
   <LyricsLockScreen
     lyrics={lyrics}  // Pass timed lyrics for blur effect + auto-scroll
-    message="Unlock unlimited interactive lyrics and translations with SingoLing Premium"
-    onUpgrade={() => navigate('/pricing')}
+    message={upgradeCta.message}
+    title={upgradeCta.title}
+    features={upgradeCta.highlight_features}
+    onUpgrade={() => navigate(upgradeCta.url)}
+    onBackToTrial={() => navigate(upgradeCta.back_to_trial_url)}  // New: return to first song
+    upgradeButtonText={upgradeCta.cta}
   />
 )}
 {/* Music player always renders, never blocked */}
 <MusicPlayer songId={songId} />
 ```
 
-**Watch-out:** Users still get music playback → less pressure to upgrade. **Mitigation:** Lock screen must be visually appealing (not punishing), auto-scroll blur effect showcases sync quality, track conversion rate and iterate.
+**Watch-out:** Users still get music playback → less pressure to upgrade. **Mitigation:** Lock screen must be visually appealing (not punishing), auto-scroll blur effect showcases sync quality, "Back to Trial Songs" button reduces frustration, track conversion rate and iterate.
+
+---
+
+## Database Schema
 
 ---
 
@@ -197,25 +205,20 @@ def can_access_lyrics(user: User, song: Song, playlist: Playlist) -> bool:
     
     # Language-specific tier: match source language
     if user.subscription_tier == song.source_lang:
-        if is_subscription_active(user):
-            return True
-    
-    # Free tier: first 2 songs per playlist
-    return song.position_in_playlist <= 2
-
-def can_create_custom_playlist(user: User) -> bool:
-    """Check if user can create custom playlists (Premium+ feature)."""
-    return user.subscription_tier in ['premium', 'lifetime', 'premium_student'] \
-           and is_subscription_active(user)
-
-def get_upgrade_cta(user: User, song: Song) -> dict:
+def get_upgrade_cta(user: User, song: Song, playlist: Playlist) -> dict:
     """Generate context-aware upgrade messaging for lyrics lock screen."""
+    
+    # Get first song in playlist for "back to trial" navigation
+    first_song_id = playlist.songs[0].id if playlist and playlist.songs else None
+    back_to_trial_url = f'/playlist/{playlist.id}/song/{first_song_id}' if first_song_id else f'/playlist/{playlist.id}'
+    
     if user.subscription_tier == 'free':
         return {
             'title': 'Unlock Interactive Lyrics',
             'message': f'Upgrade to Premium for unlimited lyrics, translations, and word definitions across all songs.',
             'cta': 'See Premium Plans',
             'url': '/pricing',
+            'back_to_trial_url': back_to_trial_url,  # Navigate back to first song
             'highlight_features': [
                 'Interactive word-by-word translations',
                 'Instant definitions with keyboard shortcuts',
@@ -229,7 +232,8 @@ def get_upgrade_cta(user: User, song: Song) -> dict:
             'title': 'Payment Issue',
             'message': 'Update your payment method to continue learning.',
             'cta': 'Update Payment',
-            'url': '/account/billing'
+            'url': '/account/billing',
+            'back_to_trial_url': back_to_trial_url
         }
     
     if user.subscription_status == 'canceled':
@@ -237,19 +241,23 @@ def get_upgrade_cta(user: User, song: Song) -> dict:
             'title': 'Subscription Ended',
             'message': 'Renew to regain full access to interactive lyrics.',
             'cta': 'Renew Subscription',
-            'url': '/pricing'
+            'url': '/pricing',
+            'back_to_trial_url': back_to_trial_url
         }
     
     return {
         'title': 'Lyrics Locked',
         'message': 'This song requires an active subscription.',
         'cta': 'Manage Subscription',
-        'url': '/account'
+        'url': '/account',
+        'back_to_trial_url': back_to_trial_url
     }
 ```
 
-
-Return song data with `lyrics_unlocked` flag instead of 403:
+### API Middleware
+        'url': '/account'
+    }
+```
 ### API Middleware
 
 Return song data with `lyrics_unlocked` flag — always include timed lyrics for auto-scroll, but gate NLP layer:
@@ -290,7 +298,7 @@ async def get_song_data(song_id: int, current_user: User = Depends(get_current_u
         'word_definitions': song.word_definitions if lyrics_unlocked else None,
         'word_translations': song.word_translations if lyrics_unlocked else None,
         
-        'upgrade_cta': None if lyrics_unlocked else get_upgrade_cta(current_user, song)
+        'upgrade_cta': None if lyrics_unlocked else get_upgrade_cta(current_user, song, playlist)
     }
 ```
 
@@ -646,6 +654,34 @@ user.subscription_tier = 'premium_student'  # Same access, different analytics l
 
 **AI shortcuts:** React components from design sketch, i18n strings via prompt, Tailwind styling for blur/overlay.
 
+**LyricsLockScreen Component Spec:**
+```tsx
+interface LyricsLockScreenProps {
+  lyrics: TimedLyric[];  // For blur effect with auto-scroll
+  title: string;
+  message: string;
+  features?: string[];  // Optional feature highlights
+  onUpgrade: () => void;
+  onBackToTrial: () => void;  // Navigate to first song in playlist
+  upgradeButtonText: string;
+}
+
+// Renders sleek overlay with:
+// 1. Blurred lyrics scrolling in background (uses timed_lyrics for sync)
+// 2. Dark gradient overlay (80% opacity)
+// 3. Title + message (centered)
+// 4. Optional feature list (if provided)
+// 5. Primary button: "See Premium Plans" (or upgradeButtonText)
+// 6. Secondary button: "Back to Trial Songs" (navigates to first song)
+```
+
+**UX Rationale:**
+- **Blurred auto-scroll:** Showcases sync quality without giving away translations
+- **Back button:** Reduces frustration, lets users return to free songs without blocking
+- **Two-button pattern:** Primary action (upgrade) + escape hatch (back to trial)
+- **No blocking music:** YouTube/Apple Music continues playing in background
+
+
 ### Phase 3: iOS In-App Purchases — L, ~5 days
 - [ ] StoreKit integration in iOS app (assumes separate repo)
 - [ ] Backend: `/api/subscriptions/apple/verify` endpoint
@@ -802,23 +838,20 @@ def can_access_lyrics(user: User, song: Song, playlist: Playlist) -> bool:
     # Free tier: first 2 songs per playlist
     if song.position_in_playlist <= 2:
         return True
-    
-    return False
-
-def can_create_custom_playlist(user: User) -> bool:
-    """Premium-only feature."""
-    if user.subscription_tier not in ['premium', 'lifetime', 'premium_student']:
-        return False
-    return is_subscription_active(user)
-
-def get_upgrade_cta(user: User, song: Song) -> dict:
+def get_upgrade_cta(user: User, song: Song, playlist: Playlist) -> dict:
     """Context-aware upgrade CTA for lyrics lock screen."""
+    
+    # Get first song in playlist for "back to trial" navigation
+    first_song_id = playlist.songs[0].id if playlist and playlist.songs else None
+    back_to_trial_url = f'/playlist/{playlist.id}/song/{first_song_id}' if first_song_id else f'/playlist/{playlist.id}'
+    
     if user.subscription_tier == 'free':
         return {
             'title': 'Unlock Interactive Lyrics',
             'message': 'Upgrade to Premium for unlimited lyrics, translations, and word definitions across all songs.',
             'cta': 'See Premium Plans',
             'url': '/pricing',
+            'back_to_trial_url': back_to_trial_url,
             'highlight_features': [
                 'Interactive word-by-word translations',
                 'Instant definitions with keyboard shortcuts',
@@ -832,7 +865,8 @@ def get_upgrade_cta(user: User, song: Song) -> dict:
             'title': 'Payment Issue',
             'message': 'Update your payment method to continue learning.',
             'cta': 'Update Payment',
-            'url': '/account/billing'
+            'url': '/account/billing',
+            'back_to_trial_url': back_to_trial_url
         }
     
     if user.subscription_status == 'canceled':
@@ -840,10 +874,19 @@ def get_upgrade_cta(user: User, song: Song) -> dict:
             'title': 'Subscription Ended',
             'message': 'Renew to regain full access to interactive lyrics.',
             'cta': 'Renew Subscription',
-            'url': '/pricing'
+            'url': '/pricing',
+            'back_to_trial_url': back_to_trial_url
         }
     
     return {
+        'title': 'Lyrics Locked',
+        'message': 'This song requires an active subscription.',
+        'cta': 'Manage Subscription',
+        'url': '/account',
+        'back_to_trial_url': back_to_trial_url
+    }
+
+# Usage in API routes
         'title': 'Lyrics Locked',
         'message': 'This song requires an active subscription.',
         'cta': 'Manage Subscription',
@@ -867,7 +910,7 @@ def get_upgrade_cta(user: User, song: Song) -> dict:
         'word_definitions': song.word_definitions if lyrics_unlocked else None,
         'word_translations': song.word_translations if lyrics_unlocked else None,
         
-        'upgrade_cta': None if lyrics_unlocked else get_upgrade_cta(current_user, song)
+        'upgrade_cta': None if lyrics_unlocked else get_upgrade_cta(current_user, song, playlist)
     }
 ```
 
@@ -888,7 +931,7 @@ def get_upgrade_cta(user: User, song: Song) -> dict:
         'lyrics': song.lyrics if lyrics_unlocked else None,
         'line_translations': song.line_translations if lyrics_unlocked else None,
         'word_data': song.word_data if lyrics_unlocked else None,
-        'upgrade_cta': None if lyrics_unlocked else get_upgrade_cta(current_user, song)
+        'upgrade_cta': None if lyrics_unlocked else get_upgrade_cta(current_user, song, playlist)
     }
 ```
 
