@@ -3974,8 +3974,8 @@ async def paddle_webhook(request: Request, db: Session = Depends(get_db)):
     print(f"[Paddle Webhook] Event type: {event_type}")
     
     # Extract user ID from custom_data/passthrough
-    custom_data = data.get('custom_data', {})
-    user_id = custom_data.get('user_id')
+    custom_data = data.get('custom_data') or {}
+    user_id = custom_data.get('user_id') if custom_data else None
     
     if not user_id:
         # Fallback: try to get from passthrough (Paddle Classic format)
