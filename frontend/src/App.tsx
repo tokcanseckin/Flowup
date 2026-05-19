@@ -2875,6 +2875,27 @@ export default function App() {
   })
   const [showPricingPage, setShowPricingPage] = useState(false)
 
+  // Auto-sync subscription after successful Paddle checkout
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('subscribed') === 'true' && credentialUser) {
+      console.log('[Paddle] Detected successful checkout, syncing subscription...')
+      api.syncSubscription()
+        .then((updatedUser) => {
+          console.log('[Paddle] Subscription synced:', updatedUser.subscription_tier)
+          setCredentialUser(updatedUser)
+          // Remove the parameter from URL
+          params.delete('subscribed')
+          const newSearch = params.toString()
+          const newUrl = window.location.pathname + (newSearch ? '?' + newSearch : '')
+          window.history.replaceState({}, '', newUrl)
+        })
+        .catch((err) => {
+          console.error('[Paddle] Failed to sync subscription:', err)
+        })
+    }
+  }, []) // Run once on mount
+
   const { favoriteSongIds, toggleFavorite } = useFavorites(!!credentialUser)
   const { listenedSongIds, markListened, unmarkListened } = useListened(!!credentialUser)
   const { entries: wordLookupEntries } = useWordHistory(!!credentialUser)
@@ -3599,7 +3620,6 @@ export default function App() {
         <PricingPage
           user={credentialUser}
           onClose={() => setShowPricingPage(false)}
-          onUserUpdate={(user) => setCredentialUser(user)}
         />
       )}
     </>

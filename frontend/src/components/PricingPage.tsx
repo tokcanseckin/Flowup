@@ -69,52 +69,12 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose, onUserUpdate }
         }
         window.Paddle.Initialize({ 
           token: clientToken,
-          eventCallback: async (data) => {
-            // Log event name immediately before object gets garbage collected
-            const eventName = data?.name || 'unknown'
-            console.log('[Paddle Event]', eventName)
-            console.log('[Paddle Event Data]', JSON.stringify(data))
-            
-            // Handle checkout completion (event name varies by Paddle version)
-            if (eventName === 'checkout.completed' || 
-                eventName === 'checkout.complete' ||
-                eventName === 'checkout.success') {
+          eventCallback: (data) => {
+            // Track checkout completion for analytics
+            if (data.name === 'checkout.completed') {
               track('Checkout Completed', { 
                 transaction_id: data.data?.transaction_id 
               })
-              // Auto-sync subscription after successful checkout with retry
-              console.log('[Paddle] Checkout completed, waiting for Paddle to process...')
-              
-              console.log('[Paddle] About to define attemptSync...')
-              const attemptSync = (attemptNumber: number, delayMs: number) => {
-                console.log(`[Paddle] attemptSync called with attempt=${attemptNumber}, delay=${delayMs}`)
-                setTimeout(async () => {
-                  try {
-                    console.log(`[Paddle] Syncing subscription (attempt ${attemptNumber})...`)
-                    const updatedUser = await api.syncSubscription()
-                    console.log('[Paddle] Subscription synced:', updatedUser.subscription_tier)
-                    if (onUserUpdate) {
-                      onUserUpdate(updatedUser)
-                    }
-                    // Don't auto-close so user can see console logs
-                    console.log('[Paddle] ✅ Sync successful! You can close this page.')
-                  } catch (err) {
-                    console.error(`[Paddle] Sync attempt ${attemptNumber} failed:`, err)
-                    if (attemptNumber === 1) {
-                      // Retry after 3 more seconds (5 seconds total)
-                      console.log('[Paddle] Retrying sync in 3 seconds...')
-                      attemptSync(2, 3000)
-                    } else {
-                      // Give up after second attempt
-                      console.error('[Paddle] ❌ Sync failed after 2 attempts. Please manually sync in Settings.')
-                    }
-                  }
-                }, delayMs)
-              }
-              
-              console.log('[Paddle] Calling attemptSync(1, 2000)...')
-              attemptSync(1, 2000)
-              console.log('[Paddle] attemptSync has been called')
             }
           }
         })
@@ -147,7 +107,9 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose, onUserUpdate }
       items: [{ priceId, quantity: 1 }],
       customData: { user_id: user?.id ?? 0 },
       customer: { email: user?.email || undefined },
-      // No successUrl - let the page stay open so our sync code can run
+      settings: {
+        successUrl: window.location.origin + '/browse?subscribed=true',
+      },
     })
   }
 
