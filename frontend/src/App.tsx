@@ -16,6 +16,7 @@ import { useLocalization, useT, useContentT } from './i18n/LocalizationContext'
 import { track } from './analytics'
 import PrivacyPolicyPage from './components/PrivacyPolicyPage'
 import TermsOfServicePage from './components/TermsOfServicePage'
+import { TutorialOverlay, TutorialHandle, TutorialStep } from './components/TutorialOverlay'
 
 // ── Module-level song cache (survives re-renders, cleared on logout) ──────────
 // Key: `{id}:{source}` where source is 'youtube' or 'apple_music'.
@@ -1094,7 +1095,7 @@ function SongBrowser({
             )}
             <select
               value={language}
-              onChange={e => setLanguage(e.target.value as 'en' | 'tr' | 'ru' | 'es' | 'pt' | 'de')}
+              onChange={e => { setLanguage(e.target.value as 'en' | 'tr' | 'ru' | 'es' | 'pt' | 'de'); e.currentTarget.blur() }}
               className="text-xs rounded-lg border border-gray-700/70 bg-gray-800/70 px-2 py-1 text-gray-300 focus:outline-none focus:border-gray-500 cursor-pointer"
               aria-label="UI language"
             >
@@ -2006,9 +2007,44 @@ function PlayerView({
   const [infoVisible, setInfoVisible] = useState(false)
   const [playerMenuOpen, setPlayerMenuOpen] = useState(false)
   const [playerReportOpen, setPlayerReportOpen] = useState(false)
+  const [showPlayerTutorial, setShowPlayerTutorial] = useState(false)
+  const [tutorialKey, setTutorialKey] = useState(0)
+  const tutorialRef = useRef<TutorialHandle>(null)
+  const tutorialStepRef = useRef(0)
   const autoPausedRef = useRef(false)
   const t = useT()
   const { language, setLanguage } = useLocalization()
+
+  // ── Tutorial ──────────────────────────────────────────────────────────────────
+  const tutorialSteps: TutorialStep[] = [
+    { id: 'lyrics-word',        target: '[data-tutorial="lyrics-word"]',        text: t('tutorial.word'),          padding: 8, scrollIntoView: true, interactive: true },
+    { id: 'lyrics-word-peek',   target: '[data-tutorial="lyrics-word-peek"]',   text: t('tutorial.peek'),          padding: 8, interactive: true },
+    { id: 'line-translate',     target: '[data-tutorial="line-translate"]',     text: t('tutorial.lineTranslate'), padding: 10, side: 'right', interactive: true },
+    { id: 'apple-music-toggle', target: '[data-tutorial="apple-music-toggle"]', text: t('tutorial.sourceToggle'), padding: 6, side: 'bottom' },
+    { id: 'shortcuts-panel',    target: '[data-tutorial="shortcuts-panel"]',    text: t('tutorial.shortcuts'),    padding: 8, side: 'left' },
+  ]
+
+  // Autopause when tutorial starts
+  useEffect(() => {
+    if (showPlayerTutorial && isPlaying) togglePlay()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showPlayerTutorial])
+
+  useEffect(() => {
+    if (showPlayerTutorial) track('Tutorial Started')
+  }, [showPlayerTutorial, tutorialKey])
+
+  const handleTutorialClose = () => {
+    track('Tutorial Skipped')
+    localStorage.setItem('tutorial_player_seen', '1')
+    setShowPlayerTutorial(false)
+  }
+
+  const handleTutorialComplete = () => {
+    track('Tutorial Completed')
+    localStorage.setItem('tutorial_player_seen', '1')
+    setShowPlayerTutorial(false)
+  }
 
   // ── Analytics refs ────────────────────────────────────────────────────────────
   const songStartedRef = useRef(false)
@@ -2347,11 +2383,20 @@ function PlayerView({
               {t('nav.admin')}
             </button>
           )}
+          {isAdmin && (
+            <button
+              type="button"
+              onClick={() => { localStorage.removeItem('tutorial_player_seen'); setShowPlayerTutorial(true); setTutorialKey(k => k + 1) }}
+              className="text-xs text-pink-500 hover:text-pink-300 transition-colors"
+            >
+              Replay tutorial
+            </button>
+          )}
           {/* Target language selector — admin only */}
           {isAdmin && song.target_langs && song.target_langs.length > 0 && onTargetLangChange && (
             <select
               value={targetLang ?? ''}
-              onChange={e => onTargetLangChange(e.target.value)}
+              onChange={e => { onTargetLangChange(e.target.value); e.currentTarget.blur() }}
               className="text-xs rounded-lg border border-indigo-700/70 bg-gray-800/70 px-2 py-1 text-indigo-300 focus:outline-none focus:border-indigo-500 cursor-pointer"
               aria-label="Translation language"
             >
@@ -2363,7 +2408,7 @@ function PlayerView({
           {/* UI language selector */}
           <select
             value={language}
-            onChange={e => setLanguage(e.target.value as 'en' | 'tr' | 'ru' | 'es' | 'pt' | 'de')}
+            onChange={e => { setLanguage(e.target.value as 'en' | 'tr' | 'ru' | 'es' | 'pt' | 'de'); e.currentTarget.blur() }}
             className="text-xs rounded-lg border border-gray-700/70 bg-gray-800/70 px-2 py-1 text-gray-300 focus:outline-none focus:border-gray-500 cursor-pointer"
             aria-label="UI language"
           >
@@ -2381,7 +2426,7 @@ function PlayerView({
               { value: 'apple_music', label: 'Apple Music', activeClass: 'text-gray-200', available: !!song.apple_music_url },
             ]
             return (
-              <div className="flex items-center gap-0.5 rounded-lg bg-gray-800/70 p-0.5">
+              <div data-tutorial="apple-music-toggle" className="flex items-center gap-0.5 rounded-lg bg-gray-800/70 p-0.5">
                 {opts.map(opt => (
                   <button
                     key={opt.value}
@@ -2606,6 +2651,11 @@ function PlayerView({
             accentTextColor={lyricsTheme.accentTextColor}
             filterStopWordsForIndexing={settings.excludeStopWordsFromShortcuts}
             onInfoVisibilityChange={setInfoVisible}
+            onFirstLineActive={() => { if (localStorage.getItem('tutorial_player_seen') !== '1') setShowPlayerTutorial(true) }}
+            onWordLookupClosed={() => { if (showPlayerTutorial && tutorialStepRef.current === 0) tutorialRef.current?.advance() }}
+            onWordPeekCompleted={() => { if (showPlayerTutorial && tutorialStepRef.current === 1) tutorialRef.current?.advance() }}
+            onLineTranslatePeekCompleted={() => { if (showPlayerTutorial && tutorialStepRef.current === 2) tutorialRef.current?.advance() }}
+            onLineTranslateClosed={() => { if (showPlayerTutorial && tutorialStepRef.current === 2) tutorialRef.current?.advance() }}
             onSeek={seekTo}
             onTogglePlayback={togglePlay}
           />
@@ -2615,6 +2665,15 @@ function PlayerView({
         open={playerReportOpen}
         onClose={() => setPlayerReportOpen(false)}
         payload={{ kind: 'song', song_id: song.id }}
+      />
+      <TutorialOverlay
+        ref={tutorialRef}
+        key={tutorialKey}
+        steps={tutorialSteps}
+        open={showPlayerTutorial}
+        onClose={handleTutorialClose}
+        onComplete={handleTutorialComplete}
+        onStepChange={(i) => { tutorialStepRef.current = i }}
       />
     </div>
   )

@@ -321,6 +321,12 @@ interface Props {
   accentTextColor?: string
   filterStopWordsForIndexing?: boolean
   onInfoVisibilityChange?: (visible: boolean) => void
+  onFirstLineActive?: () => void
+  /** Tutorial callbacks: fired when inspect panel transitions away */
+  onWordLookupClosed?: () => void
+  onWordPeekCompleted?: () => void
+  onLineTranslatePeekCompleted?: () => void
+  onLineTranslateClosed?: () => void
   onSeek?: (ms: number) => void
   onTogglePlayback?: () => void
 }
@@ -336,6 +342,11 @@ export default function LyricsPlayer({
   accentTextColor,
   filterStopWordsForIndexing = true,
   onInfoVisibilityChange,
+  onFirstLineActive,
+  onWordLookupClosed,
+  onWordPeekCompleted,
+  onLineTranslatePeekCompleted,
+  onLineTranslateClosed,
   onSeek,
   onTogglePlayback,
 }: Props) {
@@ -346,6 +357,14 @@ export default function LyricsPlayer({
 
   const activeIndex = findActiveLineIndex(lines, currentPositionMs)
   const activeLine = activeIndex >= 0 ? lines[activeIndex] : null
+
+  const firedFirstLineRef = useRef(false)
+  useEffect(() => {
+    if (activeLine && !firedFirstLineRef.current) {
+      firedFirstLineRef.current = true
+      onFirstLineActive?.()
+    }
+  }, [activeLine, onFirstLineActive])
 
   // Pre-compute break slots: gaps > 5 s before/between/after lines
   const breakSlots = useMemo(() => {
@@ -537,6 +556,24 @@ export default function LyricsPlayer({
       })
     }
   }, [inspectState, lines, songData, recordLookup, targetLang, langCode])
+
+  // Tutorial interaction callbacks: fire when inspect panel closes
+  const tutorialPrevInspectRef = useRef<InspectState | null>(null)
+  useEffect(() => {
+    const prev = tutorialPrevInspectRef.current
+    tutorialPrevInspectRef.current = inspectState
+    if (!inspectState && prev) {
+      if (prev.mode === 'pinned' && prev.target.type === 'word') {
+        onWordLookupClosed?.()
+      } else if (prev.mode === 'hold' && prev.target.type === 'word') {
+        onWordPeekCompleted?.()
+      } else if (prev.mode === 'hold' && prev.target.type === 'line') {
+        onLineTranslatePeekCompleted?.()
+      } else if (prev.mode === 'pinned' && prev.target.type === 'line') {
+        onLineTranslateClosed?.()
+      }
+    }
+  }, [inspectState, onWordLookupClosed, onWordPeekCompleted, onLineTranslatePeekCompleted, onLineTranslateClosed])
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -766,6 +803,7 @@ export default function LyricsPlayer({
                     {isActive && (
                       <button
                         type="button"
+                        data-tutorial="line-translate"
                         className={`relative h-4 w-4 transition-opacity ${circleActive ? 'opacity-100' : 'opacity-60 hover:opacity-100'}`}
                         aria-label={`Inspect translation for line ${idx + 1}`}
                         onPointerDown={() => startPointerPress(lineTarget)}
@@ -884,7 +922,7 @@ export default function LyricsPlayer({
                 songId={songData.id}
               />
             ) : (
-              <div className="rounded-xl border border-white/20 px-8 py-7 text-white/85 animate-panel-in">
+              <div data-tutorial="shortcuts-panel" className="rounded-xl border border-white/20 px-8 py-7 text-white/85 animate-panel-in">
                 <p className="text-white/50 font-semibold uppercase tracking-widest text-[12px] mb-4">{t('inspect.title')}</p>
                 <div className="flex flex-col gap-3 text-[13px] leading-snug">
                   <div className="flex items-start gap-3">
@@ -963,15 +1001,17 @@ function ActiveLineContent({
           justifyContent: isRTL ? 'flex-end' : 'flex-start',
         }}
       >
-        {line.words.map(word => {
+        {line.words.map((word, wordI) => {
           const target: InspectTarget = { type: 'word', lineIndex, wordKey: word.key }
           const displayIdx = indexedWordKeys.indexOf(word.key)  // -1 for stop words
           const isLooked = lookedUpLemmas.has(word.lemma)
+          const wordTutorialAttr = wordI === 0 ? 'lyrics-word' : wordI === 1 ? 'lyrics-word-peek' : undefined
 
           return (
             <button
               type="button"
               key={word.key}
+              data-tutorial={wordTutorialAttr}
               className="relative inline-flex items-start group cursor-pointer rounded-md px-0.5 transition-transform duration-150 hover:-translate-y-[1px]"
               onPointerDown={() => startPointerPress(target)}
               onPointerUp={() => endPointerPress(false)}

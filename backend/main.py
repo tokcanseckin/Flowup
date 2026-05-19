@@ -360,6 +360,14 @@ _INITIAL_LOCALIZATIONS: list[dict] = [
     {"key": "legal.backToApp",            "en": "Back to SingoLing",          "tr": "SingoLing'e dön",           "ru": "Вернуться в SingoLing",          "es": "Volver a SingoLing",                         "pt": "Voltar ao SingoLing",                         "de": "Zurück zu SingoLing"},
     {"key": "legal.effectiveDate",        "en": "Effective Date:",             "tr": "Yürürlük Tarihi:",          "ru": "Дата вступления в силу:",        "es": "Fecha de vigencia:",                         "pt": "Data de vigência:",                           "de": "Gültigkeitsdatum:"},
     {"key": "legal.lastUpdated",          "en": "Last Updated:",               "tr": "Son Güncelleme:",           "ru": "Последнее обновление:",          "es": "Última actualización:",                      "pt": "Última atualização:",                         "de": "Zuletzt aktualisiert:"},
+    {"key": "tutorial.word",              "en": "Hit {1} on your keyboard or {click} to instantly look up its definition", "tr": "Tanımı anında bulmak için klavyede {1}'e bas ya da {tıkla}", "ru": "Нажми {1} на клавиатуре или {нажми} мышью для мгновенного поиска", "es": "Pulsa {1} en el teclado o {haz clic} para ver la definición al instante", "pt": "Pressione {1} no teclado ou {clique} para ver a definição instantaneamente", "de": "Drücke {1} auf der Tastatur oder {klicken} für die sofortige Definition"},
+    {"key": "tutorial.peek",              "en": "For even quicker lookup, simply {hold 2} key,\nor {click and hold}", "tr": "Daha hızlı bakmak için {2 tuşunu basılı tut}\nya da {tıklayıp basılı tut}", "ru": "Для быстрого поиска просто {удерживай 2},\nили {нажми и удерживай}", "es": "Para una búsqueda aún más rápida, {mantén tecla 2},\no {haz clic y mantén}", "pt": "Para busca ainda mais rápida, {segure a tecla 2},\nou {clique e segure}", "de": "Für noch schnellere Suche einfach {2 gedrückt halten},\noder {klicken und halten}"},
+    {"key": "tutorial.lineTranslate",     "en": "Full-line translation, hit {0} key, or {click} here", "tr": "Tüm satır çevirisi için {0} tuşuna bas ya da buraya {tıkla}", "ru": "Перевод строки: нажми {0} или {нажми} здесь", "es": "Traducción de línea completa: pulsa {0} o {haz clic} aquí", "pt": "Tradução da linha inteira: pressione {0} ou {clique} aqui", "de": "Ganze Zeile übersetzen: drücke {0} oder {klicken} hier"},
+    {"key": "tutorial.sourceToggle",      "en": "You can connect Apple Music for music only playback\nand switch between two", "tr": "Yalnızca müzik için Apple Music'e bağlanabilir\nve ikisi arasında geçiş yapabilirsin", "ru": "Подключи Apple Music для воспроизведения только музыки\nи переключайся между двумя", "es": "Puedes conectar Apple Music para reproducción solo de música\ny alternar entre los dos", "pt": "Você pode conectar o Apple Music para reprodução somente de música\ne alternar entre os dois", "de": "Du kannst Apple Music für reine Musikwiedergabe verbinden\nund zwischen beiden wechseln"},
+    {"key": "tutorial.shortcuts",         "en": "And there's even more shortcuts, you can always check everything here", "tr": "Daha fazla kısayol da var, her zaman buradan her şeye bakabilirsin", "ru": "Есть ещё больше горячих клавиш — ты всегда можешь всё посмотреть здесь", "es": "Y hay aún más atajos, siempre puedes consultarlos todos aquí", "pt": "E há ainda mais atalhos, você sempre pode ver tudo aqui", "de": "Und es gibt noch mehr Tastenkombinationen — hier findest du jederzeit alles"},
+    {"key": "tutorial.skip",            "en": "Skip", "tr": "Geç", "ru": "Пропустить", "es": "Omitir", "pt": "Pular", "de": "Überspringen"},
+    {"key": "tutorial.next",            "en": "Next", "tr": "Sonraki", "ru": "Далее", "es": "Siguiente", "pt": "Próximo", "de": "Weiter"},
+    {"key": "tutorial.done",            "en": "Done", "tr": "Tamam", "ru": "Готово", "es": "Listo", "pt": "Concluído", "de": "Fertig"},
     {"key": "nav.admin",                    "en": "Admin",                      "tr": "Yönetici",                  "ru": "Администратор",                  "es": "Administrador",                               "pt": "Administrador",                                "de": "Administrator"},
     {"key": "nav.preferences",             "en": "Preferences",                "tr": "Tercihler",                 "ru": "Настройки",                      "es": "Preferencias",                                "pt": "Preferências",                                "de": "Einstellungen"},
     {"key": "nav.signOut",                  "en": "Sign out",                   "tr": "Çıkış yap",                 "ru": "Выйти",                           "es": "Cerrar sesión",                               "pt": "Sair",                                        "de": "Abmelden"},
@@ -635,7 +643,14 @@ def _seed_localizations() -> None:
     try:
         for entry in _INITIAL_LOCALIZATIONS:
             existing = db.query(Localization).filter(Localization.key == entry["key"]).first()
-            if not existing:
+            if existing:
+                existing.en = entry["en"]
+                existing.tr = entry["tr"]
+                existing.ru = entry["ru"]
+                existing.es = entry.get("es", "")
+                existing.pt = entry.get("pt", "")
+                existing.de = entry.get("de", "")
+            else:
                 db.add(Localization(
                     key=entry["key"],
                     en=entry["en"], tr=entry["tr"], ru=entry["ru"],
