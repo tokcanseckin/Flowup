@@ -7,25 +7,25 @@ interface PricingPageProps {
   onClose: () => void
 }
 
-// Paddle.js types
+// Paddle.js types (Paddle Billing v2)
 declare global {
   interface Window {
     Paddle?: {
       Environment: {
         set: (env: 'sandbox' | 'production') => void
       }
-      Setup: (options: { vendor: number; eventCallback?: (data: any) => void }) => void
+      Initialize: (options: { 
+        token: string
+        eventCallback?: (data: any) => void 
+      }) => void
       Checkout: {
         open: (options: {
           items?: Array<{ priceId: string; quantity: number }>
           customData?: Record<string, any>
           customer?: { email?: string }
-          successUrl?: string
-          product?: number
-          email?: string
-          passthrough?: string
-          success?: string
-          closeCallback?: () => void
+          settings?: {
+            successUrl?: string
+          }
         }) => void
       }
     }
@@ -52,16 +52,25 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose }) => {
   }, [])
 
   useEffect(() => {
-    // Load Paddle.js
+    // Load Paddle.js v2 for Paddle Billing
     const script = document.createElement('script')
-    script.src = 'https://cdn.paddle.com/paddle/paddle.js'
+    script.src = 'https://cdn.paddle.com/paddle/v2/paddle.js'
     script.async = true
     script.onload = () => {
       if (window.Paddle) {
-        // Use sandbox for testing, production for live
         window.Paddle.Environment.set('sandbox')
-        // TODO: Replace with actual vendor ID from Paddle dashboard
-        window.Paddle.Setup({ vendor: 12345 })
+        // For sandbox, use the seller/vendor ID directly
+        window.Paddle.Initialize({ 
+          token: '12345',  // Sandbox seller ID
+          eventCallback: (data) => {
+            console.log('[Paddle Event]', data)
+            if (data.name === 'checkout.completed') {
+              track('Checkout Completed', { 
+                transaction_id: data.data?.transaction_id 
+              })
+            }
+          }
+        })
         setPaddleLoaded(true)
       }
     }
@@ -87,9 +96,10 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose }) => {
       tier,
       source: 'pricing_page',
       user_id: user?.id ?? 0,
-    })
-
-    const priceId = tier === 'monthly' ? pricing.monthly.id : pricing.annual.id
+    })ettings: {
+        successUrl: window.location.origin + '/browse?subscribed=true',
+      },
+   ? pricing.monthly.id : pricing.annual.id
 
     window.Paddle.Checkout.open({
       items: [{ priceId, quantity: 1 }],
