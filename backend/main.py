@@ -3792,40 +3792,76 @@ async def paddle_webhook(request: Request, db: Session = Depends(get_db)):
     Paddle sends webhooks for subscription events (created, updated, canceled).
     Signature format: Paddle-Signature: ts=1234567890;h1=abc123...
     """
-    # Get signature from header
-    signature_header = request.headers.get("Paddle-Signature")
-    if not signature_header or not PADDLE_WEBHOOK_SECRET:
-        raise HTTPException(status_code=401, detail="Missing signature or webhook secret not configured")
-    
     # Get raw body for signature verification
     body = await request.body()
+    body_str = body.decode('utf-8')
+    
+    # Get signature from header
+    signature_header = request.headers.get("Paddle-Signature")
+    
+    # Log webhook receipt for debugging
+    print(f"[Paddle Webhook] Received webhook")
+    print(f"[Paddle Webhook] Signature header: {signature_header}")
+    print(f"[Paddle Webhook] Body length: {len(body_str)} bytes")
+    print(f"[Paddle Webhook] Webhook secret configured: {bool(PADDLE_WEBHOOK_SECRET)}")
+    
+    if not signature_header:
+        print("[Paddle Webhook] ERROR: Missing Paddle-Signature header")
+        raise HTTPException(status_code=401, detail="Missing signature header")
+    
+    if not PADDLE_WEBHOOK_SECRET:
+        print("[Paddle Webhook] ERROR: PADDLE_WEBHOOK_SECRET not configured")
+        raise HTTPException(status_code=401, detail="Webhook secret not configured")
     
     # Parse signature header (format: ts=timestamp;h1=signature)
-    sig_parts = dict(part.split('=', 1) for part in signature_header.split(';') if '=' in part)
-    timestamp = sig_parts.get('ts', '')
-    signature = sig_parts.get('h1', '')
+    try:
+        sig_parts = dict(part.split('=', 1) for part in signature_header.split(';') if '=' in part)
+        timestamp = sig_parts.get('ts', '')
+        signature = sig_parts.get('h1', '')
+    except Exception as e:
+        print(f"[Paddle Webhook] ERROR: Failed to parse signature header: {e}")
+        raise HTTPException(status_code=401, detail="Invalid signature format")
     
     if not timestamp or not signature:
+        print(f"[Paddle Webhook] ERROR: Missing timestamp or signature (ts={timestamp}, h1={bool(signature)})")
         raise HTTPException(status_code=401, detail="Invalid signature format")
     
     # Verify signature (Paddle uses HMAC SHA256)
-    expected_signature = _hmac.new(
-        PADDLE_WEBHOOK_SECRET.encode(),
-        f"{timestamp}:{body.decode('utf-8')}".encode(),
-        sha256
-    ).hexdigest()
-    
-    if not secrets.compare_digest(signature, expected_signature):
-        raise HTTPException(status_code=401, detail="Invalid signature")
+    try:
+        # Construct the signed payload exactly as Paddle does: timestamp + : + body
+        signed_payload = f"{timestamp}:{body_str}"
+        expected_signature = _hmac.new(
+            PADDLE_WEBHOOK_SECRET.encode(),
+            signed_payload.encode(),
+            sha256
+        ).hexdigest()
+        
+        print(f"[Paddle Webhook] Timestamp: {timestamp}")
+        print(f"[Paddle Webhook] Received signature: {signature[:20]}...")
+        print(f"[Paddle Webhook] Expected signature: {expected_signature[:20]}...")
+        
+        if not secrets.compare_digest(signature, expected_signature):
+            print("[Paddle Webhook] ERROR: Signature mismatch")
+            raise HTTPException(status_code=401, detail="Invalid signature")
+        
+        print("[Paddle Webhook] ✓ Signature verified successfully")
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"[Paddle Webhook] ERROR: Signature verification failed: {e}")
+        raise HTTPException(status_code=401, detail="Signature verification error")
     
     # Parse webhook event
     try:
-        event = json.loads(body.decode('utf-8'))
-    except json.JSONDecodeError:
+        event = json.loads(body_str)
+    except json.JSONDecodeError as e:
+        print(f"[Paddle Webhook] ERROR: Invalid JSON: {e}")
         raise HTTPException(status_code=400, detail="Invalid JSON")
     
     event_type = event.get('event_type')
     data = event.get('data', {})
+    
+    print(f"[Paddle Webhook] Event type: {event_type}")
     
     # Extract user ID from custom_data/passthrough
     custom_data = data.get('custom_data', {})
