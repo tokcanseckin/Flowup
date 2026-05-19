@@ -61,6 +61,8 @@ class SongDetailResponse(BaseModel):
     youtube_url: Optional[str] = None
     apple_music_url: Optional[str] = None
     target_langs: list[str] = []
+    lyrics_unlocked: bool = True  # Default True for backward compatibility
+    upgrade_cta: Optional[dict] = None  # Contains upgrade messaging when locked
 
 
 # ── Playlist models ────────────────────────────────────────────────────────────
@@ -150,6 +152,16 @@ class UserResponse(BaseModel):
     apple_music_user_token: Optional[str] = None
     admin_token: Optional[str] = None
     preferred_lang: str = 'en'
+    
+    # Subscription fields (nullable for backward compatibility)
+    subscription_tier: str = 'free'
+    subscription_status: Optional[str] = None
+    subscription_platform: Optional[str] = None
+    subscription_external_id: Optional[str] = None
+    subscription_started_at: Optional[str] = None  # ISO date string
+    subscription_expires_at: Optional[str] = None  # ISO date string
+    subscription_cancel_at_period_end: bool = False
+    original_platform: Optional[str] = None
 
     model_config = {"from_attributes": True}
 

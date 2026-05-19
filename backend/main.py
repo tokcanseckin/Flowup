@@ -104,6 +104,7 @@ from models import (
     ResetPasswordRequest,
     UpdateLangRequest,
 )
+import entitlements
 import mailgun as _mailgun
 from openrussian import ensure_loaded as _load_or, lookup as _or_lookup, lookup_local as _or_lookup_local
 import italian_dict as _italian_dict
@@ -1374,6 +1375,11 @@ _ADMIN_TOKEN_SECRET = os.environ.get("FLOWUP_ADMIN_SECRET", "flowup-dev-admin-se
 # ── Closed access mode (when True, new users default to pending-approval) ─────
 CLOSED_ACCESS = os.environ.get("CLOSED_ACCESS", "false").lower() in ("true", "1", "yes")
 
+# ── Paddle subscription configuration ──────────────────────────────────────────
+PADDLE_WEBHOOK_SECRET = os.environ.get("PADDLE_WEBHOOK_SECRET", "")
+PADDLE_API_KEY = os.environ.get("PADDLE_API_KEY", "")
+PADDLE_CLIENT_TOKEN = os.environ.get("PADDLE_CLIENT_TOKEN", "")
+
 
 def _make_admin_token(user: User) -> str:
     """Return a stable HMAC-SHA256 token tied to this user's identity."""
@@ -1385,6 +1391,32 @@ def _make_admin_token(user: User) -> str:
 def _verify_admin_token(token: str, user: User) -> bool:
     expected = _make_admin_token(user)
     return secrets.compare_digest(token, expected)
+
+
+def _user_to_response(user: User) -> UserResponse:
+    """Convert User model to UserResponse with all fields populated."""
+    return UserResponse(
+        id=user.id,
+        spotify_id=user.spotify_id,
+        display_name=user.display_name,
+        email=user.email,
+        has_password=bool(user.password_hash),
+        needs_onboarding=_is_onboarding_required(user),
+        is_admin=bool(user.is_admin),
+        spotify_enabled=bool(user.spotify_enabled),
+        apple_music_user_token=user.apple_music_user_token,
+        admin_token=_make_admin_token(user),
+        preferred_lang=user.preferred_lang or 'en',
+        # Subscription fields
+        subscription_tier=user.subscription_tier or 'free',
+        subscription_status=user.subscription_status,
+        subscription_platform=user.subscription_platform,
+        subscription_external_id=user.subscription_external_id,
+        subscription_started_at=user.subscription_started_at.isoformat() if user.subscription_started_at else None,
+        subscription_expires_at=user.subscription_expires_at.isoformat() if user.subscription_expires_at else None,
+        subscription_cancel_at_period_end=user.subscription_cancel_at_period_end or False,
+        original_platform=user.original_platform,
+    )
 
 
 def _require_admin(
@@ -1489,6 +1521,46 @@ def _get_current_user(
         return user
 
     raise HTTPException(status_code=401, detail="Unsupported authentication scheme")
+
+
+def _get_optional_user(
+    authorization: str | None = Header(default=None),
+    db: Session = Depends(get_db),
+) -> User | None:
+    """Dependency: optional authentication. Returns User if authenticated, None if not."""
+    if not authorization:
+        return None
+
+    try:
+        scheme, credential = authorization.split(" ", 1)
+    except ValueError:
+        return None
+
+    scheme = scheme.lower()
+
+    if scheme == "bearer":
+        try:
+            user_id_str, _ = credential.split(".", 1)
+            user_id = int(user_id_str)
+        except Exception:
+            return None
+        user = db.query(User).filter(User.id == user_id).first()
+        if not user or not _verify_admin_token(credential, user):
+            return None
+        return user
+
+    if scheme == "basic":
+        try:
+            decoded = base64.b64decode(credential).decode("utf-8")
+            email, password = decoded.split(":", 1)
+        except Exception:
+            return None
+        user = db.query(User).filter(User.email == email.strip().lower()).first()
+        if not user or not _verify_password(password, user.password_hash):
+            return None
+        return user
+
+    return None
 
 
 def rate_limit_user(limit: int, window_seconds: int, key_prefix: str = ""):
@@ -1596,12 +1668,28 @@ def list_songs(db: Session = Depends(get_db)):
 
 
 @app.get("/api/songs/{song_id}", response_model=SongDetailResponse)
-def get_song(song_id: int, source: Optional[str] = Query(default=None), target_lang: Optional[str] = Query(default=None), db: Session = Depends(get_db)):
+def get_song(
+    song_id: int, 
+    source: Optional[str] = Query(default=None), 
+    target_lang: Optional[str] = Query(default=None),
+    playlist_id: Optional[int] = Query(default=None),  # Optional playlist context
+    db: Session = Depends(get_db),
+    current_user: User | None = Depends(_get_optional_user),
+):
+    """Get song details with subscription-gated access to lyrics/translations.
+    
+    - Always returns timed lyrics (text + timestamps) for auto-scroll
+    - Gates interactive features (translations, word data) behind subscription
+    - Returns lyrics_unlocked and upgrade_cta when applicable
+    """
     # Normalize to lowercase and resolve aliases (e.g. en-us → en)
     if target_lang:
         target_lang = _canon_lang(target_lang)
-    # Cache keyed by (song_id, source, target_lang) — skip cache when target_lang specified (varies per user preference)
-    cache_key = (song_id, source or None) if not target_lang else None
+    
+    # Cache keyed by (song_id, source, target_lang) — skip cache when:
+    # 1. target_lang specified (varies per user preference)
+    # 2. current_user is authenticated (subscription status varies)
+    cache_key = (song_id, source or None) if not target_lang and not current_user else None
     if cache_key is not None:
         cached = _song_response_cache.get(cache_key)
         if cached is not None:
@@ -1609,13 +1697,78 @@ def get_song(song_id: int, source: Optional[str] = Query(default=None), target_l
                 content=cached,
                 headers={"Cache-Control": "private, max-age=3600"},
             )
+    
     song = db.get(Song, song_id)
     if not song:
         raise HTTPException(status_code=404, detail="Song not found")
+    
+    # Get playlist context if provided or try to find one
+    playlist = None
+    position_in_playlist = None
+    
+    if playlist_id:
+        playlist = db.get(Playlist, playlist_id)
+        if playlist:
+            # Find song position in this playlist
+            playlist_song = db.query(PlaylistSong).filter(
+                PlaylistSong.playlist_id == playlist_id,
+                PlaylistSong.song_id == song_id
+            ).first()
+            if playlist_song:
+                position_in_playlist = playlist_song.position
+    else:
+        # Try to find any playlist containing this song (use first one found)
+        playlist_song = db.query(PlaylistSong).filter(
+            PlaylistSong.song_id == song_id
+        ).first()
+        if playlist_song:
+            playlist = db.get(Playlist, playlist_song.playlist_id)
+            position_in_playlist = playlist_song.position
+    
+    # Check entitlements
+    lyrics_unlocked = True
+    upgrade_cta = None
+    
+    if current_user:
+        lyrics_unlocked = entitlements.can_access_lyrics(
+            current_user, 
+            song, 
+            playlist, 
+            position_in_playlist
+        )
+        
+        if not lyrics_unlocked:
+            upgrade_cta = entitlements.get_upgrade_cta(current_user, song, playlist)
+    else:
+        # Free user (not authenticated) - check position-based trial
+        if playlist and position_in_playlist is not None:
+            lyrics_unlocked = position_in_playlist <= 2
+        else:
+            lyrics_unlocked = False
+        
+        if not lyrics_unlocked:
+            # Create a minimal user object for CTA generation
+            free_user = User(subscription_tier='free')
+            upgrade_cta = entitlements.get_upgrade_cta(free_user, song, playlist)
+    
+    # Get song detail
     detail = _song_detail(song, source=source, target_lang=target_lang)
+    
+    # Gate interactive features if locked
+    if not lyrics_unlocked:
+        # Strip words and translations from all lines (but keep timed lyrics text)
+        for line in detail.lines:
+            line.words = []
+            line.translation = ""  # Empty translation
+    
+    # Add subscription fields
+    detail.lyrics_unlocked = lyrics_unlocked
+    detail.upgrade_cta = upgrade_cta
+    
     data = detail.model_dump()
     if cache_key is not None:
         _song_response_cache[cache_key] = data
+    
     return JSONResponse(
         content=data,
         headers={"Cache-Control": "private, max-age=3600"},
@@ -2602,19 +2755,7 @@ async def sync_user(body: UserSyncRequest, db: Session = Depends(get_db)):
 
     db.commit()
     db.refresh(user)
-    return UserResponse(
-        id=user.id,
-        spotify_id=user.spotify_id,
-        display_name=user.display_name,
-        email=user.email,
-        has_password=bool(user.password_hash),
-        needs_onboarding=_is_onboarding_required(user),
-        is_admin=bool(user.is_admin),
-        spotify_enabled=bool(user.spotify_enabled),
-        apple_music_user_token=user.apple_music_user_token,
-        admin_token=_make_admin_token(user),
-        preferred_lang=user.preferred_lang or 'en',
-    )
+    return _user_to_response(user)
 
 
 @app.post("/api/auth/login", response_model=UserResponse)
@@ -2623,19 +2764,7 @@ async def login_with_credentials(body: CredentialLoginRequest, db: Session = Dep
     if not user or not _verify_password(body.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Invalid email or password")
 
-    return UserResponse(
-        id=user.id,
-        spotify_id=user.spotify_id,
-        display_name=user.display_name,
-        email=user.email,
-        has_password=bool(user.password_hash),
-        needs_onboarding=_is_onboarding_required(user),
-        is_admin=bool(user.is_admin),
-        spotify_enabled=bool(user.spotify_enabled),
-        apple_music_user_token=user.apple_music_user_token,
-        admin_token=_make_admin_token(user),
-        preferred_lang=user.preferred_lang or 'en',
-    )
+    return _user_to_response(user)
 
 
 @app.post("/api/auth/register", response_model=UserResponse)
@@ -2679,19 +2808,7 @@ async def register_with_credentials(body: RegisterRequest, db: Session = Depends
 
         threading.Thread(target=_welcome_reg, daemon=True).start()
 
-    return UserResponse(
-        id=user.id,
-        spotify_id=user.spotify_id,
-        display_name=user.display_name,
-        email=user.email,
-        has_password=True,
-        needs_onboarding=False,
-        is_admin=bool(user.is_admin),
-        spotify_enabled=bool(user.spotify_enabled),
-        apple_music_user_token=user.apple_music_user_token,
-        admin_token=_make_admin_token(user),
-        preferred_lang=user.preferred_lang or 'en',
-    )
+    return _user_to_response(user)
 
 
 @app.post("/api/auth/complete-onboarding", response_model=UserResponse)
@@ -2715,19 +2832,7 @@ async def complete_onboarding(body: CompleteOnboardingRequest, db: Session = Dep
     db.commit()
     db.refresh(user)
 
-    return UserResponse(
-        id=user.id,
-        spotify_id=user.spotify_id,
-        display_name=user.display_name,
-        email=user.email,
-        has_password=bool(user.password_hash),
-        needs_onboarding=_is_onboarding_required(user),
-        is_admin=bool(user.is_admin),
-        spotify_enabled=bool(user.spotify_enabled),
-        apple_music_user_token=user.apple_music_user_token,
-        admin_token=_make_admin_token(user),
-        preferred_lang=user.preferred_lang or 'en',
-    )
+    return _user_to_response(user)
 
 
 # ── Password reset ─────────────────────────────────────────────────────────────
@@ -2938,19 +3043,7 @@ async def login_with_google(body: GoogleLoginRequest, db: Session = Depends(get_
 
         threading.Thread(target=_welcome_google, daemon=True).start()
 
-    return UserResponse(
-        id=user.id,
-        spotify_id=user.spotify_id,
-        display_name=user.display_name,
-        email=user.email,
-        has_password=bool(user.password_hash),
-        needs_onboarding=False,
-        is_admin=bool(user.is_admin),
-        spotify_enabled=bool(user.spotify_enabled),
-        apple_music_user_token=user.apple_music_user_token,
-        admin_token=_make_admin_token(user),
-        preferred_lang=user.preferred_lang or 'en',
-    )
+    return _user_to_response(user)
 
 
 @app.post("/api/auth/apple", response_model=UserResponse)
@@ -3012,19 +3105,7 @@ async def login_with_apple(body: AppleLoginRequest, db: Session = Depends(get_db
 
         threading.Thread(target=_welcome_apple, daemon=True).start()
 
-    return UserResponse(
-        id=user.id,
-        spotify_id=user.spotify_id,
-        display_name=user.display_name,
-        email=user.email,
-        has_password=bool(user.password_hash),
-        needs_onboarding=False,
-        is_admin=bool(user.is_admin),
-        spotify_enabled=bool(user.spotify_enabled),
-        apple_music_user_token=user.apple_music_user_token,
-        admin_token=_make_admin_token(user),
-        preferred_lang=user.preferred_lang or 'en',
-    )
+    return _user_to_response(user)
 
 
 @app.post("/api/auth/apple/events", status_code=200)
@@ -3694,6 +3775,137 @@ def list_admin_reports(
             status=r.status,
         ))
     return result
+
+
+# ── Paddle webhook endpoint ────────────────────────────────────────────────────
+@app.post("/api/webhooks/paddle")
+async def paddle_webhook(request: Request, db: Session = Depends(get_db)):
+    """Handle Paddle subscription webhooks.
+    
+    Paddle sends webhooks for subscription events (created, updated, canceled).
+    Signature format: Paddle-Signature: ts=1234567890;h1=abc123...
+    """
+    # Get signature from header
+    signature_header = request.headers.get("Paddle-Signature")
+    if not signature_header or not PADDLE_WEBHOOK_SECRET:
+        raise HTTPException(status_code=401, detail="Missing signature or webhook secret not configured")
+    
+    # Get raw body for signature verification
+    body = await request.body()
+    
+    # Parse signature header (format: ts=timestamp;h1=signature)
+    sig_parts = dict(part.split('=', 1) for part in signature_header.split(';') if '=' in part)
+    timestamp = sig_parts.get('ts', '')
+    signature = sig_parts.get('h1', '')
+    
+    if not timestamp or not signature:
+        raise HTTPException(status_code=401, detail="Invalid signature format")
+    
+    # Verify signature (Paddle uses HMAC SHA256)
+    expected_signature = _hmac.new(
+        PADDLE_WEBHOOK_SECRET.encode(),
+        f"{timestamp}:{body.decode('utf-8')}".encode(),
+        sha256
+    ).hexdigest()
+    
+    if not secrets.compare_digest(signature, expected_signature):
+        raise HTTPException(status_code=401, detail="Invalid signature")
+    
+    # Parse webhook event
+    try:
+        event = json.loads(body.decode('utf-8'))
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=400, detail="Invalid JSON")
+    
+    event_type = event.get('event_type')
+    data = event.get('data', {})
+    
+    # Extract user ID from custom_data/passthrough
+    custom_data = data.get('custom_data', {})
+    user_id = custom_data.get('user_id')
+    
+    if not user_id:
+        # Fallback: try to get from passthrough (Paddle Classic format)
+        user_id = event.get('passthrough')
+    
+    if not user_id:
+        # Log and return 200 (don't fail webhook for missing user_id)
+        print(f"Warning: Paddle webhook missing user_id. Event: {event_type}")
+        return {"status": "ignored", "reason": "missing_user_id"}
+    
+    # Get user from database
+    user = db.get(User, int(user_id))
+    if not user:
+        print(f"Warning: Paddle webhook for unknown user_id={user_id}")
+        return {"status": "ignored", "reason": "user_not_found"}
+    
+    # Handle subscription events
+    if event_type == 'subscription.created':
+        subscription_id = data.get('id')
+        next_billed_at = data.get('next_billed_at')
+        started_at = data.get('started_at') or data.get('created_at')
+        
+        user.subscription_tier = 'premium'
+        user.subscription_status = 'active'
+        user.subscription_platform = 'paddle'
+        user.subscription_external_id = subscription_id
+        user.subscription_started_at = datetime.fromisoformat(started_at.replace('Z', '+00:00')) if started_at else datetime.now(timezone.utc)
+        user.subscription_expires_at = datetime.fromisoformat(next_billed_at.replace('Z', '+00:00')) if next_billed_at else None
+        user.subscription_cancel_at_period_end = False
+        
+        if not user.original_platform:
+            user.original_platform = 'paddle'
+        
+        db.commit()
+        print(f"Subscription created for user_id={user_id}, subscription_id={subscription_id}")
+    
+    elif event_type == 'subscription.updated':
+        subscription_id = data.get('id')
+        status = data.get('status')
+        next_billed_at = data.get('next_billed_at')
+        scheduled_change = data.get('scheduled_change')
+        
+        # Map Paddle status to our status
+        if status == 'active':
+            user.subscription_status = 'active'
+        elif status == 'past_due':
+            user.subscription_status = 'past_due'
+        elif status == 'canceled':
+            user.subscription_status = 'canceled'
+        elif status == 'paused':
+            user.subscription_status = 'canceled'
+        
+        if next_billed_at:
+            user.subscription_expires_at = datetime.fromisoformat(next_billed_at.replace('Z', '+00:00'))
+        
+        # Check if cancellation is scheduled
+        if scheduled_change and scheduled_change.get('action') == 'cancel':
+            user.subscription_cancel_at_period_end = True
+        else:
+            user.subscription_cancel_at_period_end = False
+        
+        db.commit()
+        print(f"Subscription updated for user_id={user_id}, status={status}")
+    
+    elif event_type == 'subscription.canceled':
+        # Subscription canceled - user retains access until expiry date
+        user.subscription_status = 'canceled'
+        user.subscription_cancel_at_period_end = True
+        
+        db.commit()
+        print(f"Subscription canceled for user_id={user_id}")
+    
+    elif event_type == 'subscription.past_due':
+        user.subscription_status = 'past_due'
+        
+        db.commit()
+        print(f"Subscription past_due for user_id={user_id}")
+    
+    else:
+        # Unknown event type - log and return success
+        print(f"Unhandled Paddle webhook event: {event_type}")
+    
+    return {"status": "success"}
 
 
 @app.patch("/api/admin/reports/{report_id}", response_model=AdminReportResponse)

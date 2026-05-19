@@ -6,7 +6,7 @@ import os
 import time
 from collections.abc import Generator
 
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, LargeBinary, String, Text, UniqueConstraint, create_engine, text
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, LargeBinary, String, Text, UniqueConstraint, create_engine, text
 from sqlalchemy.orm import DeclarativeBase, Session, deferred, relationship, sessionmaker
 
 DATABASE_URL = os.environ.get("DATABASE_URL", "")
@@ -44,6 +44,17 @@ class User(Base):
     apple_user_id           = Column(String(128), nullable=True, unique=True)
     preferred_lang          = Column(String(8),   nullable=False, server_default='en', default='en')
     access_status           = Column(String(32),  nullable=False, server_default='approved', default='approved')
+    
+    # Subscription fields
+    subscription_tier                = Column(Text, nullable=False, server_default='free', default='free')
+    subscription_status              = Column(Text, nullable=True)
+    subscription_platform            = Column(Text, nullable=True)
+    subscription_external_id         = Column(Text, nullable=True, unique=True)
+    subscription_started_at          = Column(DateTime, nullable=True)
+    subscription_expires_at          = Column(DateTime, nullable=True)
+    subscription_cancel_at_period_end = Column(Boolean, nullable=False, default=False)
+    original_platform                = Column(Text, nullable=True)
+    
     created_at              = Column(Integer,     default=lambda: int(time.time()))
 
 
