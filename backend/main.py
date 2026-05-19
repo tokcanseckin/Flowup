@@ -1596,7 +1596,7 @@ def get_pricing():
 
 
 @app.post("/api/sync-subscription", response_model=UserResponse)
-def sync_subscription(current_user: User = Depends(require_user), db: Session = Depends(get_db)):
+def sync_subscription(current_user: User = Depends(_get_current_user), db: Session = Depends(get_db)):
     """Sync subscription status from Paddle API by email.
     
     Similar to iOS 'restore purchase' - queries Paddle for active subscriptions
