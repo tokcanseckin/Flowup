@@ -133,8 +133,8 @@ const LyricsLockScreen: React.FC<LyricsLockScreenProps> = ({
 
           {/* Features list (if provided) */}
           {features && features.length > 0 && (
-            <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 max-w-4xl mx-auto">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+            <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 max-w-5xl mx-auto">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2">
                 {features.map((feature, i) => (
                   <div key={i} className="flex items-start gap-2 text-left">
                     <svg
@@ -150,7 +150,7 @@ const LyricsLockScreen: React.FC<LyricsLockScreenProps> = ({
                         d="M5 13l4 4L19 7"
                       />
                     </svg>
-                    <span className="text-gray-200 text-sm">{feature}</span>
+                    <span className="text-gray-200 text-sm whitespace-nowrap">{feature}</span>
                   </div>
                 ))}
               </div>
