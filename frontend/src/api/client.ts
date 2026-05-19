@@ -117,6 +117,26 @@ export interface BackendUser {
   original_platform: string | null
 }
 
+export interface PricingData {
+  product_id: string
+  product_name: string
+  monthly: {
+    id: string
+    amount: number
+    currency: string
+  } | null
+  annual: {
+    id: string
+    amount: number
+    currency: string
+  } | null
+  lifetime: {
+    id: string
+    amount: number
+    currency: string
+  } | null
+}
+
 export interface AdminUser {
   id: number
   spotify_id: string
@@ -264,6 +284,9 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
 export const api = {
   health: (): Promise<{ status: string }> =>
     apiFetch('/health'),
+
+  getPricing: (): Promise<PricingData> =>
+    apiFetch('/pricing'),
 
   listSongs: (): Promise<SongSummary[]> =>
     apiFetch('/songs'),

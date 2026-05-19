@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { track } from '../analytics'
-import { BackendUser } from '../api/client'
+import { BackendUser, PricingData, api } from '../api/client'
 
 interface PricingPageProps {
   user: BackendUser | null
@@ -35,6 +35,21 @@ declare global {
 const PricingPage: React.FC<PricingPageProps> = ({ user, onClose }) => {
   const [isAnnual, setIsAnnual] = useState(false)
   const [paddleLoaded, setPaddleLoaded] = useState(false)
+  const [pricing, setPricing] = useState<PricingData | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  // Fetch pricing from backend
+  useEffect(() => {
+    api.getPricing()
+      .then(data => {
+        setPricing(data)
+        setLoading(false)
+      })
+      .catch(err => {
+        console.error('Failed to fetch pricing:', err)
+        setLoading(false)
+      })
+  }, [])
 
   useEffect(() => {
     // Load Paddle.js
@@ -63,20 +78,21 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose }) => {
       return
     }
 
+    if (!pricing || !pricing.monthly || !pricing.annual) {
+      alert('Pricing information unavailable. Please try again later.')
+      return
+    }
+
     track('Checkout Initiated', {
       tier,
       source: 'pricing_page',
       user_id: user?.id ?? 0,
     })
 
-    // Real Paddle price IDs from sandbox
-    const priceIds = {
-      monthly: 'pri_01ks0ddf0xdr1tskvcfr7n0dxq',  // 8.00 EUR/month
-      annual: 'pri_01ks0dfv5dxxeehzn75fs8nwa6',   // 80.00 EUR/year
-    }
+    const priceId = tier === 'monthly' ? pricing.monthly.id : pricing.annual.id
 
     window.Paddle.Checkout.open({
-      items: [{ priceId: priceIds[tier], quantity: 1 }],
+      items: [{ priceId, quantity: 1 }],
       customData: { user_id: user?.id ?? 0 },
       customer: { email: user?.email || undefined },
       successUrl: window.location.origin + '/welcome?subscribed=true',
@@ -94,6 +110,34 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose }) => {
     'Ad-free experience',
     'Priority support',
   ]
+
+  // Format price from cents to display format
+  const formatPrice = (amount: number, currency: string) => {
+    const value = (amount / 100).toFixed(2)
+    const symbol = currency === 'EUR' ? '€' : currency === 'USD' ? '$' : currency
+    return `${symbol}${value}`
+  }
+
+  const monthlyPrice = pricing?.monthly ? formatPrice(pricing.monthly.amount, pricing.monthly.currency) : '€8.00'
+  const annualPrice = pricing?.annual ? formatPrice(pricing.annual.amount, pricing.annual.currency) : '€80.00'
+  
+  // Calculate savings
+  const monthlySavings = pricing?.monthly && pricing?.annual 
+    ? formatPrice((pricing.monthly.amount * 12) - pricing.annual.amount, pricing.annual.currency)
+    : '€16'
+  const monthlyEquivalent = pricing?.annual
+    ? formatPrice(Math.floor(pricing.annual.amount / 12), pricing.annual.currency)
+    : '€6.67'
+
+  if (loading) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+        <div className="bg-white rounded-2xl p-8">
+          <div className="text-gray-900 text-lg">Loading pricing...</div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
@@ -149,24 +193,24 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose }) => {
             <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl p-8 border-2 border-purple-200">
               <div className="text-center mb-6">
                 <div className="text-5xl font-bold text-gray-900 mb-2">
-                  €{isAnnual ? '80.00' : '8.00'}
+                  {isAnnual ? annualPrice : monthlyPrice}
                   <span className="text-2xl text-gray-600 font-normal">
                     /{isAnnual ? 'year' : 'month'}
                   </span>
                 </div>
                 {isAnnual && (
                   <p className="text-sm text-purple-600 font-medium">
-                    Just €6.67/month — Save €16/year
+                    Just {monthlyEquivalent}/month — Save {monthlySavings}/year
                   </p>
                 )}
               </div>
 
               <button
                 onClick={() => handleUpgrade(isAnnual ? 'annual' : 'monthly')}
-                disabled={!paddleLoaded}
+                disabled={!paddleLoaded || !pricing}
                 className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-4 px-8 rounded-lg shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed mb-4"
               >
-                {paddleLoaded ? 'Start Learning Now' : 'Loading...'}
+                {!paddleLoaded ? 'Loading...' : !pricing ? 'Pricing unavailable' : 'Start Learning Now'}
               </button>
 
               <p className="text-center text-sm text-gray-500">

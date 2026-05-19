@@ -1589,6 +1589,12 @@ def health():
     return {"status": "ok"}
 
 
+@app.get("/api/pricing")
+def get_pricing():
+    """Get current pricing from Paddle (cached)."""
+    return paddle_config.get_current_pricing()
+
+
 @app.get("/api/image-proxy")
 def image_proxy(url: str = Query(..., min_length=8, max_length=2048)):
     """Fetch a remote image and serve it from same-origin for safe canvas sampling."""
