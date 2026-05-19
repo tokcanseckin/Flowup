@@ -1610,6 +1610,7 @@ def sync_subscription(current_user: User = Depends(_get_current_user), db: Sessi
     
     try:
         # Query Paddle Subscriptions API by customer email
+        print(f"[Sync Subscription] Querying Paddle for email: {current_user.email}")
         response = requests.get(
             'https://sandbox-api.paddle.com/subscriptions',
             headers={'Authorization': f'Bearer {PADDLE_API_KEY}'},
@@ -1620,9 +1621,13 @@ def sync_subscription(current_user: User = Depends(_get_current_user), db: Sessi
         data = response.json()
         
         subscriptions = data.get('data', [])
+        print(f"[Sync Subscription] Found {len(subscriptions)} subscriptions")
+        if subscriptions:
+            print(f"[Sync Subscription] First subscription: {subscriptions[0]}")
         
         if not subscriptions:
             # No active subscription found - set to free
+            print(f"[Sync Subscription] No subscriptions found, setting to free tier")
             if current_user.subscription_tier != 'free':
                 current_user.subscription_tier = 'free'
                 current_user.subscription_status = None
@@ -1654,6 +1659,9 @@ def sync_subscription(current_user: User = Depends(_get_current_user), db: Sessi
             items = active_sub.get('items', [])
             price_id = items[0]['price']['id'] if items and len(items) > 0 else None
             tier = paddle_config.get_tier_for_price(price_id) if price_id else 'premium'
+            print(f"[Sync Subscription] Found active subscription: {subscription_id}")
+            print(f"[Sync Subscription] Price ID: {price_id}, Tier: {tier}, Status: {status}")
+            
             
             # Update user subscription
             current_user.subscription_tier = tier
