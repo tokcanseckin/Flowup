@@ -166,6 +166,7 @@ type AppRoute =
   | { page: 'song'; songId: number }
   | { page: 'settings'; tab: SettingsTab }
   | { page: 'admin'; tab: 'songs' | 'playlists' | 'users' | 'tasks' | 'localizations' | 'reports'; id: number | null }
+  | { page: 'subscriptions' }
   | { page: 'privacy' }
   | { page: 'terms' }
 
@@ -196,6 +197,7 @@ function parseAppRoute(pathname: string): AppRoute {
     return { page: 'song', songId: Number(songMatch[1]) }
   }
 
+  if (path === '/subscriptions') return { page: 'subscriptions' }
   if (path === '/privacy') return { page: 'privacy' }
   if (path === '/terms') return { page: 'terms' }
 
@@ -2873,7 +2875,6 @@ export default function App() {
     if (typeof window === 'undefined') return null
     return new URLSearchParams(window.location.search).get('reset_token')
   })
-  const [showPricingPage, setShowPricingPage] = useState(false)
 
   // Auto-sync subscription after successful Paddle checkout
   useEffect(() => {
@@ -2884,17 +2885,14 @@ export default function App() {
         .then((updatedUser) => {
           console.log('[Paddle] Subscription synced:', updatedUser.subscription_tier)
           setCredentialUser(updatedUser)
-          // Remove the parameter from URL
-          params.delete('subscribed')
-          const newSearch = params.toString()
-          const newUrl = window.location.pathname + (newSearch ? '?' + newSearch : '')
-          window.history.replaceState({}, '', newUrl)
+          // Remove the parameter and navigate to browse
+          navigateToPath('/browse')
         })
         .catch((err) => {
           console.error('[Paddle] Failed to sync subscription:', err)
         })
     }
-  }, []) // Run once on mount
+  }, [credentialUser, navigateToPath]) // Run when user changes
 
   const { favoriteSongIds, toggleFavorite } = useFavorites(!!credentialUser)
   const { listenedSongIds, markListened, unmarkListened } = useListened(!!credentialUser)
@@ -3437,6 +3435,18 @@ export default function App() {
   if (currentPath === '/privacy') return <PrivacyPolicyPage onBack={() => window.history.back()} />
   if (currentPath === '/terms') return <TermsOfServicePage onBack={() => window.history.back()} />
 
+  // Subscriptions page requires authentication
+  if (currentPath === '/subscriptions' && isAuthenticated) {
+    return (
+      <PricingPage
+        user={credentialUser}
+        onClose={() => navigateToPath(activeSong ? songPath(activeSong.id) : activePlaylistId !== null ? playlistPath(activePlaylistId) : '/browse')}
+        onUserUpdate={(user) => setCredentialUser(user)}
+        isPage={true}
+      />
+    )
+  }
+
   if (!isAuthenticated) {
     if (resetToken) {
       return (
@@ -3491,7 +3501,7 @@ export default function App() {
         user={credentialUser}
         activeTab={route.page === 'settings' ? route.tab : 'preferences'}
         onTabChange={(t) => navigateToPath(settingsPath(t))}
-        onShowPricing={() => setShowPricingPage(true)}
+        onShowPricing={() => navigateToPath('/subscriptions')}
         onUserUpdate={(user) => setCredentialUser(user)}
       />
     )
@@ -3574,7 +3584,7 @@ export default function App() {
           onGoToBrowse={() => navigateToPath('/browse')}
           playlistName={activePlaylist ? tc(activePlaylist.name) : null}
           onGoToPlaylist={activePlaylistId !== null ? () => navigateToPath(playlistPath(activePlaylistId)) : undefined}
-          onShowPricing={() => setShowPricingPage(true)}
+          onShowPricing={() => navigateToPath('/subscriptions')}
           onBackToTrial={() => {
             // Navigate to first song in current playlist
             if (activePlaylist && activePlaylist.songs.length > 0) {
@@ -3614,14 +3624,6 @@ export default function App() {
         onBrowseTargetLang={handleBrowseTargetLang}
       />
       <HelpButton />
-      
-      {/* Pricing page overlay */}
-      {showPricingPage && (
-        <PricingPage
-          user={credentialUser}
-          onClose={() => setShowPricingPage(false)}
-        />
-      )}
     </>
   )
 }

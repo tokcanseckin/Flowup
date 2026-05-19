@@ -6,6 +6,7 @@ interface PricingPageProps {
   user: BackendUser | null
   onClose: () => void
   onUserUpdate?: (user: BackendUser) => void
+  isPage?: boolean  // If true, render as full page instead of modal
 }
 
 // Paddle.js types (Paddle Billing v2)
@@ -33,7 +34,7 @@ declare global {
   }
 }
 
-const PricingPage: React.FC<PricingPageProps> = ({ user, onClose }) => {
+const PricingPage: React.FC<PricingPageProps> = ({ user, onClose, onUserUpdate, isPage = false }) => {
   const [isAnnual, setIsAnnual] = useState(false)
   const [paddleLoaded, setPaddleLoaded] = useState(false)
   const [pricing, setPricing] = useState<PricingData | null>(null)
@@ -141,36 +142,55 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose }) => {
     : '€6.67'
 
   if (loading) {
+    const containerClass = isPage 
+      ? "min-h-screen flex items-center justify-center" 
+      : "fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
+    const bgClass = isPage
+      ? ""
+      : "bg-white rounded-2xl p-8"
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-        <div className="bg-white rounded-2xl p-8">
-          <div className="text-gray-900 text-lg">Loading pricing...</div>
+      <div className={containerClass} style={isPage ? { background: 'radial-gradient(ellipse 120% 80% at 50% 110%, #1a1040 0%, #0d0d14 60%)' } : {}}>
+        <div className={bgClass}>
+          <div className={isPage ? "text-white text-lg" : "text-gray-900 text-lg"}>Loading pricing...</div>
         </div>
       </div>
     )
   }
 
+  const containerClass = isPage
+    ? "min-h-screen flex items-center justify-center py-8"
+    : "fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-      <div className="relative w-full max-w-5xl mx-4 bg-white rounded-2xl shadow-2xl overflow-hidden">
-        {/* Close button */}
+    <div className={containerClass} style={isPage ? { background: 'radial-gradient(ellipse 120% 80% at 50% 110%, #1a1040 0%, #0d0d14 60%)' } : {}}>
+      <div className={`relative w-full max-w-5xl mx-4 ${isPage ? '' : 'bg-white'} rounded-2xl shadow-2xl overflow-hidden`} style={isPage ? { background: '#0a0a12' } : {}}>
+        {/* Back/Close button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-10 text-gray-400 hover:text-gray-600 transition-colors"
-          aria-label="Close"
+          className={`absolute top-4 ${isPage ? 'left-4' : 'right-4'} z-10 ${isPage ? 'text-gray-400 hover:text-gray-200' : 'text-gray-400 hover:text-gray-600'} transition-colors flex items-center gap-2`}
+          aria-label={isPage ? "Back" : "Close"}
         >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
+          {isPage ? (
+            <>
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              <span className="text-sm font-medium">Back</span>
+            </>
+          ) : (
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          )}
         </button>
 
         <div className="p-8 md:p-12">
           {/* Header */}
           <div className="text-center mb-8">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+            <h1 className={`text-4xl md:text-5xl font-bold ${isPage ? 'text-white' : 'text-gray-900'} mb-4`}>
               Upgrade to Premium
             </h1>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className={`text-lg ${isPage ? 'text-gray-300' : 'text-gray-600'} max-w-2xl mx-auto`}>
               Unlock unlimited interactive lyrics, translations, and word definitions across all songs
             </p>
           </div>
@@ -182,7 +202,9 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose }) => {
               className={`px-6 py-2 rounded-full font-medium transition-all ${
                 !isAnnual
                   ? 'bg-purple-600 text-white shadow-lg'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  : isPage 
+                    ? 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
               Monthly
@@ -192,7 +214,9 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose }) => {
               className={`px-6 py-2 rounded-full font-medium transition-all ${
                 isAnnual
                   ? 'bg-purple-600 text-white shadow-lg'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  : isPage
+                    ? 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
               Annual <span className="ml-2 text-sm">(Save 17%)</span>
@@ -201,16 +225,16 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose }) => {
 
           {/* Pricing card */}
           <div className="max-w-md mx-auto mb-8">
-            <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl p-8 border-2 border-purple-200">
+            <div className={`${isPage ? 'bg-gray-900/50' : 'bg-gradient-to-br from-purple-50 to-blue-50'} rounded-xl p-8 border-2 ${isPage ? 'border-purple-700/50' : 'border-purple-200'}`}>
               <div className="text-center mb-6">
-                <div className="text-5xl font-bold text-gray-900 mb-2">
+                <div className={`text-5xl font-bold ${isPage ? 'text-white' : 'text-gray-900'} mb-2`}>
                   {isAnnual ? annualPrice : monthlyPrice}
-                  <span className="text-2xl text-gray-600 font-normal">
+                  <span className={`text-2xl ${isPage ? 'text-gray-400' : 'text-gray-600'} font-normal`}>
                     /{isAnnual ? 'year' : 'month'}
                   </span>
                 </div>
                 {isAnnual && (
-                  <p className="text-sm text-purple-600 font-medium">
+                  <p className={`text-sm ${isPage ? 'text-purple-400' : 'text-purple-600'} font-medium`}>
                     Just {monthlyEquivalent}/month — Save {monthlySavings}/year
                   </p>
                 )}
@@ -224,7 +248,7 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose }) => {
                 {!paddleLoaded ? 'Loading...' : !pricing ? 'Pricing unavailable' : 'Start Learning Now'}
               </button>
 
-              <p className="text-center text-sm text-gray-500">
+              <p className={`text-center text-sm ${isPage ? 'text-gray-400' : 'text-gray-500'}`}>
                 Cancel anytime • No questions asked
               </p>
             </div>
@@ -232,14 +256,14 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose }) => {
 
           {/* Features list */}
           <div className="max-w-2xl mx-auto">
-            <h3 className="text-xl font-semibold text-gray-900 mb-4 text-center">
+            <h3 className={`text-xl font-semibold ${isPage ? 'text-white' : 'text-gray-900'} mb-4 text-center`}>
               Everything you need to master a new language
             </h3>
             <div className="grid md:grid-cols-2 gap-4">
               {features.map((feature, i) => (
                 <div key={i} className="flex items-start gap-3">
                   <svg
-                    className="w-6 h-6 text-purple-600 flex-shrink-0 mt-0.5"
+                    className={`w-6 h-6 ${isPage ? 'text-purple-400' : 'text-purple-600'} flex-shrink-0 mt-0.5`}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -251,19 +275,19 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose }) => {
                       d="M5 13l4 4L19 7"
                     />
                   </svg>
-                  <span className="text-gray-700">{feature}</span>
+                  <span className={isPage ? 'text-gray-300' : 'text-gray-700'}>{feature}</span>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Free trial info */}
-          <div className="mt-8 text-center text-sm text-gray-500">
+          <div className={`mt-8 text-center text-sm ${isPage ? 'text-gray-400' : 'text-gray-500'}`}>
             <p>
               Already subscribed?{' '}
               <button
                 onClick={onClose}
-                className="text-purple-600 hover:text-purple-700 font-medium underline"
+                className={`${isPage ? 'text-purple-400 hover:text-purple-300' : 'text-purple-600 hover:text-purple-700'} font-medium underline`}
               >
                 Continue learning
               </button>
