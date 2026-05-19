@@ -100,13 +100,13 @@ const LyricsLockScreen: React.FC<LyricsLockScreenProps> = ({
       <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/85 to-black/90" />
 
       {/* Lock screen content */}
-      <div className="absolute inset-0 flex items-center justify-center p-6">
-        <div className="max-w-2xl w-full text-center space-y-6">
+      <div className="absolute inset-0 flex items-center justify-center p-4">
+        <div className="max-w-xl w-full text-center space-y-4">
           {/* Lock icon */}
-          <div className="flex justify-center mb-4">
-            <div className="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+          <div className="flex justify-center mb-2">
+            <div className="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center backdrop-blur-sm">
               <svg
-                className="w-8 h-8 text-purple-400"
+                className="w-6 h-6 text-purple-400"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -122,22 +122,22 @@ const LyricsLockScreen: React.FC<LyricsLockScreenProps> = ({
           </div>
 
           {/* Title */}
-          <h2 className="text-3xl md:text-4xl font-bold text-white leading-tight">
+          <h2 className="text-2xl md:text-3xl font-bold text-white leading-tight">
             {title}
           </h2>
 
           {/* Message */}
-          <p className="text-lg text-gray-300 leading-relaxed max-w-xl mx-auto">
+          <p className="text-base text-gray-300 leading-relaxed max-w-lg mx-auto">
             {message}
           </p>
 
           {/* Features list (if provided) */}
           {features && features.length > 0 && (
-            <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 space-y-3 max-w-lg mx-auto">
+            <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 space-y-2 max-w-md mx-auto">
               {features.map((feature, i) => (
-                <div key={i} className="flex items-start gap-3 text-left">
+                <div key={i} className="flex items-start gap-2 text-left">
                   <svg
-                    className="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5"
+                    className="w-4 h-4 text-purple-400 flex-shrink-0 mt-0.5"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -156,11 +156,11 @@ const LyricsLockScreen: React.FC<LyricsLockScreenProps> = ({
           )}
 
           {/* Action buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
             {/* Primary: Upgrade */}
             <button
               onClick={onUpgrade}
-              className="w-full sm:w-auto px-8 py-4 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+              className="w-full sm:w-auto px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
             >
               {upgradeButtonText}
             </button>
@@ -169,7 +169,7 @@ const LyricsLockScreen: React.FC<LyricsLockScreenProps> = ({
             {onBackToTrial && (
               <button
                 onClick={onBackToTrial}
-                className="w-full sm:w-auto px-8 py-4 bg-white/10 hover:bg-white/20 text-white font-medium rounded-lg backdrop-blur-sm transition-all border border-white/20"
+                className="w-full sm:w-auto px-6 py-3 bg-white/10 hover:bg-white/20 text-white font-medium rounded-lg backdrop-blur-sm transition-all border border-white/20"
               >
                 {backButtonText}
               </button>
@@ -177,7 +177,7 @@ const LyricsLockScreen: React.FC<LyricsLockScreenProps> = ({
           </div>
 
           {/* Note about music continuing */}
-          <p className="text-sm text-gray-400 pt-4">
+          <p className="text-xs text-gray-400 pt-2">
             Music continues playing • Your progress is saved
           </p>
         </div>
