@@ -147,9 +147,7 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose, onUserUpdate }
       items: [{ priceId, quantity: 1 }],
       customData: { user_id: user?.id ?? 0 },
       customer: { email: user?.email || undefined },
-      settings: {
-        successUrl: window.location.origin + '/browse?subscribed=true',
-      },
+      // No successUrl - let the page stay open so our sync code can run
     })
   }
 
