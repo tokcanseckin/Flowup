@@ -745,7 +745,7 @@ export default function LyricsPlayer({
   }, [activeIndex])
 
   return (
-    <div className={isPhone ? 'relative h-full min-h-0' : 'grid grid-cols-[minmax(0,1fr)_420px] gap-0 h-full min-h-0'}>
+    <div className={isPhone ? 'relative h-full min-h-0' : 'relative grid grid-cols-[minmax(0,1fr)_420px] gap-0 h-full min-h-0'}>
       <div
         className="relative h-full min-h-0"
         dir={language.direction}

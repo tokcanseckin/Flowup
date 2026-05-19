@@ -1824,14 +1824,8 @@ def get_song(
             ).first()
             if playlist_song:
                 position_in_playlist = playlist_song.position
-    else:
-        # Try to find any playlist containing this song (use first one found)
-        playlist_song = db.query(PlaylistSong).filter(
-            PlaylistSong.song_id == song_id
-        ).first()
-        if playlist_song:
-            playlist = db.get(Playlist, playlist_song.playlist_id)
-            position_in_playlist = playlist_song.position
+    # Note: If no playlist_id provided, playlist stays None
+    # This ensures free users can only access songs with explicit playlist context
     
     # Check entitlements
     lyrics_unlocked = True

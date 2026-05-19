@@ -295,10 +295,11 @@ export const api = {
   listSongs: (): Promise<SongSummary[]> =>
     apiFetch('/songs'),
 
-  getSong: (id: number, source?: string, targetLang?: string): Promise<SongDetail> => {
+  getSong: (id: number, source?: string, targetLang?: string, playlistId?: number): Promise<SongDetail> => {
     const params = new URLSearchParams()
     if (source && source !== 'spotify') params.set('source', source)
     if (targetLang) params.set('target_lang', targetLang)
+    if (playlistId !== undefined) params.set('playlist_id', String(playlistId))
     const qs = params.toString()
     return apiFetch(`/songs/${id}${qs ? `?${qs}` : ''}`)
   },

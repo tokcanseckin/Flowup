@@ -29,13 +29,13 @@ function _songCacheKey(id: number, source?: string, targetLang?: string): string
 }
 
 /** Fetch a song, using the module-level cache. Deduplicates concurrent requests. */
-function _fetchSong(id: number, source?: string, targetLang?: string): Promise<SongDetail> {
+function _fetchSong(id: number, source?: string, targetLang?: string, playlistId?: number): Promise<SongDetail> {
   const key = _songCacheKey(id, source, targetLang)
   const cached = _songCache.get(key)
   if (cached) return Promise.resolve(cached)
   const inflight = _inFlight.get(key)
   if (inflight) return inflight
-  const p = api.getSong(id, source, targetLang || undefined).then(detail => {
+  const p = api.getSong(id, source, targetLang || undefined, playlistId).then(detail => {
     _songCache.set(key, detail)
     _inFlight.delete(key)
     return detail
@@ -3186,7 +3186,7 @@ export default function App() {
     setSongLoading(true)
     setActiveSong(null)
     try {
-      const detail = await _fetchSong(id, source, targetLang)
+      const detail = await _fetchSong(id, source, targetLang, activePlaylist?.id)
       setActiveSong(detail)
       setLastSelectedSongId(detail.id)
     } catch (e) {
@@ -3199,8 +3199,8 @@ export default function App() {
 
   const handlePrefetchSong = useCallback((id: number) => {
     const source = settings.preferredSource
-    void _fetchSong(id, source).catch(() => {})
-  }, [settings.preferredSource])
+    void _fetchSong(id, source, undefined, activePlaylist?.id).catch(() => {})
+  }, [settings.preferredSource, activePlaylist])
 
   // Re-fetch active song lyrics when source preference changes so the player
   // immediately gets the right per-source timestamps. Invalidate stale cache entry.
@@ -3210,9 +3210,9 @@ export default function App() {
     const targetLang = effectiveTargetLang
     const key = _songCacheKey(activeSong.id, source, targetLang)
     _songCache.delete(key)  // force fresh fetch for new source
-    void _fetchSong(activeSong.id, source, targetLang).then(d => { setActiveSong(d) }).catch(() => {})
+    void _fetchSong(activeSong.id, source, targetLang, activePlaylist?.id).then(d => { setActiveSong(d) }).catch(() => {})
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [settings.preferredSource])
+  }, [settings.preferredSource, activePlaylist])
 
   // Re-fetch active song when the effective target language changes (e.g. after
   // the initial no-target-lang fetch reveals available target langs, causing
@@ -3220,9 +3220,9 @@ export default function App() {
   useEffect(() => {
     if (!activeSong || !effectiveTargetLang) return
     const source = settings.preferredSource
-    void _fetchSong(activeSong.id, source, effectiveTargetLang).then(d => { setActiveSong(d) }).catch(() => {})
+    void _fetchSong(activeSong.id, source, effectiveTargetLang, activePlaylist?.id).then(d => { setActiveSong(d) }).catch(() => {})
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [effectiveTargetLang])
+  }, [effectiveTargetLang, activePlaylist])
 
   useEffect(() => {
     restoreDoneRef.current = false
@@ -3428,10 +3428,10 @@ export default function App() {
     if (!next) return
     const source = settings.preferredSource
     const timer = window.setTimeout(() => {
-      void _fetchSong(next.id, source, effectiveTargetLang).catch(() => {})
+      void _fetchSong(next.id, source, effectiveTargetLang, activePlaylist?.id).catch(() => {})
     }, 2000)
     return () => window.clearTimeout(timer)
-  }, [activeSong, activeSongIndex, displayedSongs, settings.preferredSource])
+  }, [activeSong, activeSongIndex, displayedSongs, settings.preferredSource, effectiveTargetLang, activePlaylist])
 
   // Legal pages are accessible without authentication
   if (currentPath === '/privacy') return <PrivacyPolicyPage onBack={() => window.history.back()} />
