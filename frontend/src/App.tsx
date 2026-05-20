@@ -3172,6 +3172,7 @@ function PlayerView({
             themeAsideBackground={lyricsTheme.asideGradient}
             accentTextColor={lyricsTheme.accentTextColor}
             filterStopWordsForIndexing={settings.excludeStopWordsFromShortcuts}
+            isMobileView={isMobileView}
             onInfoVisibilityChange={setInfoVisible}
             onFirstLineActive={() => { if (localStorage.getItem('tutorial_player_seen') !== '1') setShowPlayerTutorial(true) }}
             onWordLookupClosed={() => { if (showPlayerTutorial && tutorialStepRef.current === 0) tutorialRef.current?.advance() }}

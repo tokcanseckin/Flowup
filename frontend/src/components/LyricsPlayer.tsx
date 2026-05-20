@@ -322,6 +322,7 @@ interface Props {
   themeAsideBackground?: string
   accentTextColor?: string
   filterStopWordsForIndexing?: boolean
+  isMobileView?: boolean
   onInfoVisibilityChange?: (visible: boolean) => void
   onFirstLineActive?: () => void
   /** Tutorial callbacks: fired when inspect panel transitions away */
@@ -347,6 +348,7 @@ export default function LyricsPlayer({
   themeAsideBackground,
   accentTextColor,
   filterStopWordsForIndexing = true,
+  isMobileView = false,
   onInfoVisibilityChange,
   onFirstLineActive,
   onWordLookupClosed,
@@ -982,8 +984,8 @@ export default function LyricsPlayer({
         </aside>
       )}
 
-      {/* Lyrics Lock Screen - shown when subscription required */}
-      {songData.lyrics_unlocked === false && songData.upgrade_cta && (
+      {/* Lyrics Lock Screen - shown when subscription required (hidden on mobile) */}
+      {!isMobileView && songData.lyrics_unlocked === false && songData.upgrade_cta && (
         <LyricsLockScreen
           lyrics={lines}
           currentTime={currentPositionMs}
