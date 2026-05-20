@@ -23,6 +23,8 @@ interface LyricsLockScreenProps {
   backButtonText?: string
   /** Song ID for analytics tracking */
   songId?: number
+  /** Position in playlist (0-indexed) for analytics tracking */
+  positionInPlaylist?: number
 }
 
 const LyricsLockScreen: React.FC<LyricsLockScreenProps> = ({
@@ -36,6 +38,7 @@ const LyricsLockScreen: React.FC<LyricsLockScreenProps> = ({
   upgradeButtonText = 'See Premium Plans',
   backButtonText = 'Back to Trial Songs',
   songId,
+  positionInPlaylist,
 }) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const activeLineRef = useRef<number>(-1)
@@ -45,10 +48,11 @@ const LyricsLockScreen: React.FC<LyricsLockScreenProps> = ({
     if (songId !== undefined) {
       track('Paywall Hit', {
         song_id: songId,
+        position_in_playlist: positionInPlaylist !== undefined ? positionInPlaylist + 1 : undefined,
         source: 'lyrics_lock_screen',
       })
     }
-  }, [songId])
+  }, [songId, positionInPlaylist])
 
   // Auto-scroll to current line
   useEffect(() => {

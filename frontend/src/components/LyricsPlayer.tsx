@@ -316,6 +316,7 @@ interface Props {
   durationMs?: number
   isPlaying: boolean
   songData: SongDetail
+  positionInPlaylist?: number
   targetLang?: string
   themeBackground?: string
   themeAsideBackground?: string
@@ -340,6 +341,7 @@ export default function LyricsPlayer({
   durationMs = 0,
   isPlaying,
   songData,
+  positionInPlaylist,
   targetLang = 'en',
   themeBackground,
   themeAsideBackground,
@@ -984,9 +986,11 @@ export default function LyricsPlayer({
           features={songData.upgrade_cta.highlight_features}
           upgradeButtonText={songData.upgrade_cta.cta}
           songId={songData.id}
+          positionInPlaylist={positionInPlaylist}
           onUpgrade={() => {
             track('Upgrade Selected', {
               song_id: songData.id,
+              position_in_playlist: positionInPlaylist !== undefined ? positionInPlaylist + 1 : undefined,
               source: 'lyrics_lock_screen',
             })
             onShowPricing?.()

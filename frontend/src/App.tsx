@@ -2141,9 +2141,10 @@ function useAlbumLyricsTheme(albumArtUrl: string | null): [{ panelGradient: stri
 // ── Player view ────────────────────────────────────────────────────────────────
 
 function PlayerView({
-  song, user, onBack, onLogout, onOpenSettings, onOpenAdmin, onOpenAccount, isAdmin, onPrev, onNext, canPrev, canNext, settings, onUpdate, storedMusicUserToken, onMusicUserToken, favoriteSongIds, toggleFavorite, targetLang, onTargetLangChange, onGoToBrowse, playlistName, onGoToPlaylist, onShowPricing, onBackToTrial,
+  song, positionInPlaylist, user, onBack, onLogout, onOpenSettings, onOpenAdmin, onOpenAccount, isAdmin, onPrev, onNext, canPrev, canNext, settings, onUpdate, storedMusicUserToken, onMusicUserToken, favoriteSongIds, toggleFavorite, targetLang, onTargetLangChange, onGoToBrowse, playlistName, onGoToPlaylist, onShowPricing, onBackToTrial,
 }: {
   song: SongDetail
+  positionInPlaylist?: number
   user: { display_name: string | null; email: string | null } | null
   onBack: () => void
   onLogout: () => void
@@ -2812,6 +2813,7 @@ function PlayerView({
             durationMs={durationMs}
             isPlaying={isPlaying}
             songData={song}
+            positionInPlaylist={positionInPlaylist}
             targetLang={targetLang}
             themeBackground={lyricsTheme.panelGradient}
             themeAsideBackground={lyricsTheme.asideGradient}
@@ -3560,10 +3562,14 @@ export default function App() {
   }
 
   if (activeSong) {
+    // Calculate position in playlist (0-indexed internally, used as 1-indexed in analytics)
+    const positionInPlaylist = activePlaylist?.songs.findIndex(s => s.song_id === activeSong.id) ?? -1
+    
     return (
       <>
         <PlayerView
           song={activeSong}
+          positionInPlaylist={positionInPlaylist >= 0 ? positionInPlaylist : undefined}
           user={appUser}
           onBack={() => navigateToPath(activePlaylistId !== null ? playlistPath(activePlaylistId) : '/browse')}
           onLogout={handleLogout}
