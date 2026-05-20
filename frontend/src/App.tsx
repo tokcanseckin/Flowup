@@ -3409,8 +3409,9 @@ export default function App() {
     })
   }, [])
 
-  const handleSelectSong = useCallback(async (id: number, options?: { updateRoute?: boolean }) => {
+  const handleSelectSong = useCallback(async (id: number, options?: { updateRoute?: boolean; playlistId?: number | null }) => {
     markListened(id)
+    const effectivePlaylistId = options?.playlistId ?? activePlaylistId
     if (activePlaylist) {
       const position = activePlaylist.songs.findIndex(s => s.song_id === id)
       track('Song Selected From Playlist', { song_id: id, position_in_playlist: position + 1 })
@@ -3430,7 +3431,10 @@ export default function App() {
       : matchedLang ?? availableTargetLangs[0] ?? browsePref
     const key = _songCacheKey(id, source, targetLang)
     const cached = _songCache.get(key)
-    if (cached) {
+    // Skip cache if: (1) we have playlist context AND (2) cached version shows locked lyrics
+    // This ensures free users see unlocked trial songs immediately on reload
+    const canUseCache = cached && (!effectivePlaylistId || cached.lyrics_unlocked)
+    if (canUseCache) {
       // Instant render from cache.
       setActiveSong(cached)
       setSongLoading(false)
@@ -3440,7 +3444,7 @@ export default function App() {
     setSongLoading(true)
     setActiveSong(null)
     try {
-      const detail = await _fetchSong(id, source, targetLang, activePlaylistId ?? undefined)
+      const detail = await _fetchSong(id, source, targetLang, effectivePlaylistId ?? undefined)
       setActiveSong(detail)
       setLastSelectedSongId(detail.id)
     } catch (e) {
@@ -3587,7 +3591,7 @@ export default function App() {
         setActivePlaylistId(route.playlistId)
       }
       if (activeSong?.id !== route.songId) {
-        void handleSelectSong(route.songId, { updateRoute: false })
+        void handleSelectSong(route.songId, { updateRoute: false, playlistId: route.playlistId })
       }
       return
     }
