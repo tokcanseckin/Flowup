@@ -985,13 +985,13 @@ function SongBrowser({
                         onKeyDown={e => e.key === 'Enter' && onSelect(song.id)}
                         className="
                           w-full text-left rounded-2xl border border-zinc-700/70 p-4 md:p-3
-                          active:scale-[0.99] transition-all duration-150 cursor-pointer
+                          active:scale-[0.99] transition-all duration-150 cursor-pointer overflow-hidden
                         "
                         style={{ background: '#25262b' }}
                         onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(160,160,160,0.4)'; e.currentTarget.style.background = '#323438' }}
                         onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(63,63,70,0.7)'; e.currentTarget.style.background = '#25262b' }}
                       >
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2 md:gap-4">
                           {/* dot indicator */}
                           <svg width="8" height="8" viewBox="0 0 8 8" aria-hidden className="shrink-0">
                             {openedSongIds.has(song.id)
@@ -1108,13 +1108,13 @@ function SongBrowser({
                         onKeyDown={e => e.key === 'Enter' && onSelect(song.id)}
                         className="
                           w-full text-left rounded-2xl border border-zinc-700/70 p-4 md:p-3
-                          active:scale-[0.99] transition-all duration-150 cursor-pointer
+                          active:scale-[0.99] transition-all duration-150 cursor-pointer overflow-hidden
                         "
                         style={{ background: '#25262b' }}
                         onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(160,160,160,0.4)'; e.currentTarget.style.background = '#323438' }}
                         onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(63,63,70,0.7)'; e.currentTarget.style.background = '#25262b' }}
                       >
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2 md:gap-4">
                           {/* dot indicator */}
                           <svg width="8" height="8" viewBox="0 0 8 8" aria-hidden className="shrink-0">
                             {openedSongIds.has(song.id)
@@ -1218,13 +1218,13 @@ function SongBrowser({
                 onKeyDown={e => e.key === 'Enter' && onSelect(song.id)}
                 className="
                   w-full text-left rounded-2xl border border-zinc-700/70 p-4 md:p-3
-                  active:scale-[0.99] transition-all duration-150 cursor-pointer
+                  active:scale-[0.99] transition-all duration-150 cursor-pointer overflow-hidden
                 "
                 style={{ background: '#25262b' }}
                 onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(160,160,160,0.4)'; e.currentTarget.style.background = '#323438' }}
                 onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(63,63,70,0.7)'; e.currentTarget.style.background = '#25262b' }}
               >
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2 md:gap-4">
                   {/* dot indicator */}
                   <svg width="8" height="8" viewBox="0 0 8 8" aria-hidden className="shrink-0">
                     {openedSongIds.has(song.id)
