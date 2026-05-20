@@ -301,7 +301,7 @@ export const api = {
     if (targetLang) params.set('target_lang', targetLang)
     if (playlistId !== undefined) params.set('playlist_id', String(playlistId))
     const qs = params.toString()
-    return apiFetch(`/songs/${id}${qs ? `?${qs}` : ''}`)
+    return apiFetch(`/songs/${id}${qs ? `?${qs}` : ''}`, { headers: getUserAuthHeaders() })
   },
 
   listPlaylists: (targetLang?: string): Promise<PlaylistSummary[]> => {
