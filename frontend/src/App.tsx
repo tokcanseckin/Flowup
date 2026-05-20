@@ -1394,7 +1394,7 @@ function SongBrowser({
             </div>
           </div>
         ) : activePlaylist ? (
-          <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 lg:items-start">
+          <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
             {/* Left column — playlist detail */}
             <div className="w-full lg:w-80 shrink-0 lg:sticky lg:top-20 lg:overflow-y-auto lg:no-scrollbar lg:pb-10" style={{ maxHeight: 'calc(100vh - 5rem)' }}>
               {/* Spacer — matches height of the "Songs" heading row in the right column (desktop only) */}
@@ -1476,7 +1476,7 @@ function SongBrowser({
             </div>
 
             {/* Right column — song list */}
-            <div className="flex-1 min-w-0">
+            <div className="w-full lg:flex-1 lg:min-w-0">
               <div className="mb-4 flex items-center justify-between gap-3">
                 <h2 className="text-white font-semibold text-base md:text-lg">{t('browser.songs')}</h2>
               </div>
