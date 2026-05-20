@@ -158,7 +158,7 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose, onUserUpdate: 
   }
 
   const containerClass = isPage
-    ? "min-h-screen flex items-center justify-center py-8"
+    ? "min-h-screen flex items-center justify-center py-4"
     : "fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
 
   return (
@@ -184,19 +184,19 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose, onUserUpdate: 
           )}
         </button>
 
-        <div className="p-8 md:p-12">
+        <div className="p-6 md:p-8">
           {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className={`text-4xl md:text-5xl font-bold ${isPage ? 'text-white' : 'text-gray-900'} mb-4`}>
+          <div className="text-center mb-5">
+            <h1 className={`text-3xl md:text-4xl font-bold ${isPage ? 'text-white' : 'text-gray-900'} mb-2`}>
               Upgrade to Premium
             </h1>
-            <p className={`text-lg ${isPage ? 'text-gray-300' : 'text-gray-600'} max-w-2xl mx-auto`}>
+            <p className={`text-base ${isPage ? 'text-gray-300' : 'text-gray-600'} max-w-2xl mx-auto`}>
               Unlock unlimited interactive lyrics, translations, and word definitions across all songs
             </p>
           </div>
 
           {/* Annual/Monthly toggle */}
-          <div className="flex items-center justify-center gap-4 mb-8">
+          <div className="flex items-center justify-center gap-3 mb-5">
             <button
               onClick={() => setIsAnnual(false)}
               className={`px-6 py-2 rounded-full font-medium transition-all ${
@@ -224,12 +224,12 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose, onUserUpdate: 
           </div>
 
           {/* Pricing card */}
-          <div className="max-w-md mx-auto mb-8">
-            <div className={`${isPage ? 'bg-gray-900/50' : 'bg-gradient-to-br from-purple-50 to-blue-50'} rounded-xl p-8 border-2 ${isPage ? 'border-purple-700/50' : 'border-purple-200'}`}>
-              <div className="text-center mb-6">
-                <div className={`text-5xl font-bold ${isPage ? 'text-white' : 'text-gray-900'} mb-2`}>
+          <div className="max-w-md mx-auto mb-5">
+            <div className={`${isPage ? 'bg-gray-900/50' : 'bg-gradient-to-br from-purple-50 to-blue-50'} rounded-xl p-6 border-2 ${isPage ? 'border-purple-700/50' : 'border-purple-200'}`}>
+              <div className="text-center mb-4">
+                <div className={`text-4xl font-bold ${isPage ? 'text-white' : 'text-gray-900'} mb-1`}>
                   {isAnnual ? annualPrice : monthlyPrice}
-                  <span className={`text-2xl ${isPage ? 'text-gray-400' : 'text-gray-600'} font-normal`}>
+                  <span className={`text-xl ${isPage ? 'text-gray-400' : 'text-gray-600'} font-normal`}>
                     /{isAnnual ? 'year' : 'month'}
                   </span>
                 </div>
@@ -243,7 +243,7 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose, onUserUpdate: 
               <button
                 onClick={() => handleUpgrade(isAnnual ? 'annual' : 'monthly')}
                 disabled={!paddleLoaded || !pricing}
-                className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-4 px-8 rounded-lg shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed mb-4"
+                className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-8 rounded-lg shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed mb-3"
               >
                 {!paddleLoaded ? 'Loading...' : !pricing ? 'Pricing unavailable' : 'Start Learning Now'}
               </button>
@@ -252,14 +252,14 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose, onUserUpdate: 
 
           {/* Features list */}
           <div className="max-w-2xl mx-auto">
-            <h3 className={`text-xl font-semibold ${isPage ? 'text-white' : 'text-gray-900'} mb-4 text-center`}>
+            <h3 className={`text-base font-semibold ${isPage ? 'text-white' : 'text-gray-900'} mb-3 text-center`}>
               Everything you need to master a new language
             </h3>
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="grid md:grid-cols-2 gap-2.5">
               {features.map((feature, i) => (
-                <div key={i} className="flex items-start gap-3">
+                <div key={i} className="flex items-start gap-2">
                   <svg
-                    className={`w-6 h-6 ${isPage ? 'text-purple-400' : 'text-purple-600'} flex-shrink-0 mt-0.5`}
+                    className={`w-5 h-5 ${isPage ? 'text-purple-400' : 'text-purple-600'} flex-shrink-0 mt-0.5`}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -278,7 +278,7 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose, onUserUpdate: 
           </div>
 
           {/* Free trial info */}
-          <div className={`mt-8 text-center text-sm ${isPage ? 'text-gray-400' : 'text-gray-500'}`}>
+          <div className={`mt-5 text-center text-sm ${isPage ? 'text-gray-400' : 'text-gray-500'}`}>
             <p>
               Already subscribed?{' '}
               <button
