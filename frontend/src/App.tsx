@@ -2473,17 +2473,53 @@ function PlayerView({
   const { language, setLanguage } = useLocalization()
 
   // ── Tutorial ──────────────────────────────────────────────────────────────────
-  const tutorialSteps: TutorialStep[] = [
-    { id: 'lyrics-word',        target: '[data-tutorial="lyrics-word"]',        text: t('tutorial.word'),          padding: 8, scrollIntoView: true, interactive: true },
-    { id: 'lyrics-word-peek',   target: '[data-tutorial="lyrics-word-peek"]',   text: t('tutorial.peek'),          padding: 8, interactive: true },
-    { id: 'line-translate',     target: '[data-tutorial="line-translate"]',     text: t('tutorial.lineTranslate'), padding: 10, side: 'right', interactive: true },
-    { id: 'apple-music-toggle', target: '[data-tutorial="apple-music-toggle"]', text: t('tutorial.sourceToggle'), padding: 6, side: 'bottom' },
-    { id: 'shortcuts-panel',    target: '[data-tutorial="shortcuts-panel"]',    text: t('tutorial.shortcuts'),    padding: 8, side: 'left' },
-  ]
+  const tutorialSteps: TutorialStep[] = useMemo(() => {
+    const steps: TutorialStep[] = [
+      { 
+        id: 'lyrics-word',
+        target: '[data-tutorial="lyrics-word"]',
+        text: isMobileView 
+          ? 'Tap any word to see its definition, translation, and hear its pronunciation.'
+          : t('tutorial.word'),
+        padding: 8,
+        scrollIntoView: true,
+        interactive: true
+      },
+      { 
+        id: 'lyrics-word-peek',
+        target: '[data-tutorial="lyrics-word-peek"]',
+        text: isMobileView
+          ? 'Tap and hold a word to quickly peek at its translation without opening the full panel.'
+          : t('tutorial.peek'),
+        padding: 8,
+        interactive: true
+      },
+      { 
+        id: 'line-translate',
+        target: '[data-tutorial="line-translate"]',
+        text: isMobileView
+          ? 'Tap this icon to see the full line translation.'
+          : t('tutorial.lineTranslate'),
+        padding: 10,
+        side: 'right' as const,
+        interactive: true
+      },
+      { id: 'apple-music-toggle', target: '[data-tutorial="apple-music-toggle"]', text: t('tutorial.sourceToggle'), padding: 6, side: 'bottom' as const },
+    ]
+    
+    // Only show shortcuts step on desktop
+    if (!isMobileView) {
+      steps.push({ id: 'shortcuts-panel', target: '[data-tutorial="shortcuts-panel"]', text: t('tutorial.shortcuts'), padding: 8, side: 'left' as const })
+    }
+    
+    return steps
+  }, [isMobileView, t])
 
   // Autopause when tutorial starts
   useEffect(() => {
-    if (showPlayerTutorial && isPlaying) togglePlay()
+    if (showPlayerTutorial && isPlaying) {
+      togglePlay()
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showPlayerTutorial])
 
