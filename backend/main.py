@@ -3879,6 +3879,52 @@ def list_admin_reports(
     return result
 
 
+# ── Analytics tracking (Plausible) ────────────────────────────────────────────
+
+def track_backend_event(
+    event_name: str,
+    props: Optional[dict[str, str | int | bool]] = None,
+    user_id: Optional[int] = None,
+) -> None:
+    """
+    Send a server-side event to Plausible Analytics.
+    This is for backend-only events (e.g., subscription webhooks).
+    """
+    try:
+        import requests
+        
+        payload = {
+            "domain": "singoling.com",
+            "name": event_name,
+            "url": "https://singoling.com/api/webhook",  # Generic backend URL
+        }
+        
+        if props:
+            payload["props"] = props
+        
+        # Add user_id as a prop if provided
+        if user_id is not None:
+            if "props" not in payload:
+                payload["props"] = {}
+            payload["props"]["user_id"] = user_id
+        
+        response = requests.post(
+            "https://plausible.io/api/event",
+            json=payload,
+            headers={
+                "User-Agent": "SingoLing-Backend/1.0",
+                "Content-Type": "application/json",
+            },
+            timeout=5,
+        )
+        
+        if response.status_code != 202:
+            print(f"[Analytics] Plausible returned {response.status_code}: {response.text}")
+    except Exception as e:
+        # Never let analytics failures affect the application
+        print(f"[Analytics] Failed to track event '{event_name}': {e}")
+
+
 # ── Paddle webhook endpoint ────────────────────────────────────────────────────
 @app.post("/api/webhooks/paddle")
 async def paddle_webhook(request: Request, db: Session = Depends(get_db)):
@@ -4011,6 +4057,16 @@ async def paddle_webhook(request: Request, db: Session = Depends(get_db)):
         
         db.commit()
         print(f"Subscription created for user_id={user_id}, subscription_id={subscription_id}")
+        
+        # Track subscription activation
+        track_backend_event(
+            "Subscription Activated",
+            props={
+                "tier": tier,
+                "platform": "paddle",
+            },
+            user_id=user_id,
+        )
     
     elif event_type == 'subscription.updated':
         subscription_id = data.get('id')
@@ -4019,6 +4075,7 @@ async def paddle_webhook(request: Request, db: Session = Depends(get_db)):
         scheduled_change = data.get('scheduled_change')
         
         # Map Paddle status to our status
+        previous_status = user.subscription_status
         if status == 'active':
             user.subscription_status = 'active'
         elif status == 'past_due':
@@ -4039,6 +4096,18 @@ async def paddle_webhook(request: Request, db: Session = Depends(get_db)):
         
         db.commit()
         print(f"Subscription updated for user_id={user_id}, status={status}")
+        
+        # Track subscription activation if status changed to active
+        if status == 'active' and previous_status != 'active':
+            track_backend_event(
+                "Subscription Activated",
+                props={
+                    "tier": user.subscription_tier,
+                    "platform": "paddle",
+                    "reason": "reactivation",
+                },
+                user_id=user_id,
+            )
     
     elif event_type == 'subscription.canceled':
         # Subscription canceled - user retains access until expiry date
@@ -4047,6 +4116,16 @@ async def paddle_webhook(request: Request, db: Session = Depends(get_db)):
         
         db.commit()
         print(f"Subscription canceled for user_id={user_id}")
+        
+        # Track subscription cancellation
+        track_backend_event(
+            "Subscription Canceled",
+            props={
+                "tier": user.subscription_tier,
+                "platform": "paddle",
+            },
+            user_id=user_id,
+        )
     
     elif event_type == 'subscription.past_due':
         user.subscription_status = 'past_due'
