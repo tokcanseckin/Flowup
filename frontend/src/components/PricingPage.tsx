@@ -116,10 +116,10 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose, onUserUpdate: 
 
   const features = [
     'Super fast and interactive translation along synced lyrics',
+    'Curated songs for your level',
     'Instant definition lookups & quick keyboard shortcuts',
     'Instant full-line translations',
     'Unlimited songs in all languages',
-    'Curated songs for your level',
     'Translate to all language options for each playlist',
   ]
 
