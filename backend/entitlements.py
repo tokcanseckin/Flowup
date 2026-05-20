@@ -20,7 +20,7 @@ def is_subscription_active(user: User) -> bool:
     if user.subscription_status != 'active':
         return False
     
-    if user.subscription_expires_at and user.subscription_expires_at < datetime.now(timezone.utc):
+    if user.subscription_expires_at and user.subscription_expires_at.replace(tzinfo=timezone.utc) < datetime.now(timezone.utc):
         return False
     
     return True
