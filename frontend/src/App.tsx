@@ -1013,8 +1013,8 @@ function SongBrowser({
                             }
                           </div>
                           <div className="min-w-0 flex-1">
-                            <p className="text-white font-semibold truncate">{song.title}</p>
-                            <p className="text-gray-500 text-sm truncate">{song.artist ?? t('browser.unknownArtist')}</p>
+                            <p className="text-white font-semibold break-words line-clamp-2 md:truncate">{song.title}</p>
+                            <p className="text-gray-500 text-sm break-words line-clamp-1 md:truncate">{song.artist ?? t('browser.unknownArtist')}</p>
                           </div>
                           {favoriteSongIds.has(song.id) && (
                             <svg viewBox="0 0 24 24" className="shrink-0 w-4 h-4" fill="#f87171" aria-label="Favorited">
@@ -1136,8 +1136,8 @@ function SongBrowser({
                             }
                           </div>
                           <div className="min-w-0 flex-1">
-                            <p className="text-white font-semibold truncate">{song.title}</p>
-                            <p className="text-gray-500 text-sm truncate">{song.artist ?? t('browser.unknownArtist')}</p>
+                            <p className="text-white font-semibold break-words line-clamp-2 md:truncate">{song.title}</p>
+                            <p className="text-gray-500 text-sm break-words line-clamp-1 md:truncate">{song.artist ?? t('browser.unknownArtist')}</p>
                           </div>
                           {favoriteSongIds.has(song.id) && (
                             <svg viewBox="0 0 24 24" className="shrink-0 w-4 h-4" fill="#f87171" aria-label="Favorited">
@@ -1246,8 +1246,8 @@ function SongBrowser({
                     }
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-white font-semibold truncate">{song.title}</p>
-                    <p className="text-gray-500 text-sm truncate">{song.artist ?? t('browser.unknownArtist')}</p>
+                    <p className="text-white font-semibold break-words line-clamp-2 md:truncate">{song.title}</p>
+                    <p className="text-gray-500 text-sm break-words line-clamp-1 md:truncate">{song.artist ?? t('browser.unknownArtist')}</p>
                   </div>
                   {favoriteSongIds.has(song.id) && (
                     <svg viewBox="0 0 24 24" className="shrink-0 w-4 h-4" fill="#f87171" aria-label="Favorited">
@@ -1372,7 +1372,7 @@ function SongBrowser({
       </header>
 
       {/* Content */}
-      <div className="px-3 sm:px-4 pt-6 pb-10 max-w-[972px] mx-auto">
+      <div className="px-3 sm:px-4 lg:px-8 pt-6 pb-10 max-w-[1400px] mx-auto">
         {activePlaylistId !== null && activePlaylist === null && loading ? (
           <div className="flex gap-8 items-start">
             {/* Left skeleton */}
