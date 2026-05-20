@@ -857,7 +857,7 @@ const LANG_FLAG: Record<string, string> = {
 function langFlag(code: string): string { return LANG_FLAG[code] ?? '🌐' }
 
 function SongBrowser({
-  songs, playlists, activePlaylistId, activePlaylist, loading, error, onSelect, onPrefetch, onSelectPlaylist, onLogout, onOpenSettings, onOpenAdmin, onOpenAccount, isAdmin, user, openedSongIds, favoriteSongIds, toggleFavorite, markAsNotListened, wordsLookedUpCount, onBrowseTargetLang,
+  songs, playlists, activePlaylistId, activePlaylist, loading, error, onSelect, onPrefetch, onSelectPlaylist, onLogout, onOpenSettings, onOpenAdmin, onOpenAccount, isAdmin, user, openedSongIds, favoriteSongIds, toggleFavorite, markAsNotListened, wordsLookedUpCount, onBrowseTargetLang, navigateToPath, track,
 }: {
   songs: SongSummary[]
   playlists: PlaylistSummary[]
@@ -880,6 +880,8 @@ function SongBrowser({
   markAsNotListened: (id: number) => void
   wordsLookedUpCount: number
   onBrowseTargetLang: (musicLang: string, targetLang: string) => void
+  navigateToPath: (path: string) => void
+  track: (event: string, props?: Record<string, string | number | boolean>) => void
 }) {
   const t = useT()
   const tc = useContentT()
@@ -970,14 +972,10 @@ function SongBrowser({
               {/* Trial Songs section */}
               {songs.slice(0, 2).length > 0 && (
                 <>
-                  <div className="flex items-center gap-2 px-3 py-2 mt-1 mb-1">
-                    <div className="flex items-center gap-2 flex-1">
-                      <div className="h-px flex-1" style={{ background: 'linear-gradient(to right, transparent, rgba(74, 222, 128, 0.3), transparent)' }} />
-                      <span className="text-xs font-semibold uppercase tracking-wider px-2" style={{ color: '#4ade80' }}>
-                        Trial Songs
-                      </span>
-                      <div className="h-px flex-1" style={{ background: 'linear-gradient(to left, transparent, rgba(74, 222, 128, 0.3), transparent)' }} />
-                    </div>
+                  <div className="rounded-xl px-4 py-2.5 mb-2 mt-1" style={{ background: '#006D36' }}>
+                    <span className="text-xs font-semibold uppercase tracking-wider text-white">
+                      Trial Songs
+                    </span>
                   </div>
                   {songs.slice(0, 2).map(song => (
                     <div
@@ -1090,14 +1088,17 @@ function SongBrowser({
               {/* Premium List section */}
               {songs.slice(2).length > 0 && (
                 <>
-                  <div className="flex items-center gap-2 px-3 py-2 mt-4 mb-1">
-                    <div className="flex items-center gap-2 flex-1">
-                      <div className="h-px flex-1" style={{ background: 'linear-gradient(to right, transparent, rgba(99, 102, 241, 0.3), transparent)' }} />
-                      <span className="text-xs font-semibold uppercase tracking-wider px-2" style={{ color: '#818cf8' }}>
-                        Premium List
-                      </span>
-                      <div className="h-px flex-1" style={{ background: 'linear-gradient(to left, transparent, rgba(99, 102, 241, 0.3), transparent)' }} />
-                    </div>
+                  <div className="rounded-xl px-4 py-2.5 mb-2 mt-4 flex items-center justify-between bg-indigo-600">
+                    <span className="text-xs font-semibold uppercase tracking-wider text-white">
+                      Premium List
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => { navigateToPath('/subscriptions'); track('Premium List Header Upgrade Clicked', { playlist_id: activePlaylistId ?? '' }) }}
+                      className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-white text-indigo-600 hover:bg-gray-100 transition-colors"
+                    >
+                      Upgrade
+                    </button>
                   </div>
                   {songs.slice(2).map(song => (
                     <div
@@ -3888,6 +3889,8 @@ export default function App() {
         markAsNotListened={unmarkListened}
         wordsLookedUpCount={playlistWordCount}
         onBrowseTargetLang={handleBrowseTargetLang}
+        navigateToPath={navigateToPath}
+        track={track}
       />
       <HelpButton />
     </>
