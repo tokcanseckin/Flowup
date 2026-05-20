@@ -2926,7 +2926,7 @@ function PlayerView({
         </div>
       </header>
 
-      <main className="flex-1 min-h-0 md:p-4 max-w-[1200px] mx-auto w-full flex flex-col md:gap-3">
+      <main className={`flex-1 min-h-0 max-w-[1200px] mx-auto w-full flex flex-col ${isMobileView ? '' : 'p-4 gap-3'}`}>
 
         {/* Mobile YouTube - positioned at top, only rendered on mobile */}
         {isMobileView && hasYouTubePanel && showRightMediaPanel && (
@@ -2942,17 +2942,18 @@ function PlayerView({
           </div>
         )}
 
-        {/* Desktop grid */}
-        <div
-          className="controls-media-row hidden md:grid"
-          style={{
-            ['--media-col' as string]: hasYouTubePanel ? (showRightMediaPanel ? '410px' : '0px') : '0px',
-            ['--media-gap' as string]: showRightMediaPanel ? '0.75rem' : '0px',
-          }}
-        >
+        {/* Desktop grid - only rendered on desktop */}
+        {!isMobileView && (
+          <div
+            className="controls-media-row grid"
+            style={{
+              ['--media-col' as string]: hasYouTubePanel ? (showRightMediaPanel ? '410px' : '0px') : '0px',
+              ['--media-gap' as string]: showRightMediaPanel ? '0.75rem' : '0px',
+            }}
+          >
 
-          {/* Player controls */}
-          <section className="relative rounded-md border border-zinc-700/70 p-6 min-w-0 min-h-[210px] lg:min-h-[240px]" style={{ background: '#25262b' }}>
+            {/* Player controls - desktop only */}
+            <section className="relative rounded-md border border-zinc-700/70 p-6 min-w-0 min-h-[210px] lg:min-h-[240px]" style={{ background: '#25262b' }}>
           {/* 3-dot options menu — upper right corner */}
           <div className="absolute top-3 right-3 z-10">
               <button
@@ -3094,51 +3095,54 @@ function PlayerView({
             </aside>
           )}
 
-        </div>{/* end controls + media row */}
+          </div>
+        )}{/* end controls + media row */}
 
         {/* Mobile-only simplified player controls */}
-        <section className="md:hidden py-3 px-4 flex items-center justify-center gap-6" style={{ background: '#25262b' }}>
-          <button
-            onClick={() => { track('Previous Song'); handlePrev() }}
-            disabled={!canPrev}
-            aria-label="Previous song"
-            className="w-12 h-12 rounded-full flex items-center justify-center active:bg-black/20 disabled:opacity-40 disabled:cursor-not-allowed text-gray-100 transition-all"
-          >
-            <img src={prevIconImg} className="w-7 h-7 object-contain" alt="" />
-          </button>
-          <button
-            onClick={togglePlay}
-            disabled={!isReady}
-            aria-label={isPlaying ? 'Pause' : 'Play'}
-            className="
-              w-16 h-16 rounded-full flex items-center justify-center
-              bg-white active:bg-zinc-200 active:scale-95
-              disabled:bg-zinc-700 disabled:text-zinc-500
-              text-black shadow-lg transition-all duration-150
-            "
-          >
-            {pendingPlay && !isPlaying ? (
-              <div className="w-5 h-5 border-2 border-zinc-400/60 border-t-black rounded-full animate-spin" />
-            ) : isPlaying ? (
-              <svg viewBox="0 0 24 24" className="w-9 h-9 fill-current">
-                <rect x="6" y="5" width="4" height="14" rx="1.5"/>
-                <rect x="14" y="5" width="4" height="14" rx="1.5"/>
-              </svg>
-            ) : (
-              <svg viewBox="0 0 24 24" className="w-9 h-9 fill-current">
-                <path d="M6 3.5v17l14-8.5z"/>
-              </svg>
-            )}
-          </button>
-          <button
-            onClick={() => { track('Next Song', { trigger: 'button' }); handleNext() }}
-            disabled={!canNext}
-            aria-label="Next song"
-            className="w-12 h-12 rounded-full flex items-center justify-center active:bg-black/20 disabled:opacity-40 disabled:cursor-not-allowed text-gray-100 transition-all"
-          >
-            <img src={nextIconImg} className="w-7 h-7 object-contain" alt="" />
-          </button>
-        </section>
+        {isMobileView && (
+          <section className="py-3 px-4 flex items-center justify-center gap-6" style={{ background: '#25262b' }}>
+            <button
+              onClick={() => { track('Previous Song'); handlePrev() }}
+              disabled={!canPrev}
+              aria-label="Previous song"
+              className="w-12 h-12 rounded-full flex items-center justify-center active:bg-black/20 disabled:opacity-40 disabled:cursor-not-allowed text-gray-100 transition-all"
+            >
+              <img src={prevIconImg} className="w-7 h-7 object-contain" alt="" />
+            </button>
+            <button
+              onClick={togglePlay}
+              disabled={!isReady}
+              aria-label={isPlaying ? 'Pause' : 'Play'}
+              className="
+                w-16 h-16 rounded-full flex items-center justify-center
+                bg-white active:bg-zinc-200 active:scale-95
+                disabled:bg-zinc-700 disabled:text-zinc-500
+                text-black shadow-lg transition-all duration-150
+              "
+            >
+              {pendingPlay && !isPlaying ? (
+                <div className="w-5 h-5 border-2 border-zinc-400/60 border-t-black rounded-full animate-spin" />
+              ) : isPlaying ? (
+                <svg viewBox="0 0 24 24" className="w-9 h-9 fill-current">
+                  <rect x="6" y="5" width="4" height="14" rx="1.5"/>
+                  <rect x="14" y="5" width="4" height="14" rx="1.5"/>
+                </svg>
+              ) : (
+                <svg viewBox="0 0 24 24" className="w-9 h-9 fill-current">
+                  <path d="M6 3.5v17l14-8.5z"/>
+                </svg>
+              )}
+            </button>
+            <button
+              onClick={() => { track('Next Song', { trigger: 'button' }); handleNext() }}
+              disabled={!canNext}
+              aria-label="Next song"
+              className="w-12 h-12 rounded-full flex items-center justify-center active:bg-black/20 disabled:opacity-40 disabled:cursor-not-allowed text-gray-100 transition-all"
+            >
+              <img src={nextIconImg} className="w-7 h-7 object-contain" alt="" />
+            </button>
+          </section>
+        )}
 
         {/* Apple Music player — audio-only when playing; visible when auth/error UI is needed */}
         {effectiveSource === 'apple_music' && song.apple_music_url && (
@@ -3156,7 +3160,7 @@ function PlayerView({
         )}
 
         {/* Lyrics panel — mobile: full screen scrollable, desktop: rounded with padding */}
-        <section className="md:rounded-md overflow-hidden flex-1 min-h-0 flex flex-col" style={{ background: lyricsTheme.panelGradient }}>
+        <section className={`overflow-hidden flex-1 min-h-0 flex flex-col ${isMobileView ? '' : 'rounded-md'}`} style={{ background: lyricsTheme.panelGradient }}>
           <LyricsPlayer
             currentPositionMs={positionMs}
             durationMs={durationMs}
