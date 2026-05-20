@@ -2455,6 +2455,19 @@ function PlayerView({
   const tutorialRef = useRef<TutorialHandle>(null)
   const tutorialStepRef = useRef(0)
   const autoPausedRef = useRef(false)
+  
+  // Track mobile vs desktop for YouTube player positioning
+  const [isMobileView, setIsMobileView] = useState(() => {
+    if (typeof window === 'undefined') return false
+    return window.innerWidth < 768
+  })
+  
+  useEffect(() => {
+    const handleResize = () => setIsMobileView(window.innerWidth < 768)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+  
   const t = useT()
   const { language, setLanguage } = useLocalization()
 
@@ -2915,25 +2928,21 @@ function PlayerView({
 
       <main className="flex-1 min-h-0 md:p-4 max-w-[1200px] mx-auto w-full flex flex-col md:gap-3">
 
-        {/* YouTube video component — mobile: full width, no padding/border. Desktop: side-by-side grid */}
-        {hasYouTubePanel && (
-          <aside
-            className={`overflow-hidden bg-black min-h-[200px] md:hidden ${showRightMediaPanel ? 'block' : 'hidden'}`}
-          >
-            {showRightMediaPanel ? (
-              <YouTubePlayer
-                ref={ytRef}
-                youtubeUrl={song.youtube_url!}
-                onReady={handleYtReady}
-                onTimeUpdate={setYtPositionMs}
-                onDurationChange={setYtDurationMs}
-                onPlayStateChange={handleYtPlayStateChange}
-              />
-            ) : null}
-          </aside>
+        {/* Mobile YouTube - positioned at top, only rendered on mobile */}
+        {isMobileView && hasYouTubePanel && showRightMediaPanel && (
+          <div className="overflow-hidden bg-black min-h-[200px]">
+            <YouTubePlayer
+              ref={ytRef}
+              youtubeUrl={song.youtube_url!}
+              onReady={handleYtReady}
+              onTimeUpdate={setYtPositionMs}
+              onDurationChange={setYtDurationMs}
+              onPlayStateChange={handleYtPlayStateChange}
+            />
+          </div>
         )}
 
-        {/* Controls + YouTube row (desktop only) */}
+        {/* Desktop grid */}
         <div
           className="controls-media-row hidden md:grid"
           style={{
@@ -2942,7 +2951,7 @@ function PlayerView({
           }}
         >
 
-          {/* Player controls — takes remaining width */}
+          {/* Player controls */}
           <section className="relative rounded-md border border-zinc-700/70 p-6 min-w-0 min-h-[210px] lg:min-h-[240px]" style={{ background: '#25262b' }}>
           {/* 3-dot options menu — upper right corner */}
           <div className="absolute top-3 right-3 z-10">
@@ -3062,7 +3071,8 @@ function PlayerView({
           </div>
         </section>
 
-          {hasYouTubePanel && (
+          {/* Desktop YouTube panel - only rendered on desktop */}
+          {!isMobileView && hasYouTubePanel && (
             <aside
               className={`overflow-hidden bg-black min-h-[210px] lg:min-h-[240px] min-w-0 transition-[opacity,transform,border-color] duration-300 ease-out flex flex-col ${
                 showRightMediaPanel
@@ -3071,7 +3081,7 @@ function PlayerView({
               }`}
               aria-hidden={!showRightMediaPanel}
             >
-              {showRightMediaPanel ? (
+              {showRightMediaPanel && (
                 <YouTubePlayer
                   ref={ytRef}
                   youtubeUrl={song.youtube_url!}
@@ -3080,7 +3090,7 @@ function PlayerView({
                   onDurationChange={setYtDurationMs}
                   onPlayStateChange={handleYtPlayStateChange}
                 />
-              ) : null}
+              )}
             </aside>
           )}
 
