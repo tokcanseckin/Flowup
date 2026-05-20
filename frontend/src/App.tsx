@@ -1394,7 +1394,7 @@ function SongBrowser({
             </div>
           </div>
         ) : activePlaylist ? (
-          <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
+          <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 lg:items-start">
             {/* Left column — playlist detail */}
             <div className="w-full lg:w-80 shrink-0 lg:sticky lg:top-20 lg:overflow-y-auto lg:no-scrollbar lg:pb-10" style={{ maxHeight: 'calc(100vh - 5rem)' }}>
               {/* Spacer — matches height of the "Songs" heading row in the right column (desktop only) */}
