@@ -25,6 +25,8 @@ interface LyricsLockScreenProps {
   songId?: number
   /** Position in playlist (0-indexed) for analytics tracking */
   positionInPlaylist?: number
+  /** Hide message text on mobile */
+  isMobileView?: boolean
 }
 
 const LyricsLockScreen: React.FC<LyricsLockScreenProps> = ({
@@ -39,6 +41,7 @@ const LyricsLockScreen: React.FC<LyricsLockScreenProps> = ({
   backButtonText = 'Back to Trial Songs',
   songId,
   positionInPlaylist,
+  isMobileView = false,
 }) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const activeLineRef = useRef<number>(-1)
@@ -144,10 +147,12 @@ const LyricsLockScreen: React.FC<LyricsLockScreenProps> = ({
             {title}
           </h2>
 
-          {/* Message */}
-          <p className="text-base sm:text-lg md:text-xl text-gray-300 leading-relaxed max-w-lg mx-auto">
-            {message}
-          </p>
+          {/* Message - hidden on mobile */}
+          {!isMobileView && (
+            <p className="text-base sm:text-lg md:text-xl text-gray-300 leading-relaxed max-w-lg mx-auto">
+              {message}
+            </p>
+          )}
 
           {/* Features list (if provided) */}
           {features && features.length > 0 && (

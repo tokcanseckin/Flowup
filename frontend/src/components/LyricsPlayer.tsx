@@ -984,8 +984,8 @@ export default function LyricsPlayer({
         </aside>
       )}
 
-      {/* Lyrics Lock Screen - shown when subscription required (hidden on mobile) */}
-      {!isMobileView && songData.lyrics_unlocked === false && songData.upgrade_cta && (
+      {/* Lyrics Lock Screen - shown when subscription required */}
+      {songData.lyrics_unlocked === false && songData.upgrade_cta && (
         <LyricsLockScreen
           lyrics={lines}
           currentTime={currentPositionMs}
@@ -995,6 +995,7 @@ export default function LyricsPlayer({
           upgradeButtonText={songData.upgrade_cta.cta}
           songId={songData.id}
           positionInPlaylist={positionInPlaylist}
+          isMobileView={isMobileView}
           onUpgrade={() => {
             track('Upgrade Selected', {
               song_id: songData.id,
