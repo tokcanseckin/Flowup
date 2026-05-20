@@ -42,10 +42,12 @@ const LyricsLockScreen: React.FC<LyricsLockScreenProps> = ({
 
   // Track paywall view on mount
   useEffect(() => {
-    track('Paywall Hit', {
-      song_id: songId,
-      source: 'lyrics_lock_screen',
-    })
+    if (songId !== undefined) {
+      track('Paywall Hit', {
+        song_id: songId,
+        source: 'lyrics_lock_screen',
+      })
+    }
   }, [songId])
 
   // Auto-scroll to current line
