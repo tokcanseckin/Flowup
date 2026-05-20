@@ -932,11 +932,6 @@ function SongBrowser({
     return () => window.removeEventListener('click', close)
   }, [openMenuSongId])
 
-  useEffect(() => {
-    if (!nativeLang) return
-    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
-  }, [nativeLang])
-
   const songList = (
     <>
       {error && (
