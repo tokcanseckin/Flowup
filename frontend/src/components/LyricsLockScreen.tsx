@@ -115,7 +115,7 @@ const LyricsLockScreen: React.FC<LyricsLockScreenProps> = ({
       </div>
 
       {/* Dark gradient overlay with backdrop blur */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/85 to-black/90 backdrop-blur-md" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/85 to-black/90 backdrop-blur-md md:backdrop-blur-xl" />
 
       {/* Lock screen content */}
       <div className="absolute inset-0 flex items-center justify-center p-4">
@@ -140,23 +140,23 @@ const LyricsLockScreen: React.FC<LyricsLockScreenProps> = ({
           </div>
 
           {/* Title */}
-          <h2 className="text-2xl md:text-3xl font-bold text-white leading-tight">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white leading-tight">
             {title}
           </h2>
 
           {/* Message */}
-          <p className="text-base text-gray-300 leading-relaxed max-w-lg mx-auto">
+          <p className="text-base sm:text-lg md:text-xl text-gray-300 leading-relaxed max-w-lg mx-auto">
             {message}
           </p>
 
           {/* Features list (if provided) */}
           {features && features.length > 0 && (
             <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 w-auto inline-block mx-auto">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3 md:gap-y-2">
                 {features.map((feature, i) => (
-                  <div key={i} className="flex items-start gap-2 text-left">
+                  <div key={i} className="flex items-start gap-3 text-left">
                     <svg
-                      className="w-4 h-4 text-purple-400 flex-shrink-0 mt-0.5"
+                      className="w-5 h-5 md:w-4 md:h-4 text-purple-400 flex-shrink-0 mt-0.5"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -168,7 +168,7 @@ const LyricsLockScreen: React.FC<LyricsLockScreenProps> = ({
                         d="M5 13l4 4L19 7"
                       />
                     </svg>
-                    <span className="text-gray-200 text-sm whitespace-nowrap">{feature}</span>
+                    <span className="text-gray-200 text-sm md:text-xs whitespace-nowrap">{feature}</span>
                   </div>
                 ))}
               </div>
@@ -180,7 +180,7 @@ const LyricsLockScreen: React.FC<LyricsLockScreenProps> = ({
             {/* Primary: Upgrade */}
             <button
               onClick={onUpgrade}
-              className="w-full sm:w-auto px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+              className="w-full sm:w-auto px-6 py-4 md:py-3 text-base md:text-sm bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
             >
               {upgradeButtonText}
             </button>
@@ -189,7 +189,7 @@ const LyricsLockScreen: React.FC<LyricsLockScreenProps> = ({
             {onBackToTrial && (
               <button
                 onClick={onBackToTrial}
-                className="w-full sm:w-auto px-6 py-3 bg-white/10 hover:bg-white/20 text-white font-medium rounded-lg backdrop-blur-sm transition-all border border-white/20"
+                className="w-full sm:w-auto px-6 py-4 md:py-3 text-base md:text-sm bg-white/10 hover:bg-white/20 text-white font-medium rounded-lg backdrop-blur-sm transition-all border border-white/20"
               >
                 {backButtonText}
               </button>
