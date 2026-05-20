@@ -1357,9 +1357,13 @@ function SongBrowser({
             <button
               type="button"
               onClick={onOpenSettings}
-              className="text-xs text-gray-500 hover:text-gray-200 transition-colors"
+              className="text-xs text-gray-500 hover:text-gray-200 transition-colors flex items-center gap-1.5"
             >
-              {t('nav.preferences')}
+              <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="3" />
+                <path d="M12 1v6m0 6v6m5.5-13l-3 5.2m-3 5.6l-3 5.2m8.5-16.4l-5.2 3m-5.6 3l-5.2 3m16.4 8.5l-3-5.2m-5.6-3l-3-5.2m13 5.5h-6m-6 0H1m16.4 8.5l-5.2-3m-5.6-3l-5.2-3" />
+              </svg>
+              <span className="hidden sm:inline">{t('nav.preferences')}</span>
             </button>
             {user?.display_name && (
               <button type="button" onClick={onOpenAccount} className="text-xs text-gray-500 hover:text-gray-300 transition-colors truncate hidden sm:inline-block max-w-[140px] md:max-w-[180px]">{user.display_name}</button>
