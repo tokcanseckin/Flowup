@@ -3734,6 +3734,11 @@ export default function App() {
 
   // Subscriptions page requires authentication
   if (currentPath.startsWith('/subscriptions') && isAuthenticated) {
+    // Redirect premium users to settings/subscription instead
+    if (credentialUser && credentialUser.subscription_tier !== 'free') {
+      navigateToPath('/settings/subscription')
+      return null
+    }
     return (
       <PricingPage
         user={credentialUser}

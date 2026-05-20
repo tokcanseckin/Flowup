@@ -116,11 +116,9 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose, onUserUpdate: 
 
   const features = [
     'Interactive word-by-word translations',
-    'Instant definitions with keyboard shortcuts (D key)',
+    'Instant definition lookups & quick keyboard shortcuts',
     'Full-line translations in your language',
     'Unlimited songs in all languages',
-    'Ad-free experience',
-    'Priority support',
   ]
 
   // Format price from cents to display format
@@ -187,7 +185,7 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose, onUserUpdate: 
         <div className="p-6 md:p-8">
           {/* Header */}
           <div className="text-center mb-6 md:mb-5">
-            <h1 className={`text-2xl md:text-4xl font-bold ${isPage ? 'text-white' : 'text-gray-900'} mb-2 px-2`}>
+            <h1 className={`text-2xl md:text-4xl font-bold ${isPage ? 'text-white' : 'text-gray-900'} mb-2 ${isPage ? 'pl-12 pr-2' : 'px-2'}`}>
               Upgrade to Premium
             </h1>
             <p className={`text-base md:text-base ${isPage ? 'text-gray-300' : 'text-gray-600'} max-w-2xl mx-auto px-2`}>
@@ -275,19 +273,6 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose, onUserUpdate: 
                 </div>
               ))}
             </div>
-          </div>
-
-          {/* Free trial info */}
-          <div className={`mt-6 md:mt-5 text-center text-sm pb-2 ${isPage ? 'text-gray-400' : 'text-gray-500'}`}>
-            <p>
-              Already subscribed?{' '}
-              <button
-                onClick={onClose}
-                className={`${isPage ? 'text-purple-400 hover:text-purple-300' : 'text-purple-600 hover:text-purple-700'} font-medium underline`}
-              >
-                Continue learning
-              </button>
-            </p>
           </div>
         </div>
       </div>
