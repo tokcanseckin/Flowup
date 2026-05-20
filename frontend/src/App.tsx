@@ -2925,7 +2925,7 @@ function PlayerView({
         >
 
           {/* Player controls — takes remaining width */}
-          <section className="relative rounded-md border border-zinc-700/70 p-6 min-w-0 min-h-[210px] lg:min-h-[240px]" style={{ background: '#25262b' }}>
+          <section className={`relative rounded-md border border-zinc-700/70 p-6 min-w-0 ${hasYouTubePanel ? 'min-h-[210px] lg:min-h-[240px]' : 'min-h-[160px] lg:min-h-[240px]'}`} style={{ background: '#25262b' }}>
           {/* 3-dot options menu — upper right corner */}
           <div className="absolute top-3 right-3 z-10">
               <button
