@@ -984,7 +984,7 @@ function SongBrowser({
                         onPointerEnter={() => onPrefetch(song.id)}
                         onKeyDown={e => e.key === 'Enter' && onSelect(song.id)}
                         className="
-                          w-full text-left rounded-2xl border border-zinc-700/70 p-3
+                          w-full text-left rounded-2xl border border-zinc-700/70 p-4 md:p-3
                           active:scale-[0.99] transition-all duration-150 cursor-pointer
                         "
                         style={{ background: '#25262b' }}
@@ -1107,7 +1107,7 @@ function SongBrowser({
                         onPointerEnter={() => onPrefetch(song.id)}
                         onKeyDown={e => e.key === 'Enter' && onSelect(song.id)}
                         className="
-                          w-full text-left rounded-2xl border border-zinc-700/70 p-3
+                          w-full text-left rounded-2xl border border-zinc-700/70 p-4 md:p-3
                           active:scale-[0.99] transition-all duration-150 cursor-pointer
                         "
                         style={{ background: '#25262b' }}
@@ -1217,7 +1217,7 @@ function SongBrowser({
                 onPointerEnter={() => onPrefetch(song.id)}
                 onKeyDown={e => e.key === 'Enter' && onSelect(song.id)}
                 className="
-                  w-full text-left rounded-2xl border border-zinc-700/70 p-3
+                  w-full text-left rounded-2xl border border-zinc-700/70 p-4 md:p-3
                   active:scale-[0.99] transition-all duration-150 cursor-pointer
                 "
                 style={{ background: '#25262b' }}
@@ -1394,11 +1394,11 @@ function SongBrowser({
             </div>
           </div>
         ) : activePlaylist ? (
-          <div className="flex gap-8 items-start">
+          <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
             {/* Left column — playlist detail */}
-            <div className="w-72 shrink-0 sticky top-20 overflow-y-auto no-scrollbar pb-10" style={{ maxHeight: 'calc(100vh - 5rem)' }}>
-              {/* Spacer — matches height of the "Songs" heading row in the right column */}
-              <div className="h-11" />
+            <div className="w-full lg:w-80 shrink-0 lg:sticky lg:top-20 lg:overflow-y-auto lg:no-scrollbar lg:pb-10" style={{ maxHeight: 'calc(100vh - 5rem)' }}>
+              {/* Spacer — matches height of the "Songs" heading row in the right column (desktop only) */}
+              <div className="hidden lg:block h-11" />
               {/* Cover image */}
               {activePlaylist.cover_image_url ? (
                 <img
@@ -1478,7 +1478,7 @@ function SongBrowser({
             {/* Right column — song list */}
             <div className="flex-1 min-w-0">
               <div className="mb-4 flex items-center justify-between gap-3">
-                <h2 className="text-white font-semibold text-lg">{t('browser.songs')}</h2>
+                <h2 className="text-white font-semibold text-base md:text-lg">{t('browser.songs')}</h2>
               </div>
               {songList}
             </div>
