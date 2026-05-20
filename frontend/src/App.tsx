@@ -163,15 +163,16 @@ type SettingsTab = 'preferences' | 'account' | 'subscription' | 'support'
 type AppRoute =
   | { page: 'browse' }
   | { page: 'playlist'; playlistId: number }
-  | { page: 'song'; songId: number }
+  | { page: 'song'; songId: number; playlistId: number | null }
   | { page: 'settings'; tab: SettingsTab }
   | { page: 'admin'; tab: 'songs' | 'playlists' | 'users' | 'tasks' | 'localizations' | 'reports'; id: number | null }
   | { page: 'subscriptions' }
   | { page: 'privacy' }
   | { page: 'terms' }
 
-function parseAppRoute(pathname: string): AppRoute {
-  const path = pathname || '/browse'
+function parseAppRoute(pathWithSearch: string): AppRoute {
+  const [rawPath, searchStr] = pathWithSearch.split('?')
+  const path = rawPath || '/browse'
 
   const settingsMatch = path.match(/^\/settings(?:\/(preferences|account|subscription|support))?$/)
   if (settingsMatch) {
@@ -194,7 +195,9 @@ function parseAppRoute(pathname: string): AppRoute {
 
   const songMatch = path.match(/^\/song\/(\d+)$/)
   if (songMatch) {
-    return { page: 'song', songId: Number(songMatch[1]) }
+    const params = new URLSearchParams(searchStr ?? '')
+    const pid = params.get('playlist_id')
+    return { page: 'song', songId: Number(songMatch[1]), playlistId: pid ? Number(pid) : null }
   }
 
   if (path === '/subscriptions') return { page: 'subscriptions' }
@@ -208,8 +211,8 @@ function playlistPath(playlistId: number): string {
   return `/playlist/${playlistId}`
 }
 
-function songPath(songId: number): string {
-  return `/song/${songId}`
+function songPath(songId: number, playlistId?: number | null): string {
+  return playlistId ? `/song/${songId}?playlist_id=${playlistId}` : `/song/${songId}`
 }
 
 function adminPath(tab: 'songs' | 'playlists' | 'users' | 'tasks' | 'localizations' | 'reports', id: number | null): string {
@@ -2854,7 +2857,7 @@ function PlayerView({
 
 export default function App() {
   const { language, setLanguage } = useLocalization()
-  const [currentPath, setCurrentPath] = useState(() => (typeof window === 'undefined' ? '/browse' : (window.location.pathname || '/browse')))
+  const [currentPath, setCurrentPath] = useState(() => (typeof window === 'undefined' ? '/browse' : ((window.location.pathname || '/browse') + window.location.search)))
   const [adminOpen, setAdminOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS)
@@ -2943,7 +2946,7 @@ export default function App() {
 
   const navigateToPath = useCallback((path: string, replace = false) => {
     if (typeof window === 'undefined') return
-    if (window.location.pathname === path) return
+    if ((window.location.pathname + window.location.search) === path) return
     if (replace) {
       window.history.replaceState(null, '', path)
       setCurrentPath(path)
@@ -2973,9 +2976,9 @@ export default function App() {
 
   useEffect(() => {
     const onPopState = () => {
-      const path = window.location.pathname || '/browse'
+      const path = (window.location.pathname || '/browse') + window.location.search
       setCurrentPath(path)
-      setShowSignUp(path === '/signup')
+      setShowSignUp(window.location.pathname === '/signup')
     }
     window.addEventListener('popstate', onPopState)
     return () => window.removeEventListener('popstate', onPopState)
@@ -3168,7 +3171,7 @@ export default function App() {
     }
     // Navigate immediately so the UI responds at once; song data loads in background.
     if (options?.updateRoute !== false) {
-      navigateToPath(songPath(id))
+      navigateToPath(songPath(id, activePlaylist?.id))
     }
     const source = settings.preferredSource
     const songSummary = songs.find(s => s.id === id)
@@ -3334,6 +3337,9 @@ export default function App() {
     if (route.page === 'song') {
       setSettingsOpen(false)
       setAdminOpen(false)
+      if (route.playlistId !== null && route.playlistId !== activePlaylistId) {
+        setActivePlaylistId(route.playlistId)
+      }
       if (activeSong?.id !== route.songId) {
         void handleSelectSong(route.songId, { updateRoute: false })
       }
@@ -3439,11 +3445,11 @@ export default function App() {
   }, [activeSong, activeSongIndex, displayedSongs, settings.preferredSource, effectiveTargetLang, activePlaylist])
 
   // Legal pages are accessible without authentication
-  if (currentPath === '/privacy') return <PrivacyPolicyPage onBack={() => window.history.back()} />
-  if (currentPath === '/terms') return <TermsOfServicePage onBack={() => window.history.back()} />
+  if (currentPath.startsWith('/privacy')) return <PrivacyPolicyPage onBack={() => window.history.back()} />
+  if (currentPath.startsWith('/terms')) return <TermsOfServicePage onBack={() => window.history.back()} />
 
   // Subscriptions page requires authentication
-  if (currentPath === '/subscriptions' && isAuthenticated) {
+  if (currentPath.startsWith('/subscriptions') && isAuthenticated) {
     return (
       <PricingPage
         user={credentialUser}
