@@ -1818,9 +1818,28 @@ function SettingsPage({
       </header>
 
       <div className="flex flex-1 min-h-0 justify-center">
-        <div className="flex w-full max-w-4xl min-h-0">
-        {/* Left sidebar */}
-        <nav className="w-48 shrink-0 border-r border-gray-900 py-4 px-2 flex flex-col gap-0.5" style={{ background: '#050608' }}>
+      <div className="flex flex-col md:flex-row w-full max-w-4xl min-h-0">
+        {/* Mobile horizontal tab bar */}
+        <div className="md:hidden flex border-b border-gray-900 overflow-x-auto no-scrollbar shrink-0" style={{ background: '#050608' }}>
+          {tabs.map(tab => (
+            <button
+              key={tab.key}
+              type="button"
+              onClick={() => onTabChange(tab.key)}
+              className={`flex items-center gap-2 px-4 py-3 text-sm whitespace-nowrap border-b-2 transition-colors shrink-0 ${
+                activeTab === tab.key
+                  ? 'border-white text-white'
+                  : 'border-transparent text-gray-500 hover:text-gray-300'
+              }`}
+            >
+              {tab.icon}
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Desktop vertical sidebar */}
+        <nav className="hidden md:flex w-48 shrink-0 border-r border-gray-900 py-4 px-2 flex-col gap-0.5" style={{ background: '#050608' }}>
           {tabs.map(t => (
             <button
               key={t.key}
