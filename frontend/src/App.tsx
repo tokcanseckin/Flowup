@@ -292,7 +292,7 @@ function AppleButton({ onAppleLogin, disabled }: { onAppleLogin?: (idToken: stri
         type="button"
         onClick={() => { void handleClick() }}
         disabled={disabled}
-        className="w-full flex items-center justify-center gap-3 h-11 rounded-xl bg-white text-black text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 transition-colors"
+        className="w-full flex items-center justify-center gap-3 h-12 md:h-11 rounded-xl bg-white text-black text-base md:text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 transition-colors"
       >
         <svg viewBox="0 0 24 24" className="w-5 h-5 shrink-0" fill="currentColor">
           <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.7 9.05 7.4c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.55-1.32 3.09-2.54 4zm-3.03-17.6c.06 1.96-1.52 3.6-3.36 3.44-.25-1.8 1.61-3.6 3.36-3.44z"/>
@@ -345,7 +345,7 @@ function GoogleButton({ onGoogleLogin, disabled }: { onGoogleLogin: (credential:
       type="button"
       onClick={handleClick}
       disabled={disabled}
-      className="w-full flex items-center justify-center gap-3 h-11 rounded-xl bg-white text-black text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 transition-colors"
+      className="w-full flex items-center justify-center gap-3 h-12 md:h-11 rounded-xl bg-white text-black text-base md:text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 transition-colors"
     >
       <svg viewBox="0 0 24 24" className="w-5 h-5 shrink-0" xmlns="http://www.w3.org/2000/svg">
         <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -423,7 +423,7 @@ function LoginScreen({
               value={email}
               onChange={e => setEmail(e.target.value)}
               placeholder={t('auth.emailPlaceholder')}
-              className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500"
+              className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-3 md:py-2 text-base md:text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500"
             />
             <input
               type="password"
@@ -432,13 +432,13 @@ function LoginScreen({
               value={password}
               onChange={e => setPassword(e.target.value)}
               placeholder={t('auth.passwordPlaceholder')}
-              className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500"
+              className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-3 md:py-2 text-base md:text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500"
             />
             <button
               type="submit"
               disabled={busy}
               className="
-                w-full py-2.5 rounded-xl font-semibold text-sm
+                w-full py-3.5 md:py-2.5 rounded-xl font-semibold text-base md:text-sm
                 bg-indigo-600 hover:bg-indigo-500 disabled:bg-gray-800 disabled:text-gray-500
                 text-white transition-all duration-150
               "
@@ -514,7 +514,7 @@ function ForgotPasswordScreen({
               <button
                 type="button"
                 onClick={onBack}
-                className="w-full py-2.5 rounded-xl font-semibold text-sm bg-gray-800 hover:bg-gray-700 text-white transition-all duration-150"
+                className="w-full py-3.5 md:py-2.5 rounded-xl font-semibold text-base md:text-sm bg-gray-800 hover:bg-gray-700 text-white transition-all duration-150"
               >
                 {t('auth.backToSignIn')}
               </button>
@@ -536,12 +536,12 @@ function ForgotPasswordScreen({
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   placeholder={t('auth.emailPlaceholder')}
-                  className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500"
+                  className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-3 md:py-2 text-base md:text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500"
                 />
                 <button
                   type="submit"
                   disabled={busy}
-                  className="w-full py-2.5 rounded-xl font-semibold text-sm bg-indigo-600 hover:bg-indigo-500 disabled:bg-gray-800 disabled:text-gray-500 text-white transition-all duration-150"
+                  className="w-full py-3.5 md:py-2.5 rounded-xl font-semibold text-base md:text-sm bg-indigo-600 hover:bg-indigo-500 disabled:bg-gray-800 disabled:text-gray-500 text-white transition-all duration-150"
                 >
                   {busy ? t('auth.sending') : t('auth.sendResetLink')}
                 </button>
@@ -609,7 +609,7 @@ function ResetPasswordScreen({
               <button
                 type="button"
                 onClick={onDone}
-                className="w-full py-2.5 rounded-xl font-semibold text-sm bg-indigo-600 hover:bg-indigo-500 text-white transition-all duration-150"
+                className="w-full py-3.5 md:py-2.5 rounded-xl font-semibold text-base md:text-sm bg-indigo-600 hover:bg-indigo-500 text-white transition-all duration-150"
               >
                 {t('auth.signIn')}
               </button>
@@ -629,7 +629,7 @@ function ResetPasswordScreen({
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                   placeholder={t('auth.newPasswordPlaceholder')}
-                  className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500"
+                  className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-3 md:py-2 text-base md:text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500"
                 />
                 <input
                   type="password"
@@ -638,12 +638,12 @@ function ResetPasswordScreen({
                   value={confirm}
                   onChange={e => setConfirm(e.target.value)}
                   placeholder={t('auth.confirmNewPasswordPlaceholder')}
-                  className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500"
+                  className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-3 md:py-2 text-base md:text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500"
                 />
                 <button
                   type="submit"
                   disabled={busy}
-                  className="w-full py-2.5 rounded-xl font-semibold text-sm bg-indigo-600 hover:bg-indigo-500 disabled:bg-gray-800 disabled:text-gray-500 text-white transition-all duration-150"
+                  className="w-full py-3.5 md:py-2.5 rounded-xl font-semibold text-base md:text-sm bg-indigo-600 hover:bg-indigo-500 disabled:bg-gray-800 disabled:text-gray-500 text-white transition-all duration-150"
                 >
                   {busy ? t('auth.updating') : t('auth.setNewPassword')}
                 </button>
@@ -729,7 +729,7 @@ function SignUpScreen({
               value={displayName}
               onChange={e => setDisplayName(e.target.value)}
               placeholder={t('auth.namePlaceholder')}
-              className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500"
+              className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-3 md:py-2 text-base md:text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500"
             />
             <input
               type="email"
@@ -737,7 +737,7 @@ function SignUpScreen({
               value={email}
               onChange={e => setEmail(e.target.value)}
               placeholder={t('auth.emailPlaceholder')}
-              className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500"
+              className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-3 md:py-2 text-base md:text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500"
             />
             <input
               type="password"
@@ -746,7 +746,7 @@ function SignUpScreen({
               value={password}
               onChange={e => setPassword(e.target.value)}
               placeholder={t('auth.passwordMinPlaceholder')}
-              className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500"
+              className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-3 md:py-2 text-base md:text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500"
             />
             <input
               type="password"
@@ -755,7 +755,7 @@ function SignUpScreen({
               value={confirm}
               onChange={e => setConfirm(e.target.value)}
               placeholder={t('auth.confirmPasswordPlaceholder')}
-              className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500"
+              className="w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-3 md:py-2 text-base md:text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500"
             />
             <p className="text-center text-xs text-gray-500 leading-relaxed">
               {t('auth.signupAgreementPrefix')}{' '}
@@ -775,7 +775,7 @@ function SignUpScreen({
               type="submit"
               disabled={busy}
               className="
-                w-full py-2.5 rounded-xl font-semibold text-sm
+                w-full py-3.5 md:py-2.5 rounded-xl font-semibold text-base md:text-sm
                 bg-indigo-600 hover:bg-indigo-500 disabled:bg-gray-800 disabled:text-gray-500
                 text-white transition-all duration-150
               "
@@ -1674,7 +1674,7 @@ function SettingRow({
   onChange: (next: boolean) => void
 }) {
   return (
-    <div className="rounded-2xl border border-gray-800/80 p-4" style={{ background: '#12121f' }}>
+    <div className="rounded-2xl border border-gray-800/80 p-5 md:p-4" style={{ background: '#12121f' }}>
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-white font-medium">{title}</p>
@@ -1686,14 +1686,14 @@ function SettingRow({
           aria-checked={value}
           onClick={() => onChange(!value)}
           className={`
-            shrink-0 inline-flex h-7 w-12 items-center rounded-full transition-colors
+            shrink-0 inline-flex h-8 w-14 md:h-7 md:w-12 items-center rounded-full transition-colors
             ${value ? 'bg-green-500' : 'bg-gray-700'}
           `}
         >
           <span
             className={`
-              inline-block h-5 w-5 rounded-full bg-white transition-transform
-              ${value ? 'translate-x-6' : 'translate-x-1'}
+              inline-block h-6 w-6 md:h-5 md:w-5 rounded-full bg-white transition-transform
+              ${value ? 'translate-x-7 md:translate-x-6' : 'translate-x-1'}
             `}
           />
         </button>
