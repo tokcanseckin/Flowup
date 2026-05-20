@@ -48,7 +48,7 @@ const LyricsLockScreen: React.FC<LyricsLockScreenProps> = ({
     if (songId !== undefined) {
       track('Paywall Hit', {
         song_id: songId,
-        position_in_playlist: positionInPlaylist !== undefined ? positionInPlaylist + 1 : undefined,
+        ...(positionInPlaylist !== undefined && { position_in_playlist: positionInPlaylist + 1 }),
         source: 'lyrics_lock_screen',
       })
     }

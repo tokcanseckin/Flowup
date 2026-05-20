@@ -990,7 +990,7 @@ export default function LyricsPlayer({
           onUpgrade={() => {
             track('Upgrade Selected', {
               song_id: songData.id,
-              position_in_playlist: positionInPlaylist !== undefined ? positionInPlaylist + 1 : undefined,
+              ...(positionInPlaylist !== undefined && { position_in_playlist: positionInPlaylist + 1 }),
               source: 'lyrics_lock_screen',
             })
             onShowPricing?.()
