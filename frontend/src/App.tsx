@@ -3207,8 +3207,8 @@ export default function App() {
 
   const handlePrefetchSong = useCallback((id: number) => {
     const source = settings.preferredSource
-    void _fetchSong(id, source, undefined, activePlaylist?.id).catch(() => {})
-  }, [settings.preferredSource, activePlaylist])
+    void _fetchSong(id, source, effectiveTargetLang, activePlaylist?.id).catch(() => {})
+  }, [settings.preferredSource, activePlaylist, effectiveTargetLang])
 
   // Re-fetch active song lyrics when source preference changes so the player
   // immediately gets the right per-source timestamps. Invalidate stale cache entry.
@@ -3429,18 +3429,17 @@ export default function App() {
     void handleSelectSong(displayedSongs[activeSongIndex + 1].id)
   }, [activeSongIndex, displayedSongs, handleSelectSong])
 
-  // Prefetch the next song in the playlist ~2s after the current song loads.
-  const prefetchedSongRef = useRef<number | null>(null)
+  // Prefetch the next song in the playlist shortly after the current song loads.
   useEffect(() => {
     if (!activeSong || activeSongIndex < 0) return
-    if (prefetchedSongRef.current === activeSong.id) return
-    prefetchedSongRef.current = activeSong.id
     const next = displayedSongs[activeSongIndex + 1]
     if (!next) return
     const source = settings.preferredSource
+    const key = _songCacheKey(next.id, source, effectiveTargetLang)
+    if (_songCache.has(key) || _inFlight.has(key)) return
     const timer = window.setTimeout(() => {
       void _fetchSong(next.id, source, effectiveTargetLang, activePlaylist?.id).catch(() => {})
-    }, 2000)
+    }, 500)
     return () => window.clearTimeout(timer)
   }, [activeSong, activeSongIndex, displayedSongs, settings.preferredSource, effectiveTargetLang, activePlaylist])
 
