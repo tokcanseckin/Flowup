@@ -1344,7 +1344,7 @@ function SongBrowser({
             <select
               value={language}
               onChange={e => { setLanguage(e.target.value as 'en' | 'tr' | 'ru' | 'es' | 'pt' | 'de'); e.currentTarget.blur() }}
-              className="text-xs rounded-lg border border-gray-700/70 bg-gray-800/70 px-2 py-1 text-gray-300 focus:outline-none focus:border-gray-500 cursor-pointer"
+              className="text-xs rounded-lg border border-gray-700/70 bg-gray-800/70 px-2 py-1 text-gray-300 focus:outline-none focus:border-gray-500 cursor-pointer hidden sm:block"
               aria-label="UI language"
             >
               <option value="en">EN</option>
@@ -1357,14 +1357,14 @@ function SongBrowser({
             <button
               type="button"
               onClick={onOpenSettings}
-              className="text-xs text-gray-500 hover:text-gray-200 transition-colors hidden sm:inline-block"
+              className="text-xs text-gray-500 hover:text-gray-200 transition-colors"
             >
               {t('nav.preferences')}
             </button>
             {user?.display_name && (
               <button type="button" onClick={onOpenAccount} className="text-xs text-gray-500 hover:text-gray-300 transition-colors truncate max-w-[100px] sm:max-w-[140px] md:max-w-[180px]">{user.display_name}</button>
             )}
-            <button onClick={onLogout} className="text-xs text-gray-600 hover:text-gray-400 transition-colors">
+            <button onClick={onLogout} className="text-xs text-gray-600 hover:text-gray-400 transition-colors hidden sm:inline-block">
               {t('nav.signOut')}
             </button>
           </div>
@@ -2876,7 +2876,7 @@ function PlayerView({
             {t('nav.preferences')}
           </button>
           {user?.display_name && <button type="button" onClick={onOpenAccount} className="text-xs text-gray-500 hover:text-gray-300 transition-colors">{user.display_name}</button>}
-          <button onClick={onLogout} className="text-xs text-gray-600 hover:text-gray-400 transition-colors">{t('nav.signOut')}</button>
+          <button onClick={onLogout} className="text-xs text-gray-600 hover:text-gray-400 transition-colors hidden sm:inline-block">{t('nav.signOut')}</button>
         </div>
         </div>
       </header>
