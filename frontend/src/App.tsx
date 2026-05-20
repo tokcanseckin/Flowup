@@ -6,6 +6,7 @@ import ReportModal          from './components/ReportModal'
 import singolingLogo from '../images/singoling_logo@2x.png'
 import prevIconImg   from '../images/previous_icon@2x.png'
 import nextIconImg   from '../images/next_icon@2x.png'
+import settingsIconImg from '../images/settings_icon.svg'
 import YouTubePlayer, { YouTubePlayerHandle } from './components/YouTubePlayer'
 import AppleMusicPlayer, { AppleMusicPlayerHandle, isAppleMusicAuthorized } from './components/AppleMusicPlayer'
 import { api, BackendUser, PlaylistDetail, PlaylistSummary, SongDetail, SongSummary, UserSettings as ApiUserSettings, clearAdminSession, setAdminSession, getAdminHeaders } from './api/client'
@@ -2919,12 +2920,7 @@ function PlayerView({
             className="text-xs text-gray-500 hover:text-gray-200 transition-colors flex items-center gap-1.5"
           >
             {isMobileView ? (
-              <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="3" />
-                <path d="M12 1v6m0 6v6" />
-                <path d="m5.64 5.64 4.24 4.24m4.24 4.24 4.24 4.24" />
-                <path d="m18.36 5.64-4.24 4.24m-4.24 4.24-4.24 4.24" />
-              </svg>
+              <img src={settingsIconImg} className="w-4 h-4" alt="Settings" />
             ) : (
               t('nav.preferences')
             )}
