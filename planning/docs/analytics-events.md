@@ -33,6 +33,16 @@ Complete list of Plausible analytics events for SingoLing.
 - `Playlist Selected` — User clicks into a playlist (props: playlist_id, difficulty)
 - `Song Selected From Playlist` — User picks song from list (props: song_id, position_in_playlist)
 
+## Subscription & Monetization
+
+- `Paywall Hit` — Lock screen displayed when free user hits song limit (props: song_id, position_in_playlist, source)
+- `Upgrade Selected` — User clicks upgrade button on lock screen (props: song_id, position_in_playlist, source)
+- `Back to Trial` — User returns to free songs from lock screen (props: song_id, source)
+- `Checkout Initiated` — User starts payment flow (props: tier, source, user_id)
+- `Checkout Completed` — Payment succeeds (props: transaction_id)
+- `Subscription Activated` — Backend webhook confirms new/reactivated subscription (props: tier, platform, reason)
+- `Subscription Canceled` — User cancels subscription (props: tier, platform)
+
 ## Settings
 
 - `Settings Changed` — User modifies preference (props: setting)
@@ -75,6 +85,7 @@ Complete list of Plausible analytics events for SingoLing.
 6. `Target Language Changed` — Feature usage
 7. `Tutorial Completed` / `Tutorial Skipped` — Onboarding funnel
 8. `Help Button Clicked` — Support demand
+9. `Paywall Hit` / `Upgrade Selected` — Conversion funnel tracking
 
 ### Low Priority
 - Line translations, settings changes, admin events, detailed error tracking
@@ -88,9 +99,28 @@ Complete list of Plausible analytics events for SingoLing.
 - `Word Inspected` avg < 3 per song (broken UI or unclear feature)
 - `Tutorial Skipped` > 70% (annoying onboarding)
 - High `Playback Error` rate (integration issues)
+- `Paywall Hit` → `Upgrade Selected` conversion < 5% (poor paywall messaging)
 
 **Success Signals:**
 - `Song Completed` rate > 60%
 - `Word Inspected` avg > 5 per song
 - `Next Song` clicks (users want more content)
 - `Target Language Changed` (multi-lang feature adoption)
+- `Checkout Initiated` → `Checkout Completed` rate > 80% (smooth payment flow)
+
+---
+
+## Subscription Conversion Funnel
+
+Track users through the monetization flow:
+
+1. **Paywall Hit** — User encounters locked content (song 3+ in playlist)
+2. **Upgrade Selected** — User clicks upgrade button (conversion rate 5-15% typical)
+3. **Checkout Initiated** — User starts Paddle checkout (50-70% proceed from upgrade click)
+4. **Checkout Completed** — Payment succeeds (80-90% complete once checkout starts)
+5. **Subscription Activated** — Backend webhook confirms subscription
+
+**Drop-off Analysis:**
+- High drop-off at step 2: Improve paywall messaging, features list, pricing clarity
+- High drop-off at step 3: Simplify pricing page, add trust signals, reduce friction
+- High drop-off at step 4: Payment UX issues, add more payment methods, test pricing
