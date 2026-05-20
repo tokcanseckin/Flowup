@@ -119,6 +119,8 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose, onUserUpdate: 
     'Instant definition lookups & quick keyboard shortcuts',
     'Full-line translations in your language',
     'Unlimited songs in all languages',
+    'Curated songs for your level',
+    'Translate to all language options for each playlist',
   ]
 
   // Format price from cents to display format
