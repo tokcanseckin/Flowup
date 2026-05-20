@@ -972,7 +972,7 @@ function SongBrowser({
               {/* Trial Songs section */}
               {songs.slice(0, 2).length > 0 && (
                 <>
-                  <div className="rounded-lg px-3 h-8 mb-2 mt-1 flex items-center" style={{ background: '#006D36' }}>
+                  <div className="rounded-2xl pl-5 pr-1 h-8 mb-2 mt-1 flex items-center" style={{ background: '#006D36' }}>
                     <span className="text-xs font-semibold uppercase tracking-wider text-white">
                       Trial Songs
                     </span>
@@ -1088,7 +1088,7 @@ function SongBrowser({
               {/* Premium List section */}
               {songs.slice(2).length > 0 && (
                 <>
-                  <div className="rounded-lg px-3 h-8 mb-2 mt-4 flex items-center justify-between bg-indigo-600">
+                  <div className="rounded-2xl pl-5 pr-1 h-8 mb-2 mt-4 flex items-center justify-between bg-indigo-600">
                     <span className="text-xs font-semibold uppercase tracking-wider text-white">
                       Premium List
                     </span>
