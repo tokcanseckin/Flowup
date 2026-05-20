@@ -2479,7 +2479,7 @@ function PlayerView({
         id: 'lyrics-word',
         target: '[data-tutorial="lyrics-word"]',
         text: isMobileView 
-          ? 'Tap any word to see its definition, translation, and hear its pronunciation.'
+          ? 'Tap any word to see its definition instantly'
           : t('tutorial.word'),
         padding: 8,
         scrollIntoView: true,
@@ -2489,7 +2489,7 @@ function PlayerView({
         id: 'lyrics-word-peek',
         target: '[data-tutorial="lyrics-word-peek"]',
         text: isMobileView
-          ? 'Tap and hold a word to quickly peek at its translation without opening the full panel.'
+          ? 'Tap and hold a word for a quick peek'
           : t('tutorial.peek'),
         padding: 8,
         interactive: true
