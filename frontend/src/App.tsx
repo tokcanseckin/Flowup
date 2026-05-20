@@ -2913,11 +2913,29 @@ function PlayerView({
         </div>
       </header>
 
-      <main className="flex-1 min-h-0 p-4 max-w-[1200px] mx-auto w-full flex flex-col gap-3">
+      <main className="flex-1 min-h-0 md:p-4 max-w-[1200px] mx-auto w-full flex flex-col md:gap-3">
 
-        {/* Controls + YouTube row */}
+        {/* YouTube video component — mobile: full width, no padding/border. Desktop: side-by-side grid */}
+        {hasYouTubePanel && (
+          <aside
+            className={`overflow-hidden bg-black min-h-[200px] md:hidden ${showRightMediaPanel ? 'block' : 'hidden'}`}
+          >
+            {showRightMediaPanel ? (
+              <YouTubePlayer
+                ref={ytRef}
+                youtubeUrl={song.youtube_url!}
+                onReady={handleYtReady}
+                onTimeUpdate={setYtPositionMs}
+                onDurationChange={setYtDurationMs}
+                onPlayStateChange={handleYtPlayStateChange}
+              />
+            ) : null}
+          </aside>
+        )}
+
+        {/* Controls + YouTube row (desktop only) */}
         <div
-          className="controls-media-row"
+          className="controls-media-row hidden md:grid"
           style={{
             ['--media-col' as string]: hasYouTubePanel ? (showRightMediaPanel ? '410px' : '0px') : '0px',
             ['--media-gap' as string]: showRightMediaPanel ? '0.75rem' : '0px',
@@ -2925,7 +2943,7 @@ function PlayerView({
         >
 
           {/* Player controls — takes remaining width */}
-          <section className={`relative rounded-md border border-zinc-700/70 min-w-0 ${hasYouTubePanel ? 'p-6 min-h-[210px] lg:min-h-[240px]' : 'p-3 md:p-6 min-h-[120px] lg:min-h-[240px]'}`} style={{ background: '#25262b' }}>
+          <section className="relative rounded-md border border-zinc-700/70 p-6 min-w-0 min-h-[210px] lg:min-h-[240px]" style={{ background: '#25262b' }}>
           {/* 3-dot options menu — upper right corner */}
           <div className="absolute top-3 right-3 z-10">
               <button
@@ -2980,27 +2998,27 @@ function PlayerView({
                 </div>
               )}
             </div>
-          <div className={`flex items-center ${hasYouTubePanel ? 'gap-4 mb-5' : 'gap-2 md:gap-4 mb-2 md:mb-5'}`}>
+          <div className="flex items-center gap-4 mb-5">
             {coverArtUrl ? (
-              <img src={coverArtUrl} alt="Album art" className={`rounded object-cover border border-black/40 ${hasYouTubePanel ? 'w-16 h-16' : 'w-12 h-12 md:w-16 md:h-16'}`} />
+              <img src={coverArtUrl} alt="Album art" className="w-16 h-16 rounded object-cover border border-black/40" />
             ) : (
-              <div className={`rounded bg-black/40 flex items-center justify-center ${hasYouTubePanel ? 'w-16 h-16' : 'w-12 h-12 md:w-16 md:h-16'}`}>
-                <svg viewBox="0 0 24 24" className={hasYouTubePanel ? 'w-7 h-7 fill-gray-500' : 'w-5 h-5 md:w-7 md:h-7 fill-gray-500'}>
+              <div className="w-16 h-16 rounded bg-black/40 flex items-center justify-center">
+                <svg viewBox="0 0 24 24" className="w-7 h-7 fill-gray-500">
                   <path d="M12 3a9 9 0 100 18A9 9 0 0012 3zm-1 13V8l6 4-6 4z"/>
                 </svg>
               </div>
             )}
             <div className="min-w-0 flex-1">
-              <p className={`text-zinc-100 leading-tight font-semibold truncate ${hasYouTubePanel ? 'text-2xl' : 'text-lg md:text-2xl'}`}>
+              <p className="text-zinc-100 text-2xl leading-tight font-semibold truncate">
                 {song.title}
               </p>
-              <p className={`text-zinc-300 leading-tight truncate ${hasYouTubePanel ? 'text-lg' : 'text-base md:text-lg'}`}>
+              <p className="text-zinc-300 text-lg leading-tight truncate">
                 {song.artist ?? ''}
               </p>
             </div>
           </div>
           <ProgressBar posMs={positionMs} durMs={durationMs} onSeek={seekTo} />
-          <div className={`flex items-center justify-center gap-5 ${hasYouTubePanel ? 'mt-6' : 'mt-2 md:mt-6'}`}>
+          <div className="flex items-center justify-center gap-5 mt-6">
             <button
               onClick={() => { track('Previous Song'); handlePrev() }}
               disabled={!canPrev}
@@ -3068,6 +3086,50 @@ function PlayerView({
 
         </div>{/* end controls + media row */}
 
+        {/* Mobile-only simplified player controls */}
+        <section className="md:hidden py-3 px-4 flex items-center justify-center gap-6" style={{ background: '#25262b' }}>
+          <button
+            onClick={() => { track('Previous Song'); handlePrev() }}
+            disabled={!canPrev}
+            aria-label="Previous song"
+            className="w-12 h-12 rounded-full flex items-center justify-center active:bg-black/20 disabled:opacity-40 disabled:cursor-not-allowed text-gray-100 transition-all"
+          >
+            <img src={prevIconImg} className="w-7 h-7 object-contain" alt="" />
+          </button>
+          <button
+            onClick={togglePlay}
+            disabled={!isReady}
+            aria-label={isPlaying ? 'Pause' : 'Play'}
+            className="
+              w-16 h-16 rounded-full flex items-center justify-center
+              bg-white active:bg-zinc-200 active:scale-95
+              disabled:bg-zinc-700 disabled:text-zinc-500
+              text-black shadow-lg transition-all duration-150
+            "
+          >
+            {pendingPlay && !isPlaying ? (
+              <div className="w-5 h-5 border-2 border-zinc-400/60 border-t-black rounded-full animate-spin" />
+            ) : isPlaying ? (
+              <svg viewBox="0 0 24 24" className="w-9 h-9 fill-current">
+                <rect x="6" y="5" width="4" height="14" rx="1.5"/>
+                <rect x="14" y="5" width="4" height="14" rx="1.5"/>
+              </svg>
+            ) : (
+              <svg viewBox="0 0 24 24" className="w-9 h-9 fill-current">
+                <path d="M6 3.5v17l14-8.5z"/>
+              </svg>
+            )}
+          </button>
+          <button
+            onClick={() => { track('Next Song', { trigger: 'button' }); handleNext() }}
+            disabled={!canNext}
+            aria-label="Next song"
+            className="w-12 h-12 rounded-full flex items-center justify-center active:bg-black/20 disabled:opacity-40 disabled:cursor-not-allowed text-gray-100 transition-all"
+          >
+            <img src={nextIconImg} className="w-7 h-7 object-contain" alt="" />
+          </button>
+        </section>
+
         {/* Apple Music player — audio-only when playing; visible when auth/error UI is needed */}
         {effectiveSource === 'apple_music' && song.apple_music_url && (
           <AppleMusicPlayer
@@ -3083,8 +3145,8 @@ function PlayerView({
           />
         )}
 
-        {/* Lyrics panel */}
-        <section className="rounded-md overflow-hidden flex-1 min-h-0 flex flex-col" style={{ background: lyricsTheme.panelGradient }}>
+        {/* Lyrics panel — mobile: full screen scrollable, desktop: rounded with padding */}
+        <section className="md:rounded-md overflow-hidden flex-1 min-h-0 flex flex-col" style={{ background: lyricsTheme.panelGradient }}>
           <LyricsPlayer
             currentPositionMs={positionMs}
             durationMs={durationMs}
