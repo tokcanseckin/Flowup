@@ -2925,7 +2925,7 @@ function PlayerView({
         >
 
           {/* Player controls — takes remaining width */}
-          <section className={`relative rounded-md border border-zinc-700/70 p-6 min-w-0 ${hasYouTubePanel ? 'min-h-[210px] lg:min-h-[240px]' : 'min-h-[160px] lg:min-h-[240px]'}`} style={{ background: '#25262b' }}>
+          <section className={`relative rounded-md border border-zinc-700/70 min-w-0 ${hasYouTubePanel ? 'p-6 min-h-[210px] lg:min-h-[240px]' : 'p-3 md:p-6 min-h-[120px] lg:min-h-[240px]'}`} style={{ background: '#25262b' }}>
           {/* 3-dot options menu — upper right corner */}
           <div className="absolute top-3 right-3 z-10">
               <button
@@ -2980,27 +2980,27 @@ function PlayerView({
                 </div>
               )}
             </div>
-          <div className="flex items-center gap-4 mb-5">
+          <div className={`flex items-center ${hasYouTubePanel ? 'gap-4 mb-5' : 'gap-2 md:gap-4 mb-2 md:mb-5'}`}>
             {coverArtUrl ? (
-              <img src={coverArtUrl} alt="Album art" className="w-16 h-16 rounded object-cover border border-black/40" />
+              <img src={coverArtUrl} alt="Album art" className={`rounded object-cover border border-black/40 ${hasYouTubePanel ? 'w-16 h-16' : 'w-12 h-12 md:w-16 md:h-16'}`} />
             ) : (
-              <div className="w-16 h-16 rounded bg-black/40 flex items-center justify-center">
-                <svg viewBox="0 0 24 24" className="w-7 h-7 fill-gray-500">
+              <div className={`rounded bg-black/40 flex items-center justify-center ${hasYouTubePanel ? 'w-16 h-16' : 'w-12 h-12 md:w-16 md:h-16'}`}>
+                <svg viewBox="0 0 24 24" className={hasYouTubePanel ? 'w-7 h-7 fill-gray-500' : 'w-5 h-5 md:w-7 md:h-7 fill-gray-500'}>
                   <path d="M12 3a9 9 0 100 18A9 9 0 0012 3zm-1 13V8l6 4-6 4z"/>
                 </svg>
               </div>
             )}
             <div className="min-w-0 flex-1">
-              <p className="text-zinc-100 text-2xl leading-tight font-semibold truncate">
+              <p className={`text-zinc-100 leading-tight font-semibold truncate ${hasYouTubePanel ? 'text-2xl' : 'text-lg md:text-2xl'}`}>
                 {song.title}
               </p>
-              <p className="text-zinc-300 text-lg leading-tight truncate">
+              <p className={`text-zinc-300 leading-tight truncate ${hasYouTubePanel ? 'text-lg' : 'text-base md:text-lg'}`}>
                 {song.artist ?? ''}
               </p>
             </div>
           </div>
           <ProgressBar posMs={positionMs} durMs={durationMs} onSeek={seekTo} />
-          <div className="flex items-center justify-center gap-5 mt-6">
+          <div className={`flex items-center justify-center gap-5 ${hasYouTubePanel ? 'mt-6' : 'mt-2 md:mt-6'}`}>
             <button
               onClick={() => { track('Previous Song'); handlePrev() }}
               disabled={!canPrev}
