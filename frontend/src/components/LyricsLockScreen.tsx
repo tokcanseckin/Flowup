@@ -173,7 +173,7 @@ const LyricsLockScreen: React.FC<LyricsLockScreenProps> = ({
                         d="M5 13l4 4L19 7"
                       />
                     </svg>
-                    <span className="text-gray-200 text-sm md:text-xs whitespace-nowrap">{feature}</span>
+                    <span className="text-gray-200 text-sm md:text-xs md:whitespace-nowrap">{feature}</span>
                   </div>
                 ))}
               </div>
@@ -201,10 +201,12 @@ const LyricsLockScreen: React.FC<LyricsLockScreenProps> = ({
             )}
           </div>
 
-          {/* Note about music continuing */}
-          <p className="text-xs text-gray-400 pt-2">
-            Music continues playing • Your progress is saved
-          </p>
+          {/* Note about music continuing - hidden on mobile */}
+          {!isMobileView && (
+            <p className="text-xs text-gray-400 pt-2">
+              Music continues playing • Your progress is saved
+            </p>
+          )}
         </div>
       </div>
 
