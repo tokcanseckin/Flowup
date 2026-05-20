@@ -2863,11 +2863,11 @@ function PlayerView({
               ))}
             </select>
           )}
-          {/* UI language selector */}
+          {/* UI language selector - hidden on mobile */}
           <select
             value={language}
             onChange={e => { setLanguage(e.target.value as 'en' | 'tr' | 'ru' | 'es' | 'pt' | 'de'); e.currentTarget.blur() }}
-            className="text-xs rounded-lg border border-gray-700/70 bg-gray-800/70 px-2 py-1 text-gray-300 focus:outline-none focus:border-gray-500 cursor-pointer"
+            className="text-xs rounded-lg border border-gray-700/70 bg-gray-800/70 px-2 py-1 text-gray-300 focus:outline-none focus:border-gray-500 cursor-pointer hidden md:block"
             aria-label="UI language"
           >
             <option value="en">EN</option>
@@ -2916,9 +2916,18 @@ function PlayerView({
           <button
             type="button"
             onClick={onOpenSettings}
-            className="text-xs text-gray-500 hover:text-gray-200 transition-colors"
+            className="text-xs text-gray-500 hover:text-gray-200 transition-colors flex items-center gap-1.5"
           >
-            {t('nav.preferences')}
+            {isMobileView ? (
+              <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="3" />
+                <path d="M12 1v6m0 6v6" />
+                <path d="m5.64 5.64 4.24 4.24m4.24 4.24 4.24 4.24" />
+                <path d="m18.36 5.64-4.24 4.24m-4.24 4.24-4.24 4.24" />
+              </svg>
+            ) : (
+              t('nav.preferences')
+            )}
           </button>
           {user?.display_name && <button type="button" onClick={onOpenAccount} className="text-xs text-gray-500 hover:text-gray-300 transition-colors hidden sm:inline-block">{user.display_name}</button>}
           <button onClick={onLogout} className="text-xs text-gray-600 hover:text-gray-400 transition-colors hidden sm:inline-block">{t('nav.signOut')}</button>
