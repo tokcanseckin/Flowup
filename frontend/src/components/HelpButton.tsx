@@ -131,7 +131,7 @@ export default function HelpButton() {
       <button
         onClick={open ? handleDismiss : handleOpen}
         aria-label="Help"
-        className="fixed bottom-6 right-6 z-[9992] w-14 h-14 rounded-full shadow-lg shadow-black/40 flex items-center justify-center transition-all duration-200 hover:scale-105"
+        className="hidden md:flex fixed bottom-6 right-6 z-[9992] w-14 h-14 rounded-full shadow-lg shadow-black/40 items-center justify-center transition-all duration-200 hover:scale-105"
         style={{ backgroundColor: 'rgb(0, 109, 54)' }}
       >
         {/* Speech bubble icon in white */}

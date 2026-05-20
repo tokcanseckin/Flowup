@@ -845,7 +845,12 @@ export default function LyricsPlayer({
                         className={`stressed lyrics-text text-lg leading-tight ${
                           isPrev ? 'text-white/60' : isNext ? 'text-white/80' : (activeIndex === -1 || idx < activeIndex ? 'text-white/45' : 'text-white/70')
                         } ${onSeek ? 'cursor-pointer hover:text-gray-200 transition-colors duration-120' : ''}`}
-                        onClick={() => onSeek?.(line.start_time_ms)}
+                        onClick={() => {
+                          if (onSeek) {
+                            clearInspect()
+                            onSeek(line.start_time_ms)
+                          }
+                        }}
                       >
                         {line.original_line}
                       </span>
