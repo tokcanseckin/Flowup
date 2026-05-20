@@ -1021,7 +1021,7 @@ function SongBrowser({
                               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                             </svg>
                           )}
-                          <span className="text-[10px] font-mono font-medium px-1.5 py-0.5 rounded-md uppercase tracking-wider shrink-0" style={{ color: '#4ade80', background: 'rgba(0,109,54,0.25)', border: '1px solid rgba(0,109,54,0.45)' }}>
+                          <span className="text-[10px] font-mono font-medium px-1.5 py-0.5 rounded-md uppercase tracking-wider shrink-0 hidden md:inline-block" style={{ color: '#4ade80', background: 'rgba(0,109,54,0.25)', border: '1px solid rgba(0,109,54,0.45)' }}>
                             {t(`language.${song.language_code}`)}
                           </span>
                           {/* 3-dot menu button */}
@@ -1144,7 +1144,7 @@ function SongBrowser({
                               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                             </svg>
                           )}
-                          <span className="text-[10px] font-mono font-medium px-1.5 py-0.5 rounded-md uppercase tracking-wider shrink-0" style={{ color: '#4ade80', background: 'rgba(0,109,54,0.25)', border: '1px solid rgba(0,109,54,0.45)' }}>
+                          <span className="text-[10px] font-mono font-medium px-1.5 py-0.5 rounded-md uppercase tracking-wider shrink-0 hidden md:inline-block" style={{ color: '#4ade80', background: 'rgba(0,109,54,0.25)', border: '1px solid rgba(0,109,54,0.45)' }}>
                             {t(`language.${song.language_code}`)}
                           </span>
                           {/* 3-dot menu button */}
@@ -1254,7 +1254,7 @@ function SongBrowser({
                       <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                     </svg>
                   )}
-                  <span className="text-[10px] font-mono font-medium px-1.5 py-0.5 rounded-md uppercase tracking-wider shrink-0" style={{ color: '#4ade80', background: 'rgba(0,109,54,0.25)', border: '1px solid rgba(0,109,54,0.45)' }}>
+                  <span className="text-[10px] font-mono font-medium px-1.5 py-0.5 rounded-md uppercase tracking-wider shrink-0 hidden md:inline-block" style={{ color: '#4ade80', background: 'rgba(0,109,54,0.25)', border: '1px solid rgba(0,109,54,0.45)' }}>
                     {t(`language.${song.language_code}`)}
                   </span>
                   {/* 3-dot menu button */}
