@@ -3440,7 +3440,7 @@ export default function App() {
     setSongLoading(true)
     setActiveSong(null)
     try {
-      const detail = await _fetchSong(id, source, targetLang, activePlaylist?.id)
+      const detail = await _fetchSong(id, source, targetLang, activePlaylistId ?? undefined)
       setActiveSong(detail)
       setLastSelectedSongId(detail.id)
     } catch (e) {
@@ -3449,12 +3449,12 @@ export default function App() {
     } finally {
       setSongLoading(false)
     }
-  }, [settings.preferredSource, navigateToPath, availableTargetLangs, overrideTargetLang, songs, activePlaylist, browseTargetLangMap])
+  }, [settings.preferredSource, navigateToPath, availableTargetLangs, overrideTargetLang, songs, activePlaylist, activePlaylistId, browseTargetLangMap, markListened, track])
 
   const handlePrefetchSong = useCallback((id: number) => {
     const source = settings.preferredSource
-    void _fetchSong(id, source, effectiveTargetLang, activePlaylist?.id).catch(() => {})
-  }, [settings.preferredSource, activePlaylist, effectiveTargetLang])
+    void _fetchSong(id, source, effectiveTargetLang, activePlaylistId ?? undefined).catch(() => {})
+  }, [settings.preferredSource, activePlaylistId, effectiveTargetLang])
 
   // Re-fetch active song lyrics when source preference changes so the player
   // immediately gets the right per-source timestamps. Invalidate stale cache entry.
@@ -3464,9 +3464,9 @@ export default function App() {
     const targetLang = effectiveTargetLang
     const key = _songCacheKey(activeSong.id, source, targetLang)
     _songCache.delete(key)  // force fresh fetch for new source
-    void _fetchSong(activeSong.id, source, targetLang, activePlaylist?.id).then(d => { setActiveSong(d) }).catch(() => {})
+    void _fetchSong(activeSong.id, source, targetLang, activePlaylistId ?? undefined).then(d => { setActiveSong(d) }).catch(() => {})
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [settings.preferredSource, activePlaylist])
+  }, [settings.preferredSource, activePlaylistId])
 
   // Re-fetch active song when the effective target language changes (e.g. after
   // the initial no-target-lang fetch reveals available target langs, causing
@@ -3474,9 +3474,9 @@ export default function App() {
   useEffect(() => {
     if (!activeSong || !effectiveTargetLang) return
     const source = settings.preferredSource
-    void _fetchSong(activeSong.id, source, effectiveTargetLang, activePlaylist?.id).then(d => { setActiveSong(d) }).catch(() => {})
+    void _fetchSong(activeSong.id, source, effectiveTargetLang, activePlaylistId ?? undefined).then(d => { setActiveSong(d) }).catch(() => {})
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [effectiveTargetLang, activePlaylist])
+  }, [effectiveTargetLang, activePlaylistId])
 
   useEffect(() => {
     restoreDoneRef.current = false
@@ -3684,10 +3684,10 @@ export default function App() {
     const key = _songCacheKey(next.id, source, effectiveTargetLang)
     if (_songCache.has(key) || _inFlight.has(key)) return
     const timer = window.setTimeout(() => {
-      void _fetchSong(next.id, source, effectiveTargetLang, activePlaylist?.id).catch(() => {})
+      void _fetchSong(next.id, source, effectiveTargetLang, activePlaylistId ?? undefined).catch(() => {})
     }, 500)
     return () => window.clearTimeout(timer)
-  }, [activeSong, activeSongIndex, displayedSongs, settings.preferredSource, effectiveTargetLang, activePlaylist])
+  }, [activeSong, activeSongIndex, displayedSongs, settings.preferredSource, effectiveTargetLang, activePlaylistId])
 
   // Legal pages are accessible without authentication
   if (currentPath.startsWith('/privacy')) return <PrivacyPolicyPage onBack={() => window.history.back()} />
