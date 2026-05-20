@@ -1320,7 +1320,7 @@ function SongBrowser({
     <div className="min-h-screen" style={{ background: '#050608' }}>
       {/* Header */}
       <header className="sticky top-0 z-20 border-b border-gray-900" style={{ background: '#050608' }}>
-        <div className="max-w-[972px] mx-auto w-full px-4 py-4 flex items-center justify-between">
+        <div className="max-w-[972px] mx-auto w-full px-3 py-3 md:px-4 md:py-4 flex items-center justify-between gap-2 md:gap-4">
           <div className="flex items-center gap-3">
             {(activePlaylist || (activePlaylistId !== null && loading)) && (
               <button onClick={() => onSelectPlaylist(null)} className="text-gray-500 hover:text-gray-300 transition-colors mr-1" aria-label="Back to all playlists">
@@ -1329,9 +1329,9 @@ function SongBrowser({
                 </svg>
               </button>
             )}
-            <img src={singolingLogo} className="h-7 object-contain" alt="SingoLing" />
+            <img src={singolingLogo} className="h-6 md:h-8 object-contain" alt="SingoLing" />
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 md:gap-3">
             {isAdmin && (
               <button
                 type="button"
@@ -1357,12 +1357,12 @@ function SongBrowser({
             <button
               type="button"
               onClick={onOpenSettings}
-              className="text-xs text-gray-500 hover:text-gray-200 transition-colors"
+              className="text-xs text-gray-500 hover:text-gray-200 transition-colors hidden sm:inline-block"
             >
               {t('nav.preferences')}
             </button>
             {user?.display_name && (
-              <button type="button" onClick={onOpenAccount} className="text-xs text-gray-500 hover:text-gray-300 transition-colors">{user.display_name}</button>
+              <button type="button" onClick={onOpenAccount} className="text-xs text-gray-500 hover:text-gray-300 transition-colors truncate max-w-[100px] sm:max-w-[140px] md:max-w-[180px]">{user.display_name}</button>
             )}
             <button onClick={onLogout} className="text-xs text-gray-600 hover:text-gray-400 transition-colors">
               {t('nav.signOut')}
@@ -2758,7 +2758,7 @@ function PlayerView({
     <div className="h-screen flex flex-col overflow-hidden" style={{ background: '#050608', transition: 'background 1.2s ease' }}>
       {/* Header */}
       <header className="sticky top-0 z-20 border-b border-gray-900" style={{ background: '#050608' }}>
-        <div className="max-w-[1200px] mx-auto w-full px-4 py-4 flex items-center justify-between">
+        <div className="max-w-[1200px] mx-auto w-full px-3 py-3 md:px-4 md:py-4 flex items-center justify-between gap-2 md:gap-4">
         <div className="flex items-center gap-3">
           <button onClick={onBack} className="text-gray-500 hover:text-gray-300 transition-colors mr-1" aria-label="Back">
             <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">
@@ -2771,22 +2771,22 @@ function PlayerView({
             className="hover:opacity-70 shrink-0"
             aria-label="Go to browse"
           >
-            <img src={singolingLogo} className="h-7 object-contain" alt="SingoLing" />
+            <img src={singolingLogo} className="h-6 md:h-8 object-contain" alt="SingoLing" />
           </button>
           {playlistName && (
             <>
-              <span className="text-zinc-600 text-sm select-none">/</span>
+              <span className="text-zinc-600 text-sm select-none hidden sm:inline">/</span>
               <button
                 type="button"
                 onClick={onGoToPlaylist}
-                className="text-sm text-zinc-400 hover:text-white transition-colors truncate max-w-[180px]"
+                className="text-sm text-zinc-400 hover:text-white transition-colors truncate max-w-[100px] sm:max-w-[140px] md:max-w-[180px] hidden sm:block"
               >
                 {playlistName}
               </button>
             </>
           )}
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 md:gap-3">
           {isAdmin && (
             <button
               type="button"
@@ -2910,7 +2910,7 @@ function PlayerView({
               </button>
               {playerMenuOpen && (
                 <div
-                  className="absolute right-0 top-10 z-50 min-w-[200px] rounded-xl border border-zinc-700 py-1.5 shadow-2xl"
+                  className="absolute right-0 md:right-0 top-10 z-50 w-screen md:w-auto md:min-w-[200px] left-0 md:left-auto rounded-none md:rounded-xl border-x-0 md:border-x border-zinc-700 py-1.5 shadow-2xl"
                   style={{ background: '#1c1d21' }}
                   onClick={e => e.stopPropagation()}
                 >
