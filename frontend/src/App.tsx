@@ -1717,7 +1717,20 @@ function LanguagePicker() {
     <div className="rounded-2xl border border-gray-800/80 p-4" style={{ background: '#12121f' }}>
       <p className="text-white font-medium mb-1">{t('settings.uiLanguage')}</p>
       <p className="text-xs text-gray-500 mb-3 leading-relaxed">{t('settings.uiLanguageDesc')}</p>
-      <div className="flex gap-2">
+      
+      {/* Mobile: dropdown select */}
+      <select
+        value={language}
+        onChange={e => setLanguage(e.target.value as typeof language)}
+        className="sm:hidden w-full rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-3 text-base text-white focus:outline-none focus:border-indigo-500"
+      >
+        {langs.map(l => (
+          <option key={l.code} value={l.code}>{l.label}</option>
+        ))}
+      </select>
+
+      {/* Tablet/Desktop: wrapped button grid */}
+      <div className="hidden sm:flex flex-wrap gap-2">
         {langs.map(l => (
           <button
             key={l.code}
