@@ -1095,7 +1095,7 @@ function SongBrowser({
                     <button
                       type="button"
                       onClick={() => { navigateToPath('/subscriptions'); track('Premium List Header Upgrade Clicked', { playlist_id: activePlaylistId ?? '' }) }}
-                      className="text-xs font-semibold px-3 py-1 rounded-lg bg-white text-indigo-600 hover:bg-gray-100 transition-colors"
+                      className="text-xs font-semibold px-3 py-1 rounded-2xl bg-white text-indigo-600 hover:bg-gray-100 transition-colors"
                     >
                       Upgrade
                     </button>
@@ -3594,6 +3594,13 @@ export default function App() {
       if (activeSong?.id !== route.songId) {
         void handleSelectSong(route.songId, { updateRoute: false, playlistId: route.playlistId })
       }
+      return
+    }
+
+    // subscriptions, privacy, terms - preserve current navigation state
+    if (route.page === 'subscriptions' || route.page === 'privacy' || route.page === 'terms') {
+      setSettingsOpen(false)
+      setAdminOpen(false)
       return
     }
 
