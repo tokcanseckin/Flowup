@@ -1362,7 +1362,7 @@ function SongBrowser({
               {t('nav.preferences')}
             </button>
             {user?.display_name && (
-              <button type="button" onClick={onOpenAccount} className="text-xs text-gray-500 hover:text-gray-300 transition-colors truncate max-w-[100px] sm:max-w-[140px] md:max-w-[180px]">{user.display_name}</button>
+              <button type="button" onClick={onOpenAccount} className="text-xs text-gray-500 hover:text-gray-300 transition-colors truncate hidden sm:inline-block max-w-[140px] md:max-w-[180px]">{user.display_name}</button>
             )}
             <button onClick={onLogout} className="text-xs text-gray-600 hover:text-gray-400 transition-colors hidden sm:inline-block">
               {t('nav.signOut')}
@@ -2875,7 +2875,7 @@ function PlayerView({
           >
             {t('nav.preferences')}
           </button>
-          {user?.display_name && <button type="button" onClick={onOpenAccount} className="text-xs text-gray-500 hover:text-gray-300 transition-colors">{user.display_name}</button>}
+          {user?.display_name && <button type="button" onClick={onOpenAccount} className="text-xs text-gray-500 hover:text-gray-300 transition-colors hidden sm:inline-block">{user.display_name}</button>}
           <button onClick={onLogout} className="text-xs text-gray-600 hover:text-gray-400 transition-colors hidden sm:inline-block">{t('nav.signOut')}</button>
         </div>
         </div>
