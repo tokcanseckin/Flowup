@@ -1374,10 +1374,10 @@ function SongBrowser({
       {/* Content */}
       <div className="px-3 sm:px-4 pt-6 pb-10 max-w-[972px] mx-auto">
         {activePlaylistId !== null && activePlaylist === null && loading ? (
-          <div className="flex gap-8 items-start">
+          <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 lg:items-start">
             {/* Left skeleton */}
-            <div className="w-72 shrink-0">
-              <div className="h-11" />
+            <div className="w-full lg:w-80 shrink-0">
+              <div className="hidden lg:block h-11" />
               <div className="w-full aspect-square rounded-2xl mb-5 animate-pulse" style={{ background: '#1c1d21' }} />
               <div className="h-5 rounded-lg mb-2 animate-pulse w-3/4" style={{ background: '#1c1d21' }} />
               <div className="h-3 rounded-lg mb-5 animate-pulse w-1/2" style={{ background: '#1c1d21' }} />
