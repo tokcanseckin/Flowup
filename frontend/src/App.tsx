@@ -2920,7 +2920,7 @@ function PlayerView({
             className="text-xs text-gray-500 hover:text-gray-200 transition-colors flex items-center gap-1.5"
           >
             {isMobileView ? (
-              <img src={settingsIconImg} className="w-4 h-4" alt="Settings" />
+              <img src={settingsIconImg} className="w-5 h-5" alt="Settings" />
             ) : (
               t('nav.preferences')
             )}
