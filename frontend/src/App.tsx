@@ -1372,7 +1372,7 @@ function SongBrowser({
       </header>
 
       {/* Content */}
-      <div className="px-3 sm:px-4 lg:px-8 pt-6 pb-10 max-w-[1400px] mx-auto">
+      <div className="px-3 sm:px-4 pt-6 pb-10 max-w-[972px] mx-auto">
         {activePlaylistId !== null && activePlaylist === null && loading ? (
           <div className="flex gap-8 items-start">
             {/* Left skeleton */}
@@ -1476,7 +1476,7 @@ function SongBrowser({
             </div>
 
             {/* Right column — song list */}
-            <div className="w-full lg:flex-1 lg:min-w-0">
+            <div className="flex-1 min-w-0">
               <div className="mb-4 flex items-center justify-between gap-3">
                 <h2 className="text-white font-semibold text-base md:text-lg">{t('browser.songs')}</h2>
               </div>
