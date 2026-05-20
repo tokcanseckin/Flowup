@@ -599,9 +599,10 @@ export default function LyricsPlayer({
         return
       }
 
-      // Space = toggle playback
+      // Space = toggle playback; close lookup panel when unpausing
       if (e.key === ' ' || e.key === 'Spacebar' || e.code === 'Space') {
         e.preventDefault()
+        if (inspectState && !isPlaying) clearInspect()
         onTogglePlayback?.()
         return
       }
@@ -677,7 +678,7 @@ export default function LyricsPlayer({
       window.removeEventListener('keyup', onKeyUp)
       window.removeEventListener('blur', onBlur)
     }
-  }, [keyboardTargetFor, clearInspect, togglePinned, lines, activeIndex, onSeek, onTogglePlayback])
+  }, [keyboardTargetFor, clearInspect, togglePinned, lines, activeIndex, onSeek, onTogglePlayback, inspectState, isPlaying])
 
   useEffect(() => {
     return () => {
