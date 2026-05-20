@@ -983,8 +983,9 @@ export default function LyricsPlayer({
           message={songData.upgrade_cta.message}
           features={songData.upgrade_cta.highlight_features}
           upgradeButtonText={songData.upgrade_cta.cta}
+          songId={songData.id}
           onUpgrade={() => {
-            track('Paywall Hit', {
+            track('Upgrade Selected', {
               song_id: songData.id,
               source: 'lyrics_lock_screen',
             })

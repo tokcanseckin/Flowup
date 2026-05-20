@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react'
 import { SongLine } from '../api/client'
+import { track } from '../analytics'
 
 interface LyricsLockScreenProps {
   /** Timed lyrics for blur effect with auto-scroll */
@@ -20,6 +21,8 @@ interface LyricsLockScreenProps {
   upgradeButtonText?: string
   /** Text for back to trial button */
   backButtonText?: string
+  /** Song ID for analytics tracking */
+  songId?: number
 }
 
 const LyricsLockScreen: React.FC<LyricsLockScreenProps> = ({
@@ -32,9 +35,18 @@ const LyricsLockScreen: React.FC<LyricsLockScreenProps> = ({
   onBackToTrial,
   upgradeButtonText = 'See Premium Plans',
   backButtonText = 'Back to Trial Songs',
+  songId,
 }) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const activeLineRef = useRef<number>(-1)
+
+  // Track paywall view on mount
+  useEffect(() => {
+    track('Paywall Hit', {
+      song_id: songId,
+      source: 'lyrics_lock_screen',
+    })
+  }, [songId])
 
   // Auto-scroll to current line
   useEffect(() => {

@@ -1690,7 +1690,12 @@ function SettingsPage({
                   </div>
                   {user?.subscription_tier === 'free' && (
                     <button
-                      onClick={onShowPricing}
+                      onClick={() => {
+                        track('Upgrade Selected', {
+                          source: 'settings_subscription',
+                        })
+                        onShowPricing()
+                      }}
                       className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors"
                     >
                       Upgrade
