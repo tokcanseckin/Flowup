@@ -1086,14 +1086,14 @@ function SongBrowser({
                 <>
                   <div className="rounded-2xl pl-5 pr-1 h-8 mb-2 mt-4 flex items-center justify-between bg-indigo-600">
                     <span className="text-xs font-semibold uppercase tracking-wider text-white">
-                      Premium List
+                      {t('browse.premiumListHeader')}
                     </span>
                     <button
                       type="button"
                       onClick={() => { navigateToPath('/subscriptions'); track('Premium List Header Upgrade Clicked', { playlist_id: activePlaylistId ?? '' }) }}
                       className="text-xs font-semibold px-3 py-1 rounded-2xl bg-white text-indigo-600 hover:bg-gray-100 transition-colors"
                     >
-                      Upgrade
+                      {t('browse.upgradeButton')}
                     </button>
                   </div>
                   {songs.slice(2).map(song => (
@@ -1957,12 +1957,12 @@ function SettingsPage({
                       </svg>
                     </div>
                     <div>
-                      <p className="text-white font-semibold capitalize">{user?.subscription_tier || 'free'} Plan</p>
+                      <p className="text-white font-semibold capitalize">{user?.subscription_tier || 'free'} {t('account.planSuffix')}</p>
                       <p className="text-xs text-gray-500">
-                        {user?.subscription_status === 'active' ? 'Active' : 
-                         user?.subscription_status === 'past_due' ? 'Past Due' : 
-                         user?.subscription_status === 'canceled' ? 'Canceled' : 
-                         user?.subscription_tier === 'free' ? 'Free Trial' : 'Inactive'}
+                        {user?.subscription_status === 'active' ? t('account.statusActive') : 
+                         user?.subscription_status === 'past_due' ? t('account.statusPastDue') : 
+                         user?.subscription_status === 'canceled' ? t('account.statusCanceled') : 
+                         user?.subscription_tier === 'free' ? t('account.statusFreeTier') : t('account.statusInactive')}
                       </p>
                     </div>
                   </div>
@@ -1976,7 +1976,7 @@ function SettingsPage({
                       }}
                       className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors"
                     >
-                      Upgrade
+                      {t('account.upgradeButton')}
                     </button>
                   )}
                 </div>
@@ -1986,13 +1986,13 @@ function SettingsPage({
                   <div className="space-y-2 pt-4 border-t border-gray-800">
                     {user.subscription_platform && (
                       <div className="flex justify-between text-sm">
-                        <span className="text-gray-500">Platform</span>
+                        <span className="text-gray-500">{t('account.platform')}</span>
                         <span className="text-white capitalize">{user.subscription_platform}</span>
                       </div>
                     )}
                     {user.subscription_started_at && (
                       <div className="flex justify-between text-sm">
-                        <span className="text-gray-500">Started</span>
+                        <span className="text-gray-500">{t('account.started')}</span>
                         <span className="text-white">
                           {new Date(user.subscription_started_at).toLocaleDateString('en-US', { 
                             year: 'numeric', 
@@ -2005,7 +2005,7 @@ function SettingsPage({
                     {user.subscription_expires_at && user.subscription_tier !== 'lifetime' && (
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-500">
-                          {user.subscription_cancel_at_period_end ? 'Expires' : 'Renews'}
+                          {user.subscription_cancel_at_period_end ? t('account.expires') : t('account.renews')}
                         </span>
                         <span className="text-white">
                           {new Date(user.subscription_expires_at).toLocaleDateString('en-US', { 
@@ -2018,8 +2018,8 @@ function SettingsPage({
                     )}
                     {user.subscription_tier === 'lifetime' && (
                       <div className="flex justify-between text-sm">
-                        <span className="text-gray-500">Access</span>
-                        <span className="text-green-400 font-medium">Lifetime</span>
+                        <span className="text-gray-500">{t('account.access')}</span>
+                        <span className="text-green-400 font-medium">{t('account.lifetime')}</span>
                       </div>
                     )}
                   </div>
@@ -2034,11 +2034,11 @@ function SettingsPage({
                       
                       btn.disabled = true
                       const originalText = btn.textContent
-                      btn.textContent = 'Syncing...'
+                      btn.textContent = t('account.syncing')
                       
                       try {
                         const freshUser = await api.syncSubscription()
-                        btn.textContent = '✓ Synced'
+                        btn.textContent = t('account.synced')
                         setTimeout(() => {
                           btn.textContent = originalText
                           btn.disabled = false
@@ -2048,7 +2048,7 @@ function SettingsPage({
                         onUserUpdate?.(freshUser)
                       } catch (error) {
                         console.error('Failed to sync subscription:', error)
-                        btn.textContent = '✗ Failed'
+                        btn.textContent = t('account.syncFailed')
                         setTimeout(() => {
                           btn.textContent = originalText
                           btn.disabled = false
@@ -2058,17 +2058,17 @@ function SettingsPage({
                     data-sync-btn
                     className="w-full px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Sync Subscription
+                    {t('account.syncButton')}
                   </button>
                   <p className="text-xs text-gray-500 mt-2 text-center">
-                    Refresh subscription status from Paddle
+                    {t('account.syncHelper')}
                   </p>
                 </div>
 
                 {/* Free Plan Features */}
                 {user?.subscription_tier === 'free' && (
                   <div className="pt-4 border-t border-gray-800">
-                    <p className="text-xs text-gray-500 mb-2">With Premium you get:</p>
+                    <p className="text-xs text-gray-500 mb-2">{t('account.premiumFeaturesHeader')}</p>
                     <ul className="space-y-1.5">
                       <li className="text-sm text-gray-400 flex items-center gap-2">
                         <svg viewBox="0 0 20 20" className="w-4 h-4 fill-green-500 flex-shrink-0">
@@ -2114,10 +2114,9 @@ function SettingsPage({
               {/* Manage Subscription (for active subscriptions) */}
               {user && user.subscription_tier !== 'free' && user.subscription_platform === 'paddle' && (
                 <div className="rounded-2xl border border-gray-800/80 p-6" style={{ background: '#12121f' }}>
-                  <p className="text-white font-medium mb-2">Manage Subscription</p>
+                  <p className="text-white font-medium mb-2">{t('account.manageTitle')}</p>
                   <p className="text-sm text-gray-500 mb-4">
-                    To update your payment method, billing information, or cancel your subscription, 
-                    visit the Paddle billing portal.
+                    {t('account.manageDescription')}
                   </p>
                   <a
                     href="https://www.paddle.com/support/manage-subscription"
@@ -2125,7 +2124,7 @@ function SettingsPage({
                     rel="noopener noreferrer"
                     className="inline-block px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white text-sm font-medium rounded-lg transition-colors"
                   >
-                    Open Billing Portal →
+                    {t('account.billingPortalLink')}
                   </a>
                 </div>
               )}
@@ -2206,14 +2205,14 @@ function SettingsPage({
               )}
 
               <div className="space-y-4 pt-2">
-                <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider">Legal</h2>
+                <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider">{t('settings.legalHeader')}</h2>
                 <div className="rounded-2xl border border-gray-800/80 divide-y divide-gray-800/60" style={{ background: '#12121f' }}>
                   <a
                     href="/terms"
                     onClick={e => { e.preventDefault(); window.history.pushState(null, '', '/terms'); window.dispatchEvent(new PopStateEvent('popstate')) }}
                     className="flex items-center justify-between px-5 py-3.5 hover:bg-white/5 transition-colors group"
                   >
-                    <span className="text-sm text-gray-300 group-hover:text-white transition-colors">Terms of Service</span>
+                    <span className="text-sm text-gray-300 group-hover:text-white transition-colors">{t('settings.termsOfService')}</span>
                     <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current text-gray-600 group-hover:text-gray-400 transition-colors shrink-0">
                       <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/>
                     </svg>
@@ -2223,7 +2222,7 @@ function SettingsPage({
                     onClick={e => { e.preventDefault(); window.history.pushState(null, '', '/privacy'); window.dispatchEvent(new PopStateEvent('popstate')) }}
                     className="flex items-center justify-between px-5 py-3.5 hover:bg-white/5 transition-colors group"
                   >
-                    <span className="text-sm text-gray-300 group-hover:text-white transition-colors">Privacy Policy</span>
+                    <span className="text-sm text-gray-300 group-hover:text-white transition-colors">{t('settings.privacyPolicy')}</span>
                     <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current text-gray-600 group-hover:text-gray-400 transition-colors shrink-0">
                       <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/>
                     </svg>
@@ -3986,7 +3985,7 @@ export default function App() {
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
           </svg>
-          <span className="text-sm">Loading song…</span>
+          <span className="text-sm">{t('player.loadingSong')}</span>
         </div>
       </div>
     )
