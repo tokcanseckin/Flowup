@@ -3266,6 +3266,7 @@ function PlayerView({
 
 export default function App() {
   const { language, setLanguage } = useLocalization()
+  const t = useT()
   const [currentPath, setCurrentPath] = useState(() => (typeof window === 'undefined' ? '/browse' : ((window.location.pathname || '/browse') + window.location.search)))
   const [adminOpen, setAdminOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
