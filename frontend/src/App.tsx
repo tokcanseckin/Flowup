@@ -970,7 +970,7 @@ function SongBrowser({
                 <>
                   <div className="rounded-2xl pl-5 pr-1 h-8 mb-2 mt-1 flex items-center" style={{ background: '#006D36' }}>
                     <span className="text-xs font-semibold uppercase tracking-wider text-white">
-                      Trial Songs
+                      {t('browse.trialSongsHeader')}
                     </span>
                   </div>
                   {songs.slice(0, 2).map(song => (

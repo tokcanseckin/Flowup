@@ -437,6 +437,7 @@ _INITIAL_LOCALIZATIONS: list[dict] = [
     {"key": "browse.langPT",               "en": "PT", "tr": "PT", "ru": "PT", "es": "PT", "pt": "PT", "de": "PT"},
     {"key": "browse.langDE",               "en": "DE", "tr": "DE", "ru": "DE", "es": "DE", "pt": "DE", "de": "DE"},
     {"key": "browse.premiumListHeader",    "en": "Premium List", "tr": "Premium Liste", "ru": "Премиум-лист", "es": "Lista Premium", "pt": "Lista Premium", "de": "Premium-Liste"},
+    {"key": "browse.trialSongsHeader",     "en": "Trial Songs", "tr": "Deneme Şarkıları", "ru": "Пробные песни", "es": "Canciones de prueba", "pt": "Músicas de teste", "de": "Test-Songs"},
     {"key": "browse.upgradeButton",        "en": "Upgrade", "tr": "Yükselt", "ru": "Обновить", "es": "Mejorar", "pt": "Atualizar", "de": "Upgraden"},
     # Account / Subscription
     {"key": "account.platform",            "en": "Platform", "tr": "Platform", "ru": "Платформа", "es": "Plataforma", "pt": "Plataforma", "de": "Plattform"},
@@ -519,6 +520,7 @@ _INITIAL_LOCALIZATIONS: list[dict] = [
     {"key": "subscriptions.checkoutDisabled","en": "Pricing unavailable", "tr": "Fiyatlandırma mevcut değil", "ru": "Цены недоступны", "es": "Precios no disponibles", "pt": "Preços indisponíveis", "de": "Preise nicht verfügbar"},
     {"key": "subscriptions.checkoutCTA",  "en": "Start Learning Now", "tr": "Şimdi Öğrenmeye Başla", "ru": "Начать учиться сейчас", "es": "Comenzar a aprender ahora", "pt": "Começar a aprender agora", "de": "Jetzt mit dem Lernen beginnen"},
     {"key": "subscriptions.featuresHeading","en": "It lets you focus on fun while you get what you need instantly", "tr": "Eğlenceye odaklanmanızı sağlarken ihtiyacınız olanı anında almanızı sağlar", "ru": "Это позволяет сосредоточиться на удовольствии, мгновенно получая то, что вам нужно", "es": "Te permite concentrarte en la diversión mientras obtienes lo que necesitas al instante", "pt": "Permite que você se concentre na diversão enquanto obtém o que precisa instantaneamente", "de": "Damit kannst du dich auf den Spaß konzentrieren und bekommst sofort, was du brauchst"},
+    {"key": "subscriptions.masterLanguageHeading","en": "Everything you need to master a new language", "tr": "Yeni bir dili öğrenmek için ihtiyacınız olan her şey", "ru": "Все, что нужно для освоения нового языка", "es": "Todo lo que necesitas para dominar un nuevo idioma", "pt": "Tudo o que você precisa para dominar um novo idioma", "de": "Alles, was du brauchst, um eine neue Sprache zu meistern"},
     # Inspect / Lyrics shortcuts
     {"key": "inspect.title",              "en": "INSPECT LYRICS",             "tr": "SÖZLERE BAK",               "ru": "ТЕКСТ ПЕСНИ",                    "es": "INSPECCIONAR LETRA",                         "pt": "INSPECIONAR LETRA",                           "de": "TEXT PRÜFEN"},
     {"key": "inspect.numberedWord",       "en": "Inspect a numbered word",    "tr": "Numaralı kelimeye bak",     "ru": "Изучить пронумерованное слово",  "es": "Inspeccionar una palabra numerada",           "pt": "Inspecionar uma palavra numerada",             "de": "Nummeriertes Wort prüfen"},

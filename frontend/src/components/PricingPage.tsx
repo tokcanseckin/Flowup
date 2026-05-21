@@ -260,7 +260,7 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose, onUserUpdate: 
           {/* Features list */}
           <div className="max-w-2xl mx-auto px-4 md:px-0">
             <h3 className={`text-base font-semibold ${isPage ? 'text-white' : 'text-gray-900'} mb-4 md:mb-3 text-center`}>
-              Everything you need to master a new language
+              {t('subscriptions.masterLanguageHeading')}
             </h3>
             <div className="grid md:grid-cols-2 gap-3 md:gap-2.5">
               {features.map((feature, i) => (
