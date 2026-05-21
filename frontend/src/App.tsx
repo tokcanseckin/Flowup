@@ -235,7 +235,7 @@ function AppLogo() {
   return (
     <div className="text-center mb-10">
       <div className="inline-flex items-center justify-center mb-4">
-        <img src={singolingLogo} className="h-10 object-contain" alt="SingoLing" />
+        <img src={singolingLogo} className="h-10 object-contain" alt={t('aria.logoAlt')} />
       </div>
       <p className="text-gray-500 text-sm leading-relaxed max-w-xs mx-auto">
         {t('auth.tagline1')}<br/>
@@ -1324,13 +1324,13 @@ function SongBrowser({
         <div className="max-w-[972px] mx-auto w-full px-3 py-3 md:px-4 md:py-4 flex items-center justify-between gap-2 md:gap-4">
           <div className="flex items-center gap-3">
             {(activePlaylist || (activePlaylistId !== null && loading)) && (
-              <button onClick={() => onSelectPlaylist(null)} className="text-gray-500 hover:text-gray-300 transition-colors mr-1" aria-label="Back to all playlists">
+              <button onClick={() => onSelectPlaylist(null)} className="text-gray-500 hover:text-gray-300 transition-colors mr-1" aria-label={t('aria.backToPlaylists')}>
                 <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">
                   <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
                 </svg>
               </button>
             )}
-            <img src={singolingLogo} className="h-6 md:h-8 object-contain" alt="SingoLing" />
+            <img src={singolingLogo} className="h-6 md:h-8 object-contain" alt={t('aria.logoAlt')} />
           </div>
           <div className="flex items-center gap-2 md:gap-3">
             {isAdmin && (
@@ -1817,12 +1817,12 @@ function SettingsPage({
       <header className="sticky top-0 z-20 border-b border-gray-900 shrink-0" style={{ background: '#050608' }}>
         <div className="max-w-4xl mx-auto w-full px-4 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <button onClick={onBack} className="text-gray-500 hover:text-gray-300 transition-colors mr-1" aria-label="Back">
+          <button onClick={onBack} className="text-gray-500 hover:text-gray-300 transition-colors mr-1" aria-label={t('aria.backButton')}>
             <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">
               <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
             </svg>
           </button>
-          <img src={singolingLogo} className="h-7 object-contain" alt="SingoLing" />
+          <img src={singolingLogo} className="h-7 object-contain" alt={t('aria.logoAlt')} />
         </div>
         <div className="flex items-center gap-3">
           {user?.display_name && <button type="button" onClick={() => onTabChange('account')} className="text-xs text-gray-500 hover:text-gray-300 transition-colors">{user.display_name}</button>}
@@ -2074,19 +2074,37 @@ function SettingsPage({
                         <svg viewBox="0 0 20 20" className="w-4 h-4 fill-green-500 flex-shrink-0">
                           <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
                         </svg>
-                        <span>Unlimited word translations</span>
+                        <span>Super fast and interactive translation along synced lyrics</span>
                       </li>
                       <li className="text-sm text-gray-400 flex items-center gap-2">
                         <svg viewBox="0 0 20 20" className="w-4 h-4 fill-green-500 flex-shrink-0">
                           <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
                         </svg>
-                        <span>Full lyrics access</span>
+                        <span>Curated songs for your level</span>
                       </li>
                       <li className="text-sm text-gray-400 flex items-center gap-2">
                         <svg viewBox="0 0 20 20" className="w-4 h-4 fill-green-500 flex-shrink-0">
                           <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
                         </svg>
-                        <span>All languages supported</span>
+                        <span>Instant definition lookups & quick keyboard shortcuts</span>
+                      </li>
+                      <li className="text-sm text-gray-400 flex items-center gap-2">
+                        <svg viewBox="0 0 20 20" className="w-4 h-4 fill-green-500 flex-shrink-0">
+                          <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
+                        </svg>
+                        <span>Instant full-line translations</span>
+                      </li>
+                      <li className="text-sm text-gray-400 flex items-center gap-2">
+                        <svg viewBox="0 0 20 20" className="w-4 h-4 fill-green-500 flex-shrink-0">
+                          <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
+                        </svg>
+                        <span>Unlimited songs in all languages</span>
+                      </li>
+                      <li className="text-sm text-gray-400 flex items-center gap-2">
+                        <svg viewBox="0 0 20 20" className="w-4 h-4 fill-green-500 flex-shrink-0">
+                          <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
+                        </svg>
+                        <span>Translate to all language options for each playlist</span>
                       </li>
                     </ul>
                   </div>
@@ -2479,7 +2497,7 @@ function PlayerView({
         id: 'lyrics-word',
         target: '[data-tutorial="lyrics-word"]',
         text: isMobileView 
-          ? 'Tap any word to see its definition instantly'
+          ? t('player.tutorialStep1Mobile')
           : t('tutorial.word'),
         padding: 8,
         scrollIntoView: true,
@@ -2489,7 +2507,7 @@ function PlayerView({
         id: 'lyrics-word-peek',
         target: '[data-tutorial="lyrics-word-peek"]',
         text: isMobileView
-          ? 'Tap and hold a word for a quick peek'
+          ? t('player.tutorialStep2Mobile')
           : t('tutorial.peek'),
         padding: 8,
         interactive: true
@@ -2498,7 +2516,7 @@ function PlayerView({
         id: 'line-translate',
         target: '[data-tutorial="line-translate"]',
         text: isMobileView
-          ? 'Tap this icon to see the full line translation.'
+          ? t('player.tutorialStep3Mobile')
           : t('tutorial.lineTranslate'),
         padding: 10,
         side: 'right' as const,
@@ -2842,7 +2860,7 @@ function PlayerView({
       <header className="sticky top-0 z-20 border-b border-gray-900" style={{ background: '#050608' }}>
         <div className="max-w-[1200px] mx-auto w-full px-3 py-3 md:px-4 md:py-4 flex items-center justify-between gap-2 md:gap-4">
         <div className="flex items-center gap-3">
-          <button onClick={onBack} className="text-gray-500 hover:text-gray-300 transition-colors mr-1" aria-label="Back">
+          <button onClick={onBack} className="text-gray-500 hover:text-gray-300 transition-colors mr-1" aria-label={t('aria.backButton')}>
             <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">
               <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
             </svg>
@@ -2956,7 +2974,7 @@ function PlayerView({
             className="text-xs text-gray-500 hover:text-gray-200 transition-colors flex items-center gap-1.5"
           >
             {isMobileView ? (
-              <img src={settingsIconImg} className="w-5 h-5" alt="Settings" />
+              <img src={settingsIconImg} className="w-5 h-5" alt={t('aria.settings')} />
             ) : (
               t('nav.preferences')
             )}
@@ -3051,7 +3069,7 @@ function PlayerView({
             </div>
           <div className="flex items-center gap-4 mb-5">
             {coverArtUrl ? (
-              <img src={coverArtUrl} alt="Album art" className="w-16 h-16 rounded object-cover border border-black/40" />
+              <img src={coverArtUrl} alt={t('aria.albumArt')} className="w-16 h-16 rounded object-cover border border-black/40" />
             ) : (
               <div className="w-16 h-16 rounded bg-black/40 flex items-center justify-center">
                 <svg viewBox="0 0 24 24" className="w-7 h-7 fill-gray-500">

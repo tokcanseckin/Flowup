@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { track } from '../analytics'
 import { BackendUser, PricingData, api } from '../api/client'
+import { useT } from '../i18n/LocalizationContext'
 
 interface PricingPageProps {
   user: BackendUser | null
@@ -35,6 +36,7 @@ declare global {
 }
 
 const PricingPage: React.FC<PricingPageProps> = ({ user, onClose, onUserUpdate: _onUserUpdate, isPage = false }) => {
+  const t = useT()
   const [isAnnual, setIsAnnual] = useState(false)
   const [paddleLoaded, setPaddleLoaded] = useState(false)
   const [pricing, setPricing] = useState<PricingData | null>(null)
@@ -87,12 +89,12 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose, onUserUpdate: 
 
   const handleUpgrade = (tier: 'monthly' | 'annual') => {
     if (!paddleLoaded || !window.Paddle) {
-      alert('Payment system is loading. Please try again in a moment.')
+      alert(t('subscriptions.alertPaddleLoading'))
       return
     }
 
     if (!pricing || !pricing.monthly || !pricing.annual) {
-      alert('Pricing information unavailable. Please try again later.')
+      alert(t('subscriptions.alertPricingUnavailable'))
       return
     }
 
@@ -115,12 +117,12 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose, onUserUpdate: 
   }
 
   const features = [
-    'Super fast and interactive translation along synced lyrics',
-    'Curated songs for your level',
-    'Instant definition lookups & quick keyboard shortcuts',
-    'Instant full-line translations',
-    'Unlimited songs in all languages',
-    'Translate to all language options for each playlist',
+    t('subscriptions.feature1'),
+    t('subscriptions.feature2'),
+    t('subscriptions.feature3'),
+    t('subscriptions.feature4'),
+    t('subscriptions.feature5'),
+    t('subscriptions.feature6'),
   ]
 
   // Format price from cents to display format
@@ -140,6 +142,11 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose, onUserUpdate: 
   const monthlyEquivalent = pricing?.annual
     ? formatPrice(Math.floor(pricing.annual.amount / 12), pricing.annual.currency)
     : '€6.67'
+  
+  // Calculate savings percentage
+  const savingsPercentage = pricing?.monthly && pricing?.annual
+    ? Math.round(((pricing.monthly.amount * 12 - pricing.annual.amount) / (pricing.monthly.amount * 12)) * 100)
+    : 17
 
   if (loading) {
     const containerClass = isPage 
@@ -151,7 +158,7 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose, onUserUpdate: 
     return (
       <div className={containerClass} style={isPage ? { background: 'radial-gradient(ellipse 120% 80% at 50% 110%, #1a1040 0%, #0d0d14 60%)' } : {}}>
         <div className={bgClass}>
-          <div className={isPage ? "text-white text-lg" : "text-gray-900 text-lg"}>Loading pricing...</div>
+          <div className={isPage ? "text-white text-lg" : "text-gray-900 text-lg"}>{t('subscriptions.loadingPricing')}</div>
         </div>
       </div>
     )
@@ -168,14 +175,14 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose, onUserUpdate: 
         <button
           onClick={onClose}
           className={`absolute top-4 ${isPage ? 'left-4' : 'right-4'} z-10 ${isPage ? 'text-gray-400 hover:text-gray-200' : 'text-gray-400 hover:text-gray-600'} transition-colors flex items-center gap-2 w-10 h-10 md:w-auto md:h-auto justify-center md:justify-start`}
-          aria-label={isPage ? "Back" : "Close"}
+          aria-label={isPage ? t('aria.backButton') : t('aria.close')}
         >
           {isPage ? (
             <>
               <svg className="w-6 h-6 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
-              <span className="hidden md:inline text-sm font-medium">Back</span>
+              <span className="hidden md:inline text-sm font-medium">{t('subscriptions.backButton')}</span>
             </>
           ) : (
             <svg className="w-6 h-6 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -188,10 +195,10 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose, onUserUpdate: 
           {/* Header */}
           <div className="text-center mb-6 md:mb-5">
             <h1 className={`text-2xl md:text-4xl font-bold ${isPage ? 'text-white' : 'text-gray-900'} mb-2 ${isPage ? 'pl-12 pr-2' : 'px-2'}`}>
-              Upgrade to Premium
+              {t('subscriptions.heading')}
             </h1>
             <p className={`text-base md:text-base ${isPage ? 'text-gray-300' : 'text-gray-600'} max-w-2xl mx-auto px-2`}>
-              Unlock unlimited interactive lyrics, translations, and word definitions across all songs
+              {t('subscriptions.subtitle')}
             </p>
           </div>
 
@@ -207,7 +214,7 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose, onUserUpdate: 
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
-              Monthly
+              {t('subscriptions.monthly')}
             </button>
             <button
               onClick={() => setIsAnnual(true)}
@@ -219,7 +226,7 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose, onUserUpdate: 
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
-              Annual <span className="ml-2 text-sm md:text-xs">(Save 17%)</span>
+              {t('subscriptions.annual')} <span className="ml-2 text-sm md:text-xs">{t('pricing.saveBadge').replace('{percentage}', savingsPercentage.toString())}</span>
             </button>
           </div>
 
@@ -230,12 +237,12 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose, onUserUpdate: 
                 <div className={`text-4xl font-bold ${isPage ? 'text-white' : 'text-gray-900'} mb-1`}>
                   {isAnnual ? annualPrice : monthlyPrice}
                   <span className={`text-xl ${isPage ? 'text-gray-400' : 'text-gray-600'} font-normal`}>
-                    /{isAnnual ? 'year' : 'month'}
+                    /{isAnnual ? t('subscriptions.yearPeriod') : t('subscriptions.monthPeriod')}
                   </span>
                 </div>
                 {isAnnual && (
                   <p className={`text-sm ${isPage ? 'text-purple-400' : 'text-purple-600'} font-medium`}>
-                    Just {monthlyEquivalent}/month — Save {monthlySavings}/year
+                    {t('subscriptions.savingsDescription').replace('{price}', monthlyEquivalent).replace('{amount}', monthlySavings)}
                   </p>
                 )}
               </div>
@@ -245,7 +252,7 @@ const PricingPage: React.FC<PricingPageProps> = ({ user, onClose, onUserUpdate: 
                 disabled={!paddleLoaded || !pricing}
                 className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-4 md:py-3 px-8 text-base md:text-sm rounded-lg shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed mb-3"
               >
-                {!paddleLoaded ? 'Loading...' : !pricing ? 'Pricing unavailable' : 'Start Learning Now'}
+                {!paddleLoaded ? t('subscriptions.checkoutLoading') : !pricing ? t('subscriptions.checkoutDisabled') : t('subscriptions.checkoutCTA')}
               </button>
             </div>
           </div>

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { api } from '../api/client'
 import type { ReportCreate } from '../api/client'
+import { useT } from '../i18n/LocalizationContext'
 
 interface ReportModalProps {
   open: boolean
@@ -8,19 +9,20 @@ interface ReportModalProps {
   payload: Omit<ReportCreate, 'message'>
 }
 
-const CATEGORIES = [
-  'Wrong translation',
-  'Wrong definition',
-  'Missing or incomplete data',
-  'Audio issue',
-  'Inappropriate content',
-  'Other',
-]
-
 export default function ReportModal({ open, onClose, payload }: ReportModalProps) {
+  const t = useT()
   const [category, setCategory] = useState('')
   const [message, setMessage] = useState('')
   const [status, setStatus] = useState<'idle' | 'sending' | 'done' | 'error'>('idle')
+
+  const CATEGORIES = [
+    t('reportModal.categoryWrongTranslation'),
+    t('reportModal.categoryWrongDefinition'),
+    t('reportModal.categoryMissingData'),
+    t('reportModal.categoryAudioIssue'),
+    t('reportModal.categoryInappropriate'),
+    t('reportModal.categoryOther'),
+  ]
 
   if (!open) return null
 
@@ -55,24 +57,24 @@ export default function ReportModal({ open, onClose, payload }: ReportModalProps
               </svg>
             </div>
             <div>
-              <p className="text-white font-semibold text-base mb-1">Thanks for letting us know!</p>
-              <p className="text-zinc-400 text-sm leading-relaxed">We'll look into it and take care of it — your feedback helps make Singoling better for everyone.</p>
+              <p className="text-white font-semibold text-base mb-1">{t('reportModal.successTitle')}</p>
+              <p className="text-zinc-400 text-sm leading-relaxed">{t('reportModal.successMessage')}</p>
             </div>
             <button
               onClick={handleClose}
               className="mt-1 px-6 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-sm transition-colors"
             >
-              Close
+              {t('reportModal.successClose')}
             </button>
           </div>
         ) : (
           <>
             <div className="flex items-center justify-between mb-5">
-              <h2 className="text-white font-semibold text-base">Report a problem</h2>
+              <h2 className="text-white font-semibold text-base">{t('reportModal.title')}</h2>
               <button
                 onClick={handleClose}
                 className="text-zinc-500 hover:text-zinc-300 transition-colors"
-                aria-label="Close"
+                aria-label={t('aria.close')}
               >
                 <svg viewBox="0 0 24 24" className="w-5 h-5 fill-none stroke-current" strokeWidth="2" strokeLinecap="round">
                   <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
@@ -82,32 +84,32 @@ export default function ReportModal({ open, onClose, payload }: ReportModalProps
 
             <div className="space-y-4">
               <div>
-                <label className="block text-zinc-400 text-xs mb-1.5 font-medium uppercase tracking-wide">Category</label>
+                <label className="block text-zinc-400 text-xs mb-1.5 font-medium uppercase tracking-wide">{t('reportModal.categoryLabel')}</label>
                 <select
                   value={category}
                   onChange={e => setCategory(e.target.value)}
                   className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-zinc-500 transition-colors"
                 >
-                  <option value="" disabled>Select a category…</option>
+                  <option value="" disabled>{t('reportModal.categoryPlaceholder')}</option>
                   {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
               </div>
 
               <div>
                 <label className="block text-zinc-400 text-xs mb-1.5 font-medium uppercase tracking-wide">
-                  Details <span className="normal-case text-zinc-600 font-normal">(optional)</span>
+                  {t('reportModal.detailsLabel')} <span className="normal-case text-zinc-600 font-normal">{t('reportModal.detailsOptional')}</span>
                 </label>
                 <textarea
                   value={message}
                   onChange={e => setMessage(e.target.value)}
                   rows={3}
-                  placeholder="Describe the issue…"
+                  placeholder={t('reportModal.placeholder')}
                   className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-zinc-500 transition-colors resize-none"
                 />
               </div>
 
               {status === 'error' && (
-                <p className="text-red-400 text-xs">Something went wrong. Please try again.</p>
+                <p className="text-red-400 text-xs">{t('reportModal.error')}</p>
               )}
 
               <div className="flex gap-3 pt-1">
@@ -115,14 +117,14 @@ export default function ReportModal({ open, onClose, payload }: ReportModalProps
                   onClick={handleClose}
                   className="flex-1 py-2.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-sm transition-colors"
                 >
-                  Cancel
+                  {t('reportModal.cancel')}
                 </button>
                 <button
                   onClick={handleSubmit}
                   disabled={!category || status === 'sending'}
                   className="flex-1 py-2.5 rounded-lg bg-red-500/90 hover:bg-red-500 text-white text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {status === 'sending' ? 'Sending…' : 'Submit'}
+                  {status === 'sending' ? t('reportModal.sending') : t('reportModal.submit')}
                 </button>
               </div>
             </div>
