@@ -2074,37 +2074,37 @@ function SettingsPage({
                         <svg viewBox="0 0 20 20" className="w-4 h-4 fill-green-500 flex-shrink-0">
                           <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
                         </svg>
-                        <span>Super fast and interactive translation along synced lyrics</span>
+                        <span>{t('subscriptions.feature1')}</span>
                       </li>
                       <li className="text-sm text-gray-400 flex items-center gap-2">
                         <svg viewBox="0 0 20 20" className="w-4 h-4 fill-green-500 flex-shrink-0">
                           <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
                         </svg>
-                        <span>Curated songs for your level</span>
+                        <span>{t('subscriptions.feature2')}</span>
                       </li>
                       <li className="text-sm text-gray-400 flex items-center gap-2">
                         <svg viewBox="0 0 20 20" className="w-4 h-4 fill-green-500 flex-shrink-0">
                           <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
                         </svg>
-                        <span>Instant definition lookups & quick keyboard shortcuts</span>
+                        <span>{t('subscriptions.feature3')}</span>
                       </li>
                       <li className="text-sm text-gray-400 flex items-center gap-2">
                         <svg viewBox="0 0 20 20" className="w-4 h-4 fill-green-500 flex-shrink-0">
                           <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
                         </svg>
-                        <span>Instant full-line translations</span>
+                        <span>{t('subscriptions.feature4')}</span>
                       </li>
                       <li className="text-sm text-gray-400 flex items-center gap-2">
                         <svg viewBox="0 0 20 20" className="w-4 h-4 fill-green-500 flex-shrink-0">
                           <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
                         </svg>
-                        <span>Unlimited songs in all languages</span>
+                        <span>{t('subscriptions.feature5')}</span>
                       </li>
                       <li className="text-sm text-gray-400 flex items-center gap-2">
                         <svg viewBox="0 0 20 20" className="w-4 h-4 fill-green-500 flex-shrink-0">
                           <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
                         </svg>
-                        <span>Translate to all language options for each playlist</span>
+                        <span>{t('subscriptions.feature6')}</span>
                       </li>
                     </ul>
                   </div>
